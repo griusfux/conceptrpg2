@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+	Not implemented yet:
+		
+-->
+
+<!ELEMENT armorfile (
+				name,
+				weight,
+				value,
+				
+				type,
+				ac_bonus,
+				speed)>
+
+<!-- 
+
+	Descriptive elements 
+
+-->
+				
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT weight (#PCDATA)>
+<!ELEMENT value (#PCDATA)>
+
+
+<!--
+
+	Stats
+	
+-->
+
+<!ELEMENT type (#PCDATA)>
+<!ELEMENT ac_bonus (#PCDATA)>
+<!ELEMENT speed (#PCDATA)>
