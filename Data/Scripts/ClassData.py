@@ -1,6 +1,6 @@
 from lxml import etree
 
-class PlayerClass:
+class ClassData:
 	"""A container for data from classfiles"""
 	
 	def __init__(self, classfile):
@@ -23,20 +23,20 @@ class PlayerClass:
 		# Now iterate the xml datag
 		for element in classfile.Root.iter():
 			if element.tag == "key_abilities":
-				self.KeyAbilities = element.text
+				self.key_abilities = element.text
 			elif element.tag == "role":
-				self.Role = element.text
+				self.role = element.text
 			elif element.tag == "proficiencies":
-				self.Proficiencies = element.text
+				self.proficiencies = element.text
 			elif element.tag == "hp_first_level":
-				self.HPFirstLevel = element.text
+				self.hp_first_level = int(element.text)
 			elif element.tag == "hp_per_level":
-				self.HPPerLevel = element.text
+				self.hp_per_level = int(element.text)
 			elif element.tag == "fort_adj":
-				self.fort_adj = element.text
+				self.fort_adj = int(element.text)
 			elif element.tag == "reflex_adj":
-				self.reflex_adj = element.text
+				self.reflex_adj = int(element.text)
 			elif element.tag == "will_adj":
-				self.will_adj = element.text
+				self.will_adj = int(element.text)
 			elif element.tag == "healing_surges":
-				self.HealingSurges = element.text
+				self.healing_surges = int(element.text)
