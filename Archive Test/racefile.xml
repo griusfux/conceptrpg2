@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+	Not implemented yet:
+		* vision
+		* languages
+		* skill bonuses
+		* situational bonus
+		
+-->
+
+<!ELEMENT racefile (
+				name,
+				
+				str_adj,
+				con_adj,
+				dex_adj,
+				int_adj,
+				wis_adj,
+				cha_adj,
+				
+				fort_adj,
+				reflex_adj,
+				will_adj,
+				
+				save*,
+				
+				size,
+				proficiency*)>
+
+<!ELEMENT name (#PCDATA)>
+				
+<!--
+
+	Race ability adjustments
+	
+-->
+
+<!ELEMENT str_adj (#PCDATA)>
+<!ELEMENT con_adj (#PCDATA)>
+<!ELEMENT dex_adj (#PCDATA)>
+<!ELEMENT int_adj (#PCDATA)>
+<!ELEMENT wis_adj (#PCDATA)>
+<!ELEMENT cha_adj (#PCDATA)>
+
+<!--
+
+	Race defense adjustments
+	
+-->
+
+<!ELEMENT fort_adj (#PCDATA)>
+<!ELEMENT reflex_adj (#PCDATA)>
+<!ELEMENT will_adj (#PCDATA)>
+<!ELEMENT save (#PCDATA)>
+	<!ATTLIST save type CDATA #REQUIRED>
+	
+<!--
+
+	Other race adjustments
+	
+-->
+
+<!ELEMENT size (#PCDATA)>
+<!ELEMENT proficiency (#PCDATA)>
