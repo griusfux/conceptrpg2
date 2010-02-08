@@ -1,4 +1,4 @@
-from lxml import etree
+import xml.etree.cElementTree as etree
 from zipfile import *
 import os
 import shutil
@@ -34,34 +34,34 @@ class ArchiveFile:
 
 
 		# Store the locations for later use
-		self.FileName = filename
-		self.Blend = filename+'/'+self._blend
-		self.Config = filename+'/'+self._config
+		self.file_name = filename
+		self.blend = filename+'/'+self._blend
+		self.config = filename+'/'+self._config
 
 		# Try and load the xml file and validate it		
 		try:
-			tree = etree.parse(self.Config, parser)
-			dtd = etree.DTD(file=self._dtd)
-			if not dtd.validate(tree.getroot()):
-				print("Validation Error:")
-				print(dtd.error_log)
-				raise etree.DTDValidateError("")
-			dtd.validate(tree.getroot())
-			self.Root = tree.getroot()
-			self.Init = True
-		except(etree.XMLSyntaxError):
-			print("Syntax Error:")
-			print(parser.error_log)
-			print("\nError with config file from "+filename+"!")
-		except(etree.DTDValidateError):
-			print("\nError with config file from "+filename+"!")
+			tree = etree.parse(self.config, parser)
+			# dtd = etree.DTD(file=self._dtd)
+			# if not dtd.validate(tree.getroot()):
+				# print("Validation Error:")
+				# print(dtd.error_log)
+				# raise etree.DTDValidateError("")
+			# dtd.validate(tree.getroot())
+			self.root = tree.getroot()
+			self.init = True
+		# except(etree.XMLSyntaxError):
+			# print("Syntax Error:")
+			# print(parser.error_log)
+			# print("\nError with config file from "+filename+"!")
+		# except(etree.DTDValidateError):
+			# print("\nError with config file from "+filename+"!")
 		except(IOError):
 			print("Error in opening the config file")
 
-	def close(self):
+	def Close(self):
 		"""Clean up"""
-		if self.FileName.startswith('tmp/'):
-			shutil.rmtree(self.FileName, ignore_errors=True)
+		if self.file_name.startswith('tmp/'):
+			shutil.rmtree(self.file_name, ignore_errors=True)
 			
 			# Try and remove the tmp dir. If this fails, other files are still in it
 			try:
@@ -96,21 +96,3 @@ class RaceFile(ArchiveFile):
 	_textures = ""
 	_config = 'race.xml'
 	_dtd = 'Schemas/racefile.xml'
-	
-class ArmorFile(ArchiveFile):
-	"""Class for handling the armor files"""
-	# Options for the archive file
-	_ext = 'armor'
-	_blend = ""
-	_textures = ""
-	_config = 'armor.xml'
-	_dtd = 'Schemas/armorfile.xml'
-
-class ShieldFile(ArchiveFile):
-	"""Class for handling the shield files"""
-	# Options for the archive file
-	_ext = 'shield'
-	_blend = ""
-	_textures = ""
-	_config = 'shield.xml'
-	_dtd = 'Schemas/shieldfile.xml'
