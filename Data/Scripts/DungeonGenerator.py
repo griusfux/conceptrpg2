@@ -1,5 +1,6 @@
 import random
 import GameLogic
+from Mathutils import Vector
 
 GEN_LINEAR = 0
 GEN_RANDOM = 1
@@ -12,14 +13,17 @@ EN_DOOR = 2
 class ExitNode:
 	"""A class to store exit node information"""
 	
-	object = None
-	type = 0
+	def __init__(self, obj, type):
+		self.object = obj
+		self.type = type
 
 class DungeonGenerator:
 	"""A class for generating dungeons"""
 	
 	# Some settings
 	max_rooms = 10
+	max_tries = 5
+	ray_length = 5
 	generation = GEN_RANDOM
 	
 	def __init__(self, mapfile):
@@ -45,15 +49,25 @@ class DungeonGenerator:
 		# The current room count
 		self.room_count = 0
 		
+		# The current number of tries to place a tile
+		self.tries = 0
+		
 		# Some flags for the currently placed tiles
 		self.has_start = False
 		self.has_stairs = False
 		
 		# Store the KX_Scene object
 		self.scene = GameLogic.getCurrentScene()
+		
+		# The blend file with the pieces
+		self.blend = mapfile.blend
+		
+		# This is so we can handle collisions on multiple frames to allow for cleanup
+		self.use_as_next_node = None
 	
 		# Parse the xml file and fill the lists
-		for element in mapfile.Root.iter():
+		#for element in mapfile.root.iter():
+		for element in mapfile.root:
 			if element.tag == "start_tile":
 				self.tiles['Starts'].append((element.get("blend_obj"), element.get("blend_scene")))
 			if element.tag == "room_tile":
@@ -77,22 +91,29 @@ class DungeonGenerator:
 		"""Generate the first tile"""
 		
 		# Place the start tile
-		self.PlaceTile(node, 'Starts')
+		n = ExitNode(node, EN_ROOM)
+		self.exit_nodes.append(n)
+		self.PlaceTile(n, 'Starts')
 		
 	def GenerateNext(self):
 		"""Generate the next tile"""
 		
 		random.seed()
-
+	
+		# First grab any pending node
+		node = self.use_as_next_node
+		self.use_as_next_node = None
+		
 		# Check to see if we should keep expanding the dungeon
 		if self.room_count <= self.max_rooms:
-			# Pick the next node based on options
-			if self.generation == GEN_LINEAR:
-				index = -1
-			else: #GEN_RANDOM
-				index = random.randint(0, len(self.exit_nodes) - 1)
-				
-			node = self.exit_nodes[index]
+			if not node:
+				# Pick the next node based on options
+				if self.generation == GEN_LINEAR:
+					index = -1
+				else: #GEN_RANDOM
+					index = random.randint(0, len(self.exit_nodes) - 1)
+					
+				node = self.exit_nodes[index]
 			
 			# Choose a tile to lay down
 			roll = random.randint(1, 20)
@@ -132,16 +153,100 @@ class DungeonGenerator:
 				self.PlaceTile(self.exit_nodes[-1], 'Stairs')
 				
 			# We don't need anymore tiles, fill the rest with end pieces
-			for node in self.exit_nodes:
-				self.PlaceTile(node, 'Ends')
+			for n in self.exit_nodes:
+				self.PlaceTile(n, 'Ends', check_collision=False)
 		
-	def PlaceTile(self, node, type):
+	def PlaceTile(self, node, type, check_collision=True):
+		scene = GameLogic.getCurrentScene()
+	
 		# Get the tile to place
 		random.seed()
 		index = random.randint(0, len(self.tiles[type]) - 1)
 		tile = self.tiles[type][index]
 		
+		print('\nAttempting to place %s...' % type)
 		# First try to add the object; if it doesn't exist, merge the scene and try again
-		GameLogic.LibLoad('
-		tile_obj = scene.addObject(tile[0], node.object)
-		
+		try:
+			tile_node = scene.addObject(tile[0], node.object)
+		except ValueError:
+			GameLogic.LibLoad(self.blend, 'Scene', tile[1])
+			tile_node = scene.addObject(tile[0], node.object)
+			
+		# Get the mesh to use for collision detection
+		for ob in tile_node.childrenRecursive:
+			if ob.name.endswith('_tile'):
+				tile_obj = ob
+				break
+				
+		# Use the meshes to test for collision
+		if (check_collision and self.CheckCollision(tile_obj, tile_obj.meshes)):
+			# If our try limit has not been reached, try again
+			tile_obj = None
+			tile_node.endObject()	
+			if self.tries < self.max_tries:
+				print('Collision! Trying again.')
+				self.tries += 1
+							
+				self.use_as_next_node = node
+			else:
+				print('Maximum tries reached, force an end')
+				# The limit has been reached, force a dead end
+				self.tries = 0
+				self.PlaceTile(node, 'Ends', check_collision=False)
+		else:
+			# Success! Store some data and cleanup
+			self.tries = 0
+			print('Tile placed!')
+			# This node is done, remove it from the list
+			self.exit_nodes.remove(node)
+			
+			# Collect nodes
+			for ob in tile_node.childrenRecursive:
+				if ob.name.startswith('exit'):
+					if type == 'Doors':
+						n_type = EN_DOOR
+					elif type == 'Rooms':
+						n_type = EN_ROOM
+					else:
+						n_type = EN_CORR
+						
+					self.exit_nodes.append(ExitNode(ob, n_type))
+				elif ob.name.startswith('encounter'):
+					self.encounter_nodes.append(ob)
+					
+			# See if anything needs to be done based on the type of tile placed
+			if type == 'Rooms':
+				self.room_count += 1
+			elif type == 'Stairs':
+				self.has_stairs = True
+				
+	def CheckCollision(self, tile, meshes):
+		# Iterate the verts
+		for mesh in meshes:
+			for mat in range(mesh.numMaterials):
+				for v_index in range(mesh.getVertexArrayLength(mat)):
+					vert = mesh.getVertex(mat, v_index)
+					
+					vert_pos = vert.getXYZ()[:]
+					
+					# Scale the vert_pos on the x and y a bit to account for slight overlaps (where the tiles connect)
+					vert_pos[0] *= 0.99
+					vert_pos[1] *= 0.99
+					
+					# Convert the vertex's local position to world space
+					from_pos = Vector(vert_pos) + Vector(tile.worldPosition)
+					
+					# The to position is just x units below the vert
+					to_pos = from_pos[:]
+					to_pos[2] -= self.ray_length
+					
+					# Cast a ray from the vert down
+					hit_tuple = tile.rayCast(to_pos, from_pos)
+
+					if hit_tuple[0] and hit_tuple[0].name.endswith('_tile') and hit_tuple[0] != tile:
+						# Collision!
+						print('Collision with %s and %s at %s' % (hit_tuple[0], tile, hit_tuple[1]))
+						return True
+						
+		# Made it through, with no collision
+		return False
