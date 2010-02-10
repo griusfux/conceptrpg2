@@ -96,3 +96,21 @@ class RaceFile(ArchiveFile):
 	_textures = ""
 	_config = 'race.xml'
 	_dtd = 'Schemas/racefile.xml'
+		
+class ArmorFile(ArchiveFile):
+	"""Class for handling the armor files"""
+	# Options for the archive file
+	_ext = 'armor'
+	_blend = ""
+	_textures = ""
+	_config = 'armor.xml'
+	_dtd = 'Schemas/armorfile.xml'
+
+class ShieldFile(ArchiveFile):
+	"""Class for handling the shield files"""
+	# Options for the archive file
+	_ext = 'shield'
+	_blend = ""
+	_textures = ""
+	_config = 'shield.xml'
+	_dtd = 'Schemas/shieldfile.xml'
