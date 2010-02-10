@@ -21,7 +21,7 @@ class ClassData:
 		# self.HealingSurges = 0
 		
 		# Now iterate the xml datag
-		for element in classfile.Root.iter():
+		for element in classfile.root:
 			if element.tag == "key_abilities":
 				self.key_abilities = element.text
 			elif element.tag == "role":
