@@ -1,3 +1,8 @@
+from Scripts.InventoryLogic import *
+import pickle
+import random
+import time
+
 class CharacterLogic:
 	"""A logic object that stores all the information and methods of the player"""
 	
@@ -70,23 +75,6 @@ class CharacterLogic:
 		self.equipped_shield = None
 		self.equipped_weapon = None
 		
-	def LoadStatsFromSave(self, save):
-		"""Fills in stats from a SaveData object"""
-		self.name		= save.name
-		self.level		= save.level
-		self.player_class = save.player_class
-		self.paragon_path = save.paragon_path
-		self.epic_destiny = save.epic_destiny
-		self.xp			= save.xp
-		self.alignment	= save.alignment
-		
-		self.str_ab		= save.str_ab
-		self.con_ab		= save.con_ab
-		self.dex_ab		= save.dex_ab
-		self.int_ab		= save.int_ab
-		self.wis_ab		= save.wis_ab
-		self.cha_ab		= save.cha_ab
-	
 	def RecalcStats(self):
 		"""Recalculates the player's stats that are calculated based on other stats"""
 		#ability modifiers
@@ -99,8 +87,8 @@ class CharacterLogic:
 		
 		#defenses
 		self.ac	= 10 + self.level//2 + self.ac_bonus + self.shield_bonus + self.ac_buff
-		if self.equipped_armor == None or self.equipped_armor.type == "light":			#If player is wearing light or no armor, apply dex or int modifier to ac (whichever is greater)
-			self.ac	+= self.dex_mod if(self.dex_ab > self.int_ab) else self.int_mod
+		if self.equipped_armor == None or self.equipped_armor.type == "light":
+			self.ac	= self.ac + self.dex_mod if(self.dex_ab > self.int_ab) else self.int_mod
 		self.fortitude = 10 + self.level//2 + self.fort_buff
 		self.fortitude += self.str_mod if(self.str_ab > self.con_ab) else self.con_mod
 		self.reflex	= 10 + self.level//2 + self.reflex_buff + self.shield_bonus
@@ -112,7 +100,7 @@ class CharacterLogic:
 		self.initiative = self.dex_mod + self.level//2 + self.initiative_buff
 		
 		#hit points
-		self.max_hp		= int(self.player_class.hp_first_level) + self.level * int(self.player_class.hp_per_level)
+		self.max_hp		= int(self.player_class.hp_first_level) + (self.level - 1) * int(self.player_class.hp_per_level)
 		self.bloodied	= self.max_hp // 2
 		self.surge_value= self.max_hp // 4
 		
@@ -138,9 +126,70 @@ class CharacterLogic:
 		if type in self.saving_throw_mods:
 			mod += saving_throw_mods[type]			
 		return self.defense + mod > roll
+	
+	def RollDice(self, dice):
+		x, y = [int(i) for i in dice.split("d")]
+		roll = 0
+		
+		for die in range(x):
+			random.seed(time.time())
+			roll += random.randint(1, y)
+		return roll
+		
+class PlayerLogic(CharacterLogic):
+	
+	def __init__(self):
+		CharacterLogic.__init__(self)
+		self.inventory = InventoryLogic()
+		
+	def LoadStatsFromSave(self, save):
+		"""Fills in stats from a SaveData object"""
+		try:
+			save_data = pickle.load(save)
+		except pickle.UnpicklingError:
+			print("Invalid save file")
+		
+		self.name		= save_data["name"]
+		self.level		= save_data["level"]
+		self.player_class = save_data["player_class"]
+		self.paragon_path = save_data["paragon_path"]
+		self.epic_destiny = save_data["epic_destiny"]
+		self.xp			= save_data["xp"]
+		self.alignment	= save_data["alignment"]
+		
+		self.str_ab		= save_data["str_ab"]
+		self.con_ab		= save_data["con_ab"]
+		self.dex_ab		= save_data["dex_ab"]
+		self.int_ab		= save_data["int_ab"]
+		self.wis_ab		= save_data["wis_ab"]
+		self.cha_ab		= save_data["cha_ab"]
+		
+		if save_data["equipped_armor"]:
+			self.EquipArmor(save_data["equipped_armor"])
+		if save_data["equipped_shield"]:
+			self.EquipShield(save_data["equipped_shield"])
+		#self.equipped_weapon = save_data["equipped_weapon"]
 
-#Test code#
-# player = Character()
-# player.RecalcStats()
-# print(player.fortitude)
-# print(player.SaveAgainst(4, "fortitude"))
+		self.RecalcStats()
+		
+	def SaveStatsToSave(self, save):
+		save_data = {
+				"name"	: self.name,
+				"level"	: self.level,
+				"player_class" : self.player_class,
+				"paragon_path" : self.paragon_path,
+				"epic_destiny" : self.epic_destiny,
+				"xp"		: self.xp,
+				"alignment" : self.alignment,
+				
+				"str_ab"	: self.str_ab,
+				"con_ab"	: self.con_ab,
+				"dex_ab"	: self.dex_ab,
+				"int_ab"	: self.int_ab,
+				"wis_ab"	: self.wis_ab,
+				"cha_ab"	: self.cha_ab,
+				
+				"equipped_armor"	: self.equipped_armor,
+				"equipped_shield"	: self.equipped_shield,
+				"equipped_weapon" : self.equipped_weapon }
+		pickle.dump(save_data, save)
