@@ -164,7 +164,7 @@ class DungeonGenerator:
 		index = random.randint(0, len(self.tiles[type]) - 1)
 		tile = self.tiles[type][index]
 		
-		print('\nAttempting to place %s...' % type)
+		#print('\nAttempting to place %s...' % type)
 		# First try to add the object; if it doesn't exist, merge the scene and try again
 		try:
 			tile_node = scene.addObject(tile[0], node.object)
@@ -184,19 +184,19 @@ class DungeonGenerator:
 			tile_obj = None
 			tile_node.endObject()	
 			if self.tries < self.max_tries:
-				print('Collision! Trying again.')
+				#print('Collision! Trying again.')
 				self.tries += 1
 							
 				self.use_as_next_node = node
 			else:
-				print('Maximum tries reached, force an end')
+				#print('Maximum tries reached, force an end')
 				# The limit has been reached, force a dead end
 				self.tries = 0
 				self.PlaceTile(node, 'Ends', check_collision=False)
 		else:
 			# Success! Store some data and cleanup
 			self.tries = 0
-			print('Tile placed!')
+			#print('Tile placed!')
 			# This node is done, remove it from the list
 			self.exit_nodes.remove(node)
 			
@@ -245,7 +245,7 @@ class DungeonGenerator:
 
 					if hit_tuple[0] and hit_tuple[0].name.endswith('_tile') and hit_tuple[0] != tile:
 						# Collision!
-						print('Collision with %s and %s at %s' % (hit_tuple[0], tile, hit_tuple[1]))
+						#print('Collision with %s and %s at %s' % (hit_tuple[0], tile, hit_tuple[1]))
 						return True
 						
 		# Made it through, with no collision
