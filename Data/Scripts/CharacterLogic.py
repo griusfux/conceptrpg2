@@ -1,3 +1,8 @@
+# $Id$
+
+# Description: Handles character logic such as movement and stats
+# Contributers: Daniel Stokes, Mitchell Stokes
+
 from Scripts.InventoryLogic import *
 import pickle
 import random
@@ -6,7 +11,7 @@ import time
 class CharacterLogic:
 	"""A logic object that stores all the information and methods of the player"""
 	
-	def __init__(self):	
+	def __init__(self, obj):	
 		#Player information
 		self.name		= ""
 		self.level		= 0
@@ -75,6 +80,9 @@ class CharacterLogic:
 		self.equipped_shield = None
 		self.equipped_weapon = None
 		
+		# the character's game object
+		self.obj = obj
+		
 	def RecalcStats(self):
 		"""Recalculates the player's stats that are calculated based on other stats"""
 		#ability modifiers
@@ -142,8 +150,8 @@ class CharacterLogic:
 		
 class PlayerLogic(CharacterLogic):
 	
-	def __init__(self):
-		CharacterLogic.__init__(self)
+	def __init__(self, obj):
+		CharacterLogic.__init__(self, obj)
 		self.inventory = InventoryLogic()
 		
 	def LoadStatsFromSave(self, save):
@@ -197,3 +205,8 @@ class PlayerLogic(CharacterLogic):
 				"equipped_shield"	: self.equipped_shield,
 				"equipped_weapon" : self.equipped_weapon }
 		pickle.dump(save_data, save)
+		
+	def PlayerPlzMoveNowzKThxBai(self, cheezburger):
+		"""Move the player"""
+		
+		self.obj.Move((0, 10.0, 0))

@@ -1,10 +1,17 @@
+# $Id$
+
+# Description: Main game loops to be used in various parts of the game
+# Contributers: Mitchell Stokes
+
 # Define all of the needed game loops here
 
 import Scripts.ArchiveFile as ArchiveFile
 from Scripts.DungeonGenerator import DungeonGenerator
+from Scripts.BlenderObjectWrapper import BlenderObjectWrapper
+from Scripts.CharacterLogic import PlayerLogic
 
 # Create a shorthand for gl
-#import GameLogic as gl
+import GameLogic as gl
 
 
 def MainMenu(cont):
@@ -33,5 +40,17 @@ def InGame(cont):
 	elif 'mapfile' in own:
 		own['mapfile'].Close()
 		del own['mapfile']
+		
+	# Add the character
+	scene = gl.getCurrentScene()
+	if "CharacterEmpty" not in scene.objects:
+		temp = own.position
+		temp[2] += 5
+		own.position = temp
+		gameobj = scene.addObject("CharacterEmpty", own)
+		
+		own['character'] = PlayerLogic(BlenderObjectWrapper(gameobj))
+	
+	own['character'].PlayerPlzMoveNowzKThxBai(0)
 		
 		
