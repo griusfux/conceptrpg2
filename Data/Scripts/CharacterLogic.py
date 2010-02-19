@@ -210,3 +210,6 @@ class PlayerLogic(CharacterLogic):
 		"""Move the player"""
 		
 		self.obj.Move((0, 10.0, 0))
+		
+		if cheezburger:
+			print(cheezburger)

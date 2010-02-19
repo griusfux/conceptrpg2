@@ -7,8 +7,10 @@
 
 import Scripts.ArchiveFile as ArchiveFile
 from Scripts.DungeonGenerator import DungeonGenerator
-from Scripts.BlenderObjectWrapper import BlenderObjectWrapper
 from Scripts.CharacterLogic import PlayerLogic
+
+from Scripts.BlenderObjectWrapper import BlenderObjectWrapper
+from Scripts.BlenderInputSystem import BlenderInputSystem
 
 # Create a shorthand for gl
 import GameLogic as gl
@@ -40,7 +42,10 @@ def InGame(cont):
 	elif 'mapfile' in own:
 		own['mapfile'].Close()
 		del own['mapfile']
-		
+	
+	# Setup an input system
+	own['input_sys'] = BlenderInputSystem(cont.sensors['keyboard'], 'keys.conf')
+	
 	# Add the character
 	scene = gl.getCurrentScene()
 	if "CharacterEmpty" not in scene.objects:
@@ -51,6 +56,7 @@ def InGame(cont):
 		
 		own['character'] = PlayerLogic(BlenderObjectWrapper(gameobj))
 	
-	own['character'].PlayerPlzMoveNowzKThxBai(0)
+	# Move the character
+	own['character'].PlayerPlzMoveNowzKThxBai(own['input_sys'].Run())
 		
 		
