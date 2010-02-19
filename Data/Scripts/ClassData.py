@@ -1,5 +1,3 @@
-from lxml import etree
-
 class ClassData:
 	"""A container for data from classfiles"""
 	

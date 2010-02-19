@@ -120,6 +120,10 @@ class CharacterLogic:
 		self.shield_bonus = shield.shield_bonus
 		self.RecalcStats()
 		
+	def EquipWeapon(self, weapon):
+		"""Changes stats to newly equipped weapon"""
+		self.equipped_weapon = weapon
+		
 	def SaveAgainst(self, roll, defense, type=None):
 		"""Checks to see if a player saves against a roll of optional type with the specified defense"""
 		mod = 0
