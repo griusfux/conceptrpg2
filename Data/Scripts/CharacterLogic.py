@@ -209,7 +209,13 @@ class PlayerLogic(CharacterLogic):
 	def PlayerPlzMoveNowzKThxBai(self, cheezburger):
 		"""Move the player"""
 		
-		self.obj.Move((0, 10.0, 0))
-		
 		if cheezburger:
-			print(cheezburger)
+			if "MoveForward" in cheezburger:
+				self.obj.Move((0, 5, 0))
+			if "MoveBackward" in cheezburger:
+				self.obj.Move((0, -5, 0))
+			if "TurnLeft" in cheezburger:
+				self.obj.Rotate((0, 0, 0.04))
+			if "TurnRight" in cheezburger:
+				self.obj.Rotate((0, 0, -0.04))
+		

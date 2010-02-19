@@ -42,6 +42,8 @@ def InGame(cont):
 	elif 'mapfile' in own:
 		own['mapfile'].Close()
 		del own['mapfile']
+		
+		print("\nDungeon generation complete\n")
 	
 	# Setup an input system
 	own['input_sys'] = BlenderInputSystem(cont.sensors['keyboard'], 'keys.conf')
@@ -50,13 +52,18 @@ def InGame(cont):
 	scene = gl.getCurrentScene()
 	if "CharacterEmpty" not in scene.objects:
 		temp = own.position
-		temp[2] += 5
+		temp[2] += 1
 		own.position = temp
 		gameobj = scene.addObject("CharacterEmpty", own)
 		
 		own['character'] = PlayerLogic(BlenderObjectWrapper(gameobj))
 	
+	# Parent the camera to the player
+	cam = scene.objects["Camera"]
+	cam.setParent(own['character'].obj.gameobj)
+	
 	# Move the character
-	own['character'].PlayerPlzMoveNowzKThxBai(own['input_sys'].Run())
+	inputs = own['input_sys'].Run()
+	own['character'].PlayerPlzMoveNowzKThxBai(inputs)
 		
 		

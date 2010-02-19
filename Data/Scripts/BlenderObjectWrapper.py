@@ -17,6 +17,8 @@ class BlenderObjectWrapper:
 		self.gameobj = gameobj
 		
 	def Move(self, vec, mode=MOVE_LINV, local=True):
+		"""Do object movement"""
+		
 		if mode == MOVE_LINV:
 			self.gameobj.setLinearVelocity(vec, local)
 		elif mode == MOVE_FORCE:
@@ -29,3 +31,8 @@ class BlenderObjectWrapper:
 			self.gameobj.position = vec
 		else:
 			raise ValueError("Supplied mode is invalid!")
+			
+	def Rotate(self, vec, local=True):
+		"""Do object rotation"""
+		
+		self.gameobj.applyRotation(vec, local)
