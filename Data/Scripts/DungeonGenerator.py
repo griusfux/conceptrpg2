@@ -1,6 +1,8 @@
 import random
 import GameLogic
 from Mathutils import Vector
+from Scripts.CharacterLogic import MonsterLogic
+from Scripts.ArchiveFile import DeckFile
 
 GEN_LINEAR = 0
 GEN_RANDOM = 1
@@ -255,3 +257,65 @@ class DungeonGenerator:
 						
 		# Made it through, with no collision
 		return False
+		
+class EncounterDeck():
+	def __init__(self, deckfile):
+		self.Deckfile = DeckFile(deckfile)
+		self.Deck = []
+		self.BuildDeck()
+		
+	def BuildDeck(self):
+		for card in self.Deckfile.root:
+			monster = None
+			count = 0
+			for element in card:
+				if element.tag == "monster":
+					monster = element.text
+				elif element.tag == "count":
+					count = int(element.text)
+			for i in range(count):
+				self.Deck.append(MonsterLogic(monster))
+				
+	def GenerateEncounter(self):
+		noBrutesSoldiers = True
+		while noBrutesSoldiers:
+			count = 5
+			MonsterList = []
+			remove = []
+			while count > 0:		#while there are still players left with out cards
+				random.seed()
+				draw = random.choice(self.Deck)
+				while draw in MonsterList:				#If the card was already drawn, draw again
+					if len(remove) >= len(self.Deck):
+						self.BuildDeck()
+					draw = random.choice(self.Deck)
+					
+				#see what we get and appropriately deal with the card
+				if draw.role in ('soldier', 'brute'):
+					MonsterList.extend([draw for i in range(2)])
+					remove.append(draw)
+					noBrutesSoldiers = False
+				elif draw.role == 'minion':
+					MonsterList.extend([draw for i in range(4)])
+					remove.append(draw)
+				elif draw.role == 'lurker':
+					MonsterList.append(draw)
+					remove.append(draw)
+					count += 1
+				elif draw.elite:
+					MonsterList.append(draw)
+					remove.append(draw)
+					count -= 1
+				else:
+					MonsterList.append(draw)
+					remove.append(draw)
+				count -= 1
+				
+		#Since we have a good encounter, remove the drawn cards from the deck
+		for draw in remove:
+				self.Deck.remove(draw)
+		return MonsterList
+				
+			
+		
+		
