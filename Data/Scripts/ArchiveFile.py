@@ -17,7 +17,7 @@ class ArchiveFile:
 	
 	def __init__(self, filename):
 		parser = etree.XMLParser()
-		self.Root = None
+		self.root = None
 
 		# If the file is packed, extract the files to a tmp location
 		if os.path.exists(filename+"."+self._ext):
@@ -79,6 +79,7 @@ class MapFile(ArchiveFile):
 	_config = 'map.xml'
 	_dtd = 'Schemas/mapfile.xml'
 	
+	
 class ClassFile(ArchiveFile):
 	"""Class for handling the player class files"""
 	# Options for the archive file
@@ -96,7 +97,25 @@ class RaceFile(ArchiveFile):
 	_textures = ""
 	_config = 'race.xml'
 	_dtd = 'Schemas/racefile.xml'
+	
+class MonsterFile(ArchiveFile):
+	"""Class for handling monster files"""
+	#Options for the archive file
+	_ext = 'monster'
+	_blend = ""
+	_textures = ""
+	_config = 'monster.xml'
+	_dtd = 'Schemas/monsterfile.xml'
 		
+class DeckFile(ArchiveFile):
+	"""Class for handling Encounter Deck files"""
+	#Options for the archive file
+	_ext = 'deck'
+	_blend = ""
+	_textures = ""
+	_config = 'deck.xml'
+	_dtd = 'Schemas/deckfile.xml'
+	
 class ArmorFile(ArchiveFile):
 	"""Class for handling the armor files"""
 	# Options for the archive file
