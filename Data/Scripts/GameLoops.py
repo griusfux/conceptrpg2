@@ -22,8 +22,12 @@ def MainMenu(cont):
 def InGame(cont):
 	own = cont.owner
 
+
 	# Start by loading the dungeon
-	if 'dgen' not in own:
+	if 'dgen' not in own:	
+		# Display the splash
+		gl.addScene('Overlay')
+		
 		own['mapfile'] = ArchiveFile.MapFile('Maps/ShipRuins')
 		
 		if not own['mapfile'].init:
@@ -44,6 +48,7 @@ def InGame(cont):
 		del own['mapfile']
 		
 		print("\nDungeon generation complete\n")
+		gl.getSceneList()[1].end()
 	
 	# Setup an input system
 	own['input_sys'] = BlenderInputSystem(cont.sensors['keyboard'], 'keys.conf')
