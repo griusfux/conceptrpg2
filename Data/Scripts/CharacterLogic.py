@@ -4,6 +4,8 @@
 # Contributers: Daniel Stokes, Mitchell Stokes
 
 from Scripts.InventoryLogic import *
+from Scripts.ValidateData import *
+from Scripts.ArchiveFile import MonsterFile
 import pickle
 import random
 import time
@@ -108,7 +110,8 @@ class CharacterLogic:
 		self.initiative = self.dex_mod + self.level//2 + self.initiative_buff
 		
 		#hit points
-		self.max_hp		= int(self.player_class.hp_first_level) + (self.level - 1) * int(self.player_class.hp_per_level)
+		if isinstance(self, PlayerLogic):
+			self.max_hp		= int(self.player_class.hp_first_level) + (self.level - 1) * int(self.player_class.hp_per_level)
 		self.bloodied	= self.max_hp // 2
 		self.surge_value= self.max_hp // 4
 		
@@ -180,7 +183,8 @@ class PlayerLogic(CharacterLogic):
 			self.EquipArmor(save_data["equipped_armor"])
 		if save_data["equipped_shield"]:
 			self.EquipShield(save_data["equipped_shield"])
-		#self.equipped_weapon = save_data["equipped_weapon"]
+		if save_data["equipped_weapon"]:
+			self.EquipWeapon(save_data["equipped_weapon"])
 
 		self.RecalcStats()
 		
@@ -203,11 +207,12 @@ class PlayerLogic(CharacterLogic):
 				
 				"equipped_armor"	: self.equipped_armor,
 				"equipped_shield"	: self.equipped_shield,
-				"equipped_weapon" : self.equipped_weapon }
+				"equipped_weapon" 	: self.equipped_weapon }
 		pickle.dump(save_data, save)
 		
 	def PlayerPlzMoveNowzKThxBai(self, cheezburger):
 		"""Move the player"""
+		#Best method ever :D
 		
 		if cheezburger:
 			if "MoveForward" in cheezburger:
@@ -219,3 +224,46 @@ class PlayerLogic(CharacterLogic):
 			if "TurnRight" in cheezburger:
 				self.obj.Rotate((0, 0, -0.04))
 		
+		
+class MonsterLogic(CharacterLogic):
+	
+	def __init__(self, monster):
+		CharacterLogic.__init__(self, None)
+		datafile = MonsterFile('Monsters/%s' % monster)
+		self.allowed_roles = ('artillery', 'brute', 'controller', 'lurker', 'minion', 'skirmisher')
+		self.role = ""
+		self.leader = False
+		self.elite	= False
+		
+		print("Loading %s . . ." % datafile.file_name)
+		for element in datafile.root:
+			if element.tag == "name":
+				self.name = element.text
+			elif element.tag == "level":
+				ValidateInt(self, element.tag, element.text)
+			elif element.tag == "role":
+				ValidateAllowedData(self, element.tag, element.text, self.allowed_roles)
+			elif element.tag == "leader":
+				ValidateBoolean(self, element.tag, element.text)
+			elif element.tag == "elite":
+				ValidateBoolean(self, element.tag, element.text)
+			elif element.tag == "xp":
+				ValidateInt(self, element.tag, element.text)
+			#elif element.tag == "alignment":
+			#	ValidateAllowedData(self, element.tag, element.text, self.allowed_alignments)
+			elif element.tag == "str_ab":
+				ValidateInt(self, element.tag, element.text)
+			elif element.tag == "dex_ab":
+				ValidateInt(self, element.tag, element.text)
+			elif element.tag == "con_ab":
+				ValidateInt(self, element.tag, element.text)
+			elif element.tag == "int_ab":
+				ValidateInt(self, element.tag, element.text)
+			elif element.tag == "wis_ab":
+				ValidateInt(self, element.tag, element.text)
+			elif element.tag == "cha_ab":
+				ValidateInt(self, element.tag, element.text)
+			# elif element.tag == "armor":
+				# ValidateArmor(self, element.tag, element.text)
+				
+		self.RecalcStats()

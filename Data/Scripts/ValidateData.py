@@ -7,7 +7,7 @@ def ValidateInt(self, tag, text):
 		
 def ValidateAllowedData(self, tag, text, allowed):
 	if text.lower() in allowed:
-		setattr(self, tag, text)
+		setattr(self, tag, text.lower())
 	else:
 		print("%s is not a valid entry for %s tag. Allowed = %s" % (text, tag, allowed))
 		self.valid = False
