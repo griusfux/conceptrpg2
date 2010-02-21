@@ -67,6 +67,9 @@ class DungeonGenerator:
 		
 		# This is so we can handle collisions on multiple frames to allow for cleanup
 		self.use_as_next_node = None
+		
+		# This list is the end result of the generator (type, index, position, orientation)
+		self.result = []
 	
 		# Parse the xml file and fill the lists
 		#for element in mapfile.root.iter():
@@ -86,6 +89,28 @@ class DungeonGenerator:
 			if element.tag == "trap_tile":
 				self.tiles['Traps'].append((element.get("blend_obj"), element.get("blend_scene")))
 	
+	def GenerateFromList(self, obj, result):
+		"""Use a result list to generate the dungeon"""		
+		for type, index, position, ori in result:		
+			tile = self.tiles[type][index]
+			
+			# First try to add the object; if it doesn't exist, merge the scene and try again
+			try:
+				tile_node = self.scene.addObject(tile[0], obj)
+			except ValueError:
+				GameLogic.LibLoad(self.blend, 'Scene', tile[1])
+				tile_node = self.scene.addObject(tile[0], obj)
+				
+			tile_node.worldPosition = position
+			tile_node.worldOrientation = ori
+			
+			if type == "Rooms":
+				self.room_count += 1
+			elif type == "Stairs":
+				self.has_stairs = True
+				
+		self.result = result
+			
 	def HasNext(self):
 		"""Check to see if there are still more exit nodes to fill"""
 		return True if self.exit_nodes else False
@@ -226,6 +251,13 @@ class DungeonGenerator:
 				self.room_count += 1
 			elif type == 'Stairs':
 				self.has_stairs = True
+			
+			# Mathutils.Vector and Mathutils.Matrix can not be pickled, so convert them
+			pos = [i for i in tile_node.worldPosition]
+			ori = [[a, b, c] for a, b, c in tile_node.worldOrientation]
+			
+			# Add the tile name and position to the result list
+			self.result.append((type, index, pos, ori))
 				
 	def CheckCollision(self, tile, meshes):
 		# Iterate the verts

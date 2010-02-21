@@ -15,6 +15,7 @@ class BlenderObjectWrapper:
 	
 	def __init__(self, gameobj):
 		self.gameobj = gameobj
+		self.armature = [i for i in gameobj.childrenRecursive if i.name == "KatArm"][0]
 		
 	def Move(self, vec, mode=MOVE_LINV, local=True):
 		"""Do object movement"""
@@ -36,3 +37,6 @@ class BlenderObjectWrapper:
 		"""Do object rotation"""
 		
 		self.gameobj.applyRotation(vec, local)
+		
+	def PlayAnimation(self, anim):
+		self.gameobj.sendMessage("animation", anim, self.armature.name)

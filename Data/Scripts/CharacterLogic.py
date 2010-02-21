@@ -217,8 +217,10 @@ class PlayerLogic(CharacterLogic):
 		if cheezburger:
 			if "MoveForward" in cheezburger:
 				self.obj.Move((0, 5, 0))
+				self.obj.PlayAnimation("move")
 			if "MoveBackward" in cheezburger:
 				self.obj.Move((0, -5, 0))
+				self.obj.PlayAnimation("move")
 			if "TurnLeft" in cheezburger:
 				self.obj.Rotate((0, 0, 0.04))
 			if "TurnRight" in cheezburger:
