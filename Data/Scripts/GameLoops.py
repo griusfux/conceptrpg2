@@ -26,7 +26,8 @@ def InGame(cont):
 	# Start by loading the dungeon
 	if 'dgen' not in own:	
 		# Display the splash
-		gl.addScene('Overlay')
+		if len(gl.getSceneList()) == 1:
+			gl.addScene('Overlay')
 		
 		own['mapfile'] = ArchiveFile.MapFile('Maps/ShipRuins')
 		
@@ -43,11 +44,18 @@ def InGame(cont):
 	if own['dgen'].HasNext():
 		own['dgen'].GenerateNext()
 		return
+	elif not own['dgen'].CheckDungeon():
+		# The dungeon is unacceptable, delete it and try again
+		del own['dgen']
+		for obj in gl.getCurrentScene().objects:
+			if obj.name not in ("DungeonEmpty", "Lamp.001", "Camera"):
+				obj.endObject()
+		return
 	elif 'mapfile' in own:
 		own['mapfile'].Close()
 		del own['mapfile']
 		
-		print("\nDungeon generation complete\n")
+		print("\nDungeon generation complete with %d rooms\n" % own['dgen'].room_count)
 		gl.getSceneList()[1].end()
 	
 	# Setup an input system

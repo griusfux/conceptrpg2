@@ -22,6 +22,7 @@ class DungeonGenerator:
 	
 	# Some settings
 	max_rooms = 10
+	min_rooms = 8
 	max_tries = 5
 	ray_length = 5
 	generation = GEN_RANDOM
@@ -105,7 +106,7 @@ class DungeonGenerator:
 		self.use_as_next_node = None
 		
 		# Check to see if we should keep expanding the dungeon
-		if self.room_count <= self.max_rooms:
+		if self.room_count < self.max_rooms:
 			if not node:
 				# Pick the next node based on options
 				if self.generation == GEN_LINEAR:
@@ -155,6 +156,10 @@ class DungeonGenerator:
 			# We don't need anymore tiles, fill the rest with end pieces
 			for n in self.exit_nodes:
 				self.PlaceTile(n, 'Ends', check_collision=False)
+		
+	def CheckDungeon(self):
+		"""Checks to make sure the dungeon is up to spec"""
+		return self.room_count > self.min_rooms and	self.has_stairs
 		
 	def PlaceTile(self, node, type, check_collision=True):
 		scene = GameLogic.getCurrentScene()
