@@ -15,6 +15,7 @@ from Scripts.BlenderInputSystem import BlenderInputSystem
 import subprocess
 import socket
 import pickle
+import codecs
 
 # Create a shorthand for gl
 import GameLogic as gl
@@ -35,12 +36,16 @@ def Animation(cont):
 def InGame(cont):
 	own = cont.owner
 
-	# if is_host and "server_proc" not in own:
-		# own['server_proc'] = subprocess.Popen("python server.py")
+	# Start the server if we're the host
+	#if is_host and "server_proc" not in own:
+		#own['server_proc'] = subprocess.Popen("python server.py")
 		
-	# if 'socket' not in own:
-		# own['socket'] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		# own['socket'].setblocking(0)
+	# Create a socket and register with the server
+	if 'socket' not in own:
+		own['socket'] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		own['socket'].setblocking(0)
+
+		own['socket'].sendto(b"register Mog", addr)
 
 	# Start by loading the dungeon
 	if 'dgen' not in own:	
@@ -57,8 +62,19 @@ def InGame(cont):
 			return
 		
 		own['dgen'] = DungeonGenerator(own['mapfile'])
-		own['dgen'].GenerateFirst(cont.owner)
-		# own['dgen'].GenerateFromList(own, pickle.load(open('d.txt', 'rb')))
+		
+		if is_host:
+			own['dgen'].GenerateFirst(cont.owner)
+		else:
+			result = []
+			own['socket'].sendto('b get_map', addr)
+			while True:
+				data = own['socket'].recv(1024)
+				result.append(pickle.loads(data))
+				if not data:
+					break
+			own['dgen'].GenerateFromList(own, result)
+			
 		# Give the engine a chance to catch up
 		return
 		
@@ -79,11 +95,12 @@ def InGame(cont):
 
 		gl.getSceneList()[1].end()
 		print("\nDungeon generation complete with %d rooms\n" % own['dgen'].room_count)
-		# for i in own['dgen'].result:
-			# for j in i:
-				# print(j)
-			# print()
-		#pickle.dump(own['dgen'].result, open('d.txt', 'wb'))
+		
+		# If we're the host, send the map data to the server
+		if is_host:
+			for i in own['dgen'].result:
+				msg = b'map ' + pickle.dumps(i, 0)
+				own['socket'].sendto(msg, addr)
 		
 	
 	# Setup an input system

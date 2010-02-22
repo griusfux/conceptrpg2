@@ -1,3 +1,5 @@
+# $Id$
+
 import random
 import GameLogic
 from Mathutils import Vector
