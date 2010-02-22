@@ -11,6 +11,7 @@ except ImportError:
 	import cPickle as pickle
 	
 import re
+import socket
 
 class GameServerHandler(BaseRequestHandler):
 	""" Does stuff??"""
@@ -34,7 +35,7 @@ class GameServerHandler(BaseRequestHandler):
 			self.server.map.append(data)
 		elif cmd == "get_map":
 			for i in self.server.map:
-				self.request[1].sendto(i, self.client_address)
+				self.request[1].sendto(bytes(i, "utf8"), self.client_address)
 		#self.broadcast(self.request[0], self.client_address)
 		
 	def broadcast(self, msg, client):
@@ -47,8 +48,8 @@ class GameServerHandler(BaseRequestHandler):
 class GameServer(UDPServer):
 	"""The game server"""
 	
-	def __init__(self, addr):
+	def __init__(self, port):
 		print("Starting the server...")
 		self.clients = []
 		self.map = []
-		UDPServer.__init__(self, addr, GameServerHandler)
+		UDPServer.__init__(self, ('', port), GameServerHandler)

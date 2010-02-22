@@ -7,7 +7,7 @@ from Scripts.GameServer import GameServer
 import time
 
 def main():
-	server = GameServer(('localhost', 9999))
+	server = GameServer(9999)
 	
 	server.serve_forever()
 	

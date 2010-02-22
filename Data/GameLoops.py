@@ -21,7 +21,8 @@ import codecs
 import GameLogic as gl
 
 # Globals for networking
-is_host = True
+is_host = False
+# is_host = True
 user = b'Mog'
 addr = ('localhost', 9999)
 connected = False
@@ -57,7 +58,8 @@ def InGame(cont):
 			own['socket'].setblocking(0)
 		except socket.timeout:
 			print("Timed out while waiting on the server...")
-		except socket.error:
+		except socket.error as d:
+			print(d)
 			print("The server could not be reached...")
 		
 
@@ -81,7 +83,7 @@ def InGame(cont):
 			own['dgen'].GenerateFirst(cont.owner)
 		else:
 			result = []
-			own['socket'].sendto(b'get_map', addr)
+			own['socket'].sendto(b'get_map ', addr)
 			while True:
 				try:
 					data = own['socket'].recv(1024)
@@ -90,7 +92,7 @@ def InGame(cont):
 						break
 				except socket.error:
 					break
-			print("The map size is " + str(len(result)))
+			print("The map size received was " + str(len(result)))
 			own['dgen'].GenerateFromList(own, result)
 			
 		# Give the engine a chance to catch up
@@ -116,7 +118,7 @@ def InGame(cont):
 		
 		# If we're the host, send the map data to the server
 		if is_host:
-			print("The map size is " + str(len(own['dgen'].result)))
+			print("The map size sent was " + str(len(own['dgen'].result)))
 			for i in own['dgen'].result:
 				msg = b'map ' + pickle.dumps(i, 0)
 				own['socket'].sendto(msg, addr)
