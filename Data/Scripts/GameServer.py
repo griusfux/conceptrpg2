@@ -28,6 +28,8 @@ class GameServerHandler(BaseRequestHandler):
 		if cmd == "register":
 			if self.client_address not in self.server.clients:
 				self.server.clients.append(self.client_address)
+				
+			self.request[1].sendto(b'pong', self.client_address)
 		elif cmd == "map":
 			self.server.map.append(data)
 		elif cmd == "get_map":

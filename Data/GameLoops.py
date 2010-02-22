@@ -22,7 +22,9 @@ import GameLogic as gl
 
 # Globals for networking
 is_host = True
+user = b'Mog'
 addr = ('localhost', 9999)
+connected = False
 
 def MainMenu(cont):
 	pass
@@ -43,9 +45,21 @@ def InGame(cont):
 	# Create a socket and register with the server
 	if 'socket' not in own:
 		own['socket'] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		own['socket'].setblocking(0)
+		#own['socket'].setblocking(0)
+		# Wait 10 seconds
+		own['socket'].settimeout(10)
 
-		own['socket'].sendto(b"register Mog", addr)
+		own['socket'].sendto(b"register " + user, addr)
+		print("Waiting on the server...")
+		try:
+			data = own['socket'].recv(1024)
+			print("Reply received!")
+			own['socket'].setblocking(0)
+		except socket.timeout:
+			print("Timed out while waiting on the server...")
+		except socket.error:
+			print("The server could not be reached...")
+		
 
 	# Start by loading the dungeon
 	if 'dgen' not in own:	
