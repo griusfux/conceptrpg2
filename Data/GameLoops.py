@@ -67,12 +67,16 @@ def InGame(cont):
 			own['dgen'].GenerateFirst(cont.owner)
 		else:
 			result = []
-			own['socket'].sendto('b get_map', addr)
+			own['socket'].sendto(b'get_map', addr)
 			while True:
-				data = own['socket'].recv(1024)
-				result.append(pickle.loads(data))
-				if not data:
+				try:
+					data = own['socket'].recv(1024)
+					result.append(pickle.loads(data))
+					if not data:
+						break
+				except socket.error:
 					break
+			print("The map size is " + str(len(result)))
 			own['dgen'].GenerateFromList(own, result)
 			
 		# Give the engine a chance to catch up
@@ -98,6 +102,7 @@ def InGame(cont):
 		
 		# If we're the host, send the map data to the server
 		if is_host:
+			print("The map size is " + str(len(own['dgen'].result)))
 			for i in own['dgen'].result:
 				msg = b'map ' + pickle.dumps(i, 0)
 				own['socket'].sendto(msg, addr)
