@@ -12,20 +12,18 @@ from Scripts.CharacterLogic import PlayerLogic
 from Scripts.BlenderObjectWrapper import BlenderObjectWrapper
 from Scripts.BlenderInputSystem import BlenderInputSystem
 
+from Scripts.Networking.GameClient import GameClient
+
 import subprocess
-import socket
 import pickle
-import codecs
 
 # Create a shorthand for gl
 import GameLogic as gl
 
 # Globals for networking
 is_host = False
-# is_host = True
-user = b'Mog'
+user = 'Mog'
 addr = ('localhost', 9999)
-connected = False
 
 def MainMenu(cont):
 	pass
@@ -38,109 +36,111 @@ def Animation(cont):
 
 def InGame(cont):
 	own = cont.owner
-
-	# Start the server if we're the host
-	#if is_host and "server_proc" not in own:
-		#own['server_proc'] = subprocess.Popen("python server.py")
+	
+	own['is_host'] = is_host
 		
-	# Create a socket and register with the server
-	if 'socket' not in own:
-		own['socket'] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		#own['socket'].setblocking(0)
-		# Wait 10 seconds
-		own['socket'].settimeout(10)
-
-		own['socket'].sendto(b"register " + user, addr)
-		print("Waiting on the server...")
-		try:
-			data = own['socket'].recv(1024)
-			print("Reply received!")
-			own['socket'].setblocking(0)
-		except socket.timeout:
-			print("Timed out while waiting on the server...")
-		except socket.error as d:
-			print(d)
-			print("The server could not be reached...")
-		
-
-	# Start by loading the dungeon
-	if 'dgen' not in own:	
-		# Display the splash
-		if len(gl.getSceneList()) == 1:
-			gl.addScene('Overlay')
-		
-		own['mapfile'] = ArchiveFile.MapFile('Maps/ShipRuins')
-		
-		if not own['mapfile'].init:
-			print("Could not open the archive!")
-			own['mapfile'].Close()
-			del own['mapfile']
-			return
-		
-		own['dgen'] = DungeonGenerator(own['mapfile'])
-		
-		if is_host:
-			own['dgen'].GenerateFirst(cont.owner)
-		else:
-			result = []
-			own['socket'].sendto(b'get_map ', addr)
-			while True:
-				try:
-					data = own['socket'].recv(1024)
-					result.append(pickle.loads(data))
-					if not data:
-						break
-				except socket.error:
-					break
-			print("The map size received was " + str(len(result)))
-			own['dgen'].GenerateFromList(own, result)
+	if 'init' not in own:
+		# Create a socket and register with the server
+		if 'client' not in own:
+			own['client'] = GameClient(user, addr)
 			
-		# Give the engine a chance to catch up
-		return
-		
-	# Keep creating the dungeon if there are more tiles
-	if own['dgen'].HasNext():
-		own['dgen'].GenerateNext()
-		return
-	elif not own['dgen'].CheckDungeon():
-		# The dungeon is unacceptable, delete it and try again
-		del own['dgen']
-		for obj in gl.getCurrentScene().objects:
-			if obj.name not in ("DungeonEmpty", "Lamp.001", "Camera"):
-				obj.endObject()
-		return
-	elif 'mapfile' in own:
-		own['mapfile'].Close()
-		del own['mapfile']
+			# Fallback to offline mode
+			if not own['client'].connected:
+				print("Could not connect to the server, starting game in offline mode.")
+				own['is_offline'] = True
+				own['is_host'] = False
+			else:
+				own['is_offline'] = False
+				
+		# Try to load the mapfile
+		if 'mapfile' not in own:
+			own['mapfile'] = ArchiveFile.MapFile('Maps/ShipRuins')
+			
+			if not own['mapfile'].init:
+				print('Could not open the map file!')
+				own['mapfile'].close()
+				del own['mapfile']
+				own['init'] = False
+				return
 
-		gl.getSceneList()[1].end()
-		print("\nDungeon generation complete with %d rooms\n" % own['dgen'].room_count)
+		# Start by loading the dungeon
+		if 'dgen' not in own:	
+			# Display the splash
+			if len(gl.getSceneList()) == 1:
+				gl.addScene('Overlay')
+			
+			own['dgen'] = DungeonGenerator(own['mapfile'])
+			
+			if own['is_host'] or own['is_offline']:
+				own['dgen'].GenerateFirst(cont.owner)
+			else:
+				result = []
+				own['client'].send_message('get_map')
+				
+				cmd, data = own['client'].receive_message()
+				
+				# Hopefully this doesn't lock things for too long
+				while cmd != 'end_map':
+					if cmd == 'map' and data:
+						result.append(pickle.loads(bytes(data, 'utf8')))
+					print((cmd, data))
+					cmd, data = own['client'].receive_message()
+				
+				print("The map size received was " + str(len(result)))
+				own['dgen'].GenerateFromList(own, result)
+				
+			# Give the engine a chance to catch up
+			return
+			
+		# Keep creating the dungeon if there are more tiles
+		if own['is_host'] and own['dgen'].HasNext():
+			own['dgen'].GenerateNext()
+			return
+		# Only check the dungeon if we're the host
+		elif own['is_host'] and not own['dgen'].CheckDungeon():
+			# The dungeon is unacceptable, delete it and try again
+			del own['dgen']
+			for obj in gl.getCurrentScene().objects:
+				if obj.name not in ("DungeonEmpty", "Lamp.001", "Camera"):
+					obj.endObject()
+			return
+		elif 'mapfile' in own:
+			own['mapfile'].close()
+			del own['mapfile']
+
+			gl.getSceneList()[1].end()
+			print("\nDungeon generation complete with %d rooms\n" % own['dgen'].room_count)
+			
+			# If we're the host, send the map data to the server
+			if own['is_host'] and not own['is_offline']:
+				print("The map size sent was " + str(len(own['dgen'].result)))
+				for i in own['dgen'].result:
+					#msg = b'map ' + pickle.dumps(i, 0)
+					#own['socket'].sendto(msg, addr)
+					own['client'].send_message('send_map', pickle.dumps(i, 0))
+			
 		
-		# If we're the host, send the map data to the server
-		if is_host:
-			print("The map size sent was " + str(len(own['dgen'].result)))
-			for i in own['dgen'].result:
-				msg = b'map ' + pickle.dumps(i, 0)
-				own['socket'].sendto(msg, addr)
+		# Setup an input system
+		own['input_sys'] = BlenderInputSystem(cont.sensors['keyboard'], 'keys.conf')
 		
-	
-	# Setup an input system
-	own['input_sys'] = BlenderInputSystem(cont.sensors['keyboard'], 'keys.conf')
-	
-	# Add the character
-	scene = gl.getCurrentScene()
-	if "CharacterEmpty" not in scene.objects:
+		# Add the character
+		scene = gl.getCurrentScene()
 		temp = own.position
 		temp[2] += 1
 		own.position = temp
 		gameobj = scene.addObject("CharacterEmpty", own)
 		
 		own['character'] = PlayerLogic(BlenderObjectWrapper(gameobj))
+		
+		# Parent the camera to the player
+		cam = scene.objects["Camera"]
+		cam.setParent(own['character'].obj.gameobj)
+		
+		own['init'] = True
+	# End init
 	
-	# Parent the camera to the player
-	cam = scene.objects["Camera"]
-	cam.setParent(own['character'].obj.gameobj)
-	
-	# Move the character
-	inputs = own['input_sys'].Run()
-	own['character'].PlayerPlzMoveNowzKThxBai(inputs)
+	elif own['init']:
+		
+		# Move the character
+		inputs = own['input_sys'].Run()
+		own['character'].PlayerPlzMoveNowzKThxBai(inputs)

@@ -58,7 +58,7 @@ class ArchiveFile:
 		except(IOError):
 			print("Error in opening the config file")
 
-	def Close(self):
+	def close(self):
 		"""Clean up"""
 		if self.file_name.startswith('tmp/'):
 			shutil.rmtree(self.file_name, ignore_errors=True)
