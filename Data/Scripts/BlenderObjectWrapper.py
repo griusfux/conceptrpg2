@@ -34,7 +34,7 @@ class BlenderObjectWrapper:
 			raise ValueError("Supplied mode is invalid!")
 			
 	def GetPosition(self):
-		return gameobj.worldPosition
+		return self.gameobj.worldPosition
 			
 	def Rotate(self, vec, local=True):
 		"""Do object rotation"""

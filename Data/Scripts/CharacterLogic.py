@@ -210,7 +210,7 @@ class PlayerLogic(CharacterLogic):
 				"equipped_weapon" 	: self.equipped_weapon }
 		pickle.dump(save_data, save)
 		
-	def PlayerPlzMoveNowzKThxBai(self, cheezburger):
+	def PlayerPlzMoveNowzKThxBai(self, cheezburger, client=None):
 		"""Move the player"""
 		#Best method ever :D
 		
@@ -225,6 +225,10 @@ class PlayerLogic(CharacterLogic):
 				self.obj.Rotate((0, 0, 0.04))
 			if "TurnRight" in cheezburger:
 				self.obj.Rotate((0, 0, -0.04))
+				
+		if client:
+			pos = self.obj.GetPosition()
+			client.send_message('update_player %s %.3f %.3f %.3f' % (client.user, pos[0], pos[1], pos[2]))
 		
 		
 class MonsterLogic(CharacterLogic):
@@ -269,3 +273,14 @@ class MonsterLogic(CharacterLogic):
 				# ValidateArmor(self, element.tag, element.text)
 				
 		self.RecalcStats()
+		
+class ProxyLogic(CharacterLogic):
+	"""Class for handling network proxies"""
+	
+	def __init__(self, obj):
+		CharacterLogic.__init__(self, obj)
+		
+	def Update(self, pos_vec, ori_vec):
+		"""Update's the proxy's position and orientation"""
+		
+		

@@ -21,7 +21,7 @@ import pickle
 import GameLogic as gl
 
 # Globals for networking
-is_host = False
+is_host = True
 user = 'Mog'
 addr = ('localhost', 9999)
 
@@ -37,18 +37,18 @@ def Animation(cont):
 def InGame(cont):
 	own = cont.owner
 	
-	own['is_host'] = is_host
 		
 	if 'init' not in own:
 		# Create a socket and register with the server
 		if 'client' not in own:
+			own['is_host'] = is_host
 			own['client'] = GameClient(user, addr)
 			
 			# Fallback to offline mode
 			if not own['client'].connected:
 				print("Could not connect to the server, starting game in offline mode.")
 				own['is_offline'] = True
-				own['is_host'] = False
+				own['is_host'] = True
 			else:
 				own['is_offline'] = False
 				
@@ -73,6 +73,7 @@ def InGame(cont):
 			
 			if own['is_host'] or own['is_offline']:
 				own['dgen'].GenerateFirst(cont.owner)
+				own['client'].send_message('start_map')
 			else:
 				result = []
 				own['client'].send_message('get_map')
@@ -140,7 +141,18 @@ def InGame(cont):
 	# End init
 	
 	elif own['init']:
+		if not own['is_offline']:
+			cmd, rdata = own['client'].receive_message()
+			if rdata:
+				data = rdata.split()
+				
+				if cmd == 'update_player':
+					if data[0] not in own['net_players']:
+						gameobj = gl.getCurrentScene().addObject("CharacterEmpty", own)				
+						own['net_players'][data[0]] = ProxyLogic(gameobj)
+					
+					own['net_players'][data[0]].Update(data[1], data[2])
 		
 		# Move the character
 		inputs = own['input_sys'].Run()
-		own['character'].PlayerPlzMoveNowzKThxBai(inputs)
+		own['character'].PlayerPlzMoveNowzKThxBai(inputs, own['client'])

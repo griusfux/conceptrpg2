@@ -23,6 +23,7 @@ class GameServerHandler(BaseRequestHandler):
 		print("SERVER Message from %s: %s" % (self.client_address[0], self.request[0]))
 		
 		cmd, data = parse_request(self.request[0])
+		data = data.split()
 		sock = self.request[1]
 		server = self.server
 		
@@ -38,26 +39,45 @@ class GameServerHandler(BaseRequestHandler):
 			# If this is the first user, it's the host
 			if len(server.clients):
 				server.host = data[0]
-
+		
+		elif cmd == "start_map":
+			if self.is_host():
+				server.map = []
+				
 		elif cmd == "send_map":
-			server.map.append(data)
+			if self.is_host():
+				server.map.append(data)
 			
 		elif cmd == "get_map":
 			for i in server.map:
 				self.send_message('map '+i)
 				
 			self.send_message('end_map')
+			
+		elif cmd == "update_player":
+			self.broadcast('update_player %s %s %s %s' % (data[0], data[1], data[2], data[3]), data[0])
 		
-	def send_message(self, msg, byte_data=b''):
+	def send_message(self, msg, byte_data=b'', client=None):
+		if not client: client = self.client_address
 		print("SERVER Message to %s: %s" % (self.client_address[0], bytes(msg, NET_ENCODING)+byte_data))
-		self.request[1].sendto(bytes(msg, NET_ENCODING)+b' '+byte_data, self.client_address)
+		self.request[1].sendto(bytes(msg, NET_ENCODING)+b' '+byte_data, client)
 		
-	def broadcast(self, msg, client):
-		sock = self.request[1]
-		
+	def broadcast(self, msg, client):		
 		for client in self.server.clients:
 			if client != self.client_address:
-				sock.sendto(msg, client)
+				self.send_message(msg, client=self.server.clients[client])
+				
+	def is_host(self):
+		client = self.client_from_addr(self.client_address)
+		
+		return True if self.server.host == client else False
+				
+	def client_from_addr(self, addr):
+		for client in self.server.clients:
+			if self.server.clients[client] == addr:
+				return client
+				
+		return None
 		
 
 class GameServer(UDPServer):
