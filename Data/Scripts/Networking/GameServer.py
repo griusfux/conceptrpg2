@@ -23,7 +23,6 @@ class GameServerHandler(BaseRequestHandler):
 		print("SERVER Message from %s: %s" % (self.client_address[0], self.request[0]))
 		
 		cmd, data = parse_request(self.request[0])
-		data = data.split()
 		sock = self.request[1]
 		server = self.server
 		
@@ -33,12 +32,12 @@ class GameServerHandler(BaseRequestHandler):
 			
 		elif cmd == "register":
 			# Register the user
-			if data[0] not in server.clients:
-				server.clients[data[0]] = self.client_address
+			if data not in server.clients:
+				server.clients[data] = self.client_address
 				
 			# If this is the first user, it's the host
 			if len(server.clients):
-				server.host = data[0]
+				server.host = data
 		
 		elif cmd == "start_map":
 			if self.is_host():
@@ -55,6 +54,7 @@ class GameServerHandler(BaseRequestHandler):
 			self.send_message('end_map')
 			
 		elif cmd == "update_player":
+			data = data.split()
 			self.broadcast('update_player %s %s %s %s' % (data[0], data[1], data[2], data[3]), data[0])
 		
 	def send_message(self, msg, byte_data=b'', client=None):

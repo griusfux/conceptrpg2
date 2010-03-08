@@ -229,7 +229,7 @@ class PlayerLogic(CharacterLogic):
 			if "TurnRight" in cheezburger:
 				self.obj.Rotate((0, 0, -0.04))
 				
-		if client and update:
+		if client:
 			pos = self.obj.GetPosition()
 			client.send_message('update_player %s %.3f %.3f %.3f' % (client.user, pos[0], pos[1], pos[2]))
 		
@@ -285,5 +285,6 @@ class ProxyLogic(CharacterLogic):
 		
 	def Update(self, pos_vec, ori_vec):
 		"""Update's the proxy's position and orientation"""
-		
+		print(pos_vec)
+		self.obj.SetPosition([float(i) for i in pos_vec])
 		

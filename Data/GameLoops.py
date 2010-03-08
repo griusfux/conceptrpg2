@@ -7,7 +7,7 @@
 
 import Scripts.ArchiveFile as ArchiveFile
 from Scripts.DungeonGenerator import DungeonGenerator
-from Scripts.CharacterLogic import PlayerLogic
+from Scripts.CharacterLogic import PlayerLogic, ProxyLogic
 
 from Scripts.BlenderObjectWrapper import BlenderObjectWrapper
 from Scripts.BlenderInputSystem import BlenderInputSystem
@@ -87,7 +87,6 @@ def InGame(cont):
 				while cmd != 'end_map':
 					if cmd == 'map' and data:
 						result.append(pickle.loads(bytes(data, 'utf8')))
-					print((cmd, data))
 					cmd, data = own['client'].receive_message()
 				
 				print("The map size received was " + str(len(result)))
@@ -152,9 +151,9 @@ def InGame(cont):
 				if cmd == 'update_player':
 					if data[0] not in own['net_players']:
 						gameobj = gl.getCurrentScene().addObject("CharacterEmpty", own)				
-						own['net_players'][data[0]] = ProxyLogic(gameobj)
+						own['net_players'][data[0]] = ProxyLogic(BlenderObjectWrapper(gameobj))
 					
-					own['net_players'][data[0]].Update(data[1], data[2])
+					own['net_players'][data[0]].Update((data[1], data[2], data[3]), None)
 		
 		# Move the character
 		inputs = own['input_sys'].Run()
