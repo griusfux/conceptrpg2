@@ -26,5 +26,5 @@
 	
 	<max_cr>10</max_cr>
 
-	<encounter_deck>EncounterDecks/goblin</encounter_deck>
+	<encounter_deck>goblin</encounter_deck>
 </mapfile>

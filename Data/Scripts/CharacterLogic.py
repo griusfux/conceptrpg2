@@ -238,7 +238,7 @@ class MonsterLogic(CharacterLogic):
 	
 	def __init__(self, object, monster):
 		CharacterLogic.__init__(self, object)
-		datafile = MonsterFile('Monsters/%s' % monster)
+		datafile = MonsterFile(monster)
 		self.allowed_roles = ('artillery', 'brute', 'controller', 'lurker', 'minion', 'skirmisher')
 		self.role = ""
 		self.leader = False
@@ -274,6 +274,8 @@ class MonsterLogic(CharacterLogic):
 				ValidateInt(self, element.tag, element.text)
 			# elif element.tag == "armor":
 				# ValidateArmor(self, element.tag, element.text)
+				
+		datafile.close()
 				
 		self.RecalcStats()
 		

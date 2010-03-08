@@ -54,7 +54,7 @@ def InGame(cont):
 				
 		# Try to load the mapfile
 		if 'mapfile' not in own:
-			own['mapfile'] = ArchiveFile.MapFile('Maps/ShipRuins')
+			own['mapfile'] = ArchiveFile.MapFile('ShipRuins')
 			
 			if not own['mapfile'].init:
 				print('Could not open the map file!')

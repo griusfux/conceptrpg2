@@ -309,12 +309,13 @@ class DungeonGenerator:
 		
 class EncounterDeck():
 	def __init__(self, deckfile):
-		self.Deckfile = DeckFile(deckfile)
+		self.Deckfile = deckfile
 		self.Deck = []
 		self.BuildDeck()
 		
 	def BuildDeck(self):
-		for card in self.Deckfile.root:
+		deckfile = DeckFile(self.Deckfile)
+		for card in deckfile.root:
 			monster = None
 			count = 0
 			for element in card:
@@ -324,6 +325,8 @@ class EncounterDeck():
 					count = int(element.text)
 			for i in range(count):
 				self.Deck.append(MonsterLogic(None, monster))
+				
+		deckfile.close()
 				
 	def GenerateEncounter(self):
 		noBrutesSoldiers = True

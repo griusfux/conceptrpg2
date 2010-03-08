@@ -11,6 +11,7 @@ class ArchiveFile:
 	_textures = 'textures/'
 	_config = ''
 	_dtd = ''
+	_dir = ''
 	
 	Root = None
 	Init = False
@@ -19,6 +20,8 @@ class ArchiveFile:
 		parser = etree.XMLParser()
 		self.root = None
 
+		filename = self._dir+'/'+filename
+		
 		# If the file is packed, extract the files to a tmp location
 		if os.path.exists(filename+"."+self._ext):
 			zfile = ZipFile(filename+"."+self._ext, 'r')	
@@ -63,6 +66,12 @@ class ArchiveFile:
 		if self.file_name.startswith('tmp/'):
 			shutil.rmtree(self.file_name, ignore_errors=True)
 			
+			# Try to remove the _dir directory
+			try:
+				os.rmdir('tmp/'+self._dir)
+			except OSError:
+				pass
+			
 			# Try and remove the tmp dir. If this fails, other files are still in it
 			try:
 				os.rmdir('tmp')
@@ -78,6 +87,7 @@ class MapFile(ArchiveFile):
 	_textures = 'textures/'
 	_config = 'map.xml'
 	_dtd = 'Schemas/mapfile.xml'
+	_dir = 'Maps'
 	
 	
 class ClassFile(ArchiveFile):
@@ -88,6 +98,7 @@ class ClassFile(ArchiveFile):
 	_textures = ""
 	_config = 'class.xml'
 	_dtd = 'Schemas/classfile.xml'
+	_dir = 'Classes'
 	
 class RaceFile(ArchiveFile):
 	"""Class for handling the race files"""
@@ -97,6 +108,7 @@ class RaceFile(ArchiveFile):
 	_textures = ""
 	_config = 'race.xml'
 	_dtd = 'Schemas/racefile.xml'
+	_dir = 'Races'
 	
 class MonsterFile(ArchiveFile):
 	"""Class for handling monster files"""
@@ -106,6 +118,7 @@ class MonsterFile(ArchiveFile):
 	_textures = ""
 	_config = 'monster.xml'
 	_dtd = 'Schemas/monsterfile.xml'
+	_dir = 'Monsters'
 		
 class DeckFile(ArchiveFile):
 	"""Class for handling Encounter Deck files"""
@@ -115,6 +128,7 @@ class DeckFile(ArchiveFile):
 	_textures = ""
 	_config = 'deck.xml'
 	_dtd = 'Schemas/deckfile.xml'
+	_dir = 'EncounterDecks'
 	
 class ArmorFile(ArchiveFile):
 	"""Class for handling the armor files"""
@@ -124,6 +138,7 @@ class ArmorFile(ArchiveFile):
 	_textures = ""
 	_config = 'armor.xml'
 	_dtd = 'Schemas/armorfile.xml'
+	_dir = 'Items/Armors'
 
 class ShieldFile(ArchiveFile):
 	"""Class for handling the shield files"""
@@ -133,3 +148,4 @@ class ShieldFile(ArchiveFile):
 	_textures = ""
 	_config = 'shield.xml'
 	_dtd = 'Schemas/shieldfile.xml'
+	_dir = 'Items/Shields'
