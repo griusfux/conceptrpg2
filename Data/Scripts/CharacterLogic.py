@@ -213,20 +213,23 @@ class PlayerLogic(CharacterLogic):
 	def PlayerPlzMoveNowzKThxBai(self, cheezburger, client=None):
 		"""Move the player"""
 		#Best method ever :D
+		update = False
 		
 		if cheezburger:
 			if "MoveForward" in cheezburger:
 				self.obj.Move((0, 5, 0))
 				self.obj.PlayAnimation("move")
+				update = True
 			if "MoveBackward" in cheezburger:
 				self.obj.Move((0, -5, 0))
 				self.obj.PlayAnimation("move")
+				update = True
 			if "TurnLeft" in cheezburger:
 				self.obj.Rotate((0, 0, 0.04))
 			if "TurnRight" in cheezburger:
 				self.obj.Rotate((0, 0, -0.04))
 				
-		if client:
+		if client and update:
 			pos = self.obj.GetPosition()
 			client.send_message('update_player %s %.3f %.3f %.3f' % (client.user, pos[0], pos[1], pos[2]))
 		

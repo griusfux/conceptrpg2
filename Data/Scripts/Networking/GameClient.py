@@ -41,9 +41,9 @@ class GameClient:
 		if self.connected:
 			self.send_message('register '+user)
 		
-	def send_message(self, msg, byte_data=b'', timeout=None):
+	def send_message(self, msg, byte_data=b'', timeout=1):
 		if timeout:
-			self.scoket.settimeout(timeout)
+			self.socket.settimeout(timeout)
 		self.socket.sendto(bytes(msg, NET_ENCODING)+b' '+byte_data, self.addr)
 		if timeout:
 			self.socket.setblocking(0)

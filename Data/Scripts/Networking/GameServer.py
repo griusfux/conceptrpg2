@@ -64,15 +64,17 @@ class GameServerHandler(BaseRequestHandler):
 		
 	def broadcast(self, msg, client):		
 		for client in self.server.clients:
-			if client != self.client_address:
+			if client != self.client_from_addr():
 				self.send_message(msg, client=self.server.clients[client])
 				
 	def is_host(self):
-		client = self.client_from_addr(self.client_address)
+		client = self.client_from_addr()
 		
 		return True if self.server.host == client else False
 				
-	def client_from_addr(self, addr):
+	def client_from_addr(self, addr=None):
+		if not addr: addr = self.client_address
+		
 		for client in self.server.clients:
 			if self.server.clients[client] == addr:
 				return client
