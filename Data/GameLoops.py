@@ -49,6 +49,7 @@ def InGame(cont):
 				print("Could not connect to the server, starting game in offline mode.")
 				own['is_offline'] = True
 				own['is_host'] = True
+				own['net_players'] = {}
 			else:
 				own['is_offline'] = False
 				
