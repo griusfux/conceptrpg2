@@ -72,25 +72,32 @@ class DungeonGenerator:
 		
 		# This list is the end result of the generator (type, index, position, orientation)
 		self.result = []
+		
+		# This dictionary is used to keep track of what rooms still have encounters in them
+		self.rooms = {}
+		
+		# The EncounterDeck used to generate random incounters
+		self.encounter_deck = ""
 	
-		# Parse the xml file and fill the lists
+		# Parse the xml file and fill the lists, and create the encounter deck
 		#for element in mapfile.root.iter():
 		for element in mapfile.root:
 			if element.tag == "start_tile":
 				self.tiles['Starts'].append((element.get("blend_obj"), element.get("blend_scene")))
-			if element.tag == "room_tile":
+			elif element.tag == "room_tile":
 				self.tiles['Rooms'].append((element.get("blend_obj"), element.get("blend_scene")))
-			if element.tag == "corridor_tile":
+			elif element.tag == "corridor_tile":
 				self.tiles['Corridors'].append((element.get("blend_obj"), element.get("blend_scene")))
-			if element.tag == "end_tile":
+			elif element.tag == "end_tile":
 				self.tiles['Ends'].append((element.get("blend_obj"), element.get("blend_scene")))
-			if element.tag == "door_tile":
+			elif element.tag == "door_tile":
 				self.tiles['Doors'].append((element.get("blend_obj"), element.get("blend_scene")))
-			if element.tag == "stair_tile":
+			elif element.tag == "stair_tile":
 				self.tiles['Stairs'].append((element.get("blend_obj"), element.get("blend_scene")))
-			if element.tag == "trap_tile":
+			elif element.tag == "trap_tile":
 				self.tiles['Traps'].append((element.get("blend_obj"), element.get("blend_scene")))
-	
+			elif element.tag == "encounter_deck":
+				self.encounter_deck = EncounterDeck(element.text)
 	def GenerateFromList(self, obj, result):
 		"""Use a result list to generate the dungeon"""		
 		for type, index, position, ori in result:		
@@ -251,6 +258,7 @@ class DungeonGenerator:
 			# See if anything needs to be done based on the type of tile placed
 			if type == 'Rooms':
 				self.room_count += 1
+				tile_obj['encounter'] = True
 			elif type == 'Stairs':
 				self.has_stairs = True
 			
@@ -260,6 +268,7 @@ class DungeonGenerator:
 			
 			# Add the tile name and position to the result list
 			self.result.append((type, index, pos, ori))
+			self.rooms[str(tile_obj.getPhysicsId())] = tile_obj
 				
 	def CheckCollision(self, tile, meshes):
 		# Iterate the verts
@@ -308,7 +317,7 @@ class EncounterDeck():
 				elif element.tag == "count":
 					count = int(element.text)
 			for i in range(count):
-				self.Deck.append(MonsterLogic(monster))
+				self.Deck.append(MonsterLogic(None, monster))
 				
 	def GenerateEncounter(self):
 		noBrutesSoldiers = True
