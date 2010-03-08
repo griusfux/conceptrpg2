@@ -24,6 +24,7 @@
 	
 	<trap_tile blend_scene="trap" blend_obj="trap" />
 	
-	<monster_xml>"somefile.xml"</monster_xml>
 	<max_cr>10</max_cr>
+
+	<encounter_deck>EncounterDecks/goblin</encounter_deck>
 </mapfile>
