@@ -72,9 +72,11 @@ def InGame(cont):
 			
 			own['dgen'] = DungeonGenerator(own['mapfile'])
 			
-			if own['is_host'] or own['is_offline']:
+			if own['is_host']:
 				own['dgen'].GenerateFirst(cont.owner)
 				own['client'].send_message('start_map')
+			elif own['is_offline']:
+				own['dgen'].GenerateFirst(cont.owner)
 			else:
 				result = []
 				own['client'].send_message('get_map')

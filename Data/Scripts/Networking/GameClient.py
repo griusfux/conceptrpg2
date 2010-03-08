@@ -20,8 +20,8 @@ class GameClient:
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		
 		# Try to ping the server
-		self.socket.settimeout(5)
 		self.send_message('ping')
+		self.socket.settimeout(5)
 		print('Attempting to ping the server...')
 		try:
 			self.socket.recv(BUFF)
