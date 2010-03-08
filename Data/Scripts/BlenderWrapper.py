@@ -10,15 +10,14 @@ MOV_LOC = 2
 MOV_SERVO = 3
 MOV_POS = 4
 
-class BlenderObjectWrapper:
+class Object:
 	"""KX_GameObject wrapper"""
 	
 	def __init__(self, gameobj):
 		self.gameobj = gameobj
-		try:
-			self.armature = [i for i in gameobj.childrenRecursive if i.name == "KatArm"][0]
-		except:
-			self.armature = None
+		armature = [i for i in gameobj.childrenRecursive if i.name == "KatArm"]
+		if armature: self.armature = armature[0]
+		
 	def Move(self, vec, mode=MOVE_LINV, local=True):
 		"""Do object movement"""
 		
@@ -47,7 +46,8 @@ class BlenderObjectWrapper:
 		self.gameobj.applyRotation(vec, local)
 		
 	def PlayAnimation(self, anim):
-		self.gameobj.sendMessage("animation", anim, self.armature.name)
+		if self.armature:
+			self.gameobj.sendMessage("animation", anim, self.armature.name)
 		
 	def GetVertexList(self):
 		vertexList = []
@@ -60,6 +60,21 @@ class BlenderObjectWrapper:
 				
 		return [BlenderVertexWrapper(vertex, self.gameobj) for vertex in vertexList]
 		
-class BlenderVertexWrapper:
+class Vertex:
+	"""KX_VertexProxy wrapper"""
 	def __init__(self, vertex, gameobj):
 		self.x, self.y, self.z =  [gameobj.worldPosition[i] + vertex.getXYZ()[i] for i in range(3)]
+		
+class Engine:
+	"""Wrapper for engine functionality"""
+	
+	def AddObject(object, adder, time=0):
+		"""Add an opject"""
+		scene = gl.getCurrentScene()
+		
+		return scene.addObject(object, adder, time)
+		
+	def RayCast(to_pos, from_pos, object):
+		"""Cast a ray using the object"""
+		
+		return object.rayCast(to_pos, from_pos)

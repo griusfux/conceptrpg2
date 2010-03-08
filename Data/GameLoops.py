@@ -6,10 +6,9 @@
 # Define all of the needed game loops here
 
 import Scripts.ArchiveFile as ArchiveFile
+import Scripts.BlenderWrapper as BlenderWrapper
 from Scripts.DungeonGenerator import DungeonGenerator
 from Scripts.CharacterLogic import PlayerLogic, ProxyLogic
-
-from Scripts.BlenderObjectWrapper import BlenderObjectWrapper
 from Scripts.BlenderInputSystem import BlenderInputSystem
 
 from Scripts.Networking.GameClient import GameClient
@@ -133,7 +132,7 @@ def InGame(cont):
 		own.position = temp
 		gameobj = scene.addObject("CharacterEmpty", own)
 		
-		own['character'] = PlayerLogic(BlenderObjectWrapper(gameobj))
+		own['character'] = PlayerLogic(BlenderWrapper.Object(gameobj))
 		
 		# Parent the camera to the player
 		cam = scene.objects["Camera"]
@@ -151,7 +150,7 @@ def InGame(cont):
 				if cmd == 'update_player':
 					if data[0] not in own['net_players']:
 						gameobj = gl.getCurrentScene().addObject("CharacterEmpty", own)				
-						own['net_players'][data[0]] = ProxyLogic(BlenderObjectWrapper(gameobj))
+						own['net_players'][data[0]] = ProxyLogic(BlenderWrapper.Object(gameobj))
 					
 					own['net_players'][data[0]].Update((data[1], data[2], data[3]), None)
 		

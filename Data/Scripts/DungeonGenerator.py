@@ -301,7 +301,7 @@ class DungeonGenerator:
 
 					if hit_tuple[0] and hit_tuple[0].name.endswith('_tile') and hit_tuple[0] != tile:
 						# Collision!
-						print('Collision with %s and %s at %s' % (hit_tuple[0], tile, hit_tuple[1]))
+						#print('Collision with %s and %s at %s' % (hit_tuple[0], tile, hit_tuple[1]))
 						return True
 						
 		# Made it through, with no collision

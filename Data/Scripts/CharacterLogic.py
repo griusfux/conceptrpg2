@@ -236,8 +236,8 @@ class PlayerLogic(CharacterLogic):
 		
 class MonsterLogic(CharacterLogic):
 	
-	def __init__(self, monster):
-		CharacterLogic.__init__(self, None)
+	def __init__(self, object, monster):
+		CharacterLogic.__init__(self, object)
 		datafile = MonsterFile('Monsters/%s' % monster)
 		self.allowed_roles = ('artillery', 'brute', 'controller', 'lurker', 'minion', 'skirmisher')
 		self.role = ""
