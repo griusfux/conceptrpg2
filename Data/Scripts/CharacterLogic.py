@@ -285,6 +285,6 @@ class ProxyLogic(CharacterLogic):
 		
 	def Update(self, pos_vec, ori_vec):
 		"""Update's the proxy's position and orientation"""
-		print(pos_vec)
+		
 		self.obj.SetPosition([float(i) for i in pos_vec])
 		

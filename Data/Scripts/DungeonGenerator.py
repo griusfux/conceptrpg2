@@ -2,7 +2,7 @@
 
 import random
 import GameLogic
-from Mathutils import Vector
+from Mathutils import Vector, Matrix
 from Scripts.CharacterLogic import MonsterLogic
 from Scripts.ArchiveFile import DeckFile
 
@@ -284,7 +284,13 @@ class DungeonGenerator:
 					vert_pos[1] *= 0.99
 					
 					# Convert the vertex's local position to world space
-					from_pos = Vector(vert_pos) + Vector(tile.worldPosition)
+					
+					# This was the old way
+					#from_pos = Vector(vert_pos) + Vector(tile.worldPosition)
+					ori = tile.worldOrientation
+					# The new way
+					from_pos = (Matrix(ori[0], ori[1], ori[2]) * Vector(vert_pos)) + Vector(tile.worldPosition)
+
 					
 					# The to position is just x units below the vert
 					to_pos = from_pos[:]
@@ -295,7 +301,7 @@ class DungeonGenerator:
 
 					if hit_tuple[0] and hit_tuple[0].name.endswith('_tile') and hit_tuple[0] != tile:
 						# Collision!
-						#print('Collision with %s and %s at %s' % (hit_tuple[0], tile, hit_tuple[1]))
+						print('Collision with %s and %s at %s' % (hit_tuple[0], tile, hit_tuple[1]))
 						return True
 						
 		# Made it through, with no collision
