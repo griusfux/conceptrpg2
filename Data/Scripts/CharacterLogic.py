@@ -243,6 +243,8 @@ class MonsterLogic(CharacterLogic):
 		self.role = ""
 		self.leader = False
 		self.elite	= False
+		self.object = object
+		self.behaviors = []
 		
 		print("Loading %s . . ." % datafile.file_name)
 		for element in datafile.root:
@@ -272,8 +274,8 @@ class MonsterLogic(CharacterLogic):
 				ValidateInt(self, element.tag, element.text)
 			elif element.tag == "cha_ab":
 				ValidateInt(self, element.tag, element.text)
-			# elif element.tag == "armor":
-				# ValidateArmor(self, element.tag, element.text)
+			elif element.tag == "behaviors":
+				self.behaviors = [getattr(__import__('Scripts.Ai.Behaviors.%s' % behavior, globals(), locals(), [behavior], -1), behavior) for behavior in element.text.split(', ')]
 				
 		datafile.close()
 				
