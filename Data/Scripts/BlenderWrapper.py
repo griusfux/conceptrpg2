@@ -3,6 +3,8 @@
 # Description: Wraps a KX_GameObject to be used with the system
 # Contributers: Mitchell Stokes
 
+from Mathutils import Matrix, Vector
+import GameLogic as gl
 # Movement modes
 MOVE_LINV = 0
 MOVE_FORCE = 1
@@ -58,13 +60,13 @@ class Object:
 			for array in range(0, length):
 				vertexList.append(mesh.getVertex(matID, array))
 				
-		return [BlenderVertexWrapper(vertex, self.gameobj) for vertex in vertexList]
+		return [Vertex(vertex, self.gameobj) for vertex in vertexList]
 		
 class Vertex:
 	"""KX_VertexProxy wrapper"""
 	def __init__(self, vertex, gameobj):
-		self.x, self.y, self.z =  [gameobj.worldPosition[i] + vertex.getXYZ()[i] for i in range(3)]
-		
+		ori = gameobj.worldOrientation
+		self.x, self.y, self.z = (Matrix(ori[0], ori[1], ori[2])* Vector(vertex.getXYZ())) + Vector(gameobj.worldPosition)
 class Engine:
 	"""Wrapper for engine functionality"""
 	
@@ -72,7 +74,8 @@ class Engine:
 		"""Add an opject"""
 		scene = gl.getCurrentScene()
 		
-		return scene.addObject(object, adder, time)
+		add = scene.addObject(object, adder.gameobj, time)
+		return add if add else None
 		
 	def RayCast(to_pos, from_pos, object):
 		"""Cast a ray using the object"""
