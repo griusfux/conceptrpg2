@@ -7,8 +7,10 @@
 
 import Scripts.ArchiveFile as ArchiveFile
 import Scripts.BlenderWrapper as BlenderWrapper
-from Scripts.DungeonGenerator import DungeonGenerator
+from Scripts.DungeonGenerator import DungeonGenerator, EncounterDeck
 from Scripts.CharacterLogic import PlayerLogic, ProxyLogic
+from Scripts.CombatSystem import CombatSystem
+
 from Scripts.BlenderInputSystem import BlenderInputSystem
 
 from Scripts.Networking.GameClient import GameClient
@@ -119,7 +121,7 @@ def InGame(cont):
 				for i in own['dgen'].result:
 					#msg = b'map ' + pickle.dumps(i, 0)
 					#own['socket'].sendto(msg, addr)
-					own['client'].send_message('send_map', pickle.dumps(i, 0))
+					own['client'].send_message('send_map', pickle.dumps(i, 0), timeout=1)
 			
 		
 		# Setup an input system
@@ -137,6 +139,7 @@ def InGame(cont):
 		# Parent the camera to the player
 		cam = scene.objects["Camera"]
 		cam.setParent(own['character'].obj.gameobj)
+			
 		
 		own['init'] = True
 	# End init
@@ -153,7 +156,25 @@ def InGame(cont):
 						own['net_players'][data[0]] = ProxyLogic(BlenderWrapper.Object(gameobj))
 					
 					own['net_players'][data[0]].Update((data[1], data[2], data[3]), None)
+		# If an encounter is triggerd, set it up
+		if own.sensors['encounter_mess'].positive:
 		
+			# Get the room the encounter is taking place in
+			room = own['dgen'].rooms[own.sensors['encounter_mess'].bodies[0]]
+			# Remove the encounter property from that room
+			del room['encounter']
+			# Generate an enemy list using the encounter deck, and initiate the combat system with it
+			enemy_list = own['dgen'].encounter_deck.GenerateEncounter()
+			own['combat_system'] = CombatSystem(BlenderWrapper.Object(own), BlenderWrapper.Engine, enemy_list, BlenderWrapper.Object(room))
+			
+			
+			# When the Combat System's Update() returns false, combat is over
+		if 'combat_system' in own:
+			if own['combat_system'].Update() == False:
+				# Clean up
+				del own['combat_system']
+			
+			
 		# Move the character
 		inputs = own['input_sys'].Run()
 		own['character'].PlayerPlzMoveNowzKThxBai(inputs, own['client'])
