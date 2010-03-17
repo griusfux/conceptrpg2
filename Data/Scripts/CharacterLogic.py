@@ -246,7 +246,6 @@ class MonsterLogic(CharacterLogic):
 		self.object = object
 		self.behaviors = []
 		
-		print("Loading %s . . ." % datafile.file_name)
 		for element in datafile.root:
 			if element.tag == "name":
 				self.name = element.text

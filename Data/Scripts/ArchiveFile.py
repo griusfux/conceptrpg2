@@ -13,8 +13,8 @@ class ArchiveFile:
 	_dtd = ''
 	_dir = ''
 	
-	Root = None
-	Init = False
+	root = None
+	init = False
 	
 	def __init__(self, filename):
 		parser = etree.XMLParser()
