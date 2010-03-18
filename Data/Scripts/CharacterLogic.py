@@ -156,6 +156,7 @@ class PlayerLogic(CharacterLogic):
 	def __init__(self, obj):
 		CharacterLogic.__init__(self, obj)
 		self.inventory = InventoryLogic()
+		self.last_update = [(0, 0, 0), None]
 		
 	def LoadStatsFromSave(self, save):
 		"""Fills in stats from a SaveData object"""
@@ -213,17 +214,14 @@ class PlayerLogic(CharacterLogic):
 	def PlayerPlzMoveNowzKThxBai(self, cheezburger, client=None):
 		"""Move the player"""
 		#Best method ever :D
-		update = False
 		
 		if cheezburger:
 			if "MoveForward" in cheezburger:
 				self.obj.Move((0, 5, 0))
 				self.obj.PlayAnimation("move")
-				update = True
 			if "MoveBackward" in cheezburger:
 				self.obj.Move((0, -5, 0))
 				self.obj.PlayAnimation("move")
-				update = True
 			if "TurnLeft" in cheezburger:
 				self.obj.Rotate((0, 0, 0.04))
 			if "TurnRight" in cheezburger:
@@ -231,7 +229,9 @@ class PlayerLogic(CharacterLogic):
 				
 		if client:
 			pos = self.obj.GetPosition()
-			client.send_message('update_player %s %.3f %.3f %.3f' % (client.user, pos[0], pos[1], pos[2]))
+			if (pos[0] - self.last_update[0][0]) ** 2 + (pos[1] - self.last_update[0][1]) ** 2 > 0.0625:
+				self.last_update[0] = pos[:]
+				client.send_message('update_player %s %.3f %.3f %.3f' % (client.user, pos[0], pos[1], pos[2]))
 		
 		
 class MonsterLogic(CharacterLogic):

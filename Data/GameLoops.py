@@ -138,13 +138,14 @@ def InGame(cont):
 		
 		# Parent the camera to the player
 		cam = scene.objects["Camera"]
-		cam.setParent(own['character'].obj.gameobj)
+		cam.setParent(scene.objects["CamEmpty"])
 			
 		
 		own['init'] = True
 	# End init
 	
 	elif own['init']:
+		# Handle network data
 		if not own['is_offline']:
 			cmd, rdata = own['client'].receive_message()
 			if rdata:
@@ -156,6 +157,7 @@ def InGame(cont):
 						own['net_players'][data[0]] = ProxyLogic(BlenderWrapper.Object(gameobj))
 					
 					own['net_players'][data[0]].Update((data[1], data[2], data[3]), None)
+		
 		# If an encounter is triggerd, set it up
 		if own.sensors['encounter_mess'].positive:
 		
@@ -178,3 +180,8 @@ def InGame(cont):
 		# Move the character
 		inputs = own['input_sys'].Run()
 		own['character'].PlayerPlzMoveNowzKThxBai(inputs, own['client'])
+		
+		# Check to see if the player should be triggering combat
+		# gameobj = own['character'].obj.gameobj
+		# if gameobj.sensors['sensor'].hitObject:
+			# gameobj.sendMessage("encounter", str(gameobj.sensors['sensor'].hitObject.getPhysicsId()))
