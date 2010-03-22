@@ -22,8 +22,8 @@ import pickle
 import GameLogic as gl
 
 # Globals for networking
-user = 'Mog'
-addr = ('localhost', 9999)
+user = 'Kupoman'
+addr = ('192.168.1.5', 9999)
 
 def MainMenu(cont):
 	pass
@@ -160,7 +160,11 @@ def InGame(cont):
 						own['net_players'][data[0]].Die()
 						del own['net_players'][data[0]]
 
-		# If an encounter is triggerd, set it up
+		#################
+		## C O M B A T ##
+		#################
+		
+		# Detect combat and init
 		if own.sensors['encounter_mess'].positive:
 		
 			# Get the room the encounter is taking place in
@@ -172,10 +176,11 @@ def InGame(cont):
 			own['combat_system'] = CombatSystem(BlenderWrapper.Object(own), BlenderWrapper.Engine, enemy_list, BlenderWrapper.Object(room))
 			
 			
-			# When the Combat System's Update() returns false, combat is over
+		# When the Combat System's Update() returns false, combat is over
 		if 'combat_system' in own:
 			if own['combat_system'].Update() == False:
 				# Clean up
+				print("Combat has finished")
 				del own['combat_system']
 			
 			
