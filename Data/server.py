@@ -9,7 +9,5 @@ import time
 def main():
 	server = GameServer(9999)
 	
-	server.serve_forever()
-	
 if __name__ == "__main__":
 	main()

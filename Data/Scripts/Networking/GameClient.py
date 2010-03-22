@@ -17,15 +17,16 @@ class GameClient:
 	def __init__(self, user, addr):
 		self.user = user
 		self.addr = addr
-		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		
-		# Try to ping the server
-		self.send_message('ping')
-		self.socket.settimeout(5)
-		print('Attempting to ping the server...')
+		self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		self.udp.setblocking(0)
+		
+		self.tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.tcp.settimeout(5)
+		
 		try:
-			self.socket.recv(BUFF)
-			print('Reply received')
+			self.tcp.connect(addr)
+			print('Successfuly connected to the server')
 			self.connected = True
 		except socket.timeout:
 			print('The request to the server timed out.')
@@ -35,22 +36,28 @@ class GameClient:
 			print('The server could not be reached')
 			self.connected = False
 		finally:
-			# Keep the socket as non-blocking unless needed otherwise
-			self.socket.setblocking(0)
+			self.tcp.setblocking(0)
 			
 		if self.connected:
-			self.send_message('register '+user)
+			self.tcp.send(bytes('register '+self.user, NET_ENCODING))
 		
+	def __del__(self):
+		self.tcp.close()
+		self.udp.close()
+
 	def send_message(self, msg, byte_data=b'', timeout=1):
 		if timeout:
-			self.socket.settimeout(timeout)
-		self.socket.sendto(bytes(msg, NET_ENCODING)+b' '+byte_data, self.addr)
+			self.udp.settimeout(timeout)
+		self.udp.sendto(bytes(msg, NET_ENCODING)+b' '+byte_data, self.addr)
 		if timeout:
-			self.socket.setblocking(0)
+			self.udp.setblocking(0)
 		
 	def receive_message(self):
 		try:
-			rdata = self.socket.recv(BUFF)
+			rdata, client_addr = self.udp.recvfrom(BUFF)
+			# if client_addr != self.addr:
+				# print(client_addr, self.addr)
+				# raise socket.error
 			return parse_request(rdata)
 		except socket.error as d:
 			return (None, None)

@@ -75,7 +75,7 @@ def InGame(cont):
 			
 			if own['is_host']:
 				own['dgen'].GenerateFirst(cont.owner)
-				own['client'].send_message('start_map')
+				own['client'].send_message('reset_map')
 			elif own['is_offline']:
 				own['dgen'].GenerateFirst(cont.owner)
 			else:
@@ -119,9 +119,7 @@ def InGame(cont):
 			if own['is_host'] and not own['is_offline']:
 				print("The map size sent was " + str(len(own['dgen'].result)))
 				for i in own['dgen'].result:
-					#msg = b'map ' + pickle.dumps(i, 0)
-					#own['socket'].sendto(msg, addr)
-					own['client'].send_message('send_map', pickle.dumps(i, 0), timeout=1)
+					own['client'].send_message('set_map', pickle.dumps(i, 0), timeout=1)
 			
 		
 		# Setup an input system
@@ -157,7 +155,14 @@ def InGame(cont):
 						own['net_players'][data[0]] = ProxyLogic(BlenderWrapper.Object(gameobj))
 					
 					own['net_players'][data[0]].Update((data[1], data[2], data[3]), (data[4], data[5], data[6]))
-		
+				elif cmd == 'change_name':
+					print("Username being changed to " + data)
+					own['client'].user = data
+				elif cmd == 'disconnect':
+					if data[0] in own['net_players']:
+						own['net_players'][data[0]].Die()
+						del own['net_players'][data[0]]
+
 		# If an encounter is triggerd, set it up
 		if own.sensors['encounter_mess'].positive:
 		

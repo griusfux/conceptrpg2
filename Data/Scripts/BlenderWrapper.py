@@ -56,6 +56,9 @@ class Object:
 	def PlayAnimation(self, anim):
 		if self.armature:
 			self.gameobj.sendMessage("animation", anim, self.armature.name)
+			
+	def End(self):
+		gameobj.endObject()
 		
 	def GetVertexList(self):
 		vertexList = []
@@ -82,6 +85,10 @@ class Engine:
 		
 		add = scene.addObject(object, adder.gameobj, time)
 		return add if add else None
+		
+	def RemoveObject(object):
+		"""Remove and object"""
+		object.gameobj.endObject()
 		
 	def RayCast(to_pos, from_pos, object):
 		"""Cast a ray using the object"""
