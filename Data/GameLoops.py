@@ -22,7 +22,6 @@ import pickle
 import GameLogic as gl
 
 # Globals for networking
-is_host = True
 user = 'Mog'
 addr = ('localhost', 9999)
 
@@ -42,7 +41,6 @@ def InGame(cont):
 	if 'init' not in own:
 		# Create a socket and register with the server
 		if 'client' not in own:
-			own['is_host'] = is_host
 			own['client'] = GameClient(user, addr)
 			
 			# Fallback to offline mode
@@ -51,6 +49,8 @@ def InGame(cont):
 				own['is_offline'] = True
 				own['is_host'] = True
 			else:
+				own['is_host'] = own['client'].is_host
+				print("Username: %s\tIs host? %s" % (own['client'].user, 'True' if own['client'].is_host else 'False'))
 				own['is_offline'] = False
 				own['net_players'] = {}
 				
@@ -150,14 +150,11 @@ def InGame(cont):
 				data = rdata.split()
 				
 				if cmd == 'update_player':
-					if data[0] not in own['net_players']:
+					if data[0] != own['client'].user and data[0] not in own['net_players']:
 						gameobj = gl.getCurrentScene().addObject("CharacterEmpty", own)				
 						own['net_players'][data[0]] = ProxyLogic(BlenderWrapper.Object(gameobj))
 					
 					own['net_players'][data[0]].Update((data[1], data[2], data[3]), (data[4], data[5], data[6]))
-				elif cmd == 'change_name':
-					print("Username being changed to " + data)
-					own['client'].user = data
 				elif cmd == 'disconnect':
 					if data[0] in own['net_players']:
 						own['net_players'][data[0]].Die()

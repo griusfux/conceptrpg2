@@ -4,9 +4,9 @@
 # Contributers: Mitchell Stokes
 
 try:
-	from socketserver import TCPServer, UDPServer, BaseRequestHandler
+	from socketserver import TCPServer, UDPServer, ThreadingMixIn, BaseRequestHandler
 except ImportError:
-	from SocketServer import TCPServer, UDPServer, BaseRequestHandler
+	from SocketServer import TCPServer, UDPServer, ThreadingMixIn, BaseRequestHandler
 	
 import re
 import socket
@@ -22,7 +22,7 @@ class GameServerBaseHandler(BaseRequestHandler):
 	accepted_cmds = [
 			'ping',
 			'register',
-			'start_map',
+			'reset_map',
 			'set_map',
 			'get_map',
 			'update_player',
@@ -30,21 +30,22 @@ class GameServerBaseHandler(BaseRequestHandler):
 			]
 	
 	def handle(self):
-		cmd, data = parse_request(self.data)
+		user, cmd, data = parse_request(self.data)
+		self.user = user
 		
 		if cmd in self.accepted_cmds:
 			getattr(self, cmd)(data)
+		else:
+			print("Command not found " +cmd)
 
-	def broadcast(self, msg, exclude=()):
-		if 'self' in exclude: exclude.append(self.client_from_addr())
+	def broadcast(self, msg, exclude=None):
+		if exclude == 'self': exclude = self.user
 		for client in self.server.clients:
-			if client not in exclude:
+			if client != exclude:
 				self.send_message(msg, client=self.server.clients[client])
 				
-	def is_host(self):
-		client = self.client_from_addr()
-		
-		return True #if self.server.host == client else False
+	def is_host(self):	
+		return True if self.server.host == self.user else False
 				
 	def client_from_addr(self, addr=None):
 		if not addr: addr = self.client_address
@@ -60,18 +61,22 @@ class GameServerBaseHandler(BaseRequestHandler):
 	#		
 	def register(self, data):
 		"""Register the user"""
+		user = self.user					
 		
-		data = data.strip()
-					
-		# If this is the first user, it's the host
-		if len(self.server.clients) == 0:
-			self.server.host = data
+		# Make the name unique
+		while user in self.server.clients:
+			user = user + "_"
 			
-		while data in self.server.clients.keys():
-			data = data + "_"
-			self.send_message("change_name "+data)
-		
-		self.server.clients[data] = self.client_address
+		# If this is the first user, it's the host
+		if not self.server.host:
+			self.server.host = user
+			host = 1
+		else:
+			host = 0
+
+		print("SERVER registering %s as %s. Is host? %s" % (self.user, user, 'True' if host == 1 else 'False'))
+		self.server.clients[user] = self.client_address
+		self.send_message("setup %s %s" % (user, host))
 		
 
 	def reset_map(self, data):
@@ -120,6 +125,8 @@ class GameServerTCPHandler(GameServerBaseHandler):
 			print("SERVER disconnect: %s" % (user))
 			del self.server.clients[user]
 			self.broadcast('disconnect '+user)
+		else:
+			print("SERVER client disconnected but not found in list: (%s, %s)" % (self.client_address[0], self.client_address[1]))
 
 	def send_message(self, msg, byte_data=b'', client=None):
 		if not client: client = self.client_address
@@ -137,14 +144,15 @@ class GameServerUDPHandler(GameServerBaseHandler):
 		
 	def send_message(self, msg, byte_data=b'', client=None):
 		if not client: client = self.client_address
-		print("SERVER UDP Message to %s: %s" % (self.client_address[0], bytes(msg, NET_ENCODING)+byte_data))
-		self.request[1].sendto(bytes(msg, NET_ENCODING)+b' '+byte_data, client)
+		print("SERVER UDP Message to %s: %s" % (client[0], bytes(msg, NET_ENCODING)+byte_data))
+		self.request[1].sendto(bytes(msg, NET_ENCODING)+b' '+byte_data, (client[0], self.server.port))
 		
-class GameServerTCP(TCPServer):
+class GameServerTCP(ThreadingMixIn, TCPServer):
 	"""Tcp part of the game server"""
 	
 	def __init__(self, port, server):
 		self.server = server
+		self.daemon_threads = True
 		TCPServer.__init__(self, ('', port), GameServerTCPHandler)
 		
 	def finish_request(self, request, client_address):
@@ -170,6 +178,7 @@ class GameServer():
 		self.clients = {}
 		self.host = None
 		self.map = []
+		self.port = port
 		
 		self.tcp = GameServerTCP(port, self)
 		
