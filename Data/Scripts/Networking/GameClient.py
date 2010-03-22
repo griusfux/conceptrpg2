@@ -52,6 +52,8 @@ class GameClient:
 				self.user = data[0]
 				
 				self.is_host = (int(data[1]) != 0)
+				
+			self.send_message('register_udp')
 			
 		
 	def __del__(self):

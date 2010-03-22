@@ -22,6 +22,7 @@ class GameServerBaseHandler(BaseRequestHandler):
 	accepted_cmds = [
 			'ping',
 			'register',
+			'register_udp',
 			'reset_map',
 			'set_map',
 			'get_map',
@@ -38,7 +39,7 @@ class GameServerBaseHandler(BaseRequestHandler):
 		else:
 			print("Command not found " +cmd)
 
-	def broadcast(self, msg, exclude=None):
+	def broadcast(self, msg, exclude='self'):
 		if exclude == 'self': exclude = self.user
 		for client in self.server.clients:
 			if client != exclude:
@@ -51,7 +52,7 @@ class GameServerBaseHandler(BaseRequestHandler):
 		if not addr: addr = self.client_address
 		
 		for client in self.server.clients:
-			if self.server.clients[client] == addr:
+			if addr in self.server.clients[client]:#self.server.clients[client][0] == addr:
 				return client
 				
 		return None
@@ -75,10 +76,13 @@ class GameServerBaseHandler(BaseRequestHandler):
 			host = 0
 
 		print("SERVER registering %s as %s. Is host? %s" % (self.user, user, 'True' if host == 1 else 'False'))
-		self.server.clients[user] = self.client_address
+		self.server.clients[user] = [self.client_address, None]
 		self.send_message("setup %s %s" % (user, host))
 		
-
+	def register_udp(self, data):
+		"""Register the client's udp addr"""
+		self.server.clients[self.user][1] = self.client_address
+		
 	def reset_map(self, data):
 		"""Start a new map if the client is the host"""
 		
@@ -129,9 +133,9 @@ class GameServerTCPHandler(GameServerBaseHandler):
 			print("SERVER client disconnected but not found in list: (%s, %s)" % (self.client_address[0], self.client_address[1]))
 
 	def send_message(self, msg, byte_data=b'', client=None):
-		if not client: client = self.client_address
-		print("SERVER TCP Message to %s: %s" % (self.client_address[0], bytes(msg, NET_ENCODING)+byte_data))
-		self.request.sendto(bytes(msg, NET_ENCODING)+b' '+byte_data, client)
+		if not client: client = self.server.clients[self.user]
+		print("SERVER TCP Message to %s: %s" % (client[0][0], bytes(msg, NET_ENCODING)+byte_data))
+		self.request.sendto(bytes(msg, NET_ENCODING)+b' '+byte_data, client[0])
 		
 class GameServerUDPHandler(GameServerBaseHandler):
 	"""Handles udp client connections"""
@@ -143,9 +147,9 @@ class GameServerUDPHandler(GameServerBaseHandler):
 		print("SERVER UDP Message from %s: %s" % (self.client_address[0], self.data))
 		
 	def send_message(self, msg, byte_data=b'', client=None):
-		if not client: client = self.client_address
-		print("SERVER UDP Message to %s: %s" % (client[0], bytes(msg, NET_ENCODING)+byte_data))
-		self.request[1].sendto(bytes(msg, NET_ENCODING)+b' '+byte_data, (client[0], self.server.port))
+		if not client: client = self.server.clients[self.user]
+		print("SERVER UDP Message to %s: %s" % (client[1][0], bytes(msg, NET_ENCODING)+byte_data))
+		self.request[1].sendto(bytes(msg, NET_ENCODING)+b' '+byte_data, client[1])
 		
 class GameServerTCP(ThreadingMixIn, TCPServer):
 	"""Tcp part of the game server"""
