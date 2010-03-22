@@ -156,7 +156,7 @@ def InGame(cont):
 						gameobj = gl.getCurrentScene().addObject("CharacterEmpty", own)				
 						own['net_players'][data[0]] = ProxyLogic(BlenderWrapper.Object(gameobj))
 					
-					own['net_players'][data[0]].Update((data[1], data[2], data[3]), None)
+					own['net_players'][data[0]].Update((data[1], data[2], data[3]), (data[4], data[5], data[6]))
 		
 		# If an encounter is triggerd, set it up
 		if own.sensors['encounter_mess'].positive:

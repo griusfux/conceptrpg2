@@ -39,8 +39,14 @@ class Object:
 	def GetPosition(self):
 		return self.gameobj.worldPosition
 		
+	def GetOrientation(self):
+		return self.gameobj.worldOrientation
+		
 	def SetPosition(self, position):
-		self.gameobj.worldPosition = position
+		self.gameobj.worldPosition = position[:]
+		
+	def SetOrientation(self, ori):
+		self.gameobj.worldOrientation = ori[:]
 			
 	def Rotate(self, vec, local=True):
 		"""Do object rotation"""
