@@ -54,11 +54,6 @@ class GameClient:
 				self.is_host = (int(data[1]) != 0)
 				
 			self.send_message('register_udp')
-			
-		
-	def __del__(self):
-		self.tcp.close()
-		self.udp.close()
 
 	def send_message(self, msg, byte_data=b'', timeout=1):
 		if timeout:

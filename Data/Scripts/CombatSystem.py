@@ -1,5 +1,4 @@
 from Scripts.Ai.ai import ai
-import GameLogic as gl
 TILE_SIZE	= 1
 GRID_Z		= 0.1
 
@@ -29,6 +28,7 @@ class CombatSystem:
 				smallestX = vertex.x
 			elif vertex.x > largestX:
 				largestX = vertex.x
+
 			if vertex.y < smallestY:
 				smallestY = vertex.y
 			elif vertex.y > largestY:
@@ -38,8 +38,10 @@ class CombatSystem:
 		self.roomY = largestY - smallestY
 		self.origin = (smallestX, largestY, GRID_Z)
 		
-		empty.SetPosition(self.origin)
-		gl.getCurrentScene().addObject('debug', empty.gameobj, 0)
+		# Uncomment for the debug marker
+		# empty.SetPosition(self.origin)
+		# Engine.AddObject('debug', empty, 0)
+		
 		#Generate the grid
 		grid = CombatGrid(empty, Engine, self.origin, self.roomX, self.roomY)\
 		

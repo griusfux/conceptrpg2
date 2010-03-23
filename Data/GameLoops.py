@@ -66,12 +66,13 @@ def InGame(cont):
 	if 'init' not in own:
 		Init(own)	
 	elif own['init']:
+		# Do combat -- don't go past combant if we are still in combat
+		if HandleCombat(own):
+			return
+		
 		if not own['is_offline']:
 			HandleNetwork(own)
 
-		# Do combat
-		HandleCombat(own)
-		
 		# Do input
 		HandleInput(own)
 		
@@ -211,11 +212,7 @@ def HandleNetwork(own):
 				own['net_players'][data[0]].Die()
 				del own['net_players'][data[0]]
 				
-def HandleCombat(own):
-	#################
-	## C O M B A T ##
-	#################
-	
+def HandleCombat(own):	
 	# Detect combat and init
 	if own.sensors['encounter_mess'].positive:
 	
@@ -230,10 +227,14 @@ def HandleCombat(own):
 		
 	# When the Combat System's Update() returns false, combat is over
 	if 'combat_system' in own:
-		if own['combat_system'].Update() == False:
+		if own['combat_system'].Update():
+			return True
+		else:
 			# Clean up
 			print("Combat has finished")
 			del own['combat_system']
+			
+	return False
 
 def HandleInput(own):	
 	# Collect input
