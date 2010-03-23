@@ -25,6 +25,10 @@ import GameLogic as gl
 user = 'Kupoman'
 addr = ('192.168.1.5', 9999)
 
+# Camera globals
+scale_max = 4
+scale_min = 1
+
 def MainMenu(cont):
 	pass
 	
@@ -33,6 +37,28 @@ def Animation(cont):
 	
 	if mess.positive:
 		cont.activate(mess.bodies[0])
+		
+def Camera(cont):
+	cam = cont.owner
+	scaler = cont.sensors['scale'].owner
+	ray = cont.sensors['ray']
+	
+	if not ray.hitObject:
+		scale = scale_max
+	else:
+		scale = scaler.getDistanceTo(ray.hitPosition)
+
+		if scale > scale_max:
+			scale = scale_max
+		elif scale < scale_min:
+			scale = scale_min
+			
+	scaler.scaling = [scale, scale, scale]
+
+	cont.activate(cont.actuators['ray_track'])
+	cont.activate(cont.actuators['cam_track'])
+
+	
 					
 def InGame(cont):
 	own = cont.owner
@@ -153,6 +179,17 @@ def Init(own):
 	# Parent the camera to the player
 	cam = scene.objects["Camera"]
 	cam.setParent(scene.objects["CamEmpty"])
+	
+	# Switch to the 3rd person camera
+	cam3p = None
+	for child in gameobj.childrenRecursive:
+		if child.name == '3PCam':
+			cam3p = child
+			break
+			
+	if cam3p:
+		own['3pcam'] = cam3p
+		scene.active_camera = cam3p
 		
 	
 	own['init'] = True
@@ -202,10 +239,13 @@ def HandleInput(own):
 	# Collect input
 	inputs = own['input_sys'].Run()
 	
+	scene = gl.getCurrentScene()
+	scene.active_camera = own['3pcam']
+	
 	# Check the input
 	if inputs:
 		if "SwitchCamera" in inputs:
-			print("Hi")
+			scene.active_camera = scene.objects['Camera']
 		
 		# Move the character
 		own['character'].PlayerPlzMoveNowzKThxBai(inputs, own['client'])
