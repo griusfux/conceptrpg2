@@ -1,6 +1,6 @@
 from Scripts.Ai.ai import ai
 import GameLogic as gl
-STEP_SIZE	= 1
+TILE_SIZE	= 1
 GRID_Z		= 0.01
 
 
@@ -41,8 +41,11 @@ class CombatSystem:
 		empty.SetPosition(self.origin)
 		gl.getCurrentScene().addObject('debug', empty.gameobj, 0)
 		#Generate the grid
-		grid = CombatGrid(empty, Engine, self.origin, self.roomX, self.roomY)
+		grid = CombatGrid(empty, Engine, self.origin, self.roomX, self.roomY)\
+		
 	def Update(self):
+		"""This function is called every frame to make up the combat loop"""
+	
 		self.count -= 1
 		if self.count <= 0:
 			return False
@@ -50,12 +53,19 @@ class CombatSystem:
 		return True
 		
 class CombatGrid:
+	"""This object handles the grid aspect of combat, and is made up of CombatTile objects"""
 	def __init__(self, empty, Engine, origin, roomX, roomY):
+		# Position the main empty
 		empty.SetPosition(origin)
-		xSteps = int(roomX // STEP_SIZE)
-		ySteps = int(roomY // STEP_SIZE)
+		
+		# Find out how many tiles need to be in the room
+		xSteps = int(roomX // TILE_SIZE)
+		ySteps = int(roomY // TILE_SIZE)
+		
+		# Create an empty 2D list to hold the grid
 		self.map = [[None for i in range(ySteps)] for i in range(xSteps)]
 		
+		# Fill the 2D grid list with CombatTile objects
 		for x in range(xSteps):
 			yList = [None for i in range(ySteps)]
 			for y in range (ySteps):
@@ -64,9 +74,10 @@ class CombatGrid:
 				
 				
 class CombatTile:
+	"""The individual squares of the CombatGrid object"""
 	def __init__(self, x, y, empty, Engine):
 		self.x = x
 		self.y = y
-		self.position = (self.x + STEP_SIZE / 2, self.y + STEP_SIZE / 2, GRID_Z)
+		self.position = (self.x + TILE_SIZE / 2, self.y + TILE_SIZE / 2, GRID_Z)
 		self.grid_tile = Engine.AddObject('GridTile', empty, 0)
 		self.grid_color = Engine.AddObject('GridColor', empty, 0)
