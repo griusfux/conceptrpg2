@@ -1,7 +1,7 @@
 from Scripts.Ai.ai import ai
 import GameLogic as gl
 TILE_SIZE	= 1
-GRID_Z		= 0.01
+GRID_Z		= 0.1
 
 
 class CombatSystem:
