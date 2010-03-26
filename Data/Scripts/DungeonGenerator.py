@@ -174,9 +174,9 @@ class DungeonGenerator:
 				elif roll == 18:
 					if not self.has_stairs: tile = 'Stairs'
 					else: tile = 'Corridors'
-				elif roll < 18 and roll >= 16:
+				elif roll < 18 and roll >= 13:
 					tile = 'Rooms'
-				elif roll <16 and roll >= 13:
+				elif roll <13 and roll >= 10:
 					tile = 'Doors'
 				else:
 					tile = 'Corridors'
