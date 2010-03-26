@@ -58,7 +58,7 @@ class Object:
 			self.gameobj.sendMessage("animation", anim, self.armature.name)
 			
 	def End(self):
-		gameobj.endObject()
+		self.gameobj.endObject()
 		
 	def GetVertexList(self):
 		vertexList = []
@@ -84,7 +84,7 @@ class Engine:
 		scene = gl.getCurrentScene()
 		
 		add = scene.addObject(object, adder.gameobj, time)
-		return add if add else None
+		return Object(add) if add else None
 		
 	def RemoveObject(object):
 		"""Remove and object"""
