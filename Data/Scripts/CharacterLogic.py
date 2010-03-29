@@ -247,7 +247,9 @@ class MonsterLogic(CharacterLogic):
 	
 	def __init__(self, object, monster):
 		CharacterLogic.__init__(self, object)
-		datafile = MonsterFile(monster)
+		self.datafile = MonsterFile(monster)
+		self.id = monster
+		
 		self.allowed_roles = ('artillery', 'brute', 'controller', 'lurker', 'minion', 'skirmisher')
 		self.role = ""
 		self.leader = False
@@ -255,7 +257,7 @@ class MonsterLogic(CharacterLogic):
 		self.object = object
 		self.behaviors = []
 		
-		for element in datafile.root:
+		for element in self.datafile.root:
 			if element.tag == "name":
 				self.name = element.text
 			elif element.tag == "level":
@@ -285,7 +287,7 @@ class MonsterLogic(CharacterLogic):
 			elif element.tag == "behaviors":
 				self.behaviors = [getattr(__import__('Scripts.Ai.Behaviors.%s' % behavior, globals(), locals(), [behavior], -1), behavior) for behavior in element.text.split(', ')]
 				
-		datafile.close()
+		self.datafile.close()
 				
 		self.RecalcStats()
 		

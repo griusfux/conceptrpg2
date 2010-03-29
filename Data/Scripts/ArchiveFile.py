@@ -114,7 +114,7 @@ class MonsterFile(ArchiveFile):
 	"""Class for handling monster files"""
 	#Options for the archive file
 	_ext = 'monster'
-	_blend = ""
+	_blend = 'monster.blend'
 	_textures = ""
 	_config = 'monster.xml'
 	_dtd = 'Schemas/monsterfile.xml'

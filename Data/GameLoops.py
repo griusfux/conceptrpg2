@@ -8,7 +8,7 @@
 import Scripts.ArchiveFile as ArchiveFile
 import Scripts.BlenderWrapper as BlenderWrapper
 from Scripts.DungeonGenerator import DungeonGenerator, EncounterDeck
-from Scripts.CharacterLogic import PlayerLogic, ProxyLogic
+from Scripts.CharacterLogic import PlayerLogic, ProxyLogic, MonsterLogic
 from Scripts.CombatSystem import CombatSystem
 
 from Scripts.BlenderInputSystem import BlenderInputSystem
@@ -220,8 +220,20 @@ def HandleCombat(own):
 		room = own['dgen'].rooms[own.sensors['encounter_mess'].bodies[0]]
 		# Remove the encounter property from that room
 		del room['encounter']
-		# Generate an enemy list using the encounter deck, and initiate the combat system with it
+		
+		# Generate an enemy list using the encounter deck
 		enemy_list = own['dgen'].encounter_deck.GenerateEncounter()
+		
+		# Replace all the elements in the element list with MonsterLogic objects
+		for monster in enemy_list:
+			
+			# Load the gameobject for the monster into the scene if it isn't already there
+			if monster.id not in gl.getCurrentScene().objects:
+				gl.LibLoad(monster.datafile.blend, 'Scene', 'Scene')
+				monster.datafile.close()
+			
+			monster.object = BlenderWrapper.Object(gl.getCurrentScene().addObject(monster.id, own))
+			
 		own['combat_system'] = CombatSystem(BlenderWrapper.Object(own), BlenderWrapper.Engine, enemy_list, BlenderWrapper.Object(room))
 		
 		
