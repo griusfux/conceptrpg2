@@ -50,18 +50,39 @@ class CombatSystem:
 		##################
 
 		for monster in self.enemy_list:
-			monster.x = random.randrange(0, grid.xSteps)
-			monster.y = random.randrange(0, grid.ySteps)
+			monster.x = random.randrange(0, self.grid.xSteps)
+			monster.y = random.randrange(0, self.grid.ySteps)
 			Engine.AddObject(monster.monster.id, empty, 0)
-			tile = grid.map[monster.x][monster.y]
+			tile = self.grid.map[monster.x][monster.y]
 			monster.monster.object.SetPosition([tile.x, tile.y, GRID_Z])
 			print([tile.x, tile.y, GRID_Z])
+			
+	def __del__(self):
+		del self.grid
 		
 	def TileFromPoint(self, point):
 		x_off = abs(point[0] - self.origin[0])
 		y_off = abs(point[1] - self.origin[1])
 		
-		return self.grid(int(x_off/TILE_SIZE), int(y_off/TILE_SIZE))
+		x = int(x_off/TILE_SIZE)
+		y = int(y_off/TILE_SIZE)
+		
+		try:
+			tile = self.grid(x, y)
+		except:
+			if x > self.grid.xSteps-1:
+				x = self.grid.xSteps-1
+			elif x < 0:
+				x = 0
+				
+			if y > self.grid.ySteps-1:
+				y = self.grid.ySteps-1
+			elif y < 0:
+				y = 0
+				
+			tile = self.grid(x, y)
+			
+		return tile
 		
 	def Update(self, main):
 		"""This function is called every frame to make up the combat loop"""
@@ -99,6 +120,11 @@ class CombatGrid:
 				empty.SetPosition((origin[0] + x, origin[1] - y, GRID_Z))
 				self.map[x][y] = CombatTile(origin[0] + x, origin[1] - y, empty, Engine)
 				
+	def __del__(self):
+		for x in self.map:
+			for y in x:
+				del y
+				
 	def __call__(self, x, y):
 		return self.map[x][y]
 				
@@ -111,3 +137,7 @@ class CombatTile:
 		self.position = (self.x, self.y, GRID_Z)#(self.x + TILE_SIZE / 2, self.y + TILE_SIZE / 2, GRID_Z)
 		self.grid_tile = Engine.AddObject('GridTile', empty, 0)
 		self.grid_color = Engine.AddObject('GridColor', empty, 0)
+		
+	def __del__(self):
+		self.grid_tile.End()
+		self.grid_color.End()

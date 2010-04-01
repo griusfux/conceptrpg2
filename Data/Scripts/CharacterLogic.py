@@ -297,7 +297,7 @@ class MonsterLogic(CharacterLogic):
 			elif element.tag == "behaviors":
 				self.behaviors = [getattr(__import__('Scripts.Ai.Behaviors.%s' % behavior, globals(), locals(), [behavior], -1), behavior) for behavior in element.text.split(', ')]
 				
-		self.datafile.close()
+		#self.datafile.close()
 				
 		self.RecalcStats()
 		
