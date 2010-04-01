@@ -11,6 +11,7 @@
 -->
 
 <!ELEMENT classfile (
+				name,
 				key_abilities,
 				role,
 				proficiencies,

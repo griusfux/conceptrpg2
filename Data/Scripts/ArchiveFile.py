@@ -16,11 +16,11 @@ class ArchiveFile:
 	root = None
 	init = False
 	
-	def __init__(self, filename):
+	def __init__(self, _filename):
 		parser = etree.XMLParser()
 		self.root = None
 
-		filename = self._dir+'/'+filename
+		filename = self._dir+'/'+_filename
 		
 		# If the file is packed, extract the files to a tmp location
 		if os.path.exists(filename+"."+self._ext):
@@ -59,7 +59,7 @@ class ArchiveFile:
 		# except(etree.DTDValidateError):
 			# print("\nError with config file from "+filename+"!")
 		except(IOError):
-			print("Error in opening the config file")
+			print("Error in opening the config file: "+self.config)
 
 	def close(self):
 		"""Clean up"""

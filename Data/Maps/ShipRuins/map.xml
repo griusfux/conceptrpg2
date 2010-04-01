@@ -3,6 +3,8 @@
 <!DOCTYPE mapfile SYSTEM "mapfile.xml">
 
 <mapfile>
+	<name>Ship Ruins</name>
+
 	<start_tile blend_scene="start" blend_obj="cmbStart" />
 	
 	<room_tile blend_scene="cmbSmall" blend_obj="cmbSmall" />

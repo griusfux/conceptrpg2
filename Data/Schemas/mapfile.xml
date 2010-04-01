@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!ELEMENT mapfile (
+				name,
+				
 				start_tile+,
 				room_tile+,
 				corridor_tile+,

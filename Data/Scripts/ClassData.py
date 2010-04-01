@@ -20,7 +20,9 @@ class ClassData:
 		
 		# Now iterate the xml datag
 		for element in classfile.root:
-			if element.tag == "key_abilities":
+			if element.tag == "name":
+				self.name = element.text
+			elif element.tag == "key_abilities":
 				self.key_abilities = element.text
 			elif element.tag == "role":
 				self.role = element.text
