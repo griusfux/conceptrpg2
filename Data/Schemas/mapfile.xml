@@ -11,8 +11,10 @@
 				stair_tile+,
 				trap_tile+,
 				
-				monster_xml,
-				max_cr)>
+				max_cr,
+				encounter_deck)>
+
+<!ELEMENT name (#PCDATA)>				
 
 <!-- 
 
@@ -54,5 +56,5 @@
 	
 -->
 
-<!ELEMENT monster_xml (#PCDATA)>
 <!ELEMENT max_cr (#PCDATA)>
+<!ELEMENT encounter_deck (#PCDATA)>

@@ -157,3 +157,13 @@ class ShieldFile(ArchiveFile):
 	_config = 'shield.xml'
 	_dtd = 'Schemas/shieldfile.xml'
 	_dir = 'Items/Shields'
+	
+class WeaponFile(ArchiveFile):
+	"""Class for handling the weapon files"""
+	# Options for the archive file
+	_ext = 'weapon'
+	_blend = ""
+	_textures = ""
+	_config = 'weapon.xml'
+	_dtd = 'Schemas/weaponfile.xml'
+	_dir = 'Items/Weapons'

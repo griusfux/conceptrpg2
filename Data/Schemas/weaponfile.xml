@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ELEMENT weaponfile (
+				name,
+				
+				weight,
+				value,
+				group,
+				category,
+				two_hand,
+				ranged,
+				profeciency,
+				damage,
+				range,
+				properties)>
+				
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT weight (#PCDATA)>
+<!ELEMENT value (#PCDATA)>
+<!ELEMENT group (#PCDATA)>
+<!ELEMENT category (#PCDATA)>
+<!ELEMENT two_hand (#PCDATA)>
+<!ELEMENT ranged (#PCDATA)>
+<!ELEMENT profeciency (#PCDATA)>
+<!ELEMENT damage (#PCDATA)>
+<!ELEMENT range (#PCDATA)>
+<!ELEMENT properties (#PCDATA)>

@@ -5,6 +5,7 @@ import GameLogic
 from Mathutils import Vector, Matrix
 from Scripts.CharacterLogic import MonsterLogic
 from Scripts.ArchiveFile import DeckFile
+from Scripts.MapData import MapData
 
 GEN_LINEAR = 0
 GEN_RANDOM = 1
@@ -32,18 +33,11 @@ class DungeonGenerator:
 	generation = GEN_RANDOM
 	
 	def __init__(self, mapfile):
-		# Create some lists to store tiles
+		mapdata = MapData(mapfile)
+	
+		# self.tiles is a dictionary of lists
 		# The lists are a list of tuples [(obj, scene)]
-		
-		self.tiles = {}
-		
-		self.tiles['Starts'] = []
-		self.tiles['Rooms'] = []
-		self.tiles['Corridors'] = []
-		self.tiles['Ends'] = []
-		self.tiles['Doors'] = []
-		self.tiles['Stairs'] = []
-		self.tiles['Traps'] = []
+		self.tiles = mapdata.tiles
 		
 		# The list of exit nodes
 		self.exit_nodes = []
@@ -77,27 +71,26 @@ class DungeonGenerator:
 		self.rooms = {}
 		
 		# The EncounterDeck used to generate random incounters
-		self.encounter_deck = ""
+		self.encounter_deck = EncounterDeck(mapdata.encounter_deck)
 	
 		# Parse the xml file and fill the lists, and create the encounter deck
-		#for element in mapfile.root.iter():
-		for element in mapfile.root:
-			if element.tag == "start_tile":
-				self.tiles['Starts'].append((element.get("blend_obj"), element.get("blend_scene")))
-			elif element.tag == "room_tile":
-				self.tiles['Rooms'].append((element.get("blend_obj"), element.get("blend_scene")))
-			elif element.tag == "corridor_tile":
-				self.tiles['Corridors'].append((element.get("blend_obj"), element.get("blend_scene")))
-			elif element.tag == "end_tile":
-				self.tiles['Ends'].append((element.get("blend_obj"), element.get("blend_scene")))
-			elif element.tag == "door_tile":
-				self.tiles['Doors'].append((element.get("blend_obj"), element.get("blend_scene")))
-			elif element.tag == "stair_tile":
-				self.tiles['Stairs'].append((element.get("blend_obj"), element.get("blend_scene")))
-			elif element.tag == "trap_tile":
-				self.tiles['Traps'].append((element.get("blend_obj"), element.get("blend_scene")))
-			elif element.tag == "encounter_deck":
-				self.encounter_deck = EncounterDeck(element.text)
+		# for element in mapfile.root:
+			# if element.tag == "start_tile":
+				# self.tiles['Starts'].append((element.get("blend_obj"), element.get("blend_scene")))
+			# elif element.tag == "room_tile":
+				# self.tiles['Rooms'].append((element.get("blend_obj"), element.get("blend_scene")))
+			# elif element.tag == "corridor_tile":
+				# self.tiles['Corridors'].append((element.get("blend_obj"), element.get("blend_scene")))
+			# elif element.tag == "end_tile":
+				# self.tiles['Ends'].append((element.get("blend_obj"), element.get("blend_scene")))
+			# elif element.tag == "door_tile":
+				# self.tiles['Doors'].append((element.get("blend_obj"), element.get("blend_scene")))
+			# elif element.tag == "stair_tile":
+				# self.tiles['Stairs'].append((element.get("blend_obj"), element.get("blend_scene")))
+			# elif element.tag == "trap_tile":
+				# self.tiles['Traps'].append((element.get("blend_obj"), element.get("blend_scene")))
+			# elif element.tag == "encounter_deck":
+				# self.encounter_deck = EncounterDeck(element.text)
 	def GenerateFromList(self, obj, result):
 		"""Use a result list to generate the dungeon"""		
 		for type, index, position, ori in result:		

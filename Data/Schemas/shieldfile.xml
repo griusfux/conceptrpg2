@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ELEMENT shieldfile (
+				name,
+				
+				weight,
+				value,
+				type,
+				shield_bonus)>
+				
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT weight (#PCDATA)>
+<!ELEMENT value (#PCDATA)>
+<!ELEMENT type (#PCDATA)>
+<!ELEMENT shield_bonus (#PCDATA)>
