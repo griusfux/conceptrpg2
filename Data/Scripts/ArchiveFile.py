@@ -1,4 +1,11 @@
-import xml.etree.cElementTree as etree
+try:
+	import lxml.etree as etree
+	print('Lxml detected, xml validation enabled')
+	VALIDATING = True
+except ImportError:
+	import xml.etree.cElementTree as etree
+	VALIDATING = False
+
 from zipfile import *
 import os
 import shutil
@@ -44,20 +51,21 @@ class ArchiveFile:
 		# Try and load the xml file and validate it		
 		try:
 			tree = etree.parse(self.config, parser)
-			# dtd = etree.DTD(file=self._dtd)
-			# if not dtd.validate(tree.getroot()):
-				# print("Validation Error:")
-				# print(dtd.error_log)
-				# raise etree.DTDValidateError("")
-			# dtd.validate(tree.getroot())
-			self.root = tree.getroot()
-			self.init = True
-		# except(etree.XMLSyntaxError):
-			# print("Syntax Error:")
-			# print(parser.error_log)
-			# print("\nError with config file from "+filename+"!")
-		# except(etree.DTDValidateError):
-			# print("\nError with config file from "+filename+"!")
+			if VALIDATING:
+				dtd = etree.DTD(file=self._dtd)
+				if not dtd.validate(tree.getroot()):
+					print("\nValidation Error:")
+					print(dtd.error_log)
+				else:
+					self.root = tree.getroot()
+					self.init = True
+			else:
+				self.root = tree.getroot()
+				self.init = True
+		except(etree.XMLSyntaxError):
+			print("Syntax Error:")
+			print(parser.error_log)
+			print("\nError with config file from "+_filename+"!")
 		except(IOError):
 			print("Error in opening the config file: "+self.config)
 

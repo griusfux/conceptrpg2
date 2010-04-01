@@ -12,6 +12,7 @@
 
 <!ELEMENT classfile (
 				name,
+				
 				key_abilities,
 				role,
 				proficiencies,
@@ -30,7 +31,8 @@
 	Descriptive elements 
 
 -->
-				
+
+<!ELEMENT name (#PCDATA)>		
 <!ELEMENT key_abilities (#PCDATA)>
 <!ELEMENT role (#PCDATA)>
 

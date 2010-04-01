@@ -2,8 +2,8 @@
 
 <classfile>
 	<name>Class One</name>
-	<key_abilities>"Some abs"</key_abilities>
-	<role>"Doing stuff... LIKE A BOSS!"</role>
+	<key_abilities>Some abs</key_abilities>
+	<role>Doing stuff... LIKE A BOSS!</role>
 	
 	<proficiencies>42</proficiencies>
 	
