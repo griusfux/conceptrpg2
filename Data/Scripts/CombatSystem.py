@@ -39,15 +39,16 @@ class CombatSystem:
 		self.origin = (smallestX, largestY, GRID_Z)
 		
 		# Uncomment for the debug marker
-		# empty.SetPosition(self.origin)
-		# Engine.AddObject('debug', empty, 0)
+		empty.SetPosition(self.origin)
+		self.debug_marker = Engine.AddObject('debug', empty, 0)
 		
 		#Generate the grid
-		grid = CombatGrid(empty, Engine, self.origin, self.roomX, self.roomY)
+		self.grid = CombatGrid(empty, Engine, self.origin, self.roomX, self.roomY)
 		
 		##################
 		##Place Monsters##
 		##################
+
 		for monster in self.enemy_list:
 			monster.x = random.randrange(0, grid.xSteps)
 			monster.y = random.randrange(0, grid.ySteps)
@@ -56,14 +57,27 @@ class CombatSystem:
 			monster.monster.object.SetPosition([tile.x, tile.y, GRID_Z])
 			print([tile.x, tile.y, GRID_Z])
 		
-	def Update(self):
+	def TileFromPoint(self, point):
+		x_off = abs(point[0] - self.origin[0])
+		y_off = abs(point[1] - self.origin[1])
+		
+		return self.grid(int(x_off/TILE_SIZE), int(y_off/TILE_SIZE))
+		
+	def Update(self, main):
 		"""This function is called every frame to make up the combat loop"""
 	
-		self.count -= 1
-		if self.count <= 0:
-			return False
+		self.debug_marker.SetPosition(self.TileFromPoint(main['player'].obj.GetPosition()).position)
+	
+		inputs = main['input_system'].Run()
+		if inputs:
+			if "Jump" in inputs:
+				return False
 		
-		return True
+			main['player'].PlayerPlzMoveNowzKThxBai(inputs, main['client'])
+		else:
+			main['player'].move_to_point(self.TileFromPoint(main['player'].obj.GetPosition()).position)
+			
+		return True		
 		
 class CombatGrid:
 	"""This object handles the grid aspect of combat, and is made up of CombatTile objects"""
@@ -85,12 +99,15 @@ class CombatGrid:
 				empty.SetPosition((origin[0] + x, origin[1] - y, GRID_Z))
 				self.map[x][y] = CombatTile(origin[0] + x, origin[1] - y, empty, Engine)
 				
+	def __call__(self, x, y):
+		return self.map[x][y]
+				
 				
 class CombatTile:
 	"""The individual squares of the CombatGrid object"""
 	def __init__(self, x, y, empty, Engine):
 		self.x = x + TILE_SIZE / 2
 		self.y = y - TILE_SIZE / 2
-		self.position = (self.x + TILE_SIZE / 2, self.y + TILE_SIZE / 2, GRID_Z)
+		self.position = (self.x, self.y, GRID_Z)#(self.x + TILE_SIZE / 2, self.y + TILE_SIZE / 2, GRID_Z)
 		self.grid_tile = Engine.AddObject('GridTile', empty, 0)
 		self.grid_color = Engine.AddObject('GridColor', empty, 0)

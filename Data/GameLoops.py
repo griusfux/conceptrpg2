@@ -77,7 +77,7 @@ def InGame(cont):
 		HandleInput(own)
 		
 		# Check to see if the player should be triggering combat
-		# gameobj = own['character'].obj.gameobj
+		# gameobj = own['player'].obj.gameobj
 		# if gameobj.sensors['sensor'].hitObject:
 			# gameobj.sendMessage("encounter", str(gameobj.sensors['sensor'].hitObject.getPhysicsId()))
 			
@@ -166,7 +166,7 @@ def Init(own):
 		
 	
 	# Setup an input system
-	own['input_sys'] = BlenderInputSystem(own.sensors['keyboard'], 'keys.conf')
+	own['input_system'] = BlenderInputSystem(own.sensors['keyboard'], 'keys.conf')
 	
 	# Add the character
 	scene = gl.getCurrentScene()
@@ -175,7 +175,7 @@ def Init(own):
 	own.position = temp
 	gameobj = scene.addObject("CharacterEmpty", own)
 	
-	own['character'] = PlayerLogic(BlenderWrapper.Object(gameobj))
+	own['player'] = PlayerLogic(BlenderWrapper.Object(gameobj))
 	
 	# Parent the camera to the player
 	cam = scene.objects["Camera"]
@@ -239,7 +239,9 @@ def HandleCombat(own):
 		
 	# When the Combat System's Update() returns false, combat is over
 	if 'combat_system' in own:
-		if own['combat_system'].Update():
+		scene = gl.getCurrentScene()
+		scene.active_camera = scene.objects['Camera']
+		if own['combat_system'].Update(own):
 			return True
 		else:
 			# Clean up
@@ -250,7 +252,7 @@ def HandleCombat(own):
 
 def HandleInput(own):	
 	# Collect input
-	inputs = own['input_sys'].Run()
+	inputs = own['input_system'].Run()
 	
 	scene = gl.getCurrentScene()
 	scene.active_camera = own['3pcam']
@@ -261,5 +263,5 @@ def HandleInput(own):
 			scene.active_camera = scene.objects['Camera']
 		
 		# Move the character
-		own['character'].PlayerPlzMoveNowzKThxBai(inputs, own['client'])
+		own['player'].PlayerPlzMoveNowzKThxBai(inputs, own['client'])
 

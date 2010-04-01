@@ -69,7 +69,7 @@ class CharacterLogic:
 		self.conditions = []
 		
 		#speed
-		self.speed		= 0
+		self.speed		= 5
 		self.speed_base = 0
 		self.speed_armor_penalty = 0
 		self.speed_item_mod	= 0
@@ -152,6 +152,15 @@ class CharacterLogic:
 			roll += random.randint(1, y)
 		return roll
 		
+	def move_to_point(self, target):
+		"""Moves the character toward a given target at it's speed"""
+		
+		# Get the vector to  the target
+		target_vector = self.obj.get_local_vector_to(target)
+		
+		self.obj.Move((self.speed * target_vector[0], self.speed * target_vector[1], 0))
+		
+		
 class PlayerLogic(CharacterLogic):
 	
 	def __init__(self, obj):
@@ -212,7 +221,7 @@ class PlayerLogic(CharacterLogic):
 				"equipped_weapon" 	: self.equipped_weapon }
 		pickle.dump(save_data, save)
 		
-	def PlayerPlzMoveNowzKThxBai(self, cheezburger, client=None):
+	def PlayerPlzMoveNowzKThxBai(self, cheezburger, client):
 		"""Move the player"""
 		#Best method ever :D
 		
@@ -230,7 +239,7 @@ class PlayerLogic(CharacterLogic):
 				self.obj.Rotate((0, 0, -0.04))
 				
 		# Send updates if we need to
-		if client:
+		if client.connected:
 			pos = self.obj.GetPosition()
 			ori = self.obj.GetOrientation()
 			ori = (ori[0][1], ori[1][1], ori[2][1])
@@ -241,8 +250,9 @@ class PlayerLogic(CharacterLogic):
 				self.last_update = (pos[:], ori[:])
 				client.send_message('update_player %s %.3f %.3f %.3f %.3f %.3f %.3f' % (client.user, pos[0], pos[1], pos[2], ori[0], ori[1], ori[2]))
 			
+
 		
-		
+	
 class MonsterLogic(CharacterLogic):
 	
 	def __init__(self, object, monster):
