@@ -7,11 +7,11 @@
 
 	<start_tile blend_scene="start" blend_obj="cmbStart" />
 	
-	<room_tile blend_scene="cmbSmall" blend_obj="cmbSmall" />
+	<room_tile blend_scene="cmbSmall" blend_obj="cmbSmall" /> 
 	<room_tile blend_scene="cmbMedium1" blend_obj="cmbMedium1" />
 	<room_tile blend_scene="cmbMedium2" blend_obj="cmbMedium2" />
-	<room_tile blend_scene="cmbLarge" blend_obj="cmbLarge.001" />
-	
+	<room_tile blend_scene="cmbLarge" blend_obj="cmbLarge" />
+ 	
 	<corridor_tile blend_scene="corridor" blend_obj="corridor" />
 	<corridor_tile blend_scene="3Way" blend_obj="3Way" />
 	<corridor_tile blend_scene="4Way" blend_obj="4Way" />
