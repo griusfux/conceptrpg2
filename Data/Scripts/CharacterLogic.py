@@ -301,6 +301,10 @@ class MonsterLogic(CharacterLogic):
 				
 		self.RecalcStats()
 		
+	def __del__(self):
+		if self.object:
+			self.object.End()
+		
 class ProxyLogic(CharacterLogic):
 	"""Class for handling network proxies"""
 	

@@ -74,6 +74,9 @@ class Object:
 	def get_local_vector_to(self, position):
 		return self.gameobj.getVectTo(position)[2]
 		
+	def set_color(self, color):
+		self.gameobj.color = color
+		
 class Vertex:
 	"""KX_VertexProxy wrapper"""
 	def __init__(self, vertex, gameobj):

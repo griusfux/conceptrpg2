@@ -6,12 +6,12 @@ GRID_Z		= 0.1
 
 
 class CombatSystem:
-	def __init__(self, empty, Engine, encounter_list, room):
+	def __init__(self, main, Engine, encounter_list, room):
+		self.main = main.gameobj
 		random.seed()
 		self.count = 5
 		#Wrap all the enemies in an ai object
 		self.enemy_list = [ai(enemy) for enemy in encounter_list]
-		print([i.monster.name for i in self.enemy_list])
 		
 		###################
 		##Survey the room##
@@ -36,15 +36,18 @@ class CombatSystem:
 		
 		self.roomX = largestX - smallestX
 		self.roomY = largestY - smallestY
-		self.origin = (smallestX, largestY, GRID_Z)
-		
+		self.origin = (smallestX - TILE_SIZE, largestY + TILE_SIZE, GRID_Z)
+	
 		# Uncomment for the debug marker
-		empty.SetPosition(self.origin)
-		self.debug_marker = Engine.AddObject('debug', empty, 0)
+		# main.SetPosition(self.origin)
+		# self.debug_marker = Engine.AddObject('debug', main, 0)
 		
 		#Generate the grid
-		self.grid = CombatGrid(empty, Engine, self.origin, self.roomX, self.roomY)
-		
+		self.grid = CombatGrid(main, Engine, self.origin, self.roomX, self.roomY)
+			
+		# Make sure the player is in the room
+		self.main['player'].move_to_point(self.TileFromPoint(self.main, self.main['player'].obj.GetPosition()).position)
+
 		##################
 		##Place Monsters##
 		##################
@@ -52,42 +55,50 @@ class CombatSystem:
 		for monster in self.enemy_list:
 			monster.x = random.randrange(0, self.grid.xSteps)
 			monster.y = random.randrange(0, self.grid.ySteps)
-			Engine.AddObject(monster.monster.id, empty, 0)
+			Engine.AddObject(monster.monster.id, main, 0)
 			tile = self.grid.map[monster.x][monster.y]
-			monster.monster.object.SetPosition([tile.x, tile.y, GRID_Z])
-			print([tile.x, tile.y, GRID_Z])
+			monster.monster.object.SetPosition(tile.position)
 			
 	def __del__(self):
 		del self.grid
 		
-	def TileFromPoint(self, point):
+		for enemy in self.enemy_list:
+			del enemy
+		
+	def TileFromPoint(self, main, point):
 		x_off = abs(point[0] - self.origin[0])
 		y_off = abs(point[1] - self.origin[1])
 		
-		x = int(x_off/TILE_SIZE)
+		x = int(x_off/TILE_SIZE) - 1
 		y = int(y_off/TILE_SIZE)
 		
-		try:
-			tile = self.grid(x, y)
-		except:
-			if x > self.grid.xSteps-1:
-				x = self.grid.xSteps-1
-			elif x < 0:
-				x = 0
-				
-			if y > self.grid.ySteps-1:
-				y = self.grid.ySteps-1
-			elif y < 0:
-				y = 0
-				
-			tile = self.grid(x, y)
+		out_of_bounds = False
+		
+		if x > self.grid.xSteps - 2:
+			x = self.grid.xSteps - 2
+			out_of_bounds = True
+		elif x < 0:
+			x = 0
+			out_of_bounds = True
+			
+		if y > self.grid.ySteps - 2:
+			y = self.grid.ySteps - 2
+			out_of_bounds = True
+		elif y < 1:
+			y = 1
+			out_of_bounds = True
+			
+		tile = self.grid(x, y)
+		
+		if out_of_bounds:
+			main['player'].obj.SetPosition(tile.position)
 			
 		return tile
 		
 	def Update(self, main):
 		"""This function is called every frame to make up the combat loop"""
-	
-		self.debug_marker.SetPosition(self.TileFromPoint(main['player'].obj.GetPosition()).position)
+
+		# self.debug_marker.SetPosition(self.TileFromPoint(main, main['player'].obj.GetPosition()).position)
 	
 		inputs = main['input_system'].Run()
 		if inputs:
@@ -96,7 +107,7 @@ class CombatSystem:
 		
 			main['player'].PlayerPlzMoveNowzKThxBai(inputs, main['client'])
 		else:
-			main['player'].move_to_point(self.TileFromPoint(main['player'].obj.GetPosition()).position)
+			main['player'].move_to_point(self.TileFromPoint(main, main['player'].obj.GetPosition()).position)
 			
 		return True		
 		
@@ -107,19 +118,19 @@ class CombatGrid:
 		empty.SetPosition(origin)
 		
 		# Find out how many tiles need to be in the room
-		self.xSteps = int(round(roomX / TILE_SIZE))
-		self.ySteps = int(round(roomY / TILE_SIZE))
+		self.xSteps = int(round(roomX / TILE_SIZE)) + 2 * TILE_SIZE
+		self.ySteps = int(round(roomY / TILE_SIZE)) + 2 * TILE_SIZE
 		
+		print(self.xSteps, self.ySteps)
 		# Create an empty 2D list to hold the grid
 		self.map = [[None for i in range(self.ySteps)] for i in range(self.xSteps)]
 		
 		# Fill the 2D grid list with CombatTile objects
 		for x in range(self.xSteps):
-			yList = [None for i in range(self.ySteps)]
-			for y in range (self.ySteps):
+			for y in range(self.ySteps):
 				empty.SetPosition((origin[0] + x, origin[1] - y, GRID_Z))
-				self.map[x][y] = CombatTile(origin[0] + x, origin[1] - y, empty, Engine)
-				
+				self.map[x][y] = CombatTile(x, y, [origin[0] + x, origin[1] - y], empty, Engine, self.xSteps, self.ySteps)
+	
 	def __del__(self):
 		for x in self.map:
 			for y in x:
@@ -131,12 +142,23 @@ class CombatGrid:
 				
 class CombatTile:
 	"""The individual squares of the CombatGrid object"""
-	def __init__(self, x, y, empty, Engine):
-		self.x = x + TILE_SIZE / 2
-		self.y = y - TILE_SIZE / 2
-		self.position = (self.x, self.y, GRID_Z)#(self.x + TILE_SIZE / 2, self.y + TILE_SIZE / 2, GRID_Z)
-		self.grid_tile = Engine.AddObject('GridTile', empty, 0)
+	def __init__(self, x, y, position, empty, Engine, xSteps, ySteps):
+		self.x = x
+		self.y = y
+		self.position = ((position[0] + TILE_SIZE / 2) + 1, position[1] - TILE_SIZE / 2, GRID_Z)
+		self.valid = True
+		
 		self.grid_color = Engine.AddObject('GridColor', empty, 0)
+		self.grid_color.set_color([0, 0, 0, 0])
+		
+		if self.x in (0, xSteps - 1) or self.y in (0, ySteps - 1):
+			self.valid = False
+			
+		if self.valid:
+			self.grid_tile = Engine.AddObject('GridTile', empty, 0)
+		else:
+			self.grid_tile = Engine.AddObject('GridInvalid', empty, 0)
+			self.grid_color.set_color([1, 0, 0, 1])
 		
 	def __del__(self):
 		self.grid_tile.End()
