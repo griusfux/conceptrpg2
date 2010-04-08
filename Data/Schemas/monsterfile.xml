@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ELEMENT monsterfile (
+				name,
+				
+				level,
+				role,
+				leader,
+				elite,
+				xp,
+				alignment,
+				
+				
+				str_ab,
+				con_ab,
+				dex_ab,
+				int_ab,
+				wis_ab,
+				cha_ab,
+				
+				behaviors*,
+				armor*)>
+
+<!-- 
+
+	Descriptive elements 
+
+-->
+
+<!ELEMENT name (#PCDATA)>		
+<!ELEMENT level (#PCDATA)>
+<!ELEMENT alignment (#PCDATA)>
+<!ELEMENT role (#PCDATA)>
+<!ELEMENT xp (#PCDATA)>
+
+<!ELEMENT leader (#PCDATA)>
+<!ELEMENT elite (#PCDATA)>
+
+
+<!--
+
+	Stats
+	
+-->
+
+<!ELEMENT str_ab (#PCDATA)>
+<!ELEMENT dex_ab (#PCDATA)>
+<!ELEMENT con_ab (#PCDATA)>
+<!ELEMENT int_ab (#PCDATA)>
+<!ELEMENT wis_ab (#PCDATA)>
+<!ELEMENT cha_ab (#PCDATA)>
+
+<!ELEMENT behaviors (#PCDATA)>
+<!ELEMENT armor (#PCDATA)>
