@@ -4,8 +4,9 @@ import random
 import GameLogic
 from Mathutils import Vector, Matrix
 from Scripts.CharacterLogic import MonsterLogic
-from Scripts.ArchiveFile import DeckFile
+from Scripts.ArchiveFile import DeckFile, MonsterFile
 from Scripts.MapData import MapData
+from Scripts.MonsterData import MonsterData
 
 GEN_LINEAR = 0
 GEN_RANDOM = 1
@@ -317,7 +318,7 @@ class EncounterDeck():
 				elif element.tag == "count":
 					count = int(element.text)
 			for i in range(count):
-				self.Deck.append(MonsterLogic(None, monster))
+				self.Deck.append(MonsterLogic(None, monster, MonsterData(MonsterFile(monster))))
 				
 		deckfile.close()
 				

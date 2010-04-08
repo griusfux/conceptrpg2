@@ -4,8 +4,6 @@
 # Contributers: Daniel Stokes, Mitchell Stokes
 
 from Scripts.InventoryLogic import *
-from Scripts.ValidateData import *
-from Scripts.ArchiveFile import MonsterFile
 from Mathutils import Vector
 import pickle
 import random
@@ -255,49 +253,56 @@ class PlayerLogic(CharacterLogic):
 	
 class MonsterLogic(CharacterLogic):
 	
-	def __init__(self, object, monster):
+	def __init__(self, object, id, monsterdata):
 		CharacterLogic.__init__(self, object)
-		self.datafile = MonsterFile(monster)
-		self.id = monster
-		
-		self.allowed_roles = ('artillery', 'brute', 'controller', 'lurker', 'minion', 'skirmisher')
+		self.id = id
+
 		self.role = ""
 		self.leader = False
 		self.elite	= False
 		self.object = object
 		self.behaviors = []
 		
-		for element in self.datafile.root:
-			if element.tag == "name":
-				self.name = element.text
-			elif element.tag == "level":
-				ValidateInt(self, element.tag, element.text)
-			elif element.tag == "role":
-				ValidateAllowedData(self, element.tag, element.text, self.allowed_roles)
-			elif element.tag == "leader":
-				ValidateBoolean(self, element.tag, element.text)
-			elif element.tag == "elite":
-				ValidateBoolean(self, element.tag, element.text)
-			elif element.tag == "xp":
-				ValidateInt(self, element.tag, element.text)
-			#elif element.tag == "alignment":
-			#	ValidateAllowedData(self, element.tag, element.text, self.allowed_alignments)
-			elif element.tag == "str_ab":
-				ValidateInt(self, element.tag, element.text)
-			elif element.tag == "dex_ab":
-				ValidateInt(self, element.tag, element.text)
-			elif element.tag == "con_ab":
-				ValidateInt(self, element.tag, element.text)
-			elif element.tag == "int_ab":
-				ValidateInt(self, element.tag, element.text)
-			elif element.tag == "wis_ab":
-				ValidateInt(self, element.tag, element.text)
-			elif element.tag == "cha_ab":
-				ValidateInt(self, element.tag, element.text)
-			elif element.tag == "behaviors":
-				self.behaviors = [getattr(__import__('Scripts.Ai.Behaviors.%s' % behavior, globals(), locals(), [behavior], -1), behavior) for behavior in element.text.split(', ')]
-				
-		#self.datafile.close()
+		self.name = monsterdata.name
+		self.level = monsterdata.level
+		self.role = monsterdata.role
+		self.leader = monsterdata.leader
+		self.elite = monsterdata.elite
+		self.str_ab = monsterdata.str_ab
+		self.con_ab = monsterdata.con_ab
+		self.int_ab = monsterdata.int_ab
+		self.wis_ab = monsterdata.wis_ab
+		self.cha_ab = monsterdata.cha_ab
+		#self.behaviors = monsterdata.behaviors[:]
+		# for element in self.datafile.root:
+			# if element.tag == "name":
+				# self.name = element.text
+			# elif element.tag == "level":
+				# ValidateInt(self, element.tag, element.text)
+			# elif element.tag == "role":
+				# ValidateAllowedData(self, element.tag, element.text, self.allowed_roles)
+			# elif element.tag == "leader":
+				# ValidateBoolean(self, element.tag, element.text)
+			# elif element.tag == "elite":
+				# ValidateBoolean(self, element.tag, element.text)
+			# elif element.tag == "xp":
+				# ValidateInt(self, element.tag, element.text)
+			# # elif element.tag == "alignment":
+				# # ValidateAllowedData(self, element.tag, element.text, self.allowed_alignments)
+			# elif element.tag == "str_ab":
+				# ValidateInt(self, element.tag, element.text)
+			# elif element.tag == "dex_ab":
+				# ValidateInt(self, element.tag, element.text)
+			# elif element.tag == "con_ab":
+				# ValidateInt(self, element.tag, element.text)
+			# elif element.tag == "int_ab":
+				# ValidateInt(self, element.tag, element.text)
+			# elif element.tag == "wis_ab":
+				# ValidateInt(self, element.tag, element.text)
+			# elif element.tag == "cha_ab":
+				# ValidateInt(self, element.tag, element.text)
+			# elif element.tag == "behaviors":
+				# self.behaviors = [getattr(__import__('Scripts.Ai.Behaviors.%s' % behavior, globals(), locals(), [behavior], -1), behavior) for behavior in element.text.split(', ')]
 				
 		self.RecalcStats()
 		

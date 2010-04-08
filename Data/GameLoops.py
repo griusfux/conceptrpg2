@@ -5,8 +5,8 @@
 
 # Define all of the needed game loops here
 
-import Scripts.ArchiveFile as ArchiveFile
 import Scripts.BlenderWrapper as BlenderWrapper
+from Scripts.ArchiveFile import *
 from Scripts.DungeonGenerator import DungeonGenerator, EncounterDeck
 from Scripts.CharacterLogic import PlayerLogic, ProxyLogic, MonsterLogic
 from Scripts.CombatSystem import CombatSystem
@@ -99,7 +99,7 @@ def Init(own):
 			
 	# Try to load the mapfile
 	if 'mapfile' not in own:
-		own['mapfile'] = ArchiveFile.MapFile('ShipRuins')
+		own['mapfile'] = MapFile('ShipRuins')
 		
 		if not own['mapfile'].init:
 			print('Could not open the map file!')
@@ -229,8 +229,10 @@ def HandleCombat(own):
 			
 			# Load the gameobject for the monster into the scene if it isn't already there
 			if monster.id not in gl.getCurrentScene().objects:
-				gl.LibLoad(monster.datafile.blend, 'Scene', 'Scene')
-				monster.datafile.close()
+				monsterfile = MonsterFile(monster.id)
+				gl.LibLoad(monsterfile.blend, 'Scene', 'Scene')
+				monsterfile.close()
+				
 			
 			monster.object = BlenderWrapper.Object(gl.getCurrentScene().addObject(monster.id, own))
 			
