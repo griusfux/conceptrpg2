@@ -318,7 +318,9 @@ class EncounterDeck():
 				elif element.tag == "count":
 					count = int(element.text)
 			for i in range(count):
-				self.Deck.append(MonsterLogic(None, monster, MonsterData(MonsterFile(monster))))
+				mfile = MonsterFile(monster)
+				self.Deck.append(MonsterLogic(None, monster, MonsterData(mfile)))
+				mfile.close()
 				
 		deckfile.close()
 				
