@@ -84,7 +84,7 @@ class CharacterLogic:
 		# the character's game object
 		self.obj = obj
 		
-	def RecalcStats(self):
+	def recalc_stats(self):
 		"""Recalculates the player's stats that are calculated based on other stats"""
 		#ability modifiers
 		self.str_mod = -5 + self.str_ab // 2
@@ -117,31 +117,31 @@ class CharacterLogic:
 		#speed
 		self.speed = self.speed_base + self.speed_armor_penalty + self.speed_item_mod + self.speed_misc_mod
 		
-	def EquipArmor(self, armor):
+	def equip_armor(self, armor):
 		"""Changes stats to newly equipped armor and then recalculates stats"""
 		self.equipped_armor = armor
 		self.ac_bonus = armor.ac_bonus
 		self.speed_armor_penalty = armor.speed
-		self.RecalcStats()
+		self.recalc_stats()
 		
-	def EquipShield(self, shield):
+	def equip_shield(self, shield):
 		"""Changes stats to newly equipped shield and then recalculates stats"""
 		self.equipped_shield = shield
 		self.shield_bonus = shield.shield_bonus
-		self.RecalcStats()
+		self.recalc_stats()
 		
-	def EquipWeapon(self, weapon):
+	def equip_weapon(self, weapon):
 		"""Changes stats to newly equipped weapon"""
 		self.equipped_weapon = weapon
 		
-	def SaveAgainst(self, roll, defense, type=None):
+	def save_against(self, roll, defense, type=None):
 		"""Checks to see if a player saves against a roll of optional type with the specified defense"""
 		mod = 0
 		if type in self.saving_throw_mods:
 			mod += saving_throw_mods[type]			
 		return self.defense + mod > roll
 	
-	def RollDice(self, dice):
+	def roll_dice(self, dice):
 		x, y = [int(i) for i in dice.split("d")]
 		roll = 0
 		
@@ -156,7 +156,7 @@ class CharacterLogic:
 		# Get the vector to  the target
 		target_vector = self.obj.get_local_vector_to(target)
 		
-		self.obj.Move((self.speed * target_vector[0], self.speed * target_vector[1], 0))
+		self.obj.move((self.speed * target_vector[0], self.speed * target_vector[1], 0))
 		
 		
 class PlayerLogic(CharacterLogic):
@@ -166,7 +166,7 @@ class PlayerLogic(CharacterLogic):
 		self.inventory = InventoryLogic()
 		self.last_update = [(0, 0, 0), (1, 1, 1)]
 		
-	def LoadStatsFromSave(self, save):
+	def load_stats_from_save(self, save):
 		"""Fills in stats from a SaveData object"""
 		try:
 			save_data = pickle.load(save)
@@ -189,15 +189,15 @@ class PlayerLogic(CharacterLogic):
 		self.cha_ab		= save_data["cha_ab"]
 		
 		if save_data["equipped_armor"]:
-			self.EquipArmor(save_data["equipped_armor"])
+			self.equip_armor(save_data["equipped_armor"])
 		if save_data["equipped_shield"]:
-			self.EquipShield(save_data["equipped_shield"])
+			self.equip_shield(save_data["equipped_shield"])
 		if save_data["equipped_weapon"]:
-			self.EquipWeapon(save_data["equipped_weapon"])
+			self.equip_weapon(save_data["equipped_weapon"])
 
-		self.RecalcStats()
+		self.recalc_stats()
 		
-	def SaveStatsToSave(self, save):
+	def save_stats_to_save(self, save):
 		save_data = {
 				"name"	: self.name,
 				"level"	: self.level,
@@ -219,27 +219,27 @@ class PlayerLogic(CharacterLogic):
 				"equipped_weapon" 	: self.equipped_weapon }
 		pickle.dump(save_data, save)
 		
-	def PlayerPlzMoveNowzKThxBai(self, cheezburger, client):
+	def move_player(self, inputs, client):
 		"""Move the player"""
 		#Best method ever :D
 		
 		# Handle input
-		if cheezburger:
-			if "MoveForward" in cheezburger:
-				self.obj.Move((0, 5, 0))
-				self.obj.PlayAnimation("move")
-			if "MoveBackward" in cheezburger:
-				self.obj.Move((0, -5, 0))
-				self.obj.PlayAnimation("move")
-			if "TurnLeft" in cheezburger:
-				self.obj.Rotate((0, 0, 0.04))
-			if "TurnRight" in cheezburger:
-				self.obj.Rotate((0, 0, -0.04))
+		if inputs:
+			if "MoveForward" in inputs:
+				self.obj.move((0, 5, 0))
+				self.obj.play_animation("move")
+			if "MoveBackward" in inputs:
+				self.obj.move((0, -5, 0))
+				self.obj.play_animation("move")
+			if "TurnLeft" in inputs:
+				self.obj.rotate((0, 0, 0.04))
+			if "TurnRight" in inputs:
+				self.obj.rotate((0, 0, -0.04))
 				
 		# Send updates if we need to
 		if client.connected:
-			pos = self.obj.GetPosition()
-			ori = self.obj.GetOrientation()
+			pos = self.obj.get_position()
+			ori = self.obj.get_orientation()
 			ori = (ori[0][1], ori[1][1], ori[2][1])
 			lp = self.last_update[0]
 			lo = self.last_update[1]
@@ -273,42 +273,12 @@ class MonsterLogic(CharacterLogic):
 		self.int_ab = monsterdata.int_ab
 		self.wis_ab = monsterdata.wis_ab
 		self.cha_ab = monsterdata.cha_ab
-		#self.behaviors = monsterdata.behaviors[:]
-		# for element in self.datafile.root:
-			# if element.tag == "name":
-				# self.name = element.text
-			# elif element.tag == "level":
-				# ValidateInt(self, element.tag, element.text)
-			# elif element.tag == "role":
-				# ValidateAllowedData(self, element.tag, element.text, self.allowed_roles)
-			# elif element.tag == "leader":
-				# ValidateBoolean(self, element.tag, element.text)
-			# elif element.tag == "elite":
-				# ValidateBoolean(self, element.tag, element.text)
-			# elif element.tag == "xp":
-				# ValidateInt(self, element.tag, element.text)
-			# # elif element.tag == "alignment":
-				# # ValidateAllowedData(self, element.tag, element.text, self.allowed_alignments)
-			# elif element.tag == "str_ab":
-				# ValidateInt(self, element.tag, element.text)
-			# elif element.tag == "dex_ab":
-				# ValidateInt(self, element.tag, element.text)
-			# elif element.tag == "con_ab":
-				# ValidateInt(self, element.tag, element.text)
-			# elif element.tag == "int_ab":
-				# ValidateInt(self, element.tag, element.text)
-			# elif element.tag == "wis_ab":
-				# ValidateInt(self, element.tag, element.text)
-			# elif element.tag == "cha_ab":
-				# ValidateInt(self, element.tag, element.text)
-			# elif element.tag == "behaviors":
-				# self.behaviors = [getattr(__import__('Scripts.Ai.Behaviors.%s' % behavior, globals(), locals(), [behavior], -1), behavior) for behavior in element.text.split(', ')]
-				
-		self.RecalcStats()
+
+		self.recalc_stats()
 		
 	def __del__(self):
 		if self.object:
-			self.object.End()
+			self.object.end()
 		
 class ProxyLogic(CharacterLogic):
 	"""Class for handling network proxies"""
@@ -316,11 +286,11 @@ class ProxyLogic(CharacterLogic):
 	def __init__(self, obj):
 		CharacterLogic.__init__(self, obj)
 		
-	def Update(self, pos_vec, ori_vec):
+	def update(self, pos_vec, ori_vec):
 		"""Update's the proxy's position and orientation"""
 		
 		# Set the position
-		self.obj.SetPosition([float(i) for i in pos_vec])
+		self.obj.set_position([float(i) for i in pos_vec])
 		
 		# Construct a new orientation matrix
 		ori_vec = [float(i) for i in ori_vec]
@@ -332,11 +302,11 @@ class ProxyLogic(CharacterLogic):
 		# x.normalize()
 		# y.normalize()
 		# z.normalize()
-		self.obj.SetOrientation([
+		self.obj.set_orientation([
 						[x[0], y[0], z[0]],
 						[x[1], y[1], z[1]],
 						[x[2], y[2], z[2]]
 						])
 						
-	def Die(self):
-		self.object.End()
+	def die(self):
+		self.object.end()

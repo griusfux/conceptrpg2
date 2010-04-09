@@ -16,7 +16,7 @@ class CombatSystem:
 		##Survey the room##
 		###################
 
-		vertList = [i for i in room.GetVertexList() if i.z <= 0]
+		vertList = [i for i in room.get_vertex_list() if i.z <= 0]
 		
 		smallestX = vertList[0].x
 		smallestY = vertList[0].y
@@ -46,16 +46,16 @@ class CombatSystem:
 		self.grid = CombatGrid(main, Engine, self.origin, self.roomX, self.roomY)
 			
 		# Make sure the player is in the room
-		self.main['player'].move_to_point(self.tile_from_point(self.main, self.main['player'].obj.GetPosition()).position)
+		self.main['player'].move_to_point(self.tile_from_point(self.main, self.main['player'].obj.get_position()).position)
 
 		# Place the monsters
 
 		for monster in self.enemy_list:
 			monster.x = random.randrange(0, self.grid.xSteps)
 			monster.y = random.randrange(0, self.grid.ySteps)
-			Engine.AddObject(monster.monster.id, main, 0)
+			Engine.add_object(monster.monster.id, main, 0)
 			tile = self.grid.map[monster.x][monster.y]
-			monster.monster.object.SetPosition(tile.position)
+			monster.monster.object.set_position(tile.position)
 			
 	def __del__(self):
 		del self.grid
@@ -93,7 +93,7 @@ class CombatSystem:
 		
 		# force the player to be inside the bounds
 		if out_of_bounds:
-			main['player'].obj.SetPosition(tile.position)
+			main['player'].obj.set_position(tile.position)
 			
 		return tile
 		
@@ -102,14 +102,14 @@ class CombatSystem:
 
 		# self.debug_marker.SetPosition(self.tile_from_point(main, main['player'].obj.GetPosition()).position)
 	
-		inputs = main['input_system'].Run()
+		inputs = main['input_system'].run()
 		if inputs:
 			if "Jump" in inputs:
 				return False
 		
-			main['player'].PlayerPlzMoveNowzKThxBai(inputs, main['client'])
+			main['player'].move_player(inputs, main['client'])
 		else:
-			main['player'].move_to_point(self.tile_from_point(main, main['player'].obj.GetPosition()).position)
+			main['player'].move_to_point(self.tile_from_point(main, main['player'].obj.get_position()).position)
 			
 		return True		
 		
@@ -117,20 +117,19 @@ class CombatGrid:
 	"""This object handles the grid aspect of combat, and is made up of CombatTile objects"""
 	def __init__(self, empty, Engine, origin, roomX, roomY):
 		# Position the main empty
-		empty.SetPosition(origin)
+		empty.set_position(origin)
 		
 		# Find out how many tiles need to be in the room
 		self.xSteps = int(round(roomX / TILE_SIZE)) + 2 * TILE_SIZE
 		self.ySteps = int(round(roomY / TILE_SIZE)) + 2 * TILE_SIZE
-		
-		print(self.xSteps, self.ySteps)
+
 		# Create an empty 2D list to hold the grid
 		self.map = [[None for i in range(self.ySteps)] for i in range(self.xSteps)]
 		
 		# Fill the 2D grid list with CombatTile objects
 		for x in range(self.xSteps):
 			for y in range(self.ySteps):
-				empty.SetPosition((origin[0] + x, origin[1] - y, GRID_Z))
+				empty.set_position((origin[0] + x, origin[1] - y, GRID_Z))
 				self.map[x][y] = CombatTile(x, y, [origin[0] + x, origin[1] - y], empty, Engine, self.xSteps, self.ySteps)
 	
 	def __del__(self):
@@ -150,18 +149,18 @@ class CombatTile:
 		self.position = ((position[0] + TILE_SIZE / 2) + 1, position[1] - TILE_SIZE / 2, GRID_Z)
 		self.valid = True
 		
-		self.grid_color = Engine.AddObject('GridColor', empty, 0)
+		self.grid_color = Engine.add_object('GridColor', empty, 0)
 		self.grid_color.set_color([0, 0, 0, 0])
 		
 		if self.x in (0, xSteps - 1) or self.y in (0, ySteps - 1):
 			self.valid = False
 			
 		if self.valid:
-			self.grid_tile = Engine.AddObject('GridTile', empty, 0)
+			self.grid_tile = Engine.add_object('GridTile', empty, 0)
 		else:
-			self.grid_tile = Engine.AddObject('GridInvalid', empty, 0)
+			self.grid_tile = Engine.add_object('GridInvalid', empty, 0)
 			self.grid_color.set_color([1, 0, 0, 1])
 		
 	def __del__(self):
-		self.grid_tile.End()
-		self.grid_color.End()
+		self.grid_tile.end()
+		self.grid_color.end()

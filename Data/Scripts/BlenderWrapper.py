@@ -20,7 +20,7 @@ class Object:
 		armature = [i for i in gameobj.childrenRecursive if i.name == "KatArm"]
 		if armature: self.armature = armature[0]
 		
-	def Move(self, vec, mode=MOVE_LINV, local=True):
+	def move(self, vec, mode=MOVE_LINV, local=True):
 		"""Do object movement"""
 		
 		if mode == MOVE_LINV:
@@ -36,31 +36,31 @@ class Object:
 		else:
 			raise ValueError("Supplied mode is invalid!")
 			
-	def GetPosition(self):
+	def get_position(self):
 		return self.gameobj.worldPosition
 		
-	def GetOrientation(self):
+	def get_orientation(self):
 		return self.gameobj.worldOrientation
 		
-	def SetPosition(self, position):
+	def set_position(self, position):
 		self.gameobj.worldPosition = position[:]
 		
-	def SetOrientation(self, ori):
+	def set_orientation(self, ori):
 		self.gameobj.worldOrientation = ori[:]
 			
-	def Rotate(self, vec, local=True):
+	def rotate(self, vec, local=True):
 		"""Do object rotation"""
 		
 		self.gameobj.applyRotation(vec, local)
 		
-	def PlayAnimation(self, anim):
+	def play_animation(self, anim):
 		if self.armature:
 			self.gameobj.sendMessage("animation", anim, self.armature.name)
 			
-	def End(self):
+	def end(self):
 		self.gameobj.endObject()
 		
-	def GetVertexList(self):
+	def get_vertex_list(self):
 		vertexList = []
 		mesh = self.gameobj.meshes[0]
 		
@@ -85,18 +85,18 @@ class Vertex:
 class Engine:
 	"""Wrapper for engine functionality"""
 	
-	def AddObject(object, adder, time=0):
+	def add_object(object, adder, time=0):
 		"""Add an opject"""
 		scene = gl.getCurrentScene()
 		
 		add = scene.addObject(object, adder.gameobj, time)
 		return Object(add) if add else None
 		
-	def RemoveObject(object):
+	def remove_object(object):
 		"""Remove and object"""
 		object.gameobj.endObject()
 		
-	def RayCast(to_pos, from_pos, object):
+	def ray_cast(to_pos, from_pos, object):
 		"""Cast a ray using the object"""
 		
 		return object.rayCast(to_pos, from_pos)

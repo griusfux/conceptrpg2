@@ -8,10 +8,10 @@ class BlenderInput():
 		self.sensor = sensor
 		self.dict = dict
 		
-	def CheckInput(self):
-		raise AttributeError("Input.CheckInput() is abstract")
+	def check_input(self):
+		raise AttributeError("Input.check_input() is abstract")
 	
-	def ParseInput(self, input):
+	def parse_input(self, input):
 		for key in self.dict.keys():
 			if input == self.dict[key]:
 				return key
@@ -19,14 +19,14 @@ class BlenderInput():
 		return None
 
 class BlenderKeyboardInput(BlenderInput):
-	def CheckInput(self):
+	def check_input(self):
 		if not self.sensor.positive:
 			return None
 		
 		val = []
 		for event in self.sensor.events:
 			if event[1] == 1 or 2:
-				temp = self.ParseInput(event[0])
+				temp = self.parse_input(event[0])
 				
 				if temp:
 					val.append(temp)
@@ -34,13 +34,13 @@ class BlenderKeyboardInput(BlenderInput):
 		return val
 		
 class BlenderJoystickInput(BlenderInput):
-	def CheckInput(self):
+	def check_input(self):
 		if not self.sensor.positive:
 			return None
 			
 		val = []
 		for event in self.sensor.getButtonActiveList():
-			temp = self.ParseInput(event)
+			temp = self.parse_input(event)
 			
 			if temp:
 				val.append(temp)
@@ -94,10 +94,10 @@ class BlenderInputSystem():
 			
 	# Call this method to run the manager
 	# It will poll inputs and return them
-	def Run(self):
-		input = self.BlenderKeyboardInput.CheckInput()
+	def run(self):
+		input = self.BlenderKeyboardInput.check_input()
 		
 		if self.BlenderJoystickInput:
-			input.extend(self.BlenderJoystickInput.CheckInput())
+			input.extend(self.BlenderJoystickInput.check_input())
 
 		return input

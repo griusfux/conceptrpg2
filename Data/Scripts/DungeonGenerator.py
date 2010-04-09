@@ -92,7 +92,7 @@ class DungeonGenerator:
 				# self.tiles['Traps'].append((element.get("blend_obj"), element.get("blend_scene")))
 			# elif element.tag == "encounter_deck":
 				# self.encounter_deck = EncounterDeck(element.text)
-	def GenerateFromList(self, obj, result):
+	def generate_from_list(self, obj, result):
 		"""Use a result list to generate the dungeon"""		
 		for type, index, position, ori in result:		
 			tile = self.tiles[type][index]
@@ -114,19 +114,19 @@ class DungeonGenerator:
 				
 		self.result = result
 			
-	def HasNext(self):
+	def has_next(self):
 		"""Check to see if there are still more exit nodes to fill"""
 		return True if self.exit_nodes else False
 		
-	def GenerateFirst(self, node):
+	def generate_first(self, node):
 		"""Generate the first tile"""
 		
 		# Place the start tile
 		n = ExitNode(node, EN_ROOM)
 		self.exit_nodes.append(n)
-		self.PlaceTile(n, 'Starts')
+		self.place_tile(n, 'Starts')
 		
-	def GenerateNext(self):
+	def generate_next(self):
 		"""Generate the next tile"""
 		
 		random.seed()
@@ -175,23 +175,23 @@ class DungeonGenerator:
 				else:
 					tile = 'Corridors'
 			
-			self.PlaceTile(node, tile)
+			self.place_tile(node, tile)
 		else:
 			# We are done placing tiles
 			
 			# Check if we have some stairs
 			if not self.has_stairs:
-				self.PlaceTile(self.exit_nodes[-1], 'Stairs')
+				self.place_tile(self.exit_nodes[-1], 'Stairs')
 				
 			# We don't need anymore tiles, fill the rest with end pieces
 			for n in self.exit_nodes:
-				self.PlaceTile(n, 'Ends', check_collision=False)
+				self.place_tile(n, 'Ends', check_collision=False)
 		
-	def CheckDungeon(self):
+	def check_dungeon(self):
 		"""Checks to make sure the dungeon is up to spec"""
 		return self.room_count > self.min_rooms and	self.has_stairs
 		
-	def PlaceTile(self, node, type, check_collision=True):
+	def place_tile(self, node, type, check_collision=True):
 		scene = GameLogic.getCurrentScene()
 	
 		# Get the tile to place
@@ -214,7 +214,7 @@ class DungeonGenerator:
 				break
 				
 		# Use the meshes to test for collision
-		if (check_collision and self.CheckCollision(tile_obj, tile_obj.meshes)):
+		if (check_collision and self.check_collision(tile_obj, tile_obj.meshes)):
 			# If our try limit has not been reached, try again
 			tile_obj = None
 			tile_node.endObject()	
@@ -227,7 +227,7 @@ class DungeonGenerator:
 				#print('Maximum tries reached, force an end')
 				# The limit has been reached, force a dead end
 				self.tries = 0
-				self.PlaceTile(node, 'Ends', check_collision=False)
+				self.place_tile(node, 'Ends', check_collision=False)
 		else:
 			# Success! Store some data and cleanup
 			self.tries = 0
@@ -264,7 +264,7 @@ class DungeonGenerator:
 			self.result.append((type, index, pos, ori))
 			self.rooms[str(tile_obj.getPhysicsId())] = tile_obj
 				
-	def CheckCollision(self, tile, meshes):
+	def check_collision(self, tile, meshes):
 		# Iterate the verts
 		for mesh in meshes:
 			for mat in range(mesh.numMaterials):
@@ -305,9 +305,9 @@ class EncounterDeck():
 	def __init__(self, deckfile):
 		self.Deckfile = deckfile
 		self.Deck = []
-		self.BuildDeck()
+		self.build_deck()
 		
-	def BuildDeck(self):
+	def build_deck(self):
 		deckfile = DeckFile(self.Deckfile)
 		for card in deckfile.root:
 			monster = None
@@ -322,7 +322,7 @@ class EncounterDeck():
 				
 		deckfile.close()
 				
-	def GenerateEncounter(self):
+	def generate_encounter(self):
 		noBrutesSoldiers = True
 		while noBrutesSoldiers:
 			count = 5
@@ -333,7 +333,7 @@ class EncounterDeck():
 				draw = random.choice(self.Deck)
 				while draw in MonsterList:				#If the card was already drawn, draw again
 					if len(remove) >= len(self.Deck):
-						self.BuildDeck()
+						self.build_deck()
 					draw = random.choice(self.Deck)
 					
 				#see what we get and appropriately deal with the card

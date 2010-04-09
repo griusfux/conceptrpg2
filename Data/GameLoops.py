@@ -117,10 +117,10 @@ def Init(own):
 		own['dgen'] = DungeonGenerator(own['mapfile'])
 		
 		if own['is_host']:
-			own['dgen'].GenerateFirst(own)
+			own['dgen'].generate_first(own)
 			own['client'].send_message('reset_map')
 		elif own['is_offline']:
-			own['dgen'].GenerateFirst(own)
+			own['dgen'].generate_first(own)
 		else:
 			result = []
 			own['client'].send_message('get_map')
@@ -134,17 +134,17 @@ def Init(own):
 				cmd, data = own['client'].receive_message()
 			
 			print("The map size received was " + str(len(result)))
-			own['dgen'].GenerateFromList(own, result)
+			own['dgen'].generate_from_list(own, result)
 			
 		# Give the engine a chance to catch up
 		return
 		
 	# Keep creating the dungeon if there are more tiles
-	if own['is_host'] and own['dgen'].HasNext():
-		own['dgen'].GenerateNext()
+	if own['is_host'] and own['dgen'].has_next():
+		own['dgen'].generate_next()
 		return
 	# Only check the dungeon if we're the host
-	elif own['is_host'] and not own['dgen'].CheckDungeon():
+	elif own['is_host'] and not own['dgen'].check_dungeon():
 		# The dungeon is unacceptable, delete it and try again
 		del own['dgen']
 		for obj in gl.getCurrentScene().objects:
@@ -206,7 +206,7 @@ def HandleNetwork(own):
 				gameobj = gl.getCurrentScene().addObject("CharacterEmpty", own)				
 				own['net_players'][data[0]] = ProxyLogic(BlenderWrapper.Object(gameobj))
 			
-			own['net_players'][data[0]].Update((data[1], data[2], data[3]), (data[4], data[5], data[6]))
+			own['net_players'][data[0]].update((data[1], data[2], data[3]), (data[4], data[5], data[6]))
 		elif cmd == 'disconnect':
 			if data[0] in own['net_players']:
 				own['net_players'][data[0]].Die()
@@ -222,7 +222,7 @@ def HandleCombat(own):
 		del room['encounter']
 		
 		# Generate an enemy list using the encounter deck
-		enemy_list = own['dgen'].encounter_deck.GenerateEncounter()
+		enemy_list = own['dgen'].encounter_deck.generate_encounter()
 		
 		# Replace all the elements in the element list with MonsterLogic objects
 		for monster in enemy_list:
@@ -254,7 +254,7 @@ def HandleCombat(own):
 
 def HandleInput(own):	
 	# Collect input
-	inputs = own['input_system'].Run()
+	inputs = own['input_system'].run()
 	
 	scene = gl.getCurrentScene()
 	scene.active_camera = own['3pcam']
@@ -265,5 +265,5 @@ def HandleInput(own):
 			scene.active_camera = scene.objects['Camera']
 		
 		# Move the character
-		own['player'].PlayerPlzMoveNowzKThxBai(inputs, own['client'])
+		own['player'].move_player(inputs, own['client'])
 
