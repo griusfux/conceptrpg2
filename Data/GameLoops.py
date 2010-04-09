@@ -239,11 +239,11 @@ def HandleCombat(own):
 		own['combat_system'] = CombatSystem(BlenderWrapper.Object(own), BlenderWrapper.Engine, enemy_list, BlenderWrapper.Object(room))
 		
 		
-	# When the Combat System's Update() returns false, combat is over
+	# When the Combat System's update() returns false, combat is over
 	if 'combat_system' in own:
 		scene = gl.getCurrentScene()
 		scene.active_camera = scene.objects['Camera']
-		if own['combat_system'].Update(own):
+		if own['combat_system'].update(own):
 			return True
 		else:
 			# Clean up

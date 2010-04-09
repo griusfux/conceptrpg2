@@ -1,21 +1,21 @@
 from Scripts.Ai.ai import ai
 import random
 
+# Grid constants
 TILE_SIZE	= 1
 GRID_Z		= 0.1
-
 
 class CombatSystem:
 	def __init__(self, main, Engine, encounter_list, room):
 		self.main = main.gameobj
 		random.seed()
-		self.count = 5
 		#Wrap all the enemies in an ai object
 		self.enemy_list = [ai(enemy) for enemy in encounter_list]
 		
 		###################
 		##Survey the room##
 		###################
+
 		vertList = [i for i in room.GetVertexList() if i.z <= 0]
 		
 		smallestX = vertList[0].x
@@ -46,11 +46,9 @@ class CombatSystem:
 		self.grid = CombatGrid(main, Engine, self.origin, self.roomX, self.roomY)
 			
 		# Make sure the player is in the room
-		self.main['player'].move_to_point(self.TileFromPoint(self.main, self.main['player'].obj.GetPosition()).position)
+		self.main['player'].move_to_point(self.tile_from_point(self.main, self.main['player'].obj.GetPosition()).position)
 
-		##################
-		##Place Monsters##
-		##################
+		# Place the monsters
 
 		for monster in self.enemy_list:
 			monster.x = random.randrange(0, self.grid.xSteps)
@@ -65,13 +63,16 @@ class CombatSystem:
 		for enemy in self.enemy_list:
 			del enemy
 		
-	def TileFromPoint(self, main, point):
+	def tile_from_point(self, main, point):
+		# Calculate the offset based on the distance from the origin
 		x_off = abs(point[0] - self.origin[0])
 		y_off = abs(point[1] - self.origin[1])
 		
+		# Convert the offset to tiles
 		x = int(x_off/TILE_SIZE) - 1
 		y = int(y_off/TILE_SIZE)
 		
+		# Clamp the player's position to be within the grid
 		out_of_bounds = False
 		
 		if x > self.grid.xSteps - 2:
@@ -90,15 +91,16 @@ class CombatSystem:
 			
 		tile = self.grid(x, y)
 		
+		# force the player to be inside the bounds
 		if out_of_bounds:
 			main['player'].obj.SetPosition(tile.position)
 			
 		return tile
 		
-	def Update(self, main):
+	def update(self, main):
 		"""This function is called every frame to make up the combat loop"""
 
-		# self.debug_marker.SetPosition(self.TileFromPoint(main, main['player'].obj.GetPosition()).position)
+		# self.debug_marker.SetPosition(self.tile_from_point(main, main['player'].obj.GetPosition()).position)
 	
 		inputs = main['input_system'].Run()
 		if inputs:
@@ -107,7 +109,7 @@ class CombatSystem:
 		
 			main['player'].PlayerPlzMoveNowzKThxBai(inputs, main['client'])
 		else:
-			main['player'].move_to_point(self.TileFromPoint(main, main['player'].obj.GetPosition()).position)
+			main['player'].move_to_point(self.tile_from_point(main, main['player'].obj.GetPosition()).position)
 			
 		return True		
 		
