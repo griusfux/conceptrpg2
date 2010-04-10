@@ -218,8 +218,6 @@ def HandleCombat(own):
 	
 		# Get the room the encounter is taking place in
 		room = own['dgen'].rooms[own.sensors['encounter_mess'].bodies[0]]
-		# Remove the encounter property from that room
-		del room['encounter']
 		
 		# Generate an enemy list using the encounter deck
 		enemy_list = own['dgen'].encounter_deck.generate_encounter()
@@ -236,8 +234,10 @@ def HandleCombat(own):
 			
 			monster.object = BlenderWrapper.Object(gl.getCurrentScene().addObject(monster.id, own))
 			
-		own['combat_system'] = CombatSystem(BlenderWrapper.Object(own), BlenderWrapper.Engine, enemy_list, BlenderWrapper.Object(room))
+		own['combat_system'] = CombatSystem(own, BlenderWrapper.Object(own), BlenderWrapper.Engine, enemy_list, BlenderWrapper.Object(room))
 		
+		# The combat system is setup, we don't need this anymore
+		del room['encounter']
 		
 	# When the Combat System's update() returns false, combat is over
 	if 'combat_system' in own:

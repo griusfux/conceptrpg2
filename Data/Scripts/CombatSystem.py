@@ -6,8 +6,7 @@ TILE_SIZE	= 1
 GRID_Z		= 0.1
 
 class CombatSystem:
-	def __init__(self, main, Engine, encounter_list, room):
-		self.main = main.gameobj
+	def __init__(self, main, empty, Engine, encounter_list, room):
 		random.seed()
 		#Wrap all the enemies in an ai object
 		self.enemy_list = [ai(enemy) for enemy in encounter_list]
@@ -42,18 +41,23 @@ class CombatSystem:
 		# main.SetPosition(self.origin)
 		# self.debug_marker = Engine.AddObject('debug', main, 0)
 		
+		# Move the player out of the way
+		temp = main['player'].obj.get_position()
+		main['player'].obj.set_position((temp[0], temp[1], temp[2] + 100))
+		
 		#Generate the grid
-		self.grid = CombatGrid(main, Engine, self.origin, self.roomX, self.roomY)
+		self.grid = CombatGrid(empty, Engine, self.origin, room, self.roomX, self.roomY)
 			
 		# Make sure the player is in the room
-		self.main['player'].move_to_point(self.tile_from_point(self.main, self.main['player'].obj.get_position()).position)
+		main['player'].obj.set_position((temp[0], temp[1], temp[2]))
+		main['player'].move_to_point(self.tile_from_point(main, main['player'].obj.get_position()).position)
 
 		# Place the monsters
 
 		for monster in self.enemy_list:
 			monster.x = random.randrange(0, self.grid.xSteps)
 			monster.y = random.randrange(0, self.grid.ySteps)
-			Engine.add_object(monster.monster.id, main, 0)
+			Engine.add_object(monster.monster.id, empty, 0)
 			tile = self.grid.map[monster.x][monster.y]
 			monster.monster.object.set_position(tile.position)
 			
@@ -115,7 +119,7 @@ class CombatSystem:
 		
 class CombatGrid:
 	"""This object handles the grid aspect of combat, and is made up of CombatTile objects"""
-	def __init__(self, empty, Engine, origin, roomX, roomY):
+	def __init__(self, empty, Engine, origin, room, roomX, roomY):
 		# Position the main empty
 		empty.set_position(origin)
 		
@@ -130,7 +134,7 @@ class CombatGrid:
 		for x in range(self.xSteps):
 			for y in range(self.ySteps):
 				empty.set_position((origin[0] + x, origin[1] - y, GRID_Z))
-				self.map[x][y] = CombatTile(x, y, [origin[0] + x, origin[1] - y], empty, Engine, self.xSteps, self.ySteps)
+				self.map[x][y] = CombatTile(x, y, [origin[0] + x, origin[1] - y], empty, Engine, room, self.xSteps, self.ySteps)
 	
 	def __del__(self):
 		for x in self.map:
@@ -143,7 +147,7 @@ class CombatGrid:
 				
 class CombatTile:
 	"""The individual squares of the CombatGrid object"""
-	def __init__(self, x, y, position, empty, Engine, xSteps, ySteps):
+	def __init__(self, x, y, position, empty, Engine, room, xSteps, ySteps):
 		self.x = x
 		self.y = y
 		self.position = ((position[0] + TILE_SIZE / 2) + 1, position[1] - TILE_SIZE / 2, GRID_Z)
@@ -154,6 +158,13 @@ class CombatTile:
 		
 		if self.x in (0, xSteps - 1) or self.y in (0, ySteps - 1):
 			self.valid = False
+		else:
+			for vert in self.grid_color.get_vertex_list():
+				hit_ob, hit_pos, hit_norm = Engine.ray_cast((vert.x, vert.y, vert.z + 1), (vert.x, vert.y, vert.z-1), self.grid_color, 'encounter')
+				if not hit_ob or hit_ob.gameobj != room.gameobj:
+					self.valid = False
+					break
+			
 			
 		if self.valid:
 			self.grid_tile = Engine.add_object('GridTile', empty, 0)
