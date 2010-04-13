@@ -8,6 +8,8 @@ GRID_Z		= 0.1
 class CombatSystem:
 	def __init__(self, main, empty, Engine, encounter_list, room):
 		random.seed()
+		
+		print([i.name for i in encounter_list])
 		#Wrap all the enemies in an ai object
 		self.enemy_list = [ai(enemy) for enemy in encounter_list]
 		
@@ -42,21 +44,22 @@ class CombatSystem:
 		# self.debug_marker = Engine.AddObject('debug', main, 0)
 		
 		# Move the player out of the way
-		temp = main['player'].obj.get_position()
-		main['player'].obj.set_position((temp[0], temp[1], temp[2] + 100))
 		
 		#Generate the grid
 		self.grid = CombatGrid(empty, Engine, self.origin, room, self.roomX, self.roomY)
 			
 		# Make sure the player is in the room
-		main['player'].obj.set_position((temp[0], temp[1], temp[2]))
 		main['player'].move_to_point(self.tile_from_point(main, main['player'].obj.get_position()).position)
 
 		# Place the monsters
 
 		for monster in self.enemy_list:
-			monster.x = random.randrange(0, self.grid.xSteps)
-			monster.y = random.randrange(0, self.grid.ySteps)
+			while True:
+				monster.x = random.randrange(0, self.grid.xSteps)
+				monster.y = random.randrange(0, self.grid.ySteps)
+				
+				if self.grid(monster.x, monster.y).valid:
+					break
 			Engine.add_object(monster.monster.id, empty, 0)
 			tile = self.grid.map[monster.x][monster.y]
 			monster.monster.object.set_position(tile.position)
@@ -156,21 +159,29 @@ class CombatTile:
 		self.grid_color = Engine.add_object('GridColor', empty, 0)
 		self.grid_color.set_color([0, 0, 0, 0])
 		
+		# Check if we're out side the room or on the border
 		if self.x in (0, xSteps - 1) or self.y in (0, ySteps - 1):
 			self.valid = False
 		else:
 			for vert in self.grid_color.get_vertex_list():
 				hit_ob, hit_pos, hit_norm = Engine.ray_cast((vert.x, vert.y, vert.z + 1), (vert.x, vert.y, vert.z-1), self.grid_color, 'encounter')
 				if not hit_ob or hit_ob.gameobj != room.gameobj:
+					# We didn't find the room, don't bother with the rest of the verts
 					self.valid = False
 					break
+					
+		# Check if anything is in the tile
+		v1 = self.grid_color.get_vertex_list()[0]
+		v2 = self.grid_color.get_vertex_list()[2]
+		hit_ob, hit_pos, hit_norm = Engine.ray_cast((v1.x, v1.y, v1.z), (v2.x, v2.y, v2.z), self.grid_color)
+		if hit_ob:
+			self.valid = False
 			
-			
+		# Place the appropriate tile based on validity
 		if self.valid:
 			self.grid_tile = Engine.add_object('GridTile', empty, 0)
 		else:
 			self.grid_tile = Engine.add_object('GridInvalid', empty, 0)
-			self.grid_color.set_color([1, 0, 0, 1])
 		
 	def __del__(self):
 		self.grid_tile.end()

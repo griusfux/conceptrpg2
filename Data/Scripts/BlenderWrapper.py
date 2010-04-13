@@ -97,7 +97,7 @@ class Engine:
 		"""Remove and object"""
 		object.gameobj.endObject()
 		
-	def ray_cast(to_pos, from_pos, object, xray_prop=None):
+	def ray_cast(to_pos, from_pos, object, xray_prop=""):
 		"""Cast a ray using the object"""
 		
 		ob, pos, norm = object.gameobj.rayCast(to_pos, from_pos, 0, xray_prop, 0, 1 if xray_prop else 0)
