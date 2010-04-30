@@ -3,7 +3,7 @@
 # Description: Wraps a KX_GameObject to be used with the system
 # Contributers: Mitchell Stokes
 
-from Mathutils import Matrix, Vector
+from mathutils import Matrix, Vector
 import GameLogic as gl
 
 # Movement modes

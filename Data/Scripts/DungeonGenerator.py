@@ -2,7 +2,7 @@
 
 import random
 import GameLogic
-from Mathutils import Vector, Matrix
+from mathutils import Vector, Matrix
 from Scripts.CharacterLogic import MonsterLogic
 from Scripts.ArchiveFile import DeckFile, MonsterFile
 from Scripts.MapData import MapData
@@ -274,8 +274,8 @@ class DungeonGenerator:
 					vert_pos = vert.getXYZ()[:]
 					
 					# Scale the vert_pos on the x and y a bit to account for slight overlaps (where the tiles connect)
-					vert_pos[0] *= 0.99
-					vert_pos[1] *= 0.99
+					vert_pos[0] *= 0.9
+					vert_pos[1] *= 0.9
 					
 					# Convert the vertex's local position to world space
 					
@@ -309,6 +309,7 @@ class EncounterDeck():
 		
 	def build_deck(self):
 		deckfile = DeckFile(self.Deckfile)
+		toclose = []
 		for card in deckfile.root:
 			monster = None
 			count = 0
@@ -317,10 +318,16 @@ class EncounterDeck():
 					monster = element.text
 				elif element.tag == "count":
 					count = int(element.text)
+					
+			# Only open each monster file once, then close all of the files later.
+			# This helps minimize excessive file I/O and Windows doesn't complain as much
+			mfile = MonsterFile(monster)
+			toclose.append(mfile)
 			for i in range(count):
-				mfile = MonsterFile(monster)
 				self.Deck.append(MonsterLogic(None, monster, MonsterData(mfile)))
-				mfile.close()
+		
+		for mfile in toclose:
+			mfile.close()
 				
 		deckfile.close()
 				

@@ -4,7 +4,7 @@
 # Contributers: Daniel Stokes, Mitchell Stokes
 
 from Scripts.InventoryLogic import *
-from Mathutils import Vector
+from mathutils import Vector
 import pickle
 import random
 import time
@@ -219,10 +219,9 @@ class PlayerLogic(CharacterLogic):
 				"equipped_weapon" 	: self.equipped_weapon }
 		pickle.dump(save_data, save)
 		
-	def move_player(self, inputs, client):
+	def move_player(self, inputs, mouse, client):
 		"""Move the player"""
-		#Best method ever :D
-		
+
 		# Handle input
 		if inputs:
 			if "MoveForward" in inputs:
@@ -231,10 +230,10 @@ class PlayerLogic(CharacterLogic):
 			if "MoveBackward" in inputs:
 				self.obj.move((0, -5, 0))
 				self.obj.play_animation("move")
-			if "TurnLeft" in inputs:
-				self.obj.rotate((0, 0, 0.04))
-			if "TurnRight" in inputs:
-				self.obj.rotate((0, 0, -0.04))
+			# if "TurnLeft" in inputs:
+				# self.obj.rotate((0, 0, 0.04))
+			# if "TurnRight" in inputs:
+				# self.obj.rotate((0, 0, -0.04))
 				
 		# Send updates if we need to
 		if client.connected:

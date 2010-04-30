@@ -1,3 +1,5 @@
+# $Id$
+
 from Scripts.Ai.ai import ai
 import random
 
@@ -114,7 +116,7 @@ class CombatSystem:
 			if "Jump" in inputs:
 				return False
 		
-			main['player'].move_player(inputs, main['client'])
+			main['player'].move_player(inputs, main['input_system'].mouse, main['client'])
 		else:
 			main['player'].move_to_point(self.tile_from_point(main, main['player'].obj.get_position()).position)
 			

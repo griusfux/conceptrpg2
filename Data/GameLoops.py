@@ -26,8 +26,8 @@ user = 'Kupoman'
 addr = ('192.168.1.5', 9999)
 
 # Camera globals
-scale_max = 4
-scale_min = 1
+scale_max = 1
+scale_min = 0.25
 
 def MainMenu(cont):
 	pass
@@ -42,6 +42,7 @@ def Camera(cont):
 	cam = cont.owner
 	scaler = cont.sensors['scale'].owner
 	ray = cont.sensors['ray']
+	cempty = cont.sensors['CamEmpty'].owner
 	
 	if not ray.hitObject:
 		scale = scale_max
@@ -57,6 +58,44 @@ def Camera(cont):
 
 	cont.activate(cont.actuators['ray_track'])
 	cont.activate(cont.actuators['cam_track'])
+	
+	# Handle mouselook
+	mouse = gl.mouse
+	
+	# Calculate the change in x
+	dx = 0.5 - mouse.position[0]
+	
+	# Rotate the object
+	cempty.parent.applyRotation((0, 0, dx*5))
+	
+	# Calculate the change in y
+	dy = 0.5 - mouse.position[1]
+	
+	is_upright = cempty.localOrientation[2][2] >= 0.0
+	is_facing_up = cempty.localOrientation[2][1] >= 0.0
+	apply_rot = False
+	
+	# if not (bool(is_upright) ^ bool(not(bool(dy >= 0) ^ bool(is_facing_up)))):
+		# apply_rot = True
+	# if is_upright:
+		# apply_rot = True
+	# elif dy >= 0.0 and is_facing_up:
+		# apply_rot = True
+	# elif dy < 0.0 and not is_facing_up:
+		# apply_rot = True
+		
+	if apply_rot:
+		cempty.applyRotation((-dy*5, 0, 0))
+	
+	# if cempty.localOrientation[2][1] >= 0.0:
+		# if dy > 0:
+			# cempty.applyRotation((-dy*5, 0, 0))
+	#else
+	# Rotate the camera
+	# cempty.applyRotation((-dy*5, 0, 0))
+	
+	# Reset the mouse
+	mouse.position = (0.5, 0.5)
 
 	
 					
@@ -166,7 +205,11 @@ def Init(own):
 		
 	
 	# Setup an input system
-	own['input_system'] = BlenderInputSystem(own.sensors['keyboard'], 'keys.conf')
+	own['input_system'] = BlenderInputSystem('keys.conf', 'mouse.conf')
+	#own['input_system'].mouse.show(True)
+	
+	# Add the HUD
+	gl.addScene('HUD')
 	
 	# Add the character
 	scene = gl.getCurrentScene()
@@ -179,7 +222,7 @@ def Init(own):
 	
 	# Parent the camera to the player
 	cam = scene.objects["Camera"]
-	cam.setParent(scene.objects["CamEmpty"])
+	cam.setParent(scene.objects["TopDownEmpty"])
 	
 	# Switch to the 3rd person camera
 	cam3p = None
@@ -265,5 +308,5 @@ def HandleInput(own):
 			scene.active_camera = scene.objects['Camera']
 		
 		# Move the character
-		own['player'].move_player(inputs, own['client'])
+		own['player'].move_player(inputs, own['input_system'].mouse, own['client'])
 
