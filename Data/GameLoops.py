@@ -65,8 +65,8 @@ def Camera(cont):
 	# Calculate the change in x
 	dx = 0.5 - mouse.position[0]
 	
-	# Rotate the object
-	cempty.parent.applyRotation((0, 0, dx*5))
+	# Rotate the camera
+	# cempty.applyRotation((0, 0, dx*5))
 	
 	# Calculate the change in y
 	dy = 0.5 - mouse.position[1]
@@ -84,8 +84,8 @@ def Camera(cont):
 	# elif dy < 0.0 and not is_facing_up:
 		# apply_rot = True
 		
-	if apply_rot:
-		cempty.applyRotation((-dy*5, 0, 0))
+	# if apply_rot:
+		# cempty.applyRotation((-dy*5, 0, 0))
 	
 	# if cempty.localOrientation[2][1] >= 0.0:
 		# if dy > 0:
@@ -95,7 +95,7 @@ def Camera(cont):
 	# cempty.applyRotation((-dy*5, 0, 0))
 	
 	# Reset the mouse
-	mouse.position = (0.5, 0.5)
+	# mouse.position = (0.5, 0.5)
 
 	
 					
@@ -223,6 +223,7 @@ def Init(own):
 	# Parent the camera to the player
 	cam = scene.objects["Camera"]
 	cam.setParent(scene.objects["TopDownEmpty"])
+	own['cam_empty'] = scene.objects["CamEmpty"]
 	
 	# Switch to the 3rd person camera
 	cam3p = None
@@ -308,5 +309,5 @@ def HandleInput(own):
 			scene.active_camera = scene.objects['Camera']
 		
 		# Move the character
-		own['player'].move_player(inputs, own['input_system'].mouse, own['client'])
+		own['player'].move_player(inputs, own['input_system'].mouse, own['client'], own['cam_empty'].worldOrientation[:])
 
