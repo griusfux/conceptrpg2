@@ -5,7 +5,7 @@
 
 # Define all of the needed game loops here
 
-import Scripts.BlenderWrapper as BlenderWrapper
+import Scripts.blender_wrapper as BlenderWrapper
 from Scripts.ArchiveFile import *
 from Scripts.DungeonGenerator import DungeonGenerator, EncounterDeck
 from Scripts.CharacterLogic import PlayerLogic, ProxyLogic, MonsterLogic
@@ -28,17 +28,14 @@ addr = ('192.168.1.5', 9999)
 # Camera globals
 scale_max = 1
 scale_min = 0.25
-
-def MainMenu(cont):
-	pass
 	
-def Animation(cont):
+def animation(cont):
 	mess = cont.sensors['mess']
 	
 	if mess.positive:
 		cont.activate(mess.bodies[0])
 		
-def Camera(cont):
+def camera(cont):
 	cam = cont.owner
 	scaler = cont.sensors['scale'].owner
 	ray = cont.sensors['ray']
@@ -99,28 +96,28 @@ def Camera(cont):
 
 	
 					
-def InGame(cont):
+def in_game(cont):
 	own = cont.owner
 		
 	if 'init' not in own:
-		Init(own)	
+		init(own)	
 	elif own['init']:
 		# Do combat -- don't go past combant if we are still in combat
-		if HandleCombat(own):
+		if handle_combat(own):
 			return
 		
 		if not own['is_offline']:
-			HandleNetwork(own)
+			handle_network(own)
 
 		# Do input
-		HandleInput(own)
+		handle_input(own)
 		
 		# Check to see if the player should be triggering combat
 		# gameobj = own['player'].obj.gameobj
 		# if gameobj.sensors['sensor'].hitObject:
 			# gameobj.sendMessage("encounter", str(gameobj.sensors['sensor'].hitObject.getPhysicsId()))
 			
-def Init(own):
+def init(own):
 	# Create a socket and register with the server
 	if 'client' not in own:
 		own['client'] = GameClient(user, addr)
@@ -239,7 +236,7 @@ def Init(own):
 	
 	own['init'] = True
 	
-def HandleNetwork(own):
+def handle_network(own):
 	# Handle network data
 	cmd, rdata = own['client'].receive_message()
 	if rdata:
@@ -256,7 +253,7 @@ def HandleNetwork(own):
 				own['net_players'][data[0]].Die()
 				del own['net_players'][data[0]]
 				
-def HandleCombat(own):	
+def handle_combat(own):	
 	# Detect combat and init
 	if own.sensors['encounter_mess'].positive:
 	
@@ -296,7 +293,7 @@ def HandleCombat(own):
 			
 	return False
 
-def HandleInput(own):	
+def handle_input(own):	
 	# Collect input
 	inputs = own['input_system'].run()
 	
