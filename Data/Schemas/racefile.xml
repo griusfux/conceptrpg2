@@ -12,6 +12,12 @@
 
 <!ELEMENT racefile (
 				name,
+				root_object,
+)>
+
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT root_object (#PCDATA)>
+		<!--
 				
 				str_adj,
 				con_adj,
@@ -27,40 +33,39 @@
 				save*,
 				
 				size,
-				proficiency*)>
-
-<!ELEMENT name (#PCDATA)>
-				
+				proficiency*
+-->				
 <!--
 
 	Race ability adjustments
 	
 -->
-
+<!--
 <!ELEMENT str_adj (#PCDATA)>
 <!ELEMENT con_adj (#PCDATA)>
 <!ELEMENT dex_adj (#PCDATA)>
 <!ELEMENT int_adj (#PCDATA)>
 <!ELEMENT wis_adj (#PCDATA)>
-<!ELEMENT cha_adj (#PCDATA)>
+<!ELEMENT cha_adj (#PCDATA)>-->
 
 <!--
 
 	Race defense adjustments
 	
 -->
-
+<!--
 <!ELEMENT fort_adj (#PCDATA)>
 <!ELEMENT reflex_adj (#PCDATA)>
 <!ELEMENT will_adj (#PCDATA)>
 <!ELEMENT save (#PCDATA)>
 	<!ATTLIST save type CDATA #REQUIRED>
+	-->
 	
 <!--
 
 	Other race adjustments
 	
 -->
-
+<!--
 <!ELEMENT size (#PCDATA)>
-<!ELEMENT proficiency (#PCDATA)>
+<!ELEMENT proficiency (#PCDATA)>-->

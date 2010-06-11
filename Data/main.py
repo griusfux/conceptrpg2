@@ -11,6 +11,8 @@ from Scripts.dungeon_generator import DungeonGenerator, EncounterDeck
 from Scripts.character_logic import PlayerLogic, ProxyLogic, MonsterLogic
 from Scripts.combat_system import CombatSystem
 
+from Scripts.race_data import *
+
 from Scripts.blender_input_system import BlenderInputSystem
 
 from Scripts.Networking.GameClient import GameClient
@@ -31,7 +33,7 @@ scale_min = 0.25
 	
 def animation(cont):
 	mess = cont.sensors['mess']
-	
+
 	if mess.positive:
 		cont.activate(mess.bodies[0])
 		
@@ -212,14 +214,24 @@ def init(own):
 	# Add the HUD
 	gl.addScene('HUD')
 	
-	# Add the character
+	# Add the player
 	scene = gl.getCurrentScene()
 	temp = own.position
 	temp[2] += 1
 	own.position = temp
 	gameobj = scene.addObject("CharacterEmpty", own)
 	
-	own['player'] = PlayerLogic(BlenderWrapper.Object(gameobj))
+	# Now add the mesh and armature based on race data
+	race = RaceFile("DarkKnight")
+	race_data = RaceData(race)
+	gl.LibLoad(race.blend, "Scene", "Scene")
+	race.close()
+	
+	root_ob = scene.addObject(race_data.root_object, own)
+	root_ob.setParent(gameobj)
+	
+	# Store the player
+	own['player'] = PlayerLogic(BlenderWrapper.Object(gameobj, root_ob))
 	
 	# Parent the camera to the player
 	cam = scene.objects["Camera"]

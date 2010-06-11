@@ -221,18 +221,25 @@ class PlayerLogic(CharacterLogic):
 				"equipped_weapon" 	: self.equipped_weapon }
 		pickle.dump(save_data, save)
 		
-	def move_player(self, inputs, mouse, client, cam_ori):
+	def move_player(self, inputs, mouse, client):
 		"""Move the player"""
 
 		# Handle input
 		if inputs:
 		
+			moving = False
+		
 			if "MoveForward" in inputs:
 				self.obj.move((0, 5, 0))
 				self.obj.play_animation("move")
+				moving = True
 			if "MoveBackward" in inputs:
 				self.obj.move((0, -5, 0))
 				self.obj.play_animation("move")
+				moving = True
+				
+			if not moving:
+				self.obj.play_animation("idle")
 			
 			# Rotation is now handled by the mouse look
 			# if "TurnLeft" in inputs:

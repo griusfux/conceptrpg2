@@ -6,6 +6,7 @@ from PyQt4.QtCore import *
 from Scripts.class_data import ClassData
 from Scripts.map_data import MapData
 from Scripts.monster_data import MonsterData
+from Scripts.race_data import RaceData
 from Scripts.item_data import *
 from Scripts.archive_file import *
 
@@ -55,7 +56,7 @@ class EditorWindow(QMainWindow):
 		# self.create_subtree('Decks', DeckFile, DeckData)
 		self.create_subtree('Maps', MapFile, MapData)
 		self.create_subtree('Monsters', MonsterFile, MonsterData)
-		# self.create_subtree('Races', RaceFile, RaceData)
+		self.create_subtree('Races', RaceFile, RaceData)
 		self.create_subtree('Shields', ShieldFile, ShieldData)
 		self.create_subtree('Weapons', WeaponFile, WeaponData)
 		

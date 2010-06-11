@@ -112,7 +112,7 @@ class RaceFile(ArchiveFile):
 	"""Class for handling the race files"""
 	# Options for the archive file
 	_ext = 'race'
-	_blend = ""
+	_blend = "race.blend"
 	_textures = ""
 	_config = 'race.xml'
 	_dtd = 'Schemas/racefile.xml'

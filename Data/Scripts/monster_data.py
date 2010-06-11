@@ -1,7 +1,7 @@
 from Scripts.validate_data import *
 
 class MonsterData:
-	"""A container for data from classfiles"""
+	"""A container for data from monsterfiles"""
 	
 	def __init__(self, datafile):
 		

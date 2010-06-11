@@ -16,10 +16,9 @@ MOV_POS = 4
 class Object:
 	"""KX_GameObject wrapper"""
 	
-	def __init__(self, gameobj):
+	def __init__(self, gameobj, armature=None):
 		self.gameobj = gameobj
-		armature = [i for i in gameobj.childrenRecursive if i.name == "KatArm"]
-		if armature: self.armature = armature[0]
+		self.armature = armature
 		
 	def move(self, vec, mode=MOVE_LINV, local=True):
 		"""Do object movement"""
