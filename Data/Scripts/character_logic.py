@@ -16,6 +16,7 @@ class CharacterLogic:
 		#Player information
 		self.name		= ""
 		self.level		= 0
+		self.race		= ""
 		self.player_class= ""
 		self.paragon_path= ""
 		self.epic_destiny= ""
@@ -117,6 +118,7 @@ class CharacterLogic:
 		#speed
 		self.speed = self.speed_base + self.speed_armor_penalty + self.speed_item_mod + self.speed_misc_mod
 		
+		
 	def equip_armor(self, armor):
 		"""Changes stats to newly equipped armor and then recalculates stats"""
 		self.equipped_armor = armor
@@ -175,6 +177,7 @@ class PlayerLogic(CharacterLogic):
 		
 		self.name		= save_data["name"]
 		self.level		= save_data["level"]
+		self.race		= save_data["race"]
 		self.player_class = save_data["player_class"]
 		self.paragon_path = save_data["paragon_path"]
 		self.epic_destiny = save_data["epic_destiny"]
@@ -201,6 +204,7 @@ class PlayerLogic(CharacterLogic):
 		save_data = {
 				"name"	: self.name,
 				"level"	: self.level,
+				"race"	: self.race,
 				"player_class" : self.player_class,
 				"paragon_path" : self.paragon_path,
 				"epic_destiny" : self.epic_destiny,
@@ -274,6 +278,9 @@ class MonsterLogic(CharacterLogic):
 		self.int_ab = monsterdata.int_ab
 		self.wis_ab = monsterdata.wis_ab
 		self.cha_ab = monsterdata.cha_ab
+		
+		self.ai_keywords = monsterdata.ai_keywords
+		self.ai_start_state = monsterdata.ai_start_state
 
 		self.recalc_stats()
 		

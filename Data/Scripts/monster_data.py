@@ -32,5 +32,7 @@ class MonsterData:
 				ValidateInt(self, element.tag, element.text)
 			elif element.tag == "cha_ab":
 				ValidateInt(self, element.tag, element.text)
-			elif element.tag == "behaviors":
-				self.behaviors = [getattr(__import__('Scripts.Ai.Behaviors.%s' % behavior, globals(), locals(), [behavior], -1), behavior) for behavior in element.text.split(', ')]
+			elif element.tag == "ai_keywords":
+				self.ai_keywords = [keyword.strip() for keyword in element.text.split(',') if keyword.strip() != '']
+			elif element.tag == "ai_start_state":
+				self.ai_start_state = element.text.strip()
