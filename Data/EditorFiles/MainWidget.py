@@ -3,11 +3,11 @@ import os
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
-from Scripts.ClassData import ClassData
-from Scripts.MapData import MapData
-from Scripts.MonsterData import MonsterData
-from Scripts.ItemData import *
-from Scripts.ArchiveFile import *
+from Scripts.class_data import ClassData
+from Scripts.map_data import MapData
+from Scripts.monster_data import MonsterData
+from Scripts.item_data import *
+from Scripts.archive_file import *
 
 from EditorFiles.EmptyEditor import *
 	

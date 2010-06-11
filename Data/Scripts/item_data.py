@@ -1,4 +1,4 @@
-from Scripts.ValidateData import *
+from Scripts.validate_data import *
 
 class ArmorData():
 	"""A data object to handle armor"""
