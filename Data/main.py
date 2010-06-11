@@ -63,7 +63,7 @@ def camera(cont):
 	dx = 0.5 - mouse.position[0]
 	
 	# Rotate the camera
-	# cempty.applyRotation((0, 0, dx*5))
+	cempty.applyRotation((0, 0, dx*5))
 	
 	# Calculate the change in y
 	dy = 0.5 - mouse.position[1]
@@ -92,7 +92,7 @@ def camera(cont):
 	# cempty.applyRotation((-dy*5, 0, 0))
 	
 	# Reset the mouse
-	# mouse.position = (0.5, 0.5)
+	mouse.position = (0.5, 0.5)
 
 	
 					
@@ -308,7 +308,12 @@ def handle_input(own):
 	if inputs:
 		if "SwitchCamera" in inputs:
 			scene.active_camera = scene.objects['Camera']
+			
+		if "MoveForward" in inputs:
+			old_ori = own['cam_empty'].worldOrientation.copy()
+			own['cam_empty'].localOrientation.identity()
+			own['player'].obj.gameobj.localOrientation = old_ori
 		
 		# Move the character
-		own['player'].move_player(inputs, own['input_system'].mouse, own['client'], own['cam_empty'].worldOrientation[:])
+		own['player'].move_player(inputs, own['input_system'].mouse, own['client'])
 
