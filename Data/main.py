@@ -118,6 +118,10 @@ def in_game(cont):
 			# gameobj.sendMessage("encounter", str(gameobj.sensors['sensor'].hitObject.getPhysicsId()))
 			
 def init(own):
+	# Create a wrapper for the engine
+	if 'engine' not in own:
+		own['engine'] = BlenderWrapper.Engine(own)
+
 	# Create a socket and register with the server
 	if 'client' not in own:
 		own['client'] = GameClient(user, addr)
@@ -275,7 +279,7 @@ def handle_combat(own):
 			
 			monster.object = BlenderWrapper.Object(gl.getCurrentScene().addObject(monster.id, own))
 			
-		own['combat_system'] = CombatSystem(own, BlenderWrapper.Object(own), BlenderWrapper.Engine, enemy_list, BlenderWrapper.Object(room))
+		own['combat_system'] = CombatSystem(own, BlenderWrapper.Object(own), own['engine'], enemy_list, BlenderWrapper.Object(room))
 		
 		# The combat system is setup, we don't need this anymore
 		del room['encounter']

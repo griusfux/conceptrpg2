@@ -83,21 +83,28 @@ class Vertex:
 	def __init__(self, vertex, gameobj):
 		ori = gameobj.worldOrientation
 		self.x, self.y, self.z = (Matrix(ori[0], ori[1], ori[2])* Vector(vertex.getXYZ())) + Vector(gameobj.worldPosition)
+
 class Engine:
 	"""Wrapper for engine functionality"""
 	
-	def add_object(object, adder, time=0):
+	def __init__(self, adder):
+		self.adder = adder
+	
+	def add_object(self, object, pos=None, ori=None, time=0):
 		"""Add an opject"""
 		scene = gl.getCurrentScene()
 		
-		add = scene.addObject(object, adder.gameobj, time)
+		if pos: self.adder.worldPosition = pos
+		if ori: self.adder.worldOrientation = ori
+				
+		add = scene.addObject(object, self.adder, time)
 		return Object(add) if add else None
 		
-	def remove_object(object):
+	def remove_object(self, object):
 		"""Remove and object"""
 		object.gameobj.endObject()
 		
-	def ray_cast(to_pos, from_pos, object, xray_prop=""):
+	def ray_cast(self, to_pos, from_pos, object, xray_prop=""):
 		"""Cast a ray using the object"""
 		
 		ob, pos, norm = object.gameobj.rayCast(to_pos, from_pos, 0, xray_prop, 0, 1 if xray_prop else 0)
