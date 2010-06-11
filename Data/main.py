@@ -6,12 +6,12 @@
 # Define all of the needed game loops here
 
 import Scripts.blender_wrapper as BlenderWrapper
-from Scripts.ArchiveFile import *
-from Scripts.DungeonGenerator import DungeonGenerator, EncounterDeck
-from Scripts.CharacterLogic import PlayerLogic, ProxyLogic, MonsterLogic
-from Scripts.CombatSystem import CombatSystem
+from Scripts.archive_file import *
+from Scripts.dungeon_generator import DungeonGenerator, EncounterDeck
+from Scripts.character_logic import PlayerLogic, ProxyLogic, MonsterLogic
+from Scripts.combat_system import CombatSystem
 
-from Scripts.BlenderInputSystem import BlenderInputSystem
+from Scripts.blender_input_system import BlenderInputSystem
 
 from Scripts.Networking.GameClient import GameClient
 

@@ -3,7 +3,6 @@
 # Description: Handles character logic such as movement and stats
 # Contributers: Daniel Stokes, Mitchell Stokes
 
-from Scripts.InventoryLogic import *
 from mathutils import Vector
 import pickle
 import random
@@ -165,7 +164,6 @@ class PlayerLogic(CharacterLogic):
 	
 	def __init__(self, obj):
 		CharacterLogic.__init__(self, obj)
-		self.inventory = InventoryLogic()
 		self.last_update = [(0, 0, 0), (1, 1, 1)]
 		
 	def load_stats_from_save(self, save):

@@ -3,10 +3,10 @@
 import random
 import GameLogic
 from mathutils import Vector, Matrix
-from Scripts.CharacterLogic import MonsterLogic
-from Scripts.ArchiveFile import DeckFile, MonsterFile
-from Scripts.MapData import MapData
-from Scripts.MonsterData import MonsterData
+from Scripts.character_logic import MonsterLogic
+from Scripts.archive_file import DeckFile, MonsterFile
+from Scripts.map_data import MapData
+from Scripts.monster_data import MonsterData
 
 GEN_LINEAR = 0
 GEN_RANDOM = 1
