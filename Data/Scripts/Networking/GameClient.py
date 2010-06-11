@@ -24,7 +24,7 @@ class GameClient:
 		self.udp.setblocking(0)
 		
 		self.tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.tcp.settimeout(5)
+		self.tcp.settimeout(0)
 		
 		try:
 			self.tcp.connect(addr)
