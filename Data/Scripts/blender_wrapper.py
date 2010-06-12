@@ -9,9 +9,9 @@ import GameLogic as gl
 # Movement modes
 MOVE_LINV = 0
 MOVE_FORCE = 1
-MOV_LOC = 2
-MOV_SERVO = 3
-MOV_POS = 4
+MOVE_LOC = 2
+MOVE_SERVO = 3
+MOVE_POS = 4
 
 class Object:
 	"""KX_GameObject wrapper"""
@@ -19,8 +19,12 @@ class Object:
 	def __init__(self, gameobj, armature=None):
 		self.gameobj = gameobj
 		self.armature = armature
+		# used for servo motion
+		self.prev_error = Vector((0.0, 0.0, 0.0));
+		self.tot_error = Vector((0.0, 0.0, 0.0));
+		self.pid = [30.0, 0.5, 0.0]
 		
-	def move(self, vec, mode=MOVE_LINV, local=True):
+	def move(self, vec, mode=MOVE_SERVO, min=[None, None, None], max=[None,None,None], local=True):
 		"""Do object movement"""
 		
 		if mode == MOVE_LINV:
@@ -30,7 +34,22 @@ class Object:
 		elif mode == MOVE_LOC:
 			self.gameobj.applyMovement(vec, local)
 		elif mode == MOVE_SERVO:
-			self.gameobj.applyForce(vec, local)
+			target = Vector(vec)
+			curr = self.gameobj.getLinearVelocity(local)
+			error = target - curr
+			self.tot_error += error
+			dv = error - self.prev_error
+			
+			force = self.pid[0]*error + self.pid[1]*self.tot_error + self.pid[2]*dv
+			
+			# Handle limits
+			for i in range(3):
+				if min[i] != None and force[i] < min[i]:
+					force[i] = min[i]
+				if max[i] != None and force[i] > max[i]:
+					force[i] = max[i]
+			
+			self.gameobj.applyForce(force, local)
 		elif mode == MOVE_POS:
 			self.gameobj.position = vec
 		else:

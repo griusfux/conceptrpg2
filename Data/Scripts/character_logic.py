@@ -230,16 +230,17 @@ class PlayerLogic(CharacterLogic):
 			moving = False
 		
 			if "MoveForward" in inputs:
-				self.obj.move((0, 5, 0))
+				self.obj.move((0, 5, 0), min=[None, 0, 0], max=[None, 50, 0])
 				self.obj.play_animation("move")
 				moving = True
 			if "MoveBackward" in inputs:
-				self.obj.move((0, -5, 0))
+				self.obj.move((0, -5, 0), min=[None, -50, 0], max=[None, 0, 0])
 				self.obj.play_animation("move")
 				moving = True
 				
 			if not moving:
 				self.obj.play_animation("idle")
+				self.obj.move((0, 0, 0), min=[0, None, 0], max=[0, None, 0])
 			
 			# Rotation is now handled by the mouse look
 			# if "TurnLeft" in inputs:
