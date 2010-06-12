@@ -12,6 +12,7 @@ from Scripts.character_logic import PlayerLogic, ProxyLogic, MonsterLogic
 from Scripts.combat_system import CombatSystem
 
 from Scripts.race_data import *
+from Scripts.monster_data import *
 
 from Scripts.blender_input_system import BlenderInputSystem
 
@@ -104,6 +105,9 @@ def in_game(cont):
 	if 'init' not in own:
 		init(own)	
 	elif own['init']:
+		old_ori = own['cam_empty'].worldOrientation.copy()
+		own['cam_empty'].localOrientation.identity()
+		own['player'].obj.gameobj.localOrientation = old_ori
 		# Do combat -- don't go past combant if we are still in combat
 		if handle_combat(own):
 			return
@@ -277,20 +281,21 @@ def handle_combat(own):
 		room = own['dgen'].rooms[own.sensors['encounter_mess'].bodies[0]]
 		
 		# Generate an enemy list using the encounter deck
-		enemy_list = own['dgen'].encounter_deck.generate_encounter()
+		enemy_list = own['dgen'].encounter_deck.generate_encounter(5)
 		
 		# Replace all the elements in the element list with MonsterLogic objects
 		for monster in enemy_list:
 			
 			# Load the gameobject for the monster into the scene if it isn't already there
-			if monster.id not in gl.getCurrentScene().objects:
-				monsterfile = MonsterFile(monster.id)
+			if monster not in gl.getCurrentScene().objects:
+				monsterfile = MonsterFile(monster)
 				gl.LibLoad(monsterfile.blend, 'Scene', 'Scene')
 				monsterfile.close()
 				
-			
-			monster.object = BlenderWrapper.Object(gl.getCurrentScene().addObject(monster.id, own))
-			
+			monster_object = None #BlenderWrapper.Object(gl.getCurrentScene().addObject(monster, own))
+			monster_data = MonsterData(MonsterFile(monster))
+			enemy_list[enemy_list.index(monster)] = MonsterLogic(monster_object, monster_data)
+
 		own['combat_system'] = CombatSystem(own, BlenderWrapper.Object(own), own['engine'], enemy_list, BlenderWrapper.Object(room))
 		
 		# The combat system is setup, we don't need this anymore
@@ -299,7 +304,7 @@ def handle_combat(own):
 	# When the Combat System's update() returns false, combat is over
 	if 'combat_system' in own:
 		scene = gl.getCurrentScene()
-		scene.active_camera = scene.objects['Camera']
+		# scene.active_camera = scene.objects['Camera']
 		if own['combat_system'].update(own):
 			return True
 		else:

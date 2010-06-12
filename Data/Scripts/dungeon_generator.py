@@ -3,10 +3,8 @@
 import random
 import GameLogic
 from mathutils import Vector, Matrix
-from Scripts.character_logic import MonsterLogic
-from Scripts.archive_file import DeckFile, MonsterFile
+from Scripts.archive_file import DeckFile
 from Scripts.map_data import MapData
-from Scripts.monster_data import MonsterData
 
 GEN_LINEAR = 0
 GEN_RANDOM = 1
@@ -312,29 +310,25 @@ class EncounterDeck():
 		toclose = []
 		for card in deckfile.root:
 			monster = None
+			role = ""
 			count = 0
 			for element in card:
 				if element.tag == "monster":
 					monster = element.text
+				if element.tag == "role":
+					role = element.text
 				elif element.tag == "count":
 					count = int(element.text)
-					
-			# Only open each monster file once, then close all of the files later.
-			# This helps minimize excessive file I/O and Windows doesn't complain as much
-			mfile = MonsterFile(monster)
-			toclose.append(mfile)
+			
 			for i in range(count):
-				self.Deck.append(MonsterLogic(None, monster, MonsterData(mfile)))
-		
-		for mfile in toclose:
-			mfile.close()
+				self.Deck.append((monster, role))
 				
 		deckfile.close()
 				
-	def generate_encounter(self):
+	def generate_encounter(self, num_players):
 		noBrutesSoldiers = True
 		while noBrutesSoldiers:
-			count = 5
+			count = num_players
 			MonsterList = []
 			remove = []
 			while count > 0:		#while there are still players left with out cards
@@ -346,23 +340,23 @@ class EncounterDeck():
 					draw = random.choice(self.Deck)
 					
 				#see what we get and appropriately deal with the card
-				if draw.role in ('soldier', 'brute'):
-					MonsterList.extend([draw for i in range(2)])
+				if draw[1] in ('soldier', 'brute'):
+					MonsterList.extend([draw[0] for i in range(2)])
 					remove.append(draw)
 					noBrutesSoldiers = False
-				elif draw.role == 'minion':
-					MonsterList.extend([draw for i in range(4)])
+				elif draw[1] == 'minion':
+					MonsterList.extend([draw[0] for i in range(4)])
 					remove.append(draw)
-				elif draw.role == 'lurker':
-					MonsterList.append(draw)
+				elif draw[1] == 'lurker':
+					MonsterList.append(draw[0])
 					remove.append(draw)
 					count += 1
-				elif draw.elite:
-					MonsterList.append(draw)
+				elif draw[1]:
+					MonsterList.append(draw[0])
 					remove.append(draw)
 					count -= 1
 				else:
-					MonsterList.append(draw)
+					MonsterList.append(draw[0])
 					remove.append(draw)
 				count -= 1
 				

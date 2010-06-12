@@ -8,6 +8,8 @@ import pickle
 import random
 import time
 
+from Scripts.monster_data import MonsterData
+
 class CharacterLogic:
 	"""A logic object that stores all the information and methods of the player"""
 	
@@ -264,10 +266,9 @@ class PlayerLogic(CharacterLogic):
 		
 	
 class MonsterLogic(CharacterLogic):
-	
-	def __init__(self, object, id, monsterdata):
+	def __init__(self, object, monsterdata):
 		CharacterLogic.__init__(self, object)
-		self.id = id
+		self.id = monsterdata.id
 
 		self.role = ""
 		self.leader = False

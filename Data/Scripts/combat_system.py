@@ -51,12 +51,23 @@ class CombatSystem:
 				
 				if self.grid(monster.x, monster.y).valid:
 					break
-			Engine.add_object(monster.id)
 			tile = self.grid.map[monster.x][monster.y]
-			monster.object.set_position(tile.position)
+			monster.obj = Engine.add_object(monster.id, tile.position)
+			tile.fill(monster)
 		
 	def update(self, main):
 		"""This function is called every frame to make up the combat loop"""
+		
+		# Establish the input dictionary for the ai
+		machine_input = {
+						'self'		: 'Set when ai is run',
+						'foe_list'	: (main['player'],)
+						}
+						
+		# Run the enemy ai
+		for enemy in self.enemy_list:
+			machine_input['self'] = enemy
+			enemy.ai.run(machine_input)
 
 		# self.debug_marker.SetPosition(self.tile_from_point(main, main['player'].obj.GetPosition()).position)
 	
@@ -172,6 +183,7 @@ class CombatTile:
 		self.y = y
 		self.position = ((position[0] + TILE_SIZE / 2) + 1, position[1] - TILE_SIZE / 2, position[2])
 		self.valid = True
+		self.obj = None
 		
 		self.grid_color = Engine.add_object('GridColor', position)
 		self.grid_color.set_color([0, 0, 0, 0])
@@ -199,7 +211,11 @@ class CombatTile:
 			self.grid_tile = Engine.add_object('GridTile', position)
 		else:
 			self.grid_tile = Engine.add_object('GridInvalid', position)
+			
+	def fill(self, obj):
+		self.obj = obj
+		self.valid = False
 		
 	def __del__(self):
-		self.grid_tile.end()
-		self.grid_color.end()
+		del self.grid_tile
+		del self.grid_color
