@@ -77,7 +77,8 @@ class Object:
 			self.gameobj.sendMessage("animation", anim, self.armature.name)
 			
 	def end(self):
-		self.gameobj.endObject()
+		if not self.gameobj.invalid:
+			self.gameobj.endObject()
 		
 	def get_vertex_list(self):
 		vertexList = []

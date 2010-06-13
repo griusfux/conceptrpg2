@@ -82,12 +82,11 @@ class CombatSystem:
 			
 		return True		
 		
-		return tile		
 	def __del__(self):
 		del self.grid
 		
 		for enemy in self.enemy_list:
-			del enemy
+			enemy.obj.end()
 		
 ################################################################################
 # Utility Functions
@@ -217,5 +216,5 @@ class CombatTile:
 		self.valid = False
 		
 	def __del__(self):
-		del self.grid_tile
-		del self.grid_color
+		self.grid_tile.end()
+		self.grid_color.end()
