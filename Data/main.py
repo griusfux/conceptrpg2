@@ -6,6 +6,7 @@
 # Define all of the needed game loops here
 
 import Scripts.blender_wrapper as BlenderWrapper
+from Scripts.ui.blender_ui_system import *
 from Scripts.archive_file import *
 from Scripts.dungeon_generator import DungeonGenerator, EncounterDeck
 from Scripts.character_logic import PlayerLogic, ProxyLogic, MonsterLogic
@@ -123,11 +124,17 @@ def in_game(cont):
 		# if gameobj.sensors['sensor'].hitObject:
 			# gameobj.sendMessage("encounter", str(gameobj.sensors['sensor'].hitObject.getPhysicsId()))
 			
+	# Always update the ui
+	own['ui_system'].run()
 def init(own):
 	# Create a wrapper for the engine
 	if 'engine' not in own:
 		own['engine'] = BlenderWrapper.Engine(own)
 
+	# Create a ui system
+	if 'ui_system' not in own:
+		own['ui_system'] = BlenderUISystem()
+		
 	# Create a socket and register with the server
 	if 'client' not in own:
 		own['client'] = GameClient(user, addr)
@@ -157,8 +164,9 @@ def init(own):
 	# Start by loading the dungeon
 	if 'dgen' not in own:	
 		# Display the splash
-		if len(gl.getSceneList()) == 1:
-			gl.addScene('Overlay')
+		# if len(gl.getSceneList()) == 1:
+			# gl.addScene('Overlay')
+		own['ui_system'].load_layout('dun_gen')
 		
 		own['dgen'] = DungeonGenerator(own['mapfile'])
 		
@@ -201,7 +209,8 @@ def init(own):
 		own['mapfile'].close()
 		del own['mapfile']
 
-		gl.getSceneList()[1].end()
+		# gl.getSceneList()[1].end()
+		own['ui_system'].load_layout(None)
 		print("\nDungeon generation complete with %d rooms\n" % own['dgen'].room_count)
 		
 		# If we're the host, send the map data to the server
