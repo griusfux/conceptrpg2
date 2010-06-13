@@ -68,6 +68,10 @@ class ArchiveFile:
 			print("\nError with config file from "+_filename+"!")
 		except(IOError):
 			print("Error in opening the config file: "+self.config)
+			
+	def __del__(self):
+		# Try to cleanup
+		self.close()
 
 	def close(self):
 		"""Clean up"""
