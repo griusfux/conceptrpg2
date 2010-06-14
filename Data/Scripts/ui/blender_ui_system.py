@@ -38,6 +38,8 @@ class BlenderUISystem(bgui.System):
 			mouse_state = bgui.BGUI_MOUSE_CLICK
 		elif (bge.events.LEFTMOUSE, bge.logic.KX_INPUT_JUST_RELEASED) in mouse.events:
 			mouse_state = bgui.BGUI_MOUSE_RELEASE
+		elif (bge.events.LEFTMOUSE, bge.logic.KX_INPUT_ACTIVE) in mouse.events:
+			mouse_state = bgui.BGUI_MOUSE_ACTIVE
 		else:
 			mouse_state = bgui.BGUI_MOUSE_NONE
 			
