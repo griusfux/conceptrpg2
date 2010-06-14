@@ -57,9 +57,6 @@ class DungeonGenerator:
 		# Store the KX_Scene object
 		self.scene = GameLogic.getCurrentScene()
 		
-		# The blend file with the pieces
-		self.blend = mapfile.blend
-		
 		# This is so we can handle collisions on multiple frames to allow for cleanup
 		self.use_as_next_node = None
 		
@@ -199,11 +196,11 @@ class DungeonGenerator:
 		
 		#print('\nAttempting to place %s...' % type)
 		# First try to add the object; if it doesn't exist, merge the scene and try again
-		try:
-			tile_node = scene.addObject(tile[0], node.object)
-		except ValueError:
-			GameLogic.LibLoad(self.blend, 'Scene', tile[1])
-			tile_node = scene.addObject(tile[0], node.object)
+		# try:
+		tile_node = scene.addObject(tile[0], node.object)
+		# except ValueError:
+			# GameLogic.LibLoad(self.blend, 'Scene', tile[1])
+			# tile_node = scene.addObject(tile[0], node.object)
 			
 		# Get the mesh to use for collision detection
 		for ob in tile_node.childrenRecursive:

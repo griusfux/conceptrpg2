@@ -160,6 +160,9 @@ def init(own):
 			del own['mapfile']
 			own['init'] = False
 			return
+			
+		# Otherwise, load the scenes so the dungeon generator can use them
+		gl.LibLoad(own['mapfile'].blend, 'Scene')
 
 	# Start by loading the dungeon
 	if 'dgen' not in own:	
