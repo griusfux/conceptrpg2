@@ -31,7 +31,7 @@ user = 'Kupoman'
 addr = ('192.168.1.5', 9999)
 
 # Camera globals
-scale_max = 1
+scale_max = 2
 scale_min = 0.25
 	
 def animation(cont):
