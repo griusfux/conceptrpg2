@@ -1,4 +1,4 @@
-# $Id $
+# $Id$
 
 class InactiveCombatSystem:
 	"""A combat system for when the player isn't actively engaged in an encounter"""

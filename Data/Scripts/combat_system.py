@@ -1,4 +1,4 @@
-# $Id $
+# $Id$
 
 import Scripts.Ai.machine as ai
 import random
