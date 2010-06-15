@@ -153,23 +153,23 @@ def init(own):
 	# Try to load the mapfile
 	if 'mapfile' not in own:
 		own['mapfile'] = MapFile('ShipRuins')
+		own['ui_system'].load_layout('dun_gen')
 		
 		if not own['mapfile'].init:
 			print('Could not open the map file!')
 			own['mapfile'].close()
 			del own['mapfile']
 			own['init'] = False
-			return
-			
-		# Otherwise, load the scenes so the dungeon generator can use them
-		gl.LibLoad(own['mapfile'].blend, 'Scene')
+		return
 
 	# Start by loading the dungeon
 	if 'dgen' not in own:	
 		# Display the splash
 		# if len(gl.getSceneList()) == 1:
 			# gl.addScene('Overlay')
-		own['ui_system'].load_layout('dun_gen')
+		
+		# Load the scenes so the dungeon generator can use them
+		gl.LibLoad(own['mapfile'].blend, 'Scene')
 		
 		own['dgen'] = DungeonGenerator(own['mapfile'])
 		
@@ -238,7 +238,7 @@ def init(own):
 	gameobj = scene.addObject("CharacterEmpty", own)
 	
 	# Now add the mesh and armature based on race data
-	race = RaceFile("DarkKnight")
+	race = RaceFile("Kat")
 	race_data = RaceData(race)
 	gl.LibLoad(race.blend, "Scene", "Scene")
 	race.close()
