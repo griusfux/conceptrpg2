@@ -160,6 +160,11 @@ def init(own):
 			own['mapfile'].close()
 			del own['mapfile']
 			own['init'] = False
+			
+				
+		# Load the scenes so the dungeon generator can use them
+		gl.LibLoad(own['mapfile'].blend, 'Scene')
+
 		return
 
 	# Start by loading the dungeon
@@ -167,9 +172,6 @@ def init(own):
 		# Display the splash
 		# if len(gl.getSceneList()) == 1:
 			# gl.addScene('Overlay')
-		
-		# Load the scenes so the dungeon generator can use them
-		gl.LibLoad(own['mapfile'].blend, 'Scene')
 		
 		own['dgen'] = DungeonGenerator(own['mapfile'])
 		
@@ -238,9 +240,9 @@ def init(own):
 	gameobj = scene.addObject("CharacterEmpty", own)
 	
 	# Now add the mesh and armature based on race data
-	race = RaceFile("Kat")
+	race = RaceFile("DarkKnight")
 	race_data = RaceData(race)
-	gl.LibLoad(race.blend, "Scene", "Scene")
+	gl.LibLoad(race.blend, "Scene")
 	race.close()
 	
 	root_ob = scene.addObject(race_data.root_object, own)
