@@ -171,3 +171,13 @@ class WeaponFile(ArchiveFile):
 	_config = 'weapon.xml'
 	_dtd = 'Schemas/weaponfile.xml'
 	_dir = 'Items/Weapons'
+	
+class PowerFile(ArchiveFile):
+	"""Class for handling power files"""
+	#Options for the archive file
+	_ext = 'power'
+	_blender = ''
+	_textures = ''
+	_config = 'power.xml'
+	_dtd = 'Schemas/powerfile.xml'
+	_dir = 'Powers'
