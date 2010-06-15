@@ -33,13 +33,19 @@ class PassiveCombatSystem:
 		
 		if "MoveForward" in inputs:
 			player.obj.move((0, 5, 0), min=[None, 0, 0], max=[None, 50, 0])
-			player.obj.play_animation("move")
 			moving = True
 		if "MoveBackward" in inputs:
 			player.obj.move((0, -5, 0), min=[None, -50, 0], max=[None, 0, 0])
-			player.obj.play_animation("move")
+			moving = True
+		if "MoveRight" in inputs:
+			player.obj.move((5, 0, 0), min=[0, None, 0], max=[50, None, 0])
+			moving = True
+		if "MoveLeft" in inputs:
+			player.obj.move((-5, 0, 0), min=[-50, None, 0], max=[0, None, 0])
 			moving = True
 			
-		if not moving:
+		if moving:
+			player.obj.play_animation("move")
+		else:
 			player.obj.play_animation("idle")
 			player.obj.move((0, 0, 0))
