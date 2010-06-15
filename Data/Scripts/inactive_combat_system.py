@@ -16,11 +16,15 @@ class InactiveCombatSystem:
 		old_ori = main['3p_cam'].world_orientation
 		main['3p_cam'].reset_orientation()
 		main['player'].obj.set_orientation(old_ori, local=True)
+		main['engine'].set_active_camera(main['3p_cam'])
 		
 		# Handles input
 		inputs = main['input_system'].run()
 		
 		if inputs:
+			if "SwitchCamera" in inputs:
+				main['engine'].set_active_camera(main['top_down_camera'])
+		
 			self._move_player(main['player'], inputs)
 			
 	def _move_player(self, player, inputs):

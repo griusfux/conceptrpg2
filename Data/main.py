@@ -335,24 +335,3 @@ def handle_combat(own):
 			del own['combat_system']
 			
 	return False
-
-def handle_input(own):	
-	# Collect input
-	inputs = own['input_system'].run()
-	
-	scene = gl.getCurrentScene()
-	scene.active_camera = own['3p_cam']
-	
-	# Check the input
-	if inputs:
-		if "SwitchCamera" in inputs:
-			scene.active_camera = scene.objects['Camera']
-			
-		if "MoveForward" in inputs:
-			old_ori = own['cam_empty'].worldOrientation.copy()
-			own['cam_empty'].localOrientation.identity()
-			own['player'].obj.gameobj.localOrientation = old_ori
-		
-		# Move the character
-		own['player'].move_player(inputs, own['input_system'].mouse, own['client'])
-
