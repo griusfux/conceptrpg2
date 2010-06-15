@@ -37,7 +37,10 @@ def animation(cont):
 	mess = cont.sensors['mess']
 
 	if mess.positive:
-		cont.activate(mess.bodies[0])
+		if mess.bodies[0] in cont.actuators:
+			cont.activate(mess.bodies[0])
+		else:
+			print("WARNING: No actuator found for animation: %s" % mess.bodies[0])
 		
 def camera(cont):
 	cam = cont.owner
@@ -240,7 +243,7 @@ def init(own):
 	gameobj = scene.addObject("CharacterEmpty", own)
 	
 	# Now add the mesh and armature based on race data
-	race = RaceFile("DarkKnight")
+	race = RaceFile("Kat")
 	race_data = RaceData(race)
 	gl.LibLoad(race.blend, "Scene")
 	race.close()
