@@ -332,6 +332,7 @@ def handle_combat(own):
 		else:
 			# Clean up
 			print("Combat has finished")
+			own['combat_system'].end()
 			del own['combat_system']
 			
 	return False

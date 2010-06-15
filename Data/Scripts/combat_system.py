@@ -82,8 +82,8 @@ class CombatSystem:
 			
 		return True		
 		
-	def __del__(self):
-		del self.grid
+	def end(self):
+		self.grid.end()
 		
 		for enemy in self.enemy_list:
 			enemy.obj.end()
@@ -166,10 +166,10 @@ class CombatGrid:
 				# position =(room.origin[0] + x, room.origin[1] - y, GRID_Z)
 				self.map[x][y] = CombatTile(x, y, [room.origin[0] + x, room.origin[1] - y, GRID_Z], Engine, room, self.xSteps, self.ySteps)
 	
-	def __del__(self):
+	def end(self):
 		for x in self.map:
 			for y in x:
-				del y
+				y.end()
 				
 	def __call__(self, x, y):
 		return self.map[x][y]
@@ -215,6 +215,6 @@ class CombatTile:
 		self.obj = obj
 		self.valid = False
 		
-	def __del__(self):
+	def end(self):
 		self.grid_tile.end()
 		self.grid_color.end()
