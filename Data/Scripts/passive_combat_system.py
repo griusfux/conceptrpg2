@@ -3,11 +3,10 @@
 class PassiveCombatSystem:
 	"""A combat system for when the player isn't actively engaged in an encounter"""
 	
-	def __init__(self):
+	def __init__(self, main):
 		"""Constructor"""
 		
-		# Nothing to do right now
-		pass
+		main['ui_system'].load_layout("passive_combat")
 		
 	def run(self, main):
 		"""A high-level run method"""

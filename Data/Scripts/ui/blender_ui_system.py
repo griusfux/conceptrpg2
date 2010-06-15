@@ -5,6 +5,7 @@ from Scripts.ui.layouts import *
 
 layouts = {
 	"dun_gen": DunGenLayout,
+	"passive_combat": PassiveCombatLayout
 	}
 
 class BlenderUISystem(bgui.System):
@@ -15,17 +16,20 @@ class BlenderUISystem(bgui.System):
 		bgui.System.__init__(self)
 		
 		# All layouts will be a widget subclass, so we can just keep track of one widget
-		self.layout = None
+		self.layout = Layout(self, "none_layout")
 		
 		# Now we generate a dict to map BGE keys to bgui keys
 		self.keymap = {getattr(bge.events, val): getattr(bgui, val) for val in dir(bge.events) if val.endswith('KEY') or val.startswith('PAD')}
 		
 	def load_layout(self, layout):
 		self._widgets = {}
-		self.layout = layouts[layout](self) if layout else None
+		self.layout = layouts[layout](self) if layout else Layout(self, "none_layout")
 		
-	def run(self):
+	def run(self, main):
 		"""A high-level method to be run every frame"""
+		
+		# Update the layout
+		self.layout.update(main)
 		
 		# Handle the mouse
 		mouse = bge.logic.mouse
@@ -56,9 +60,3 @@ class BlenderUISystem(bgui.System):
 		
 		# Now setup the scene callback so we can draw
 		bge.logic.getCurrentScene().post_draw = [self.render]
-		
-	# def render(self):
-		# print(self._widgets)
-		
-		# bgui.System.render(self)
-		

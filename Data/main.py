@@ -112,7 +112,7 @@ def in_game(cont):
 	
 	# Update the ui
 	if 'ui_system' in own:
-		own['ui_system'].run()
+		own['ui_system'].run(own)
 	
 	if 'init' not in own:
 		init(own)	
@@ -151,7 +151,7 @@ def in_game(cont):
 				# Clean up
 				print("Combat has finished")
 				own['combat_system'].end()
-				own['combat_system'] = PassiveCombatSystem()
+				own['combat_system'] = PassiveCombatSystem(own)
 				own['combat_state'] = COMBAT_PASSIVE
 		else:
 			own['combat_system'].run(own)
@@ -294,7 +294,7 @@ def init(own):
 		scene.active_camera = own['3p_cam'].camera
 		
 	# Setup the passive combat system
-	own['combat_system'] = PassiveCombatSystem()
+	own['combat_system'] = PassiveCombatSystem(own)
 	own['combat_state'] = COMBAT_PASSIVE
 	own['init'] = True
 	
