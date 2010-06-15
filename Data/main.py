@@ -30,6 +30,9 @@ import GameLogic as gl
 user = 'Kupoman'
 addr = ('192.168.1.5', 9999)
 
+COMBAT_ACTIVE = 0
+COMBAT_PASSIVE = 1
+
 # Camera globals
 scale_max = 2
 scale_min = 0.25
@@ -117,7 +120,7 @@ def in_game(cont):
 		if handle_combat(own):
 			return
 		
-		own['icombat_system'].run(own)
+		# own['icombat_system'].run(own)
 		# if not own['is_offline']:
 			# handle_network(own)
 
@@ -275,7 +278,8 @@ def init(own):
 		scene.active_camera = own['3p_cam'].camera
 		
 	# Setup the passive combat system
-	own['icombat_system'] = PassiveCombatSystem()
+	own['combat_system'] = PassiveCombatSystem()
+	own['combat_state'] = COMBAT_PASSIVE
 	own['init'] = True
 	
 def handle_network(own):
@@ -319,12 +323,13 @@ def handle_combat(own):
 			enemy_list[enemy_list.index(monster)] = MonsterLogic(monster_object, monster_data)
 
 		own['combat_system'] = CombatSystem(own, BlenderWrapper.Object(own), own['engine'], enemy_list, BlenderWrapper.Object(room))
+		own['combat_state'] = COMBAT_ACTIVE
 		
 		# The combat system is setup, we don't need this anymore
 		del room['encounter']
 		
 	# When the Combat System's update() returns false, combat is over
-	if 'combat_system' in own:
+	if own['combat_state'] == COMBAT_ACTIVE:
 		scene = gl.getCurrentScene()
 		# scene.active_camera = scene.objects['Camera']
 		if own['combat_system'].update(own):
@@ -333,6 +338,9 @@ def handle_combat(own):
 			# Clean up
 			print("Combat has finished")
 			own['combat_system'].end()
-			del own['combat_system']
+			own['combat_system'] = PassiveCombatSystem()
+			own['combat_state'] = COMBAT_PASSIVE
+	else:
+		own['combat_system'].run(own)
 			
 	return False
