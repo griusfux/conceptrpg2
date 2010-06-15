@@ -11,6 +11,7 @@ from Scripts.archive_file import *
 from Scripts.dungeon_generator import DungeonGenerator, EncounterDeck
 from Scripts.character_logic import PlayerLogic, ProxyLogic, MonsterLogic
 from Scripts.combat_system import CombatSystem
+from Scripts.inactive_combat_system import InactiveCombatSystem
 
 from Scripts.race_data import *
 from Scripts.monster_data import *
@@ -116,11 +117,12 @@ def in_game(cont):
 		if handle_combat(own):
 			return
 		
-		if not own['is_offline']:
-			handle_network(own)
+		own['icombat_system'].run(own)
+		# if not own['is_offline']:
+			# handle_network(own)
 
-		# Do input
-		handle_input(own)
+		# # Do input
+		# handle_input(own)
 		
 		# Check to see if the player should be triggering combat
 		# gameobj = own['player'].obj.gameobj
@@ -243,7 +245,7 @@ def init(own):
 	gameobj = scene.addObject("CharacterEmpty", own)
 	
 	# Now add the mesh and armature based on race data
-	race = RaceFile("Kat")
+	race = RaceFile("DarkKnight")
 	race_data = RaceData(race)
 	gl.LibLoad(race.blend, "Scene")
 	race.close()
@@ -270,7 +272,8 @@ def init(own):
 		own['3pcam'] = cam3p
 		scene.active_camera = cam3p
 		
-	
+	# Setup the inactive combat system
+	own['icombat_system'] = InactiveCombatSystem()
 	own['init'] = True
 	
 def handle_network(own):
