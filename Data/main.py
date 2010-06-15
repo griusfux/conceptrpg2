@@ -11,7 +11,7 @@ from Scripts.archive_file import *
 from Scripts.dungeon_generator import DungeonGenerator, EncounterDeck
 from Scripts.character_logic import PlayerLogic, ProxyLogic, MonsterLogic
 from Scripts.combat_system import CombatSystem
-from Scripts.inactive_combat_system import InactiveCombatSystem
+from Scripts.passive_combat_system import PassiveCombatSystem
 
 from Scripts.race_data import *
 from Scripts.monster_data import *
@@ -274,8 +274,8 @@ def init(own):
 		own['top_down_camera'] = BlenderWrapper.Camera(scene.active_camera)
 		scene.active_camera = own['3p_cam'].camera
 		
-	# Setup the inactive combat system
-	own['icombat_system'] = InactiveCombatSystem()
+	# Setup the passive combat system
+	own['icombat_system'] = PassiveCombatSystem()
 	own['init'] = True
 	
 def handle_network(own):

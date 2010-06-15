@@ -1,6 +1,6 @@
 # $Id$
 
-class InactiveCombatSystem:
+class PassiveCombatSystem:
 	"""A combat system for when the player isn't actively engaged in an encounter"""
 	
 	def __init__(self):
