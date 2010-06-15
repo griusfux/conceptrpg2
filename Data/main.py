@@ -109,31 +109,53 @@ def camera(cont):
 					
 def in_game(cont):
 	own = cont.owner
-		
+	
+	# Update the ui
+	if 'ui_system' in own:
+		own['ui_system'].run()
+	
 	if 'init' not in own:
 		init(own)	
-	elif own['init']:
-		# old_ori = own['cam_empty'].worldOrientation.copy()
-		# own['cam_empty'].localOrientation.identity()
-		# own['player'].obj.gameobj.localOrientation = old_ori
-		# Do combat -- don't go past combant if we are still in combat
-		if handle_combat(own):
-			return
+	elif own['init']:		
+		# Detect combat and switch states if necessary
+		if own.sensors['encounter_mess'].positive:
 		
-		# own['icombat_system'].run(own)
-		# if not own['is_offline']:
-			# handle_network(own)
-
-		# # Do input
-		# handle_input(own)
-		
-		# Check to see if the player should be triggering combat
-		# gameobj = own['player'].obj.gameobj
-		# if gameobj.sensors['sensor'].hitObject:
-			# gameobj.sendMessage("encounter", str(gameobj.sensors['sensor'].hitObject.getPhysicsId()))
+			# Get the room the encounter is taking place in
+			room = own['dgen'].rooms[own.sensors['encounter_mess'].bodies[0]]
 			
-	# Always update the ui
-	own['ui_system'].run()
+			# Generate an enemy list using the encounter deck
+			enemy_list = own['dgen'].encounter_deck.generate_encounter(5)
+			
+			# Replace all the elements in the element list with MonsterLogic objects
+			for monster in enemy_list:
+				
+				# Load the gameobject for the monster into the scene if it isn't already there
+				if monster not in gl.getCurrentScene().objects:
+					monsterfile = MonsterFile(monster)
+					gl.LibLoad(monsterfile.blend, 'Scene', 'Scene')
+					monsterfile.close()
+					
+				monster_object = None #BlenderWrapper.Object(gl.getCurrentScene().addObject(monster, own))
+				monster_data = MonsterData(MonsterFile(monster))
+				enemy_list[enemy_list.index(monster)] = MonsterLogic(monster_object, monster_data)
+
+			own['combat_system'] = CombatSystem(own, BlenderWrapper.Object(own), own['engine'], enemy_list, BlenderWrapper.Object(room))
+			own['combat_state'] = COMBAT_ACTIVE
+			
+			# The combat system is setup, we don't need this anymore
+			del room['encounter']
+			
+		# Run the correct combat system based on the current combat_state
+		if own['combat_state'] == COMBAT_ACTIVE:
+			if not own['combat_system'].update(own):
+				# Clean up
+				print("Combat has finished")
+				own['combat_system'].end()
+				own['combat_system'] = PassiveCombatSystem()
+				own['combat_state'] = COMBAT_PASSIVE
+		else:
+			own['combat_system'].run(own)
+		
 def init(own):
 	# Create a wrapper for the engine
 	if 'engine' not in own:
@@ -176,11 +198,7 @@ def init(own):
 		return
 
 	# Start by loading the dungeon
-	if 'dgen' not in own:	
-		# Display the splash
-		# if len(gl.getSceneList()) == 1:
-			# gl.addScene('Overlay')
-		
+	if 'dgen' not in own:		
 		own['dgen'] = DungeonGenerator(own['mapfile'])
 		
 		if own['is_host']:
@@ -222,7 +240,6 @@ def init(own):
 		own['mapfile'].close()
 		del own['mapfile']
 
-		# gl.getSceneList()[1].end()
 		own['ui_system'].load_layout(None)
 		print("\nDungeon generation complete with %d rooms\n" % own['dgen'].room_count)
 		
@@ -262,7 +279,6 @@ def init(own):
 	# Parent the camera to the player
 	cam = scene.objects["Camera"]
 	cam.setParent(scene.objects["TopDownEmpty"])
-	#own['cam_empty'] = scene.objects["CamEmpty"]
 	cam_empty = scene.objects['CamEmpty']
 	
 	# Switch to the 3rd person camera
@@ -298,49 +314,3 @@ def handle_network(own):
 			if data[0] in own['net_players']:
 				own['net_players'][data[0]].Die()
 				del own['net_players'][data[0]]
-				
-def handle_combat(own):	
-	# Detect combat and init
-	if own.sensors['encounter_mess'].positive:
-	
-		# Get the room the encounter is taking place in
-		room = own['dgen'].rooms[own.sensors['encounter_mess'].bodies[0]]
-		
-		# Generate an enemy list using the encounter deck
-		enemy_list = own['dgen'].encounter_deck.generate_encounter(5)
-		
-		# Replace all the elements in the element list with MonsterLogic objects
-		for monster in enemy_list:
-			
-			# Load the gameobject for the monster into the scene if it isn't already there
-			if monster not in gl.getCurrentScene().objects:
-				monsterfile = MonsterFile(monster)
-				gl.LibLoad(monsterfile.blend, 'Scene', 'Scene')
-				monsterfile.close()
-				
-			monster_object = None #BlenderWrapper.Object(gl.getCurrentScene().addObject(monster, own))
-			monster_data = MonsterData(MonsterFile(monster))
-			enemy_list[enemy_list.index(monster)] = MonsterLogic(monster_object, monster_data)
-
-		own['combat_system'] = CombatSystem(own, BlenderWrapper.Object(own), own['engine'], enemy_list, BlenderWrapper.Object(room))
-		own['combat_state'] = COMBAT_ACTIVE
-		
-		# The combat system is setup, we don't need this anymore
-		del room['encounter']
-		
-	# When the Combat System's update() returns false, combat is over
-	if own['combat_state'] == COMBAT_ACTIVE:
-		scene = gl.getCurrentScene()
-		# scene.active_camera = scene.objects['Camera']
-		if own['combat_system'].update(own):
-			return True
-		else:
-			# Clean up
-			print("Combat has finished")
-			own['combat_system'].end()
-			own['combat_system'] = PassiveCombatSystem()
-			own['combat_state'] = COMBAT_PASSIVE
-	else:
-		own['combat_system'].run(own)
-			
-	return False
