@@ -12,6 +12,11 @@ class InactiveCombatSystem:
 	def run(self, main):
 		"""A high-level run method"""
 		
+		# Reset the camera
+		old_ori = main['3p_cam'].world_orientation
+		main['3p_cam'].reset_orientation()
+		main['player'].obj.set_orientation(old_ori, local=True)
+		
 		# Handles input
 		inputs = main['input_system'].run()
 		
@@ -33,5 +38,5 @@ class InactiveCombatSystem:
 			moving = True
 			
 		if not moving:
-			player.obj.player_animation("idle")
+			player.obj.play_animation("idle")
 			player.obj.move((0, 0, 0))

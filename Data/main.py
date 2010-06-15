@@ -110,9 +110,9 @@ def in_game(cont):
 	if 'init' not in own:
 		init(own)	
 	elif own['init']:
-		old_ori = own['cam_empty'].worldOrientation.copy()
-		own['cam_empty'].localOrientation.identity()
-		own['player'].obj.gameobj.localOrientation = old_ori
+		# old_ori = own['cam_empty'].worldOrientation.copy()
+		# own['cam_empty'].localOrientation.identity()
+		# own['player'].obj.gameobj.localOrientation = old_ori
 		# Do combat -- don't go past combant if we are still in combat
 		if handle_combat(own):
 			return
@@ -259,7 +259,8 @@ def init(own):
 	# Parent the camera to the player
 	cam = scene.objects["Camera"]
 	cam.setParent(scene.objects["TopDownEmpty"])
-	own['cam_empty'] = scene.objects["CamEmpty"]
+	#own['cam_empty'] = scene.objects["CamEmpty"]
+	cam_empty = scene.objects['CamEmpty']
 	
 	# Switch to the 3rd person camera
 	cam3p = None
@@ -269,8 +270,9 @@ def init(own):
 			break
 			
 	if cam3p:
-		own['3pcam'] = cam3p
-		scene.active_camera = cam3p
+		own['3p_cam'] = BlenderWrapper.Camera(cam3p, cam_empty)
+		own['top_down_camera'] = BlenderWrapper.Camera(scene.active_camera)
+		scene.active_camera = own['3p_cam'].camera
 		
 	# Setup the inactive combat system
 	own['icombat_system'] = InactiveCombatSystem()
@@ -339,7 +341,7 @@ def handle_input(own):
 	inputs = own['input_system'].run()
 	
 	scene = gl.getCurrentScene()
-	scene.active_camera = own['3pcam']
+	scene.active_camera = own['3p_cam']
 	
 	# Check the input
 	if inputs:

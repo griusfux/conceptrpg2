@@ -64,8 +64,11 @@ class Object:
 	def set_position(self, position):
 		self.gameobj.worldPosition = position[:]
 		
-	def set_orientation(self, ori):
-		self.gameobj.worldOrientation = ori[:]
+	def set_orientation(self, ori, local=False):
+		if local:
+			self.gameobj.localOrientation = ori[:]
+		else:
+			self.gameobj.worldOrientation = ori[:]
 			
 	def rotate(self, vec, local=True):
 		"""Do object rotation"""
@@ -103,6 +106,34 @@ class Vertex:
 		ori = gameobj.worldOrientation
 		self.x, self.y, self.z = (Matrix(ori[0], ori[1], ori[2])* Vector(vertex.getXYZ())) + Vector(gameobj.worldPosition)
 
+class Camera:
+	"""Wrapper for KX_Camera"""
+	
+	def __init__(self, camera, pivot=None):
+		self.camera = camera
+		self.pivot = pivot if pivot else camera
+		
+	@property
+	def world_orientation(self):
+		"""The camera's world orientation"""
+		return [[x,y,z] for x, y, z in self.pivot.worldOrientation]
+
+	@world_orientation.setter
+	def set_world_orientation(self, value):
+		self.pivot.worldOrientation = value
+		
+	@property
+	def local_orientation(self):
+		"""The camera's local orientation"""
+		return [[x,y,z] for x, y, z in self.pivot.localOrientation]
+
+	@local_orientation.setter
+	def set_local_orientation(self, value):
+		self.pivot.localOrientation = value
+
+	def reset_orientation(self):
+		self.pivot.localOrientation.identity()
+
 class Engine:
 	"""Wrapper for engine functionality"""
 	
@@ -122,6 +153,11 @@ class Engine:
 	def remove_object(self, object):
 		"""Remove and object"""
 		object.gameobj.endObject()
+		
+	def set_active_camera(self, camera):
+		"""Set the active camera"""
+		
+		gl.getCurrentScene().active_camera = camera.camera
 		
 	def ray_cast(self, to_pos, from_pos, object, xray_prop=""):
 		"""Cast a ray using the object"""
