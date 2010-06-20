@@ -26,18 +26,28 @@ ET_POLYMORPH = 2048
 
 # 
 
-class Powers:
-	name
-	desc
+# class Powers:
+	# name
+	# desc
 	
-	id
-	class
-	level
-	usage
-	cost
-	damage_type
-	power_source
-	is_trigger
+	# id
+	# class
+	# level
+	# usage
+	# cost
+	# damage_type
+	# power_source
+	# is_trigger
 	
-	implements
-	weapons
+	# implements
+	# weapons
+	
+class Power:
+	
+	def __init__(self, powerdata):
+		self.name = powerdata.name
+		self.animation = powerdata.animation
+		
+	def use(self, combat_system, user, target):
+		target.hp += 10
+		combat_system.play_animation(user, self.animation)

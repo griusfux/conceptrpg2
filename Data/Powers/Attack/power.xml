@@ -2,4 +2,6 @@
 
 <powerfile>
 	<name>Attack</name>
+	
+	<animation>attack</animation>
 </powerfile>

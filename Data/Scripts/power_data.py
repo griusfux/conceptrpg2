@@ -8,3 +8,5 @@ class PowerData():
 		for element in datafile.root:
 			if element.tag == "name":
 				self.name = element.text
+			elif element.tag == "animation":
+				self.animation = element.text

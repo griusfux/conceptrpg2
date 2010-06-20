@@ -12,6 +12,8 @@ from Scripts.dungeon_generator import DungeonGenerator, EncounterDeck
 from Scripts.character_logic import PlayerLogic, ProxyLogic, MonsterLogic
 from Scripts.combat_system import CombatSystem
 from Scripts.passive_combat_system import PassiveCombatSystem
+from Scripts.powers import Power
+from Scripts.power_data import PowerData
 
 from Scripts.race_data import *
 from Scripts.monster_data import *
@@ -275,6 +277,9 @@ def init(own):
 	
 	# Store the player
 	own['player'] = PlayerLogic(BlenderWrapper.Object(gameobj, root_ob))
+	
+	# Give the player an attack power
+	own['player'].active_power = Power(PowerData(PowerFile("attack")))
 	
 	# Parent the camera to the player
 	cam = scene.objects["Camera"]

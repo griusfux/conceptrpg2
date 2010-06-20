@@ -24,7 +24,13 @@ class PassiveCombatSystem:
 			if "SwitchCamera" in inputs:
 				main['engine'].set_active_camera(main['top_down_camera'])
 		
+			if "UsePower" in inputs:
+				target = main['player']
+				main['player'].active_power.use(self, main['player'], target)
 			self._move_player(main['player'], inputs)
+			
+	def play_animation(self, char, action):
+		char.obj.play_animation(action)
 			
 	def _move_player(self, player, inputs):
 		"""Move the player"""
