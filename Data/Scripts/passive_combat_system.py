@@ -20,8 +20,7 @@ class PassiveCombatSystem:
 		main['engine'].set_active_camera(main['3p_cam'])
 		
 		# Update the player's lock
-		if main['player'].lock and time() > main['player'].lock:
-			main['player'].lock = None
+		main['player'].update_lock()
 		
 		# Handles input
 		inputs = main['input_system'].run()

@@ -91,6 +91,10 @@ class CharacterLogic:
 		
 	def add_lock(self, duration):
 		self.lock = time.time()+duration
+		
+	def update_lock(self):
+		if self.lock and time.time() > self.lock:
+			self.lock = None
 
 	def recalc_stats(self):
 		"""Recalculates the player's stats that are calculated based on other stats"""
