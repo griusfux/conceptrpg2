@@ -47,7 +47,7 @@ class Power:
 	def __init__(self, powerdata):
 		self.name = powerdata.name
 		self.animation = powerdata.animation
+		self._use = powerdata.method
 		
 	def use(self, combat_system, user, target):
-		target.hp += 10
-		combat_system.play_animation(user, self.animation)
+		self._use(self, combat_system, user, target)

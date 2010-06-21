@@ -257,7 +257,7 @@ def init(own):
 	#own['input_system'].mouse.show(True)
 	
 	# Add the HUD
-	gl.addScene('HUD')
+	# gl.addScene('HUD')
 	
 	# Add the player
 	scene = gl.getCurrentScene()
@@ -279,7 +279,7 @@ def init(own):
 	own['player'] = PlayerLogic(BlenderWrapper.Object(gameobj, root_ob))
 	
 	# Give the player an attack power
-	own['player'].active_power = Power(PowerData(PowerFile("attack")))
+	own['player'].active_power = Power(PowerData(PowerFile("Attack")))
 	
 	# Parent the camera to the player
 	cam = scene.objects["Camera"]

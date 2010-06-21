@@ -1,5 +1,7 @@
 # $Id$
 
+from time import time
+
 class PassiveCombatSystem:
 	"""A combat system for when the player isn't actively engaged in an encounter"""
 	
@@ -17,6 +19,10 @@ class PassiveCombatSystem:
 		main['player'].obj.set_orientation(old_ori, local=True)
 		main['engine'].set_active_camera(main['3p_cam'])
 		
+		# Update the player's lock
+		if main['player'].lock and time() > main['player'].lock:
+			main['player'].lock = None
+		
 		# Handles input
 		inputs = main['input_system'].run()
 		
@@ -24,11 +30,13 @@ class PassiveCombatSystem:
 			if "SwitchCamera" in inputs:
 				main['engine'].set_active_camera(main['top_down_camera'])
 		
-			if "UsePower" in inputs:
-				target = main['player']
-				main['player'].active_power.use(self, main['player'], target)
-			self._move_player(main['player'], inputs)
-			
+			# Only let the player do stuff while they are not "locked"
+			if not main['player'].lock:
+				if "UsePower" in inputs:
+					target = main['player']
+					main['player'].active_power.use(self, main['player'], target)
+				self._move_player(main['player'], inputs)
+				
 	def play_animation(self, char, action):
 		char.obj.play_animation(action)
 			
