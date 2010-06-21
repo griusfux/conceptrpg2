@@ -86,6 +86,12 @@ class CharacterLogic:
 		# the character's game object
 		self.obj = obj
 		
+		# The character's current "lock", which is represented as the time at which the lock ends
+		self.lock = None
+		
+	def add_lock(self, duration):
+		self.lock = time.time()+duration
+
 	def recalc_stats(self):
 		"""Recalculates the player's stats that are calculated based on other stats"""
 		#ability modifiers
@@ -149,7 +155,7 @@ class CharacterLogic:
 		roll = 0
 		
 		for die in range(x):
-			random.seed(time.time())
+			random.seed()
 			roll += random.randint(1, y)
 		return roll
 		
