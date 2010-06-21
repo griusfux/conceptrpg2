@@ -10,9 +10,8 @@ class Machine:
 					}
 		self.current_state = start_state
 		
-		self.timer = 5000
+		self.timer = 0
 		self.counter = 0
-		self.target = None
 		
 		if keywords:
 			for keyword in keywords:

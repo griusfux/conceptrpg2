@@ -23,8 +23,8 @@ def move_happy(self, input):
 			happy = True
 			break
 			
-	if happy and self.timer > 500:
-		input['self'].obj.move((0,0,1), 2)
+	if happy and self.timer > 30:
+		input['self'].obj.move((0,0,300), 1)
 		self.timer = 0
 	
 	return 'idle'
