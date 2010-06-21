@@ -1,9 +1,11 @@
 try:
 	import lxml.etree as etree
 	print('Lxml detected, xml validation enabled')
+	XMLSyntaxError = etree.XMLSyntaxError
 	VALIDATING = True
 except ImportError:
 	import xml.etree.cElementTree as etree
+	XMLSyntaxError = SyntaxError
 	VALIDATING = False
 
 from zipfile import *
@@ -28,11 +30,14 @@ class ArchiveFile:
 		self.root = None
 
 		filename = self._dir+'/'+_filename
+		self.origin = filename
+		self.is_zip = False
 		
 		# If the file is packed, extract the files to a tmp location
-		if os.path.exists(filename+"."+self._ext):
+		if not os.path.exists(filename) and os.path.exists(filename+"."+self._ext):
 			zfile = ZipFile(filename+"."+self._ext, 'r')	
 			filename = 'tmp/'+filename
+			self.is_zip = True
 			
 			zfile.extract(self._config,  filename)
 			if self._blend:
@@ -62,11 +67,14 @@ class ArchiveFile:
 			else:
 				self.root = tree.getroot()
 				self.init = True
-		except(etree.XMLSyntaxError):
-			print("Syntax Error:")
-			print(parser.error_log)
+		except XMLSyntaxError as e:
+			if VALIDATING:
+				print("Syntax Error:")
+				print(parser.error_log)
+			else:
+				print(e)
 			print("\nError with config file from "+_filename+"!")
-		except(IOError):
+		except IOError:
 			print("Error in opening the config file: "+self.config)
 			
 	def __del__(self):
