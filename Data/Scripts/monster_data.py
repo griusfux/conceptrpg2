@@ -4,7 +4,7 @@ class MonsterData:
 	"""A container for data from monsterfiles"""
 	
 	def __init__(self, datafile):
-		self.id = datafile.file_name.split('/')[2]
+		self.id = datafile.origin.split('/')[-1]
 		self.allowed_roles = ('artillery', 'brute', 'controller', 'lurker', 'minion', 'skirmisher')
 	
 		for element in datafile.root:

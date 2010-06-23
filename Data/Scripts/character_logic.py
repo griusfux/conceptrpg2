@@ -169,7 +169,7 @@ class CharacterLogic:
 		# Get the vector to  the target
 		target_vector = self.obj.get_local_vector_to(target)
 		
-		self.obj.move((self.speed * target_vector[0], self.speed * target_vector[1], 0))
+		self.obj.move((self.speed * target_vector[0], self.speed * target_vector[1], 0), mode=0)
 		
 		
 class PlayerLogic(CharacterLogic):
@@ -178,7 +178,7 @@ class PlayerLogic(CharacterLogic):
 		CharacterLogic.__init__(self, obj)
 		self.last_update = [(0, 0, 0), (1, 1, 1)]
 		
-	def load_stats_from_save(self, save):
+	def load_stats(self, save):
 		"""Fills in stats from a SaveData object"""
 		try:
 			save_data = pickle.load(save)
@@ -201,6 +201,8 @@ class PlayerLogic(CharacterLogic):
 		self.wis_ab		= save_data["wis_ab"]
 		self.cha_ab		= save_data["cha_ab"]
 		
+		self.speed_base = save_data["speed_base"]
+		
 		if save_data["equipped_armor"]:
 			self.equip_armor(save_data["equipped_armor"])
 		if save_data["equipped_shield"]:
@@ -210,7 +212,7 @@ class PlayerLogic(CharacterLogic):
 
 		self.recalc_stats()
 		
-	def save_stats_to_save(self, save):
+	def save_stats(self, save):
 		save_data = {
 				"name"	: self.name,
 				"level"	: self.level,
@@ -228,9 +230,11 @@ class PlayerLogic(CharacterLogic):
 				"wis_ab"	: self.wis_ab,
 				"cha_ab"	: self.cha_ab,
 				
+				"speed_base" : self.speed_base,
+				
 				"equipped_armor"	: self.equipped_armor,
 				"equipped_shield"	: self.equipped_shield,
-				"equipped_weapon" 	: self.equipped_weapon }
+				"equipped_weapon" 	: self.equipped_weapon}
 		pickle.dump(save_data, save)
 		
 	def move_player(self, inputs, mouse, client):

@@ -141,7 +141,7 @@ def in_game(cont):
 				monster_data = MonsterData(MonsterFile(monster))
 				enemy_list[enemy_list.index(monster)] = MonsterLogic(monster_object, monster_data)
 
-			own['combat_system'] = CombatSystem(own, BlenderWrapper.Object(own), own['engine'], enemy_list, BlenderWrapper.Object(room))
+			own['combat_system'] = CombatSystem(own, own['engine'], enemy_list, BlenderWrapper.Object(room))
 			own['combat_state'] = COMBAT_ACTIVE
 			
 			# The combat system is setup, we don't need this anymore
@@ -277,6 +277,12 @@ def init(own):
 	
 	# Store the player
 	own['player'] = PlayerLogic(BlenderWrapper.Object(gameobj, root_ob))
+	
+	# Load stats for the player
+	own['player'].load_stats(open('Kupoman.save', 'rb'))
+	
+	# Fill the player's hit points
+	own['player'].hp = own['player'].max_hp
 	
 	# Give the player an attack power
 	own['player'].active_power = Power(PowerData(PowerFile("Attack")))
