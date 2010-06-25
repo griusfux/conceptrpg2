@@ -1,5 +1,27 @@
 from Scripts.validate_data import *
 
+class ItemData:
+	"""A data object base class for items"""
+	
+	def __init__(self, datafile):
+		##############
+		# Attributes
+		#
+		# name
+		# type // Obtained from class?
+		# weight
+		# value
+		
+		# Load data from .item file
+		for element in datafile.root:
+			if element.tag == 'name':
+				self.name = element.text
+			if element.tag == 'weight':
+				ValidateInt(self, element.tag, element.text)
+			if element.tag == 'value':
+				ValidateInt(self, element.tag, element.text)
+		
+		
 class ArmorData():
 	"""A data object to handle armor"""
 	
