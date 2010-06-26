@@ -9,6 +9,7 @@ class PassiveCombatSystem:
 		"""Constructor"""
 		
 		main['ui_system'].load_layout("passive_combat")
+		self.inventory_window_active = False
 		
 	def run(self, main):
 		"""A high-level run method"""
@@ -28,6 +29,14 @@ class PassiveCombatSystem:
 		if inputs:
 			if "SwitchCamera" in inputs:
 				main['engine'].set_active_camera(main['top_down_camera'])
+				
+			if "Inventory" in inputs:
+				if self.inventory_window_active:
+					main['ui_system'].remove_overlay("inventory_overlay")
+					self.inventory_window_active = False
+				else:
+					main['ui_system'].add_overlay("inventory_overlay")
+					self.inventory_window_active = True
 		
 			# Only let the player do stuff while they are not "locked"
 			if not main['player'].lock:

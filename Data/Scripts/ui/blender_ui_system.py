@@ -5,7 +5,8 @@ from Scripts.ui.layouts import *
 
 layouts = {
 	"dun_gen": DunGenLayout,
-	"passive_combat": PassiveCombatLayout
+	"passive_combat": PassiveCombatLayout,
+	"inventory_overlay": InventoryOverlay,
 	}
 
 class BlenderUISystem(bgui.System):
@@ -18,6 +19,9 @@ class BlenderUISystem(bgui.System):
 		# All layouts will be a widget subclass, so we can just keep track of one widget
 		self.layout = Layout(self, "none_layout")
 		
+		# We can also add 'overlay' layouts
+		self.overlays = {}
+		
 		# Now we generate a dict to map BGE keys to bgui keys
 		self.keymap = {getattr(bge.events, val): getattr(bgui, val) for val in dir(bge.events) if val.endswith('KEY') or val.startswith('PAD')}
 		
@@ -25,11 +29,32 @@ class BlenderUISystem(bgui.System):
 		self._widgets = {}
 		self.layout = layouts[layout](self) if layout else Layout(self, "none_layout")
 		
+	def add_overlay(self, layout):
+		"""Add an overlay layout"""
+		
+		if layout in self.overlays:
+			print("Overlay: %s, is already added" % layout)
+			return
+	
+		self.overlays[layout] = layouts[layout](self.layout)
+		
+	def remove_overlay(self, layout):
+		"""Remove an overlay layout by name"""
+		
+		if layout in self.overlays:
+			self.layout._remove_widget(self.overlays[layout])
+			del self.overlays[layout]
+		else:
+			print("WARNING: Overlay: %s was not found, nothing was removed" % layout)
+		
 	def run(self, main):
 		"""A high-level method to be run every frame"""
 		
-		# Update the layout
+		# Update the layout and overlays
 		self.layout.update(main)
+		
+		for key, value in self.overlays.items():
+			value.update(main)
 		
 		# Handle the mouse
 		mouse = bge.logic.mouse

@@ -8,6 +8,12 @@ class Layout(bgui.Widget):
 	def update(self, main):
 		# To be overridden
 		pass
+		
+class InventoryOverlay(Layout):
+	def __init__(self, parent):
+		Layout.__init__(self, parent, "inventory_overlay")
+		
+		self.frame = bgui.Frame(self, "inv_frame", size=[0.25, 0.25], pos=[0.6, 0.4])
 
 class DunGenLayout(Layout):
 	
