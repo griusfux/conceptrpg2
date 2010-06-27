@@ -90,7 +90,7 @@ class CombatSystem:
 		inputs = main['input_system'].run()
 		# if set(["MoveForward", "MoveBackward", "TurnLeft", "TurnRight", "Jump", "Aim"]).intersection(set(inputs)):
 		if inputs:
-			if set(["MoveForward", "MoveBackward", "MoveLeft", "MoveRight"]).intersection(set(inputs)) and not main['player'].lock:
+			if set([("MoveForward", "INPUT_ACTIVE"), ("MoveBackward", "INPUT_ACTIVE"), ("MoveLeft", "INPUT_ACTIVE"), ("MoveRight", "INPUT_ACTIVE")]).intersection(set(inputs)) and not main['player'].lock:
 				main['player'].move_player(inputs, main['input_system'].mouse, main['client'])
 			else:
 				# Snap the player to the grid
@@ -101,14 +101,14 @@ class CombatSystem:
 				main['player'].obj.move(vector_to_tile)
 				
 			if not main['player'].lock:
-				if "UsePower" in inputs:
+				if ("UsePower", "INPUT_ACTIVE") in inputs:
 					target = main['player']
 					main['player'].active_power.use(self, main['player'], target)
 			
 			
-				if "Jump" in inputs:
+				if ("Jump", "INPUT_ACTIVE") in inputs:
 					return False
-				if "Aim" in inputs:
+				if ("Aim", "INPUT_ACTIVE") in inputs:
 					self.display_target_range('area burst 5', main['player'].obj.get_position())
 
 				

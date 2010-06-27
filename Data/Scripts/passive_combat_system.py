@@ -27,10 +27,10 @@ class PassiveCombatSystem:
 		inputs = main['input_system'].run()
 		
 		if inputs:
-			if "SwitchCamera" in inputs:
+			if ("SwitchCamera", "INPUT_ACTIVE") in inputs:
 				main['engine'].set_active_camera(main['top_down_camera'])
 				
-			if "Inventory" in inputs:
+			if ("Inventory", "INPUT_CLICK") in inputs:
 				if self.inventory_window_active:
 					main['ui_system'].remove_overlay("inventory_overlay")
 					self.inventory_window_active = False
@@ -40,7 +40,7 @@ class PassiveCombatSystem:
 		
 			# Only let the player do stuff while they are not "locked"
 			if not main['player'].lock:
-				if "UsePower" in inputs:
+				if ("UsePower", "INPUT_ACTIVE") in inputs:
 					target = main['player']
 					main['player'].active_power.use(self, main['player'], target)
 				self._move_player(main['player'], inputs)
@@ -53,16 +53,16 @@ class PassiveCombatSystem:
 		
 		moving = False
 		
-		if "MoveForward" in inputs:
+		if ("MoveForward", "INPUT_ACTIVE") in inputs:
 			player.obj.move((0, 5, 0), min=[None, 0, 0], max=[None, 50, 0])
 			moving = True
-		if "MoveBackward" in inputs:
+		if ("MoveBackward", "INPUT_ACTIVE") in inputs:
 			player.obj.move((0, -5, 0), min=[None, -50, 0], max=[None, 0, 0])
 			moving = True
-		if "MoveRight" in inputs:
+		if ("MoveRight", "INPUT_ACTIVE") in inputs:
 			player.obj.move((5, 0, 0), min=[0, None, 0], max=[50, None, 0])
 			moving = True
-		if "MoveLeft" in inputs:
+		if ("MoveLeft", "INPUT_ACTIVE") in inputs:
 			player.obj.move((-5, 0, 0), min=[-50, None, 0], max=[0, None, 0])
 			moving = True
 			

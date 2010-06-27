@@ -237,6 +237,7 @@ class PlayerLogic(CharacterLogic):
 				"equipped_weapon" 	: self.equipped_weapon}
 		pickle.dump(save_data, save)
 		
+	# This function should be removed, but CombatSystem is still using it
 	def move_player(self, inputs, mouse, client):
 		"""Move the player"""
 
@@ -245,11 +246,11 @@ class PlayerLogic(CharacterLogic):
 		
 			moving = False
 		
-			if "MoveForward" in inputs:
+			if ("MoveForward", "INPUT_ACTIVE") in inputs:
 				self.obj.move((0, 5, 0), min=[None, 0, 0], max=[None, 50, 0])
 				self.obj.play_animation("move")
 				moving = True
-			if "MoveBackward" in inputs:
+			if ("MoveBackward", "INPUT_ACTIVE") in inputs:
 				self.obj.move((0, -5, 0), min=[None, -50, 0], max=[None, 0, 0])
 				self.obj.play_animation("move")
 				moving = True

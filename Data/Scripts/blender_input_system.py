@@ -3,8 +3,16 @@
 # Description: Handles player keyboard and joystick input from Blender
 # Contributers: Mitchell Stokes
 
-import GameKeys
-import GameLogic
+import bge
+
+# Dictionary to map Ketsji input states to generic ones
+INPUT_STATE = {
+		bge.logic.KX_INPUT_NONE: "INPUT_NONE",
+		bge.logic.KX_INPUT_ACTIVE: "INPUT_ACTIVE",
+		bge.logic.KX_INPUT_JUST_ACTIVATED: "INPUT_CLICK",
+		bge.logic.KX_INPUT_JUST_RELEASED: "INPUT_RELEASE",
+	}
+			
 	
 # utility method for parsing config data
 def parse_conf(file):
@@ -25,7 +33,7 @@ def parse_conf(file):
 		
 		# If we have a bad line, ignore it and tell the user.
 		try:
-			dict[key[0]] = getattr(GameKeys, key[1].strip())
+			dict[key[0]] = getattr(bge.events, key[1].strip())
 		except IndexError:
 			print("Invalid line ignored: %s" % line)
 		
@@ -54,11 +62,11 @@ class BlenderKeyboardInput(BlenderInput):
 		
 		val = []
 		for event in self.sensor.events:
-			if event[1] == 1 or 2:
+			if event[1] != bge.logic.KX_INPUT_NONE:
 				temp = self.parse_input(event[0])
 				
 				if temp:
-					val.append(temp)
+					val.append((temp, INPUT_STATE[event[1]]))
 					
 		return val
 		
@@ -67,11 +75,11 @@ class BlenderMouseInput(BlenderInput):
 		val = []
 		
 		for event in self.sensor.events:
-			if event[1] == 1 or 2:
+			if event[1] != bge.logic.KX_INPUT_NONE:
 				temp = self.parse_input(event[0])
 				
 				if temp:
-					val.append(temp)
+					val.append((temp, INPUT_STATE[event[1]]))
 					
 		return val
 		
@@ -101,12 +109,12 @@ class BlenderInputSystem():
 		# Setup the keyboard
 		kb_dict = parse_conf(kb_conf)		
 		
-		self.keyboard = BlenderKeyboardInput(GameLogic.keyboard, kb_dict)
+		self.keyboard = BlenderKeyboardInput(bge.logic.keyboard, kb_dict)
 		
 		# Setup the mouse
 		m_dict = parse_conf(mouse_conf)
 		
-		self.mouse = BlenderMouseInput(GameLogic.mouse, m_dict)
+		self.mouse = BlenderMouseInput(bge.logic.mouse, m_dict)
 		
 		
 		# # The joystick input is optional, so check for it first
