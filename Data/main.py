@@ -10,8 +10,9 @@ from Scripts.ui.blender_ui_system import *
 from Scripts.archive_file import *
 from Scripts.dungeon_generator import DungeonGenerator, EncounterDeck
 from Scripts.character_logic import PlayerLogic, ProxyLogic, MonsterLogic
-from Scripts.combat_system import CombatSystem
-from Scripts.passive_combat_system import PassiveCombatSystem
+# from Scripts.combat_system import CombatSystem
+# from Scripts.passive_combat_system import PassiveCombatSystem
+from Scripts.gamestates import *
 from Scripts.powers import Power
 from Scripts.power_data import PowerData
 
@@ -120,43 +121,43 @@ def in_game(cont):
 		init(own)	
 	elif own['init']:		
 		# Detect combat and switch states if necessary
-		if own.sensors['encounter_mess'].positive:
+		# if own.sensors['encounter_mess'].positive:
 		
 			# Get the room the encounter is taking place in
-			room = own['dgen'].rooms[own.sensors['encounter_mess'].bodies[0]]
+			# room = own['dgen'].rooms[own.sensors['encounter_mess'].bodies[0]]
 			
 			# Generate an enemy list using the encounter deck
-			enemy_list = own['dgen'].encounter_deck.generate_encounter(5)
+			# enemy_list = own['dgen'].encounter_deck.generate_encounter(5)
 			
 			# Replace all the elements in the element list with MonsterLogic objects
-			for monster in enemy_list:
+			# for monster in enemy_list:
 				
 				# Load the gameobject for the monster into the scene if it isn't already there
-				if monster not in gl.getCurrentScene().objects:
-					monsterfile = MonsterFile(monster)
-					gl.LibLoad(monsterfile.blend, 'Scene', 'Scene')
-					monsterfile.close()
+				# if monster not in gl.getCurrentScene().objects:
+					# monsterfile = MonsterFile(monster)
+					# gl.LibLoad(monsterfile.blend, 'Scene', 'Scene')
+					# monsterfile.close()
 					
-				monster_object = None #BlenderWrapper.Object(gl.getCurrentScene().addObject(monster, own))
-				monster_data = MonsterData(MonsterFile(monster))
-				enemy_list[enemy_list.index(monster)] = MonsterLogic(monster_object, monster_data)
+				# monster_object = None #BlenderWrapper.Object(gl.getCurrentScene().addObject(monster, own))
+				# monster_data = MonsterData(MonsterFile(monster))
+				# enemy_list[enemy_list.index(monster)] = MonsterLogic(monster_object, monster_data)
 
-			own['combat_system'] = CombatSystem(own, own['engine'], enemy_list, BlenderWrapper.Object(room))
-			own['combat_state'] = COMBAT_ACTIVE
+			# own['combat_system'] = CombatSystem(own, own['engine'], enemy_list, BlenderWrapper.Object(room))
+			# own['combat_state'] = COMBAT_ACTIVE
 			
 			# The combat system is setup, we don't need this anymore
-			del room['encounter']
+			# del room['encounter']
 			
 		# Run the correct combat system based on the current combat_state
-		if own['combat_state'] == COMBAT_ACTIVE:
-			if not own['combat_system'].update(own):
-				# Clean up
-				print("Combat has finished")
-				own['combat_system'].end()
-				own['combat_system'] = PassiveCombatSystem(own)
-				own['combat_state'] = COMBAT_PASSIVE
-		else:
-			own['combat_system'].run(own)
+		# if own['combat_state'] == COMBAT_ACTIVE:
+			# if not own['combat_system'].update(own):
+				# # Clean up
+				# print("Combat has finished")
+				# own['combat_system'].end()
+				# own['combat_system'] = PassiveCombatSystem(own)
+				# own['combat_state'] = COMBAT_PASSIVE
+		# else:
+		own['game_state'].run(own)
 		
 def init(own):
 	# Create a wrapper for the engine
@@ -305,9 +306,13 @@ def init(own):
 		scene.active_camera = own['3p_cam'].camera
 		
 	# Setup the passive combat system
-	own['combat_system'] = PassiveCombatSystem(own)
-	own['combat_state'] = COMBAT_PASSIVE
+	# own['combat_system'] = PassiveCombatSystem(own)
+	# own['combat_state'] = COMBAT_PASSIVE
+	own['game_state'] = DefaultState(own)
 	own['init'] = True
+	
+	
+	own['ui_system'].add_overlay("stats")
 	
 def handle_network(own):
 	# Handle network data

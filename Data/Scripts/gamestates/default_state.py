@@ -2,7 +2,7 @@
 
 from time import time
 
-class PassiveCombatSystem:
+class DefaultState:
 	"""A combat system for when the player isn't actively engaged in an encounter"""
 	
 	def __init__(self, main):

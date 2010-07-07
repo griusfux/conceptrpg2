@@ -9,7 +9,7 @@ from math import sqrt
 TILE_SIZE	= 1
 GRID_Z		= 0.01
 
-class CombatSystem:
+class CombatState:
 	def __init__(self, main, Engine, encounter_list, room):
 		random.seed()
 		self.Engine = Engine
