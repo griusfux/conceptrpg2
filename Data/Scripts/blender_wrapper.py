@@ -165,3 +165,8 @@ class Engine:
 		ob, pos, norm = object.gameobj.rayCast(to_pos, from_pos, 0, xray_prop, 0, 1 if xray_prop else 0)
 		
 		return Object(ob) if ob else None, pos, norm
+		
+	@property
+	def fps(self):
+		"""The current fps"""
+		return gl.getAverageFrameRate()

@@ -311,9 +311,6 @@ def init(own):
 	own['game_state'] = DefaultState(own)
 	own['init'] = True
 	
-	
-	own['ui_system'].add_overlay("stats")
-	
 def handle_network(own):
 	# Handle network data
 	cmd, rdata = own['client'].receive_message()

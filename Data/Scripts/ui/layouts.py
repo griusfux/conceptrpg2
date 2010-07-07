@@ -9,6 +9,15 @@ class Layout(bgui.Widget):
 		# To be overridden
 		pass
 		
+class StatsOverlay(Layout):
+	def __init__(self, parent):
+		Layout.__init__(self, parent, "stats_overlay")
+		
+		self.fps = bgui.Label(self, "fps", pt_size=42, pos=[0.05, .9])
+		
+	def update(self, main):
+		self.fps.text = "%.2f fps" % main['engine'].fps
+		
 class InventoryOverlay(Layout):
 	def __init__(self, parent):
 		Layout.__init__(self, parent, "inventory_overlay")

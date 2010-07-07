@@ -6,7 +6,9 @@ from Scripts.ui.layouts import *
 layouts = {
 	"dun_gen": DunGenLayout,
 	"passive_combat": PassiveCombatLayout,
+	
 	"inventory_overlay": InventoryOverlay,
+	"stats": StatsOverlay,
 	}
 
 class BlenderUISystem(bgui.System):
@@ -28,6 +30,12 @@ class BlenderUISystem(bgui.System):
 	def load_layout(self, layout):
 		self._widgets = {}
 		self.layout = layouts[layout](self) if layout else Layout(self, "none_layout")
+		
+	def toogle_overlay(self, layout):
+		if layout in self.overlays:
+			self.remove_overlay(layout)
+		else:
+			self.add_overlay(layout)
 		
 	def add_overlay(self, layout):
 		"""Add an overlay layout"""
