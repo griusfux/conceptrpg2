@@ -55,25 +55,68 @@ class Object:
 		else:
 			raise ValueError("Supplied mode is invalid!")
 			
-	def get_position(self):
-		return self.gameobj.worldPosition
-		
-	def get_orientation(self):
-		return self.gameobj.worldOrientation
-		
-	def set_position(self, position):
-		self.gameobj.worldPosition = position[:]
-		
-	def set_orientation(self, ori, local=False):
-		if local:
-			self.gameobj.localOrientation = ori[:]
-		else:
-			self.gameobj.worldOrientation = ori[:]
-			
 	def rotate(self, vec, local=True):
 		"""Do object rotation"""
 		
 		self.gameobj.applyRotation(vec, local)
+			
+	def get_position(self):
+		return self.gameobj.worldPosition
+		
+	def set_position(self, position):
+		self.gameobj.worldPosition = position[:]
+		
+	def get_orientation(self):
+		return self.gameobj.worldOrientation
+		
+	def set_orientation(self, ori, local=False):
+		vector = True
+		try:
+			len(ori[0])
+			vector = False
+		except TypeError:
+			pass
+		if vector:
+			ori_vec = [float(i) for i in ori]
+			y = Vector((ori_vec[0], ori_vec[1], ori_vec[2]))
+			z = Vector((0.0, 0.0, 1.0))
+			x = y.cross(z)
+			ori = ([
+						[x[0], y[0], z[0]],
+						[x[1], y[1], z[1]],
+						[x[2], y[2], z[2]]
+						])
+	
+		if local:
+			self.gameobj.localOrientation = ori[:]
+		else:
+			self.gameobj.worldOrientation = ori[:]
+		
+	def get_forward_vector(self):
+		return self.gameobj.getAxisVect((0,1,0))
+		
+	def get_axis_vector(self, axis):
+		sign = 1
+		if len(axis) == 2:
+			sign = -1
+		else:
+			axis = " " + axis
+		
+		ori = self.gameobj.localOrientation[:]
+		vector = (0, 0, 0)
+		if axis[1] == 'x':
+			vector = (1, 0, 0)
+		elif axis[1] == 'y':
+			vector = (0, 1, 0)
+		elif axis[1] == 'z':
+			vector = (0, 0, 1)
+		
+		vector = [component*sign for component in vector]
+		
+		return vector
+		
+	def get_local_vector_to(self, position, arg = 2):
+		return self.gameobj.getVectTo(position)[arg]	
 		
 	def play_animation(self, anim):
 		if self.armature:
@@ -93,9 +136,6 @@ class Object:
 				vertexList.append(mesh.getVertex(matID, array))
 				
 		return [Vertex(vertex, self.gameobj) for vertex in vertexList]
-		
-	def get_local_vector_to(self, position):
-		return self.gameobj.getVectTo(position)[2]
 		
 	def set_color(self, color):
 		self.gameobj.color = color
@@ -139,6 +179,12 @@ class Engine:
 	
 	def __init__(self, adder):
 		self.adder = adder
+	
+	def angle_between(self, vec1, vec2):
+		vec1 = Vector(vec1)
+		vec2 = Vector(vec2)
+		
+		return vec1.angle(vec2)
 	
 	def add_object(self, object, pos=None, ori=None, time=0):
 		"""Add an opject"""
