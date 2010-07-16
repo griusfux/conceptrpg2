@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapfile SYSTEM "deckfile.xml">
+
+<!--Prototype Encounter Deck for the first map-->
+<deckfile>
+	<card>
+		<monster>dire_rat</monster>
+		<role>brute</role>
+		<count>50</count>
+	</card>
+</deckfile>

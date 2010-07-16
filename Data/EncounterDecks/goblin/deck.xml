@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapfile SYSTEM "deckfile.xml">
+
+<!--Prototype Encounter Deck for the first map-->
+<deckfile>
+	<card>
+		<monster>giant_rat</monster>
+		<count>2</count>
+	</card>
+	<card>
+		<monster>goblin_cutter</monster>
+		<count>3</count>
+	</card>
+	<card>
+		<monster>goblin_hexer</monster>
+		<count>4</count>
+	</card>
+	<card>
+		<monster>goblin_skullcleaver</monster>
+		<count>6</count>
+	</card>
+	<card>
+		<monster>goblin_blackblade</monster>
+		<count>2</count>
+	</card>
+	<card>
+		<monster>goblin_sharpshooter</monster>
+		<count>5</count>
+	</card>
+	<card>
+		<monster>goblin_warrior</monster>
+		<count>14</count>
+	</card>
+	<card>
+		<monster>fire_beetle</monster>
+		<count>8</count>
+	</card>
+	<card>
+		<monster>dire_rat</monster>
+		<count>4</count>
+	</card>
+</deckfile>
