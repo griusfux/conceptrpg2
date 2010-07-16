@@ -2,7 +2,7 @@
 
 import Scripts.Ai.machine as ai
 import random
-from math import sqrt
+from math import sqrt, pi
 
 
 # Grid constants
@@ -41,7 +41,10 @@ class CombatState:
 		# Place participants
 		
 		# Make sure the player is in the room
-		main['player'].obj.set_position(self.tile_from_point(main['player'].obj.get_position()).position)
+		player_tile = self.tile_from_point(main['player'].obj.get_position())
+		main['player'].obj.set_position(player_tile.position)
+		player_tile.fill(main['player'])
+		main['player'].tile = player_tile
 
 		# Place the monsters
 
@@ -55,6 +58,7 @@ class CombatState:
 			monster.obj = Engine.add_object(monster.id, tile.position)
 			tile.fill(monster)
 			monster.target = None
+			monster.tile = tile
 		
 	def update(self, main):
 		"""This function is called every frame to make up the combat loop"""
@@ -67,13 +71,16 @@ class CombatState:
 		# Establish the input dictionary for the ai
 		machine_input = {
 						'self'		: 'Set when ai is run',
-						'foe_list'	: (main['player'],)
+						'combat_system': self,
+						'foe_list'	: (main['player'],),
+						'friend_list': self.enemy_list
 						}
 						
 		# Run the enemy ai
 		for enemy in self.enemy_list:
+			self.display_target_range("burst 0", enemy.obj.get_position())
 			machine_input['self'] = enemy
-			enemy.ai.run(machine_input)
+			# enemy.ai.run(machine_input)
 
 		# self.debug_marker.SetPosition(self.tile_from_point(main, main['player'].obj.GetPosition()).position)
 		
@@ -88,17 +95,15 @@ class CombatState:
 		
 		# Handle inputs
 		inputs = main['input_system'].run()
-		# if set(["MoveForward", "MoveBackward", "TurnLeft", "TurnRight", "Jump", "Aim"]).intersection(set(inputs)):
 		if inputs:
 			if set([("MoveForward", "INPUT_ACTIVE"), ("MoveBackward", "INPUT_ACTIVE"), ("MoveLeft", "INPUT_ACTIVE"), ("MoveRight", "INPUT_ACTIVE")]).intersection(set(inputs)) and not main['player'].lock:
-				main['player'].move_player(inputs, main['input_system'].mouse, main['client'])
+				self._move_player(main['player'], inputs)
 			else:
 				# Snap the player to the grid
 				target_tile = self.tile_from_point(main['player'].obj.get_position())
 				vector_to_tile = main['player'].obj.get_local_vector_to(target_tile.position)
 				vector_to_tile[2] = 0
-				vector_to_tile = [component*main['player'].speed for component in vector_to_tile]
-				main['player'].obj.move(vector_to_tile)
+				self.move(main['player'], vector_to_tile)
 				
 			if not main['player'].lock:
 				if ("UsePower", "INPUT_ACTIVE") in inputs:
@@ -109,12 +114,12 @@ class CombatState:
 				if ("Jump", "INPUT_ACTIVE") in inputs:
 					return False
 				if ("Aim", "INPUT_ACTIVE") in inputs:
-					self.display_target_range('area burst 5', main['player'].obj.get_position())
+					self.display_target_range('burst 5', main['player'].obj.get_position())
 
 				
 		else:
-			pass		
-				
+			pass
+		
 		return True	
 		
 
@@ -126,7 +131,70 @@ class CombatState:
 		
 		for enemy in self.enemy_list:
 			enemy.obj.end()
+################################################################################
+# Movement Functions
+#
+	def _move_player(self, player, inputs):
+		"""Move the player"""
 		
+		moving = False
+		
+		if ("MoveForward", "INPUT_ACTIVE") in inputs:
+			self.move(player, player.obj.get_axis_vector("y"))
+			moving = True
+		if ("MoveBackward", "INPUT_ACTIVE") in inputs:
+			self.move(player, player.obj.get_axis_vector("-y"))
+			moving = True
+		if ("MoveRight", "INPUT_ACTIVE") in inputs:
+			self.move(player, player.obj.get_axis_vector("x"))
+			moving = True
+		if ("MoveLeft", "INPUT_ACTIVE") in inputs:
+			self.move(player, player.obj.get_axis_vector("-x"))
+			moving = True
+			
+		if moving:
+			player.obj.play_animation("move")
+		else:
+			player.obj.play_animation("idle")
+			player.obj.move((0, 0, 0))
+			
+	def move(self, character, vector, local=True):
+		vector = [component * character.speed for component in vector]
+		character.obj.move(vector, local=local)
+		
+		new_tile = self.tile_from_point(character.obj.get_position())
+		if new_tile != character.tile:
+			character.tile.obj = None
+			new_tile.fill(character)
+			character.tile = new_tile
+			
+	def turn(self, character, angle):
+		character.obj.rotate((0, 0, angle))
+		
+	def point_in_range(self, character, target, radius):
+		# If the player has no target, don't return a vector
+		if target == None:
+			return None
+		# Get the tiles in range
+		tiles = self.find_target_range("burst "+str(radius), target)
+		
+		# Remove invalid tiles
+		tiles = [tile for tile in tiles if tile.valid]
+		
+		# If there are no tiles, return none
+		if len(tiles) == 0:
+			return None
+			
+		# Get vectors from the character to the tiles
+		vectors = [character.tile.grid_tile.get_local_vector_to(tile.position, arg=1) for tile in tiles]
+		
+		# Find the closest tile
+		closest = vectors[0]
+		for vector in vectors[1:]:
+			if vector[0]**2 + vector[1]**2 < closest[0]**2 + closest[1]**2:
+				closest = vector
+				
+		return closest
 ################################################################################
 # Utility Functions
 #		
@@ -160,10 +228,14 @@ class CombatState:
 		return tile
 	
 	def find_target_range(self, target_range, point):
+		# Break up target_range string into a useable tuple
 		target_range = target_range.strip().split(' ')
-		point = (point[0], point[1], point[2])
+		# If the point passed in was a 2tuple, then add a z of GRID_SIZE to the end)
+		if len(point) == 2:
+			point += (GRID_SIZE,)
+		# point = (point[0], point[1], point[2])
+		tiles = []
 		if target_range[0] == 'melee':
-			tiles = []
 			for i in range(int(target_range[1])):
 				# if x+:
 				tiles.append(self.tile_from_point((point[0]+TILE_SIZE*(i+1), point[1])))
@@ -180,30 +252,21 @@ class CombatState:
 				pass
 			else: # It's a number
 				pass
-		elif target_range[0] == 'close':
-			if target_range[1] == 'burst':
+		elif target_range[0] == 'blast':
 				pass
-			elif target_range[1] == 'blast':
+		elif target_range[0] == 'burst':
+			radius = int(target_range[1])+1
+			y_vals = [sqrt((radius**2) - ((i+0.5)**2)) for i in range(radius)]
+			for x in range(int(target_range[1])+1):
+				for y in range(int(round(y_vals[x]))):
+					tiles.append(self.tile_from_point((point[0]+x*TILE_SIZE, point[1] + y*TILE_SIZE)))
+			point = self.tile_from_point(point)
+			next_quarter = [self.grid(curr.x - (curr.x-point.x)*2, curr.y) for curr in tiles if curr]
+			tiles += next_quarter
+			next_half = [self.grid(curr.x, curr.y - (curr.y-point.y)*2) for curr in tiles if curr]
+			tiles += next_half
+		elif target_range[0] == 'wall':
 				pass
-			else:
-				print("Invalid argument for 'close' range: %s" % target_range[1])
-		elif target_range[0] == 'area':
-			if target_range[1] == 'burst':
-				tiles = []
-				radius = int(target_range[2])+1
-				y_vals = [sqrt((radius**2) - ((i+0.5)**2)) for i in range(radius)]
-				for x in range(int(target_range[2])+1):
-					for y in range(int(round(y_vals[x]))):
-						tiles.append(self.tile_from_point((point[0]+x*TILE_SIZE, point[1] + y*TILE_SIZE)))
-				point = self.tile_from_point(point)
-				next_quarter = [self.grid(curr.x - (curr.x-point.x)*2, curr.y) for curr in tiles if curr]
-				tiles += next_quarter
-				next_half = [self.grid(curr.x, curr.y - (curr.y-point.y)*2) for curr in tiles if curr]
-				tiles += next_half
-			elif target_range[1] == 'wall':
-				pass
-			else:
-				print("Invalid argument for 'area' range: %s" % target_range[1])
 		else:
 			print("Invalid range type: %s" % target_range[0])
 
@@ -314,6 +377,9 @@ class CombatTile:
 			self.grid_tile = Engine.add_object('GridTile', position)
 		else:
 			self.grid_tile = None #Engine.add_object('GridInvalid', position)
+			
+	def __repr__(self):
+		return str((self.x, self.y))
 	
 	def color(self, color):
 		self.grid_color.set_color(color)
@@ -323,5 +389,7 @@ class CombatTile:
 		self.valid = False
 		
 	def end(self):
-		self.grid_tile.end()
+		if self.grid_tile:
+			self.grid_tile.end()
 		self.grid_color.end()
+		
