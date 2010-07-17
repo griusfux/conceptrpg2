@@ -63,7 +63,7 @@ class DefaultState:
 			if cid not in main['net_players']:
 				root = main['engine'].add_object("NetEmpty")
 				player = main['engine'].add_object("DarkKnightArm")
-				player.gameobj.setParent(root)
+				player.gameobj.setParent(root.gameobj)
 				main['net_players'][cid] = PlayerLogic(root)
 			
 			try:
@@ -71,6 +71,24 @@ class DefaultState:
 					if input.startswith('mov'):
 						input = input.replace('mov', '')
 						main['net_players'][cid].obj.move([int(i) for i in input.split('$')], min=[-50, -50, 0], max=[50, 50, 0])
+					elif input.startswith('pos'):
+						input = input.replace('pos', '')
+						server_pos = [float(i) for i in input.split('$')]
+						client_pos = main['net_players'][cid].obj.get_position()
+						
+						for i in range(3):
+							if abs(server_pos[i]-client_pos[i]) > 0.1:
+								client_pos[i] = server_pos[i]
+							
+						main['net_players'][cid].obj.set_position(client_pos)
+					elif input.startswith('to'):
+						main['net_players'][cid].obj.end()
+						del main['net_players'][cid]
+						print(cid, "timed out")
+					elif input.startswith('dis'):
+						main['net_players'][cid].obj.end()
+						del main['net_players'][cid]
+						print(cid, "disconnected")
 			except ValueError as e:
 				print(e)
 				print(val)
@@ -93,8 +111,8 @@ class DefaultState:
 					target = main['player']
 					main['player'].active_power.use(self, main['player'], target)
 					
-					
-				move = ""
+				pos = main['player'].obj.get_position()
+				move = "pos%.4f$%.4f$%.4f " % (pos[0], pos[1], pos[2])
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
 					move += "mov0$5$0 "
 				if ("MoveBackward", "INPUT_ACTIVE") in inputs:
@@ -104,9 +122,9 @@ class DefaultState:
 				if ("MoveLeft", "INPUT_ACTIVE") in inputs:
 					move += "mov-5$0$0 "
 					
-				if not move:
+				if 'mov' not in move:
 					move = "mov0$0$0"
-					
+	
 				main['client'].send(move.strip())
 					
 				#self._move_player(main['player'], inputs)
