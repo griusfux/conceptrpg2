@@ -21,7 +21,7 @@ from Scripts.monster_data import *
 
 from Scripts.blender_input_system import BlenderInputSystem
 
-from Scripts.Networking.GameClient import GameClient
+from Scripts.Networking.game_client import GameClient
 
 import subprocess
 import pickle
@@ -31,7 +31,9 @@ import GameLogic as gl
 
 # Globals for networking
 user = 'Kupoman'
-addr = ('192.168.1.5', 9999)
+port = 9999
+ip = 'localhost'
+addr = (ip, port)
 
 COMBAT_ACTIVE = 0
 COMBAT_PASSIVE = 1
@@ -173,15 +175,28 @@ def init(own):
 		own['client'] = GameClient(user, addr)
 		
 		# Fallback to offline mode
-		if not own['client'].connected:
-			print("Could not connect to the server, starting game in offline mode.")
-			own['is_offline'] = True
-			own['is_host'] = True
-		else:
-			own['is_host'] = own['client'].is_host
-			print("Username: %s\tIs host? %s" % (own['client'].user, 'True' if own['client'].is_host else 'False'))
-			own['is_offline'] = False
-			own['net_players'] = {}
+		# if not own['client'].connected:
+			# print("Could not connect to the server, starting game in offline mode.")
+			# own['is_offline'] = True
+			# own['is_host'] = True
+		# else:
+			# own['is_host'] = own['client'].is_host
+			# print("Username: %s\tIs host? %s" % (own['client'].user, 'True' if own['client'].is_host else 'False'))
+			# own['is_offline'] = False
+			# own['net_players'] = {}
+		own['is_host'] = own['is_offline'] = True
+		return
+	elif not own['client'].connected:
+		own['client'].run()
+		if own['client'].server_addr == "0.0.0.0":
+			# We failed to reach the server
+			print("Failed to reach the server...")
+			# print("Starting local server")
+			# subprocess.Popen(["python", "server.py"])
+			# own['client'] = GameClient(user, ('localhost', port))
+			own['init'] = False
+		
+		return		
 			
 	# Try to load the mapfile
 	if 'mapfile' not in own:
@@ -206,9 +221,8 @@ def init(own):
 		
 		if own['is_host']:
 			own['dgen'].generate_first(own)
-			own['client'].send_message('reset_map')
-		elif own['is_offline']:
-			own['dgen'].generate_first(own)
+			if not own['is_offline']:
+				own['client'].send_message('reset_map')
 		else:
 			result = []
 			own['client'].send_message('get_map')
@@ -229,6 +243,7 @@ def init(own):
 		
 	# Keep creating the dungeon if there are more tiles
 	if own['is_host'] and own['dgen'].has_next():
+		own['client'].send("")
 		own['dgen'].generate_next()
 		return
 	# Only check the dungeon if we're the host
@@ -277,16 +292,19 @@ def init(own):
 	root_ob.setParent(gameobj)
 	
 	# Store the player
-	own['player'] = PlayerLogic(BlenderWrapper.Object(gameobj, root_ob))
+	player = PlayerLogic(BlenderWrapper.Object(gameobj, root_ob))
 	
 	# Load stats for the player
-	own['player'].load_stats(open('Kupoman.save', 'rb'))
+	player.load_stats(open('Kupoman.save', 'rb'))
 	
 	# Fill the player's hit points
-	own['player'].hp = own['player'].max_hp
+	player.hp = player.max_hp
 	
 	# Give the player an attack power
-	own['player'].active_power = Power(PowerData(PowerFile("Attack")))
+	player.active_power = Power(PowerData(PowerFile("Attack")))
+	
+	own['net_players'] = {own['client'].id: player}
+	own['player'] = player
 	
 	# Parent the camera to the player
 	cam = scene.objects["Camera"]

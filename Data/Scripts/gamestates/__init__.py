@@ -1,2 +1,2 @@
-from combat_state import CombatState
-from default_state import DefaultState
+from Scripts.gamestates.combat_state import CombatState
+from Scripts.gamestates.default_state import DefaultState
