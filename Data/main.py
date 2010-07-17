@@ -110,10 +110,16 @@ def camera(cont):
 	# Reset the mouse
 	mouse.position = (0.5, 0.5)
 
-	
+def exit_game():
+	print("Exiting...")
+	gl.endGame()
 					
 def in_game(cont):
 	own = cont.owner
+	
+	# Check for and handle exits
+	if cont.sensors['exit'].positive:
+		exit_game()
 	
 	# Update the ui
 	if 'ui_system' in own:
@@ -121,7 +127,7 @@ def in_game(cont):
 	
 	if 'init' not in own:
 		init(own)	
-	elif own['init']:		
+	elif own['init']:
 		# Detect combat and switch states if necessary
 		# if own.sensors['encounter_mess'].positive:
 		
