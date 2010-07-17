@@ -59,9 +59,12 @@ class DefaultState:
 		while val != None:
 			cid, data = val
 			
+			# XXX This needs to be cleaned up
 			if cid not in main['net_players']:
+				root = main['engine'].add_object("NetEmpty")
 				player = main['engine'].add_object("DarkKnightArm")
-				main['net_players'][cid] = PlayerLogic(player)
+				player.gameobj.setParent(root)
+				main['net_players'][cid] = PlayerLogic(root)
 			
 			try:
 				for input in data:
