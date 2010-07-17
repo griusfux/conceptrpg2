@@ -1,5 +1,7 @@
 # $Id$
 
+from Scripts.character_logic import PlayerLogic
+
 class DefaultState:
 	"""A combat system for when the player isn't actively engaged in an encounter"""
 	
