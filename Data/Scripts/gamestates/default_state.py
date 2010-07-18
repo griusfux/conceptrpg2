@@ -43,9 +43,6 @@ class DefaultState:
 		main['player'].obj.set_orientation(old_ori, local=True)
 		main['engine'].set_active_camera(main['3p_cam'])
 		
-		# Update the orientation values
-		
-		
 		# Update the player's lock
 		main['player'].update_lock()
 		
@@ -77,7 +74,7 @@ class DefaultState:
 						client_pos = main['net_players'][cid].obj.get_position()
 						
 						for i in range(3):
-							if abs(server_pos[i]-client_pos[i]) > 0.1:
+							if abs(server_pos[i]-client_pos[i]) > 1.0:
 								client_pos[i] = server_pos[i]
 							
 						main['net_players'][cid].obj.set_position(client_pos)
@@ -94,6 +91,10 @@ class DefaultState:
 				print(val)
 					
 			val = main['client'].run()
+			
+		# The message we will send to the server
+		pos = main['player'].obj.get_position()
+		msg += "pos%.4f$%.4f$%.4f " % (pos[0], pos[1], pos[2])
 		
 		if inputs:
 			if ("SwitchCamera", "INPUT_ACTIVE") in inputs:
@@ -110,24 +111,21 @@ class DefaultState:
 				if ("UsePower", "INPUT_ACTIVE") in inputs:
 					target = main['player']
 					main['player'].active_power.use(self, main['player'], target)
-					
-				pos = main['player'].obj.get_position()
-				move = "pos%.4f$%.4f$%.4f " % (pos[0], pos[1], pos[2])
+
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
-					move += "mov0$5$0 "
+					msg += "mov0$5$0 "
 				if ("MoveBackward", "INPUT_ACTIVE") in inputs:
-					move += "mov0$-5$0 "
+					msg += "mov0$-5$0 "
 				if ("MoveRight", "INPUT_ACTIVE") in inputs:
-					move += "mov5$0$0 "
+					msg += "mov5$0$0 "
 				if ("MoveLeft", "INPUT_ACTIVE") in inputs:
-					move += "mov-5$0$0 "
+					msg += "mov-5$0$0 "
 					
-				if 'mov' not in move:
-					move = "mov0$0$0"
+				if 'mov' not in msg:
+					msg += "mov0$0$0"
 	
-				main['client'].send(move.strip())
-					
-				#self._move_player(main['player'], inputs)
+			# Send the message
+			main['client'].send(msg.strip())
 				
 	def play_animation(self, char, action):
 		char.obj.play_animation(action)

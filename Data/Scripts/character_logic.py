@@ -3,7 +3,6 @@
 # Description: Handles character logic such as movement and stats
 # Contributers: Daniel Stokes, Mitchell Stokes
 
-from mathutils import Vector
 import pickle
 import random
 import time
@@ -266,16 +265,16 @@ class PlayerLogic(CharacterLogic):
 				# self.obj.rotate((0, 0, -0.04))
 				
 		# Send updates if we need to
-		if client.connected:
-			pos = self.obj.get_position()
-			ori = self.obj.get_orientation()
-			ori = (ori[0][1], ori[1][1], ori[2][1])
-			lp = self.last_update[0]
-			lo = self.last_update[1]
-			if (pos[0] - lp[0]) ** 2 + (pos[1] - lp[1]) ** 2 > 0.0625 or \
-				Vector(ori[0], ori[1]).angle(Vector(lo[0], lo[1])) > 0.0174:
-				self.last_update = (pos[:], ori[:])
-				client.send_message('update_player %s %.3f %.3f %.3f %.3f %.3f %.3f' % (client.user, pos[0], pos[1], pos[2], ori[0], ori[1], ori[2]))
+		# if client.connected:
+			# pos = self.obj.get_position()
+			# ori = self.obj.get_orientation()
+			# ori = (ori[0][1], ori[1][1], ori[2][1])
+			# lp = self.last_update[0]
+			# lo = self.last_update[1]
+			# if (pos[0] - lp[0]) ** 2 + (pos[1] - lp[1]) ** 2 > 0.0625 or \
+				# Vector(ori[0], ori[1]).angle(Vector(lo[0], lo[1])) > 0.0174:
+				# self.last_update = (pos[:], ori[:])
+				# client.send_message('update_player %s %.3f %.3f %.3f %.3f %.3f %.3f' % (client.user, pos[0], pos[1], pos[2], ori[0], ori[1], ori[2]))
 			
 
 		
@@ -326,18 +325,18 @@ class ProxyLogic(CharacterLogic):
 		# Construct a new orientation matrix
 		ori_vec = [float(i) for i in ori_vec]
 		#self.obj.gameobj.alignAxisToVect(ori_vec, 1)
-		y = Vector(ori_vec[0], ori_vec[1], ori_vec[2])
-		z = Vector(0.0, 0.0, 1.0)
-		x = y.cross(z)
+		# y = Vector(ori_vec[0], ori_vec[1], ori_vec[2])
+		# z = Vector(0.0, 0.0, 1.0)
+		# x = y.cross(z)
 		# y = z.cross(x)
 		# x.normalize()
 		# y.normalize()
 		# z.normalize()
-		self.obj.set_orientation([
-						[x[0], y[0], z[0]],
-						[x[1], y[1], z[1]],
-						[x[2], y[2], z[2]]
-						])
+		# self.obj.set_orientation([
+						# [x[0], y[0], z[0]],
+						# [x[1], y[1], z[1]],
+						# [x[2], y[2], z[2]]
+						# ])
 						
 	def die(self):
 		self.object.end()

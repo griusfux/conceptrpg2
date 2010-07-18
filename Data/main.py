@@ -112,6 +112,11 @@ def camera(cont):
 
 def exit_game():
 	print("Exiting...")
+	try:
+		if hasattr(gl, "server"):
+			gl.server.terminate()
+	except:
+		pass
 	gl.endGame()
 					
 def in_game(cont):
@@ -120,52 +125,52 @@ def in_game(cont):
 	# Check for and handle exits
 	if cont.sensors['exit'].positive:
 		exit_game()
-	
-	# Update the ui
-	if 'ui_system' in own:
-		own['ui_system'].run(own)
-	
-	if 'init' not in own:
-		init(own)	
-	elif own['init']:
-		# Detect combat and switch states if necessary
-		# if own.sensors['encounter_mess'].positive:
+	else:
+		# Update the ui
+		if 'ui_system' in own:
+			own['ui_system'].run(own)
 		
-			# Get the room the encounter is taking place in
-			# room = own['dgen'].rooms[own.sensors['encounter_mess'].bodies[0]]
+		if 'init' not in own:
+			init(own)	
+		elif own['init']:
+			# Detect combat and switch states if necessary
+			# if own.sensors['encounter_mess'].positive:
 			
-			# Generate an enemy list using the encounter deck
-			# enemy_list = own['dgen'].encounter_deck.generate_encounter(5)
-			
-			# Replace all the elements in the element list with MonsterLogic objects
-			# for monster in enemy_list:
+				# Get the room the encounter is taking place in
+				# room = own['dgen'].rooms[own.sensors['encounter_mess'].bodies[0]]
 				
-				# Load the gameobject for the monster into the scene if it isn't already there
-				# if monster not in gl.getCurrentScene().objects:
-					# monsterfile = MonsterFile(monster)
-					# gl.LibLoad(monsterfile.blend, 'Scene', 'Scene')
-					# monsterfile.close()
+				# Generate an enemy list using the encounter deck
+				# enemy_list = own['dgen'].encounter_deck.generate_encounter(5)
+				
+				# Replace all the elements in the element list with MonsterLogic objects
+				# for monster in enemy_list:
 					
-				# monster_object = None #BlenderWrapper.Object(gl.getCurrentScene().addObject(monster, own))
-				# monster_data = MonsterData(MonsterFile(monster))
-				# enemy_list[enemy_list.index(monster)] = MonsterLogic(monster_object, monster_data)
+					# Load the gameobject for the monster into the scene if it isn't already there
+					# if monster not in gl.getCurrentScene().objects:
+						# monsterfile = MonsterFile(monster)
+						# gl.LibLoad(monsterfile.blend, 'Scene', 'Scene')
+						# monsterfile.close()
+						
+					# monster_object = None #BlenderWrapper.Object(gl.getCurrentScene().addObject(monster, own))
+					# monster_data = MonsterData(MonsterFile(monster))
+					# enemy_list[enemy_list.index(monster)] = MonsterLogic(monster_object, monster_data)
 
-			# own['combat_system'] = CombatSystem(own, own['engine'], enemy_list, BlenderWrapper.Object(room))
-			# own['combat_state'] = COMBAT_ACTIVE
-			
-			# The combat system is setup, we don't need this anymore
-			# del room['encounter']
-			
-		# Run the correct combat system based on the current combat_state
-		# if own['combat_state'] == COMBAT_ACTIVE:
-			# if not own['combat_system'].update(own):
-				# # Clean up
-				# print("Combat has finished")
-				# own['combat_system'].end()
-				# own['combat_system'] = PassiveCombatSystem(own)
-				# own['combat_state'] = COMBAT_PASSIVE
-		# else:
-		own['game_state'].run(own)
+				# own['combat_system'] = CombatSystem(own, own['engine'], enemy_list, BlenderWrapper.Object(room))
+				# own['combat_state'] = COMBAT_ACTIVE
+				
+				# The combat system is setup, we don't need this anymore
+				# del room['encounter']
+				
+			# Run the correct combat system based on the current combat_state
+			# if own['combat_state'] == COMBAT_ACTIVE:
+				# if not own['combat_system'].update(own):
+					# # Clean up
+					# print("Combat has finished")
+					# own['combat_system'].end()
+					# own['combat_system'] = PassiveCombatSystem(own)
+					# own['combat_state'] = COMBAT_PASSIVE
+			# else:
+			own['game_state'].run(own)
 		
 def init(own):
 	# Create a wrapper for the engine
@@ -197,10 +202,15 @@ def init(own):
 		if own['client'].server_addr == "0.0.0.0":
 			# We failed to reach the server
 			print("Failed to reach the server...")
-			# print("Starting local server")
-			# subprocess.Popen(["python", "server.py"])
+			print("Starting local server")
+			own['client'].restart(user, ('localhost', port))
+			if hasattr(gl, 'server'):
+				gl.server.terminate()
+			gl.server = subprocess.Popen("python server.py", creationflags=subprocess.CREATE_NEW_CONSOLE)
+			print(gl.server.pid)
+			# del own['client']
 			# own['client'] = GameClient(user, ('localhost', port))
-			own['init'] = False
+			# own['init'] = False
 		
 		return		
 			

@@ -10,7 +10,7 @@ import time
 
 # The buffer size to use
 BUFFER = 4096
-TIMEOUT = 20
+TIMEOUT = 5
 
 class GameClient:
 	"""The client for game networking"""
@@ -28,10 +28,23 @@ class GameClient:
 		self.last_update = time.time()
 		self.socket.sendto(bytes(id, NET_ENCODING), addr)
 		
+	def restart(self, id, addr):
+		self.id = id
+		self.addr = addr
+	
+		self.connected = False
+		self.server_addr = None
+		
+		self.last_update = time.time()
+		self.socket.sendto(bytes(self.id, NET_ENCODING), self.addr)
+		
 	def run(self):
 		"""Try to get data from the server"""
-		
 		val = None
+		
+		# If we haven't yet connected, keep poking for a server
+		if not self.connected:
+			self.socket.sendto(bytes(self.id, NET_ENCODING), self.addr)
 		
 		try:
 			data, addr = self.socket.recvfrom(BUFFER)
