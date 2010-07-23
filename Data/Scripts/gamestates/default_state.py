@@ -94,7 +94,7 @@ class DefaultState:
 			
 		# The message we will send to the server
 		pos = main['player'].obj.get_position()
-		msg += "pos%.4f$%.4f$%.4f " % (pos[0], pos[1], pos[2])
+		msg = "pos%.4f$%.4f$%.4f " % (pos[0], pos[1], pos[2])
 		
 		if inputs:
 			if ("SwitchCamera", "INPUT_ACTIVE") in inputs:
