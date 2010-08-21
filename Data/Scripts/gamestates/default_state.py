@@ -3,7 +3,7 @@
 from Scripts.character_logic import PlayerLogic
 
 class DefaultState:
-	"""A combat system for when the player isn't actively engaged in an encounter"""
+	"""The default state for the game"""
 	
 	def __init__(self, main, is_server=False):
 		"""Constructor"""
@@ -13,30 +13,19 @@ class DefaultState:
 		else:
 			self.client_init(main)
 			
+	##########
+	# Client
+	##########
+			
 	def client_init(self, main):
 		"""Intialize the client state"""
 		
 		main['ui_system'].load_layout("passive_combat")
 		self.run = self.client_run
 		
-	def server_init(self, main):
-		"""Initialize the server state"""
-		
-		self.run = self.server_run
-		
 	def client_run(self, main):
-		self._run(main)
-		
-	def server_run(self, client, main):
-		client.server.broadcast(client.id + " " + client.data)
-		
-		for input in client.data.split():
-			if input.startswith("dis"):
-				client.server.drop_client(client.id, "Disconnected")
-		
-	def _run(self, main):
-		"""A high-level run method"""
-		
+		"""Client-side run method"""
+
 		# Reset the camera
 		old_ori = main['3p_cam'].world_orientation
 		main['3p_cam'].reset_orientation()
@@ -126,30 +115,30 @@ class DefaultState:
 	
 			# Send the message
 			main['client'].send(msg.strip())
+			
+	##########
+	# Server
+	##########
+		
+	def server_init(self, main):
+		"""Initialize the server state"""
+		
+		self.run = self.server_run
+		
+	def server_run(self, client, main):
+		"""Server-side run method"""
+
+		# Here we just need to broadcast the data to the other clients
+		client.server.broadcast(client.id + " " + client.data)
+		
+		
+		for input in client.data.split():
+			if input.startswith("dis"):
+				client.server.drop_client(client.id, "Disconnected")
+				
+	##########
+	# Other
+	##########
 				
 	def play_animation(self, char, action):
 		char.obj.play_animation(action)
-			
-	def _move_player(self, player, inputs):
-		"""Move the player"""
-		
-		moving = False
-		
-		if ("MoveForward", "INPUT_ACTIVE") in inputs:
-			player.obj.move((0, 5, 0), min=[-50, -50, 0], max=[50, 50, 0])
-			moving = True
-		if ("MoveBackward", "INPUT_ACTIVE") in inputs:
-			player.obj.move((0, -5, 0), min=[-50, -50, 0], max=[50, 50, 0])
-			moving = True
-		if ("MoveRight", "INPUT_ACTIVE") in inputs:
-			player.obj.move((5, 0, 0), min=[-50, -50, 0], max=[50, 50, 0])
-			moving = True
-		if ("MoveLeft", "INPUT_ACTIVE") in inputs:
-			player.obj.move((-5, 0, 0), min=[-50, -50, 0], max=[50, 50, 0])
-			moving = True
-			
-		if moving:
-			player.obj.play_animation("move")
-		else:
-			player.obj.play_animation("idle")
-			player.obj.move((0, 0, 0))
