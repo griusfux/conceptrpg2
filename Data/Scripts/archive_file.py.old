@@ -1,12 +1,12 @@
-try:
-	import lxml.etree as etree
-	print('Lxml detected, xml validation enabled')
-	XMLSyntaxError = etree.XMLSyntaxError
-	VALIDATING = True
-except ImportError:
-	import xml.etree.cElementTree as etree
-	XMLSyntaxError = SyntaxError
-	VALIDATING = False
+# try:
+	# import lxml.etree as etree
+	# print('Lxml detected, xml validation enabled')
+	# XMLSyntaxError = etree.XMLSyntaxError
+	# VALIDATING = True
+# except ImportError:
+import xml.etree.ElementTree as etree
+XMLSyntaxError = SyntaxError
+VALIDATING = False
 
 from zipfile import *
 import os
