@@ -6,7 +6,7 @@ class DefaultState:
 	"""The default state for the game"""
 	
 	def __init__(self, main, is_server=False):
-		"""Constructor"""
+		"""DefaultState Constructor"""
 		
 		if is_server:
 			self.server_init(main)
@@ -39,7 +39,6 @@ class DefaultState:
 		inputs = main['input_system'].run()
 		
 		# Keep our connection to the server alive
-		#main['client'].send("")
 		val = main['client'].run()
 		
 		while val != None:
@@ -52,6 +51,7 @@ class DefaultState:
 				player.gameobj.setParent(root.gameobj)
 				main['net_players'][cid] = PlayerLogic(root)
 			
+			# Parse the inputs from the server
 			try:
 				for input in data:
 					if input.startswith('mov'):
@@ -113,8 +113,8 @@ class DefaultState:
 				if 'mov' not in msg:
 					msg += "mov0$0$0"
 	
-			# Send the message
-			main['client'].send(msg.strip())
+		# Send the message
+		main['client'].send(msg.strip())
 			
 	##########
 	# Server
@@ -135,6 +135,8 @@ class DefaultState:
 		for input in client.data.split():
 			if input.startswith("dis"):
 				client.server.drop_client(client.id, "Disconnected")
+			# elif input.startswith("cmbt"):
+				# main['state'] = CombatState(main, True)
 				
 	##########
 	# Other
