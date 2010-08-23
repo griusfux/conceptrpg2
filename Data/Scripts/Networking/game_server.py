@@ -32,9 +32,20 @@ class ClientHandle():
 		if data:
 			# Clean up the data a little
 			self.id = data.split()[0]
-			self.data = "".join([i + " " for i in data.split()[1:]])
+			self.data = " ".join([i for i in data.split()[1:]])
 		
 			print("Message %s from %s" % (data, client_addr))
+			
+			for input in self.data.split():
+				if input.startswith('state'):
+					state = input.replace('state', '')
+					if state == 'cmbt':
+						state = CombateState
+					elif state == 'dflt':
+						state = DefaultState
+						
+					self.server.main['state'] = state(self.server.main, True)
+			
 			self.server.main['state'].run(self, self.server.main)
 
 class GameServer():

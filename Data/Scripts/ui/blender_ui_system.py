@@ -6,6 +6,7 @@ from Scripts.ui.layouts import *
 layouts = {
 	"dun_gen": DunGenLayout,
 	"passive_combat": PassiveCombatLayout,
+	"combat": CombatLayout,
 	
 	"inventory_overlay": InventoryOverlay,
 	"stats": StatsOverlay,

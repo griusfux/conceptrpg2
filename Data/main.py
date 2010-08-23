@@ -134,10 +134,10 @@ def in_game(cont):
 			init(own)	
 		elif own['init']:
 			# Detect combat and switch states if necessary
-			# if own.sensors['encounter_mess'].positive:
+			if own.sensors['encounter_mess'].positive:
 			
 				# Get the room the encounter is taking place in
-				# room = own['dgen'].rooms[own.sensors['encounter_mess'].bodies[0]]
+				room = own['dgen'].rooms[own.sensors['encounter_mess'].bodies[0]]
 				
 				# Generate an enemy list using the encounter deck
 				# enemy_list = own['dgen'].encounter_deck.generate_encounter(5)
@@ -157,9 +157,10 @@ def in_game(cont):
 
 				# own['combat_system'] = CombatSystem(own, own['engine'], enemy_list, BlenderWrapper.Object(room))
 				# own['combat_state'] = COMBAT_ACTIVE
+				own['game_state'] = CombatState(own)
 				
 				# The combat system is setup, we don't need this anymore
-				# del room['encounter']
+				del room['encounter']
 				
 			# Run the correct combat system based on the current combat_state
 			# if own['combat_state'] == COMBAT_ACTIVE:

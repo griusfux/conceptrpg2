@@ -43,3 +43,7 @@ class PassiveCombatLayout(Layout):
 		player = main['player']
 		self.hp.text = "HP: %d/%d" % (player.hp, player.max_hp)
 		self.lock_msg.text = "LOCKED: %s" % (main['player'].lock - time()) if main['player'].lock else ""
+		
+class CombatLayout(Layout):
+	def __init__(self, sys):
+		Layout.__init__(self, sys, "combat_layout")
