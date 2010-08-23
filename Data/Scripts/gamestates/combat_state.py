@@ -1,4 +1,4 @@
-# $Id: $
+# $Id$
 
 from Scripts.gamestates.default_state import DefaultState
 
