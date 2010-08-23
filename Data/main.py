@@ -12,7 +12,8 @@ from Scripts.dungeon_generator import DungeonGenerator, EncounterDeck
 from Scripts.character_logic import PlayerLogic, ProxyLogic, MonsterLogic
 # from Scripts.combat_system import CombatSystem
 # from Scripts.passive_combat_system import PassiveCombatSystem
-from Scripts.gamestates import *
+# from Scripts.gamestates import *
+from Scripts.gamestate_manager import GameStateManager
 from Scripts.powers import Power
 from Scripts.power_data import PowerData
 
@@ -41,6 +42,9 @@ COMBAT_PASSIVE = 1
 # Camera globals
 scale_max = 2
 scale_min = 0.25
+
+# Error handling global
+gl.error = False
 	
 def animation(cont):
 	mess = cont.sensors['mess']
@@ -120,58 +124,69 @@ def exit_game():
 	gl.endGame()
 					
 def in_game(cont):
-	own = cont.owner
+	# Wrap this whole thing in a try/except to prevent console spam
+	try:
+		if gl.error:
+			return
 	
-	# Check for and handle exits
-	if cont.sensors['exit'].positive:
-		exit_game()
-	else:
-		# Update the ui
-		if 'ui_system' in own:
-			own['ui_system'].run(own)
+		own = cont.owner
 		
-		if 'init' not in own:
-			init(own)	
-		elif own['init']:
-			# Detect combat and switch states if necessary
-			if own.sensors['encounter_mess'].positive:
+		# Check for and handle exits
+		if cont.sensors['exit'].positive:
+			exit_game()
+		else:
+			# Update the ui
+			if 'ui_system' in own:
+				own['ui_system'].run(own)
 			
-				# Get the room the encounter is taking place in
-				room = own['dgen'].rooms[own.sensors['encounter_mess'].bodies[0]]
+			if 'init' not in own:
+					init(own)
+			elif own['init']:
+				own['state_manager'].run(own)
+				# Detect combat and switch states if necessary
+				# if own.sensors['encounter_mess'].positive:
 				
-				# Generate an enemy list using the encounter deck
-				# enemy_list = own['dgen'].encounter_deck.generate_encounter(5)
-				
-				# Replace all the elements in the element list with MonsterLogic objects
-				# for monster in enemy_list:
+					# Get the room the encounter is taking place in
+					# room = own['dgen'].rooms[own.sensors['encounter_mess'].bodies[0]]
 					
-					# Load the gameobject for the monster into the scene if it isn't already there
-					# if monster not in gl.getCurrentScene().objects:
-						# monsterfile = MonsterFile(monster)
-						# gl.LibLoad(monsterfile.blend, 'Scene', 'Scene')
-						# monsterfile.close()
+					# Generate an enemy list using the encounter deck
+					# enemy_list = own['dgen'].encounter_deck.generate_encounter(5)
+					
+					# Replace all the elements in the element list with MonsterLogic objects
+					# for monster in enemy_list:
 						
-					# monster_object = None #BlenderWrapper.Object(gl.getCurrentScene().addObject(monster, own))
-					# monster_data = MonsterData(MonsterFile(monster))
-					# enemy_list[enemy_list.index(monster)] = MonsterLogic(monster_object, monster_data)
+						# Load the gameobject for the monster into the scene if it isn't already there
+						# if monster not in gl.getCurrentScene().objects:
+							# monsterfile = MonsterFile(monster)
+							# gl.LibLoad(monsterfile.blend, 'Scene', 'Scene')
+							# monsterfile.close()
+							
+						# monster_object = None #BlenderWrapper.Object(gl.getCurrentScene().addObject(monster, own))
+						# monster_data = MonsterData(MonsterFile(monster))
+						# enemy_list[enemy_list.index(monster)] = MonsterLogic(monster_object, monster_data)
 
-				# own['combat_system'] = CombatSystem(own, own['engine'], enemy_list, BlenderWrapper.Object(room))
-				# own['combat_state'] = COMBAT_ACTIVE
-				own['game_state'] = CombatState(own)
-				
-				# The combat system is setup, we don't need this anymore
-				del room['encounter']
-				
-			# Run the correct combat system based on the current combat_state
-			# if own['combat_state'] == COMBAT_ACTIVE:
-				# if not own['combat_system'].update(own):
-					# # Clean up
-					# print("Combat has finished")
-					# own['combat_system'].end()
-					# own['combat_system'] = PassiveCombatSystem(own)
-					# own['combat_state'] = COMBAT_PASSIVE
-			# else:
-			own['game_state'].run(own)
+					# own['combat_system'] = CombatSystem(own, own['engine'], enemy_list, BlenderWrapper.Object(room))
+					# own['combat_state'] = COMBAT_ACTIVE
+					# own['game_state'] = CombatState(own)
+					
+					# The combat system is setup, we don't need this anymore
+					# del room['encounter']
+					
+				# Run the correct combat system based on the current combat_state
+				# if own['combat_state'] == COMBAT_ACTIVE:
+					# if not own['combat_system'].update(own):
+						# # Clean up
+						# print("Combat has finished")
+						# own['combat_system'].end()
+						# own['combat_system'] = PassiveCombatSystem(own)
+						# own['combat_state'] = COMBAT_PASSIVE
+				# else:
+				# own['game_state'].run(own)
+	
+	except:
+		import traceback
+		traceback.print_exc()
+		gl.error = True
 		
 def init(own):
 	# Create a wrapper for the engine
@@ -343,7 +358,8 @@ def init(own):
 	# Setup the passive combat system
 	# own['combat_system'] = PassiveCombatSystem(own)
 	# own['combat_state'] = COMBAT_PASSIVE
-	own['game_state'] = DefaultState(own)
+	# own['game_state'] = DefaultState(own)
+	own['state_manager'] = GameStateManager("Default", own)
 	own['init'] = True
 	
 def handle_network(own):

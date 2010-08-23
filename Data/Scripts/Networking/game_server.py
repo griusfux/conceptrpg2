@@ -6,7 +6,7 @@
 # from socketserver import UDPServer, BaseRequestHandler
 
 from Scripts.Networking import NET_ENCODING
-from Scripts.gamestates import *
+from Scripts.gamestate_manager import GameStateManager
 
 import socket
 import select
@@ -36,17 +36,18 @@ class ClientHandle():
 		
 			print("Message %s from %s" % (data, client_addr))
 			
-			for input in self.data.split():
-				if input.startswith('state'):
-					state = input.replace('state', '')
-					if state == 'cmbt':
-						state = CombateState
-					elif state == 'dflt':
-						state = DefaultState
+			# for input in self.data.split():
+				# if input.startswith('state'):
+					# state = input.replace('state', '')
+					# if state == 'cmbt':
+						# state = CombateState
+					# elif state == 'dflt':
+						# state = DefaultState
 						
-					self.server.main['state'] = state(self.server.main, True)
+					# self.server.main['state'] = state(self.server.main, True)
 			
-			self.server.main['state'].run(self, self.server.main)
+			# self.server.main['state'].run(self, self.server.main)
+			self.server.state_manager.run(self.server.main, self)
 
 class GameServer():
 	"""The game server"""
@@ -59,9 +60,6 @@ class GameServer():
 		
 		# Client info
 		self.main['clients'] = {}
-
-		# Set the default state
-		self.main['state'] = DefaultState(self.main, True)
 		
 		# Create the socket
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -69,6 +67,9 @@ class GameServer():
 		
 		# How long we wait on players
 		self.timeout = timeout
+		
+		# Startup the state manager with the default state
+		self.state_manager = GameStateManager("Default", self.main, is_server=True)
 		
 		print("Server ready")
 		

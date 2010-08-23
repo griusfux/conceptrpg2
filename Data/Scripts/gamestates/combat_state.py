@@ -1,6 +1,5 @@
 # $Id$
 
-from Scripts.gamestates.default_state import DefaultState
 
 # We don't need to bother subclassing DefaultState since we are going to mostly override
 # everything anyways, and Python doesn't have abstract classes or interfaces.
@@ -13,6 +12,9 @@ class CombatState():
 			self.server_init(main)
 		else:
 			self.client_init(main)
+			
+	def cleanup(self, main):
+		pass
 			
 	##########
 	# Client
@@ -100,7 +102,8 @@ class CombatState():
 			# Only let the player do stuff while they are not "locked"
 			if not main['player'].lock:
 				if ("Jump", "INPUT_ACTIVE") in inputs:
-					main['game_state'] = DefaultState(main)
+					main['client'].send('stateDefault')
+					return ("Default", "SWITCH")
 				if ("UsePower", "INPUT_ACTIVE") in inputs:
 					target = main['player']
 					main['player'].active_power.use(self, main['player'], target)
@@ -127,9 +130,11 @@ class CombatState():
 	def server_init(self, main):
 		"""Initialize the server state"""
 		
+		print("\n\n\nCombat!\n\n\n")
+		
 		self.run = self.server_run
 		
-	def server_run(self, client, main):
+	def server_run(self, main, client):
 		"""Server-side run method"""
 
 		# Here we just need to broadcast the data to the other clients
@@ -139,6 +144,9 @@ class CombatState():
 		for input in client.data.split():
 			if input.startswith("dis"):
 				client.server.drop_client(client.id, "Disconnected")
+			elif input.startswith("state"):
+				input = input.replace('state', '')
+				return (input, 'SWITCH')
 				
 	##########
 	# Other

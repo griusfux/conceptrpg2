@@ -13,6 +13,9 @@ class DefaultState:
 		else:
 			self.client_init(main)
 			
+	def cleanup(self, main):
+		pass
+			
 	##########
 	# Client
 	##########
@@ -20,11 +23,17 @@ class DefaultState:
 	def client_init(self, main):
 		"""Intialize the client state"""
 		
+		# Store main for the state callbacks to use
+		self.main = main
+		
 		main['ui_system'].load_layout("passive_combat")
 		self.run = self.client_run
 		
 	def client_run(self, main):
 		"""Client-side run method"""
+		
+		# Update self.main for the state callbacks
+		self.main = main
 
 		# Reset the camera
 		old_ori = main['3p_cam'].world_orientation
@@ -67,6 +76,10 @@ class DefaultState:
 								client_pos[i] = server_pos[i]
 							
 						main['net_players'][cid].obj.set_position(client_pos)
+					elif input.startswith('anim'):
+						input = input.replace('anim', '')
+						main['net_players'][cid].obj.move((0, 0, 0))
+						main['net_players'][cid].obj.play_animation(input)
 					elif input.startswith('to'):
 						main['net_players'][cid].obj.end()
 						del main['net_players'][cid]
@@ -112,9 +125,20 @@ class DefaultState:
 					
 				if 'mov' not in msg:
 					msg += "mov0$0$0"
+					# self.play_animation(None, "idle")
+				# else:
+					# self.play_animation(None, "move")
 	
 		# Send the message
 		main['client'].send(msg.strip())
+		
+		# Check to see if we need to move to the combat state
+		# XXX This needs cleanup, we shouldn't be accessing KX_GameObject attributes
+		if main.sensors['encounter_mess'].positive:
+			room = main['dgen'].rooms[main.sensors['encounter_mess'].bodies[0]]
+			del room['encounter']
+			main['client'].send('stateCombat')
+			return ('Combat', 'SWITCH')
 			
 	##########
 	# Server
@@ -125,7 +149,7 @@ class DefaultState:
 		
 		self.run = self.server_run
 		
-	def server_run(self, client, main):
+	def server_run(self, main, client):
 		"""Server-side run method"""
 
 		# Here we just need to broadcast the data to the other clients
@@ -135,12 +159,14 @@ class DefaultState:
 		for input in client.data.split():
 			if input.startswith("dis"):
 				client.server.drop_client(client.id, "Disconnected")
-			# elif input.startswith("cmbt"):
-				# main['state'] = CombatState(main, True)
+			elif input.startswith("state"):
+				input = input.replace('state', '')
+				return (input, 'SWITCH')
 				
 	##########
 	# Other
 	##########
 				
 	def play_animation(self, char, action):
-		char.obj.play_animation(action)
+		self.main['client'].send('anim'+action)
+		#char.obj.play_animation(action)
