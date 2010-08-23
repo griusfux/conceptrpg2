@@ -200,6 +200,12 @@ class Engine:
 		"""Remove and object"""
 		object.gameobj.endObject()
 		
+	def add_network_player(self, ob_name):
+		root = self.add_object("NetEmpty")
+		player = self.add_object(ob_name)
+		player.gameobj.setParent(root.gameobj)
+		return player
+		
 	def set_active_camera(self, camera):
 		"""Set the active camera"""
 		

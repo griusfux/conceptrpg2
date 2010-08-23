@@ -1,4 +1,4 @@
-# $Id: GameLoops.py 29 2010-02-21 01:54:51Z Moguri $
+# $Id$
 
 # Description: Main game loops to be used in various parts of the game
 # Contributers: Mitchell Stokes

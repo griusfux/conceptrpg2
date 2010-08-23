@@ -55,10 +55,11 @@ class DefaultState:
 			
 			# XXX This needs to be cleaned up
 			if cid not in main['net_players']:
-				root = main['engine'].add_object("NetEmpty")
-				player = main['engine'].add_object("DarkKnightArm")
-				player.gameobj.setParent(root.gameobj)
-				main['net_players'][cid] = PlayerLogic(root)
+				main['net_players'][cid] = PlayerLogic(main['engine'].add_network_player("DarkKnightArm"))
+				# root = main['engine'].add_object("NetEmpty")
+				# player = main['engine'].add_object("DarkKnightArm")
+				# player.gameobj.setParent(root.gameobj)
+				# main['net_players'][cid] = PlayerLogic(root)
 			
 			# Parse the inputs from the server
 			try:
