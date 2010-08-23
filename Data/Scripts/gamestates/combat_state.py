@@ -5,7 +5,7 @@ from Scripts.gamestates.default_state import DefaultState
 # We don't need to bother subclassing DefaultState since we are going to mostly override
 # everything anyways, and Python doesn't have abstract classes or interfaces.
 
-class CombatState(DefaultState):
+class CombatState():
 	def __init__(self, main, is_server=False):
 		"""CombatState constructor"""
 		
