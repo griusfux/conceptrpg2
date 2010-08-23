@@ -1,4 +1,4 @@
-# $Id: $
+# $Id$
 
 # Description: The game client
 # Contributers: Mitchell Stokes
