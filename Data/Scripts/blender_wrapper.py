@@ -180,6 +180,10 @@ class Engine:
 	def __init__(self, adder):
 		self.adder = adder
 	
+	def load_library(self, package):
+		"""Load scene data from a package file"""
+		gl.LibLoad(package.name, 'Scene', package.blend)
+		
 	def angle_between(self, vec1, vec2):
 		vec1 = Vector(vec1)
 		vec2 = Vector(vec2)

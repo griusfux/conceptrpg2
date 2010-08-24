@@ -2,6 +2,7 @@
 
 import random
 import GameLogic
+import Scripts.blender_wrapper as BlenderWrapper
 from mathutils import Vector, Matrix
 from Scripts.archive_file import DeckFile
 
@@ -41,7 +42,11 @@ class DungeonGenerator:
 				'Stairs': [(i['obj'], i['scene']) for i in map.stair_tiles],
 				'Traps': [(i['obj'], i['scene']) for i in map.trap_tiles],
 				}
+	
+		self._init_values()
 		
+	def _init_values(self):
+		"""Reset the generator to it's original state"""
 		# The list of exit nodes
 		self.exit_nodes = []
 		
@@ -70,27 +75,9 @@ class DungeonGenerator:
 		# This dictionary is used to keep track of what rooms still have encounters in them
 		self.rooms = {}
 		
-		# The EncounterDeck used to generate random incounters
-		self.encounter_deck = EncounterDeck(map.encounter_deck)
-	
-		# Parse the xml file and fill the lists, and create the encounter deck
-		# for element in mapfile.root:
-			# if element.tag == "start_tile":
-				# self.tiles['Starts'].append((element.get("blend_obj"), element.get("blend_scene")))
-			# elif element.tag == "room_tile":
-				# self.tiles['Rooms'].append((element.get("blend_obj"), element.get("blend_scene")))
-			# elif element.tag == "corridor_tile":
-				# self.tiles['Corridors'].append((element.get("blend_obj"), element.get("blend_scene")))
-			# elif element.tag == "end_tile":
-				# self.tiles['Ends'].append((element.get("blend_obj"), element.get("blend_scene")))
-			# elif element.tag == "door_tile":
-				# self.tiles['Doors'].append((element.get("blend_obj"), element.get("blend_scene")))
-			# elif element.tag == "stair_tile":
-				# self.tiles['Stairs'].append((element.get("blend_obj"), element.get("blend_scene")))
-			# elif element.tag == "trap_tile":
-				# self.tiles['Traps'].append((element.get("blend_obj"), element.get("blend_scene")))
-			# elif element.tag == "encounter_deck":
-				# self.encounter_deck = EncounterDeck(element.text)
+		# This is used so we can clear the dungeon if we need to
+		self._tiles = []
+
 	def generate_from_list(self, obj, result):
 		"""Use a result list to generate the dungeon"""		
 		for type, index, position, ori in result:		
@@ -112,6 +99,13 @@ class DungeonGenerator:
 				self.has_stairs = True
 				
 		self.result = result
+			
+	def clear(self):
+		"""Get rid of the dungeon created by the generator"""
+		for tile in self._tiles:
+			tile.end()
+			
+		self._init_values()
 			
 	def has_next(self):
 		"""Check to see if there are still more exit nodes to fill"""
@@ -262,6 +256,7 @@ class DungeonGenerator:
 			# Add the tile name and position to the result list
 			self.result.append((type, index, pos, ori))
 			self.rooms[str(tile_obj.getPhysicsId())] = tile_obj
+			self._tiles.append(BlenderWrapper.Object(tile_node))
 				
 	def check_collision(self, tile, meshes):
 		# Iterate the verts

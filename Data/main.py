@@ -232,9 +232,9 @@ def init(own):
 		return		
 			
 	# Try to load the mapfile
-	if 'mapfile' not in own:
-		own['mapfile'] = Map('ShipRuins')
-		own['ui_system'].load_layout('dun_gen')
+	# if 'mapfile' not in own:
+		# own['mapfile'] = Map('ShipRuins')
+		# own['ui_system'].load_layout('dun_gen')
 		
 		# if not own['mapfile'].init:
 			# print('Could not open the map file!')
@@ -244,61 +244,61 @@ def init(own):
 			
 				
 		# Load the scenes so the dungeon generator can use them
-		gl.LibLoad(own['mapfile'].name, 'Scene', own['mapfile'].blend)
+		# gl.LibLoad(own['mapfile'].name, 'Scene', own['mapfile'].blend)
 
-		return
+		# return
 
 	# Start by loading the dungeon
-	if 'dgen' not in own:		
-		own['dgen'] = DungeonGenerator(own['mapfile'])
+	# if 'dgen' not in own:		
+		# own['dgen'] = DungeonGenerator(own['mapfile'])
 		
-		if own['is_host']:
-			own['dgen'].generate_first(own)
-			if not own['is_offline']:
-				own['client'].send_message('reset_map')
-		else:
-			result = []
-			own['client'].send_message('get_map')
+		# if own['is_host']:
+			# own['dgen'].generate_first(own)
+			# if not own['is_offline']:
+				# own['client'].send_message('reset_map')
+		# else:
+			# result = []
+			# own['client'].send_message('get_map')
 			
-			cmd, data = own['client'].receive_message()
+			# cmd, data = own['client'].receive_message()
 			
 			# Hopefully this doesn't lock things for too long
-			while cmd != 'end_map':
-				if cmd == 'map' and data:
-					result.append(pickle.loads(bytes(data, 'utf8')))
-				cmd, data = own['client'].receive_message()
+			# while cmd != 'end_map':
+				# if cmd == 'map' and data:
+					# result.append(pickle.loads(bytes(data, 'utf8')))
+				# cmd, data = own['client'].receive_message()
 			
-			print("The map size received was " + str(len(result)))
-			own['dgen'].generate_from_list(own, result)
+			# print("The map size received was " + str(len(result)))
+			# own['dgen'].generate_from_list(own, result)
 			
 		# Give the engine a chance to catch up
-		return
+		# return
 		
 	# Keep creating the dungeon if there are more tiles
-	if own['is_host'] and own['dgen'].has_next():
-		own['client'].send("")
-		own['dgen'].generate_next()
-		return
+	# if own['is_host'] and own['dgen'].has_next():
+		# own['client'].send("")
+		# own['dgen'].generate_next()
+		# return
 	# Only check the dungeon if we're the host
-	elif own['is_host'] and not own['dgen'].check_dungeon():
+	# elif own['is_host'] and not own['dgen'].check_dungeon():
 		# The dungeon is unacceptable, delete it and try again
-		del own['dgen']
-		for obj in gl.getCurrentScene().objects:
-			if obj.name not in ("DungeonEmpty", "Lamp.001", "Camera"):
-				obj.endObject()
-		return
-	elif 'mapfile' in own:
+		# del own['dgen']
+		# for obj in gl.getCurrentScene().objects:
+			# if obj.name not in ("DungeonEmpty", "Lamp.001", "Camera"):
+				# obj.endObject()
+		# return
+	# elif 'mapfile' in own:
 		# own['mapfile'].close()
-		del own['mapfile']
+		# del own['mapfile']
 
-		own['ui_system'].load_layout(None)
-		print("\nDungeon generation complete with %d rooms\n" % own['dgen'].room_count)
+		# own['ui_system'].load_layout(None)
+		# print("\nDungeon generation complete with %d rooms\n" % own['dgen'].room_count)
 		
 		# If we're the host, send the map data to the server
-		if own['is_host'] and not own['is_offline']:
-			print("The map size sent was " + str(len(own['dgen'].result)))
-			for i in own['dgen'].result:
-				own['client'].send_message('set_map', pickle.dumps(i, 0), timeout=1)
+		# if own['is_host'] and not own['is_offline']:
+			# print("The map size sent was " + str(len(own['dgen'].result)))
+			# for i in own['dgen'].result:
+				# own['client'].send_message('set_map', pickle.dumps(i, 0), timeout=1)
 		
 	
 	# Setup an input system
@@ -310,9 +310,6 @@ def init(own):
 	
 	# Add the player
 	scene = gl.getCurrentScene()
-	temp = own.position
-	temp[2] += 1
-	own.position = temp
 	gameobj = scene.addObject("CharacterEmpty", own)
 	
 	# Now add the mesh and armature based on race data
@@ -360,7 +357,7 @@ def init(own):
 	# own['combat_system'] = PassiveCombatSystem(own)
 	# own['combat_state'] = COMBAT_PASSIVE
 	# own['game_state'] = DefaultState(own)
-	own['state_manager'] = GameStateManager("Default", own)
+	own['state_manager'] = GameStateManager("DungeonGeneration", own)
 	own['init'] = True
 	
 def handle_network(own):
