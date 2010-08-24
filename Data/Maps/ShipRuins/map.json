@@ -1,0 +1,26 @@
+{
+	"name": "Ship Ruins",
+	"encounter_deck": "test",
+	"start_tiles":[
+			{ "scene": "start", "obj": "cmbStart" }
+		],
+	"room_tiles": [
+			{ "scene": "cmbSmall", "obj": "cmbSmall" },
+			{ "scene": "cmbMedium1", "obj": "cmbMedium1" },
+			{ "scene": "cmbMedium2", "obj": "cmbMedium2" },
+			{ "scene": "cmbLarge", "obj": "cmbLarge" }
+		],
+	"corridor_tiles": [
+			{ "scene": "corridor", "obj": "corridor" },
+			{ "scene": "3Way", "obj": "3Way" },
+			{ "scene": "4Way", "obj": "4Way" },
+			{ "scene": "turnLeft", "obj": "turnLeft" },
+			{ "scene": "turnRight", "obj": "turnRight" }
+		],
+	"end_tiles": [
+			{ "scene": "end", "obj": "end" }
+		],
+	"stair_tiles": [
+			{ "scene": "stair", "obj": "stair" }
+		]
+}

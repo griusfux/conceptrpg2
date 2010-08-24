@@ -1,0 +1,9 @@
+{
+	"name": "str",
+	"encounter_deck": "str",
+	"start_tiles": { "scene": "str", "obj": "str" },
+	"room_tiles": { "scene": "str", "obj": "str" },
+	"corridor_tiles": { "scene": "str", "obj": "str" },
+	"end_tiles": { "scene": "str", "obj": "str" },
+	"stair_tiles": { "scene": "str", "obj": "str" }
+}
