@@ -1,20 +1,15 @@
 # $Id$
 
 from Scripts.character_logic import PlayerLogic
+from .base_state import BaseState
 
-class DefaultState:
+class DefaultState(BaseState):
 	"""The default state for the game"""
 	
 	def __init__(self, main, is_server=False):
 		"""DefaultState Constructor"""
 		
-		if is_server:
-			self.server_init(main)
-		else:
-			self.client_init(main)
-			
-	def cleanup(self, main):
-		pass
+		BaseState.__init__(self, main, is_server)
 			
 	##########
 	# Client
@@ -27,14 +22,13 @@ class DefaultState:
 		self.main = main
 		
 		main['ui_system'].load_layout("passive_combat")
-		self.run = self.client_run
 		
 	def client_run(self, main):
 		"""Client-side run method"""
 		
 		# Update self.main for the state callbacks
 		self.main = main
-
+		
 		# Reset the camera
 		old_ori = main['3p_cam'].world_orientation
 		main['3p_cam'].reset_orientation()
@@ -147,8 +141,7 @@ class DefaultState:
 		
 	def server_init(self, main):
 		"""Initialize the server state"""
-		
-		self.run = self.server_run
+		pass
 		
 	def server_run(self, main, client):
 		"""Server-side run method"""
