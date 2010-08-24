@@ -1,3 +1,5 @@
+# $Id$
+
 import json
 import os
 import zipfile
@@ -129,6 +131,9 @@ class Power(Package):
 		import sys
 		sys.path.append(self._path)
 		import power
-		self.method = power.power
+		self._use = power.power
 		
 		sys.path.remove(self._path)
+		
+	def use(self, state, user, target):
+		self._use(self, state, user, target)

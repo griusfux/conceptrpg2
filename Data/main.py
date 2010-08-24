@@ -8,14 +8,15 @@
 import Scripts.blender_wrapper as BlenderWrapper
 from Scripts.ui.blender_ui_system import *
 from Scripts.archive_file import *
+from Scripts.packages import *
 from Scripts.dungeon_generator import DungeonGenerator, EncounterDeck
 from Scripts.character_logic import PlayerLogic, ProxyLogic, MonsterLogic
 # from Scripts.combat_system import CombatSystem
 # from Scripts.passive_combat_system import PassiveCombatSystem
 # from Scripts.gamestates import *
 from Scripts.gamestate_manager import GameStateManager
-from Scripts.powers import Power
-from Scripts.power_data import PowerData
+# from Scripts.powers import Power
+# from Scripts.power_data import PowerData
 
 from Scripts.race_data import *
 from Scripts.monster_data import *
@@ -333,7 +334,7 @@ def init(own):
 	player.hp = player.max_hp
 	
 	# Give the player an attack power
-	player.active_power = Power(PowerData(PowerFile("Attack")))
+	player.active_power = Power('Attack')
 	
 	own['net_players'] = {own['client'].id: player}
 	own['player'] = player
