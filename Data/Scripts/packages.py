@@ -31,7 +31,7 @@ class Package:
 	
 	# Options for the package file
 	_ext = 'zip'
-	_blend_file = ''
+	_blend = ''
 	_config = ''
 	_schema = ''
 	_dir = ''
@@ -51,8 +51,8 @@ class Package:
 			package = Directory(path)
 			
 		# If there is a .blend file, load and store the data
-		if self._blend_file:
-			self._blend = package.read(self._blend_file)
+		if self._blend:
+			self.blend = package.read(self._blend)
 			
 		try:
 			self._dict = json.loads(str(package.read(self._config), encoding='utf8'))

@@ -4,7 +4,6 @@ import random
 import GameLogic
 from mathutils import Vector, Matrix
 from Scripts.archive_file import DeckFile
-from Scripts.map_data import MapData
 
 GEN_LINEAR = 0
 GEN_RANDOM = 1
@@ -31,12 +30,17 @@ class DungeonGenerator:
 	ray_length = 5
 	generation = GEN_RANDOM
 	
-	def __init__(self, mapfile):
-		mapdata = MapData(mapfile)
-	
+	def __init__(self, map):	
 		# self.tiles is a dictionary of lists
 		# The lists are a list of tuples [(obj, scene)]
-		self.tiles = mapdata.tiles
+		self.tiles = {
+				'Starts': [(i['obj'], i['scene']) for i in map.start_tiles],
+				'Rooms': [(i['obj'], i['scene']) for i in map.room_tiles],
+				'Corridors': [(i['obj'], i['scene']) for i in map.corridor_tiles],
+				'Ends': [(i['obj'], i['scene']) for i in map.end_tiles],
+				'Stairs': [(i['obj'], i['scene']) for i in map.stair_tiles],
+				'Traps': [(i['obj'], i['scene']) for i in map.trap_tiles],
+				}
 		
 		# The list of exit nodes
 		self.exit_nodes = []
@@ -67,7 +71,7 @@ class DungeonGenerator:
 		self.rooms = {}
 		
 		# The EncounterDeck used to generate random incounters
-		self.encounter_deck = EncounterDeck(mapdata.encounter_deck)
+		self.encounter_deck = EncounterDeck(map.encounter_deck)
 	
 		# Parse the xml file and fill the lists, and create the encounter deck
 		# for element in mapfile.root:
@@ -166,7 +170,7 @@ class DungeonGenerator:
 				elif roll < 18 and roll >= 13:
 					tile = 'Rooms'
 				elif roll <13 and roll >= 10:
-					tile = 'Doors'
+					tile = 'Rooms'
 				else:
 					tile = 'Corridors'
 			

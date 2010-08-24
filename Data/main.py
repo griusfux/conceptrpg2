@@ -233,18 +233,18 @@ def init(own):
 			
 	# Try to load the mapfile
 	if 'mapfile' not in own:
-		own['mapfile'] = MapFile('ShipRuins')
+		own['mapfile'] = Map('ShipRuins')
 		own['ui_system'].load_layout('dun_gen')
 		
-		if not own['mapfile'].init:
-			print('Could not open the map file!')
-			own['mapfile'].close()
-			del own['mapfile']
-			own['init'] = False
+		# if not own['mapfile'].init:
+			# print('Could not open the map file!')
+			# own['mapfile'].close()
+			# del own['mapfile']
+			# own['init'] = False
 			
 				
 		# Load the scenes so the dungeon generator can use them
-		gl.LibLoad(own['mapfile'].blend, 'Scene')
+		gl.LibLoad(own['mapfile'].name, 'Scene', own['mapfile'].blend)
 
 		return
 
@@ -288,7 +288,7 @@ def init(own):
 				obj.endObject()
 		return
 	elif 'mapfile' in own:
-		own['mapfile'].close()
+		# own['mapfile'].close()
 		del own['mapfile']
 
 		own['ui_system'].load_layout(None)

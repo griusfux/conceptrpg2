@@ -17,6 +17,9 @@
 			{ "scene": "turnLeft", "obj": "turnLeft" },
 			{ "scene": "turnRight", "obj": "turnRight" }
 		],
+	"trap_tiles": [
+			{ "scene": "trap", "obj": "trap" }
+		],
 	"end_tiles": [
 			{ "scene": "end", "obj": "end" }
 		],
