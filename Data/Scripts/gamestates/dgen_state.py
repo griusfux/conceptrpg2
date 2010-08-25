@@ -33,8 +33,10 @@ class DungeonGenerationState(BaseState):
 		self.start_time = time.time()
 		
 		# Now startup the generator
-		self.generator = DungeonGenerator(map)
-		# self.generator.generate_first(main)
+		if 'dgen' not in main:
+			main['dgen'] = DungeonGenerator(map)
+		else:
+			main['dgen'].clear()
 		
 		# Save an encounter deck
 		main['encounter_deck'] = map.encounter_deck
@@ -45,23 +47,23 @@ class DungeonGenerationState(BaseState):
 		# Keep our connection to the server up
 		main['client'].send('')
 		
-		if not self.generator.rooms:
-			self.generator.generate_first(main)
-		elif self.generator.has_next():
-			self.generator.generate_next()
+		if not main['dgen'].rooms:
+			main['dgen'].generate_first(main)
+		elif main['dgen'].has_next():
+			main['dgen'].generate_next()
 			return
-		elif not self.generator.check_dungeon():
+		elif not main['dgen'].check_dungeon():
 			# Clear the tiles and restart the generator
-			self.generator.clear()
+			main['dgen'].clear()
 			return
 		else:
 			# Dungeon is done
-			print("\nDungeon generation complete with %d rooms\n in %.4f seconds" % (self.generator.room_count, time.time() - self.start_time))
+			print("\nDungeon generation complete with %d rooms\n in %.4f seconds" % (main['dgen'].room_count, time.time() - self.start_time))
 			
-			main['dgen'] = self.generator
+			main['dgen'] = main['dgen']
 			
 			# Move the player to the start tile
-			pos = self.generator._tiles[0].get_position()
+			pos = main['dgen']._tiles[0].get_position()
 			pos[2] += 0.5
 			main['player'].obj.set_position(pos)
 			
