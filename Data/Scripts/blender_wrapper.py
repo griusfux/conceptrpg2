@@ -61,7 +61,7 @@ class Object:
 		self.gameobj.applyRotation(vec, local)
 			
 	def get_position(self):
-		return self.gameobj.worldPosition
+		return self.gameobj.worldPosition.copy()
 		
 	def set_position(self, position):
 		self.gameobj.worldPosition = position[:]
