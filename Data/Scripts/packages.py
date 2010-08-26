@@ -3,6 +3,8 @@
 import json
 import os
 import zipfile
+import gzip
+import io
 
 class PackageError(Exception):
 	"""Package file related errors"""
@@ -54,10 +56,18 @@ class Package:
 		if self._blend:
 			self.blend = package.read(self._blend)
 			
+			# Try to unpack the .blend if it's compressed
+			try:
+				with gzip.GzipFile(fileobj=io.BytesIO(self.blend)) as f:
+					self.blend = f.read()
+			except IOError as e:
+				pass
+			
 		try:
 			self._dict = json.loads(str(package.read(self._config), encoding='utf8'))
 		except ValueError as e:
-			raise PackageError("Problem parsing the JSON file: "+str(e))
+			print(self._config)
+			raise PackageException("Problem parsing the JSON file: "+str(e))
 		
 		# Store the path for possible later use
 		self._path = path
@@ -116,6 +126,15 @@ class Map(Package):
 	_schema = 'Schemas/mapfile.json'
 	_dir = 'Maps'
 	
+class Race(Package):
+	"""Race package"""
+	
+	_ext = 'race'
+	_blend = 'race.blend'
+	_config = 'race.json'
+	_schema = 'Schemas/racefile.json'
+	_dir = 'Races'
+
 class Power(Package):
 	"""Power package"""
 	

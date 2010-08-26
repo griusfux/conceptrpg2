@@ -313,12 +313,10 @@ def init(own):
 	gameobj = scene.addObject("CharacterEmpty", own)
 	
 	# Now add the mesh and armature based on race data
-	race = RaceFile("DarkKnight")
-	race_data = RaceData(race)
-	gl.LibLoad(race.blend, "Scene")
-	race.close()
+	race = Race("DarkKnight")
+	own['engine'].load_library(race)
 	
-	root_ob = scene.addObject(race_data.root_object, own)
+	root_ob = scene.addObject(race.root_object, own)
 	root_ob.setParent(gameobj)
 	
 	# Store the player
