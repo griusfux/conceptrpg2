@@ -60,8 +60,6 @@ class DungeonGenerationState(BaseState):
 			# Dungeon is done
 			print("\nDungeon generation complete with %d rooms\n in %.4f seconds" % (main['dgen'].room_count, time.time() - self.start_time))
 			
-			main['dgen'] = main['dgen']
-			
 			# Move the player to the start tile
 			pos = main['dgen']._tiles[0].get_position()
 			pos[2] += 0.5
