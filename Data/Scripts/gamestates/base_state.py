@@ -12,13 +12,11 @@ class BaseState:
 		if is_server:
 			self.server_init(main)
 			self.run = self.server_run
+			self.cleanup = self.server_cleanup
 		else:
 			self.client_init(main)
 			self.run = self.client_run
-			
-	def cleanup(self, main):
-		"""Do any cleanup here (override if you need it)"""
-		pass
+			self.cleanup = self.client_cleanup
 					
 	##########
 	# Client
@@ -32,6 +30,10 @@ class BaseState:
 		"""Client-side run method"""
 		pass
 			
+	def client_cleanup(self, main):
+		"""Cleanup the client state"""
+		pass
+			
 	##########
 	# Server
 	##########
@@ -42,6 +44,10 @@ class BaseState:
 		
 	def server_run(self, main):
 		"""Server-side run method"""
+		pass
+			
+	def server_cleanup(self, main):
+		"""Cleanup the server state"""
 		pass
 
 	##########
