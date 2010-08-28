@@ -24,6 +24,15 @@ class Object:
 		self.tot_error = Vector((0.0, 0.0, 0.0));
 		self.pid = [30.0, 0.5, 0.0]
 		
+	def __eq__(self, other):
+		self.gameobj == other.gamobj
+	
+	def __ne__(self, other):
+		self.gameobj != other.gameobj
+		
+	def __repr__(self):
+		return self.gameobj.name
+		
 	def move(self, vec, mode=MOVE_SERVO, min=[None, None, None], max=[None,None,None], local=True):
 		"""Do object movement"""
 		
