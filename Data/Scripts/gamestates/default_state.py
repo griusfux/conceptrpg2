@@ -130,8 +130,10 @@ class DefaultState(BaseState):
 		# Check to see if we need to move to the combat state
 		# XXX This needs cleanup, we shouldn't be accessing KX_GameObject attributes
 		if main.sensors['encounter_mess'].positive:
+			import Scripts.blender_wrapper as Blender
 			room = main['dgen'].rooms[main.sensors['encounter_mess'].bodies[0]]
 			del room['encounter']
+			main['room'] = Blender.Object(room)
 			main['client'].send('stateCombat')
 			return ('Combat', 'SWITCH')
 			

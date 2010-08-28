@@ -1,21 +1,15 @@
 # $Id$
 
+from .base_state import BaseState
+
+# Constants for grid generation
+TILE_SIZE = 1
+GRID_Z = 0.01
 
 # We don't need to bother subclassing DefaultState since we are going to mostly override
 # everything anyways, and Python doesn't have abstract classes or interfaces.
 
-class CombatState():
-	def __init__(self, main, is_server=False):
-		"""CombatState constructor"""
-		
-		if is_server:
-			self.server_init(main)
-		else:
-			self.client_init(main)
-			
-	def cleanup(self, main):
-		pass
-			
+class CombatState(BaseState):		
 	##########
 	# Client
 	##########
@@ -26,6 +20,9 @@ class CombatState():
 		
 		main['ui_system'].load_layout("combat")
 		self.run = self.client_run
+		
+		# Generate the grid
+		self.grid = CombatGrid(main['engine'], main['room'])		
 		
 	def client_run(self, main):
 		"""Client-side run method"""
@@ -123,6 +120,10 @@ class CombatState():
 		# Send the message
 		main['client'].send(msg.strip())
 
+	def client_cleanup(self, main):
+		"""Cleanup the client state"""
+		self.grid.end()
+
 	##########
 	# Server
 	##########
@@ -153,3 +154,88 @@ class CombatState():
 	##########
 	
 	# -----
+	
+# The following classes are for handling the combat grid
+class CombatGrid:
+	"""This object handles the grid aspect of combat, and is made up of CombatTile objects"""
+	
+	def __init__(self, Engine, room):
+		vert_list = [i for i in room.get_vertex_list() if i.z <=0]
+		
+		# Find the smallest and largest x and y
+		sx = lx = vert_list[0].x
+		sy = ly = vert_list[0].y
+		
+		for vert in vert_list:
+			if vert.x < sx:
+				sx = vert.x
+			elif vert.x > lx:
+				lx = vert.x
+				
+			if vert.y < sy:
+				sy = vert.y
+			elif vert.y > ly:
+				ly = vert.y
+		
+		# Record the size of the room
+		x = lx - sx
+		y = ly - sy
+		origin = (sx, ly, GRID_Z)
+		
+		# Find out how many tiles we need
+		self.x_steps = int(round(x / TILE_SIZE))
+		self.y_steps = int(round(y / TILE_SIZE))
+		
+		# Create an empty 2D list/array to hold the grid
+		self.map = [[None for i in range(self.y_steps)] for i in range(self.x_steps)]
+		
+		# Now fill the 2D list/array
+		for x in range(self.x_steps):
+			for y in range(self.y_steps):
+				self.map[x][y] = CombatTile(Engine, x, y, (origin[0] + x, origin[1] - y, GRID_Z), room, self.x_steps, self.y_steps)
+				
+	def end(self):
+		for x in self.map:
+			for y in x:
+				y.end()
+				
+class CombatTile:
+	"""The individual squares of the CombatGrid object"""
+	
+	def __init__(self, Engine, x, y, position, room, x_steps, y_steps):
+		self.x = x
+		self.y = y
+		self.position = (position[0] + TILE_SIZE / 2, position[1] - TILE_SIZE / 2, position[2])
+		self.valid = True
+		self.obj = None
+		
+		self.grid_color = Engine.add_object('GridColor', position)
+		self.grid_color.set_color([0, 0, 0, 0])
+		
+		# Check if the tile is in the room
+		for vert in self.grid_color.get_vertex_list():
+			hit_ob, hit_pos, hit_norm = Engine.ray_cast((vert.x, vert.y, vert.z + 1), (vert.x, vert.y, vert.z-1), self.grid_color)
+			if not hit_ob or hit_ob != room:
+				self.valid = False
+				break
+				
+		# Check if anything is in the tile
+		v1 = self.grid_color.get_vertex_list()[0]
+		v2 = self.grid_color.get_vertex_list()[2]
+		hit_ob, hit_pos, hit_norm = Engine.ray_cast((v1.x, v1.y, v1.z), (v2.x, v2.y, v2.z), self.grid_color)
+		if hit_ob:
+			self.valid = False
+			
+		# Place the appropriate tile based on validity
+		self.grid_tile = Engine.add_object('GridTile', position) if self.valid else None
+		# if self.valid:
+			# self.grid_tile = Engine.add_object('GridTile', position)
+		# else:
+			# self.grid_tile = None
+			# self.grid_color.set_color([1, 0, 0, 1])
+			
+	def end(self):
+		if self.grid_tile:
+			self.grid_tile.end()
+		self.grid_color.end()
+	
