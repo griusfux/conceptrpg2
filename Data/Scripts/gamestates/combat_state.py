@@ -57,7 +57,7 @@ class CombatState(BaseState):
 				for input in data:
 					if input.startswith('mov'):
 						input = input.replace('mov', '')
-						main['net_players'][cid].obj.move([int(i) for i in input.split('$')], min=[-50, -50, 0], max=[50, 50, 0])
+						main['net_players'][cid].obj.move([float(i) for i in input.split('$')], min=[-50, -50, 0], max=[50, 50, 0])
 					elif input.startswith('pos'):
 						input = input.replace('pos', '')
 						server_pos = [float(i) for i in input.split('$')]
@@ -115,7 +115,11 @@ class CombatState(BaseState):
 					msg += "mov-5$0$0 "
 					
 				if 'mov' not in msg:
-					msg += "mov0$0$0"
+					target = self._tile_from_point(main['player'].obj.get_position())
+					vec = main['player'].obj.get_local_vector_to(target.position)
+					vec[2] = 0
+					vec = [i * main['player'].speed for i in vec]
+					msg += "mov"+"$".join(["%.3f" % i for i in vec])
 	
 		# Send the message
 		main['client'].send(msg.strip())
@@ -153,7 +157,31 @@ class CombatState(BaseState):
 	# Other
 	##########
 	
-	# -----
+	def _tile_from_point(self, point):
+		# Calculate the offset based on the distance from the origin
+		x_off = abs(point[0] - self.grid.origin[0])
+		y_off = abs(point[1] - self.grid.origin[1])
+		
+		# Convert the offset to tiles
+		x = int(x_off/TILE_SIZE)
+		y = int(y_off/TILE_SIZE)
+		
+		# Clamp the player's position to be within the grid
+		out_of_bounds = False
+		
+		if x > self.grid.x_steps - 1:
+			x = self.grid.x_steps - 1
+		elif x < 0:
+			x = 0
+			
+		if y > self.grid.y_steps - 1:
+			y = self.grid.y_steps - 1 
+		elif y < 1:
+			y = 1
+		
+		tile = self.grid(x, y)
+			
+		return tile
 	
 # The following classes are for handling the combat grid
 class CombatGrid:
@@ -180,7 +208,7 @@ class CombatGrid:
 		# Record the size of the room
 		x = lx - sx
 		y = ly - sy
-		origin = (sx, ly, GRID_Z)
+		self.origin = (sx, ly, GRID_Z)
 		
 		# Find out how many tiles we need
 		self.x_steps = int(round(x / TILE_SIZE))
@@ -192,8 +220,17 @@ class CombatGrid:
 		# Now fill the 2D list/array
 		for x in range(self.x_steps):
 			for y in range(self.y_steps):
-				self.map[x][y] = CombatTile(Engine, x, y, (origin[0] + x, origin[1] - y, GRID_Z), room, self.x_steps, self.y_steps)
-				
+				self.map[x][y] = CombatTile(Engine, x, y, (self.origin[0] + x, self.origin[1] - y, GRID_Z), room, self.x_steps, self.y_steps)
+	
+	def __call__(self, x, y):
+		if x < 0 or y < 0:
+			return None
+			
+		try:
+			return self.map[x][y]
+		except IndexError:
+			return None
+
 	def end(self):
 		for x in self.map:
 			for y in x:

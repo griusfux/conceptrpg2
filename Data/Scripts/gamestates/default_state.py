@@ -60,7 +60,7 @@ class DefaultState(BaseState):
 				for input in data:
 					if input.startswith('mov'):
 						input = input.replace('mov', '')
-						main['net_players'][cid].obj.move([int(i) for i in input.split('$')], min=[-50, -50, 0], max=[50, 50, 0])
+						main['net_players'][cid].obj.move([float(i) for i in input.split('$')], min=[-50, -50, 0], max=[50, 50, 0])
 					elif input.startswith('pos'):
 						input = input.replace('pos', '')
 						server_pos = [float(i) for i in input.split('$')]
