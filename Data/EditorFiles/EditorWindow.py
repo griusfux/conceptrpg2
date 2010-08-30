@@ -3,15 +3,14 @@ import sys
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
-from Scripts.class_data import ClassData
-from Scripts.map_data import MapData
-from Scripts.monster_data import MonsterData
-from Scripts.race_data import RaceData
-from Scripts.item_data import *
-from Scripts.archive_file import *
+from Scripts.packages import *
 
 from EditorFiles.LogWidget import *
 from EditorFiles.Editors import *
+
+EDITORS = {
+	'Maps': MapEditor,
+	}
 
 class EditorWindow(QMainWindow):
 	def __init__(self):
@@ -51,14 +50,15 @@ class EditorWindow(QMainWindow):
 		
 		# Create the sub trees
 		# XXX uncomment subtrees when they are ready
-		self.create_subtree('Armor', ArmorFile, ArmorData)
-		self.create_subtree('Classes', ClassFile, ClassData)
-		# self.create_subtree('Decks', DeckFile, DeckData)
-		self.create_subtree('Maps', MapFile, MapData)
-		self.create_subtree('Monsters', MonsterFile, MonsterData)
-		self.create_subtree('Races', RaceFile, RaceData)
-		self.create_subtree('Shields', ShieldFile, ShieldData)
-		self.create_subtree('Weapons', WeaponFile, WeaponData)
+		# self.create_subtree('Armor', Armor)
+		# self.create_subtree('Classes', Class)
+		# self.create_subtree('Decks', Deck)
+		self.create_subtree('Maps', Map)
+		# self.create_subtree('Monsters', Monster)
+		self.create_subtree('Powers', Power)
+		self.create_subtree('Races', Race)
+		# self.create_subtree('Shields', Shield)
+		# self.create_subtree('Weapons', Weapon)
 		
 		left = QTreeView()
 		left.setHeaderHidden(True)
@@ -83,13 +83,14 @@ class EditorWindow(QMainWindow):
 		
 		self.setCentralWidget(splitter)
 		
-	def create_subtree(self, type, Archive, DataFile):
+	def create_subtree(self, type, package):
 		sub_root = QStandardItem(type)
+		sub_root.setEditable(False)
 		self.data_files[type] = {}
 		self.root.appendRow(sub_root)
 		
 		# Build a list of the files to use
-		files = [i.split('.')[0] for i in os.listdir(Archive._dir) if not i.startswith('.')]
+		files = [i.split('.')[0] for i in os.listdir(package._dir) if not i.startswith('.')]
 		
 		# Remove duplicates
 		for file in files:
@@ -99,19 +100,17 @@ class EditorWindow(QMainWindow):
 		# Load the files
 		for file in files:
 			if file.startswith('.'): continue
-			arc_file = Archive(file)
-			
-			if not arc_file.init:
-				arc_file.close()
-				print('Error with: ' + file)
+			try:
+				arc_file = package(file)
+			except PackageError as e:
+				print(e)
+				print('Unable to open', file)
 				continue
-				
-			d_file = DataFile(arc_file)
-			arc_file.close()
-			
-			item =  QStandardItem(d_file.name)
+
+			item =  QStandardItem(arc_file.name)
+			item.setEditable(False)
 			sub_root.appendRow(item)
-			self.data_files[type][d_file.name] = d_file
+			self.data_files[type][arc_file.name] = arc_file
 			
 	def change_editor(self, editor):
 		self.right.widget(0).hide()
@@ -127,6 +126,8 @@ class EditorWindow(QMainWindow):
 		if item.parent():
 			text = item.parent().text()
 
-			if text == 'Monsters':
-				self.change_editor(MonsterEditor(self, QImage('icon.png'), self.data_files['Monsters'][item.text()]))
+			if text in EDITORS:
+				self.change_editor(EDITORS[text](self, self.data_files[text][item.text()]))
+			else:
+				print("No editor found for", text)
 				
