@@ -48,7 +48,7 @@ class Package:
 				path += '.'+self._ext
 				package = zipfile.ZipFile(path)
 			else:
-				raise ArchiveError("could not find the archive: "+package_name)
+				raise PackageError("Could not find package: "+package_name)
 		else:
 			package = Directory(path)
 			
@@ -67,7 +67,7 @@ class Package:
 			self._dict = json.loads(str(package.read(self._config), encoding='utf8'))
 		except ValueError as e:
 			print(self._config)
-			raise PackageException("Problem parsing the JSON file: "+str(e))
+			raise PackageError("Problem parsing the JSON file: "+str(e))
 		
 		# Store the path for possible later use
 		self._path = path
@@ -98,9 +98,12 @@ class Package:
 			else:
 				l = []
 				for item in d[key]:
+					good = True
 					for k, v in value.items():
-						if self._validate_dict(item, k, v, setting=False):
-							l.append(item)
+						if not self._validate_dict(item, k, v, setting=False):
+							good = False
+							break
+					if good: l.append(item)
 						
 				setattr(self, key, l)
 				
