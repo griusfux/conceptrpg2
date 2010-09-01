@@ -188,10 +188,18 @@ class Engine:
 	
 	def __init__(self, adder):
 		self.adder = adder
+		
+		# So we can keep track of already loaded libraries
+		self.library_list = []
 	
 	def load_library(self, package):
 		"""Load scene data from a package file"""
+		# Don't load libraries multiple times
+		if package.name in self.library_list:
+			return
+			
 		gl.LibLoad(package.name, 'Scene', package.blend)
+		self.library_list.append(package.name)
 		
 	def angle_between(self, vec1, vec2):
 		vec1 = Vector(vec1)
