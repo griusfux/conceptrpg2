@@ -129,6 +129,33 @@ class Map(Package):
 	_schema = 'Schemas/mapfile.json'
 	_dir = 'Maps'
 	
+class EncounterDeck(Package):
+	"""Encounter deck package"""
+	
+	def __init__(self, package_name):
+		Package.__init__(self, package_name)
+		
+		# Build a deck
+		self.deck = []
+		
+		for card in self.cards:
+			self.deck.extend([(card['monster'], card['role']) for i in range(card['count'])])
+	
+	_ext = 'deck'
+	_blend = ''
+	_config = 'deck.json'
+	_schema = 'Schemas/deckfile.json'
+	_dir = 'EncounterDecks'
+	
+class Monster(Package):
+	"""Monster package"""
+	
+	_ext = 'monster'
+	_blend = 'monster.blend'
+	_config = 'monster.json'
+	_schema = 'Schemas/monsterfile.json'
+	_dir = 'Monsters'
+	
 class Race(Package):
 	"""Race package"""
 	
