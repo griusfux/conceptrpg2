@@ -4,7 +4,7 @@ import random
 import GameLogic
 import Scripts.blender_wrapper as BlenderWrapper
 from mathutils import Vector, Matrix
-from Scripts.archive_file import DeckFile
+from Scripts.packages import EncounterDeck
 
 GEN_LINEAR = 0
 GEN_RANDOM = 1
@@ -42,6 +42,8 @@ class DungeonGenerator:
 				'Stairs': [(i['obj'], i['scene']) for i in map.stair_tiles],
 				'Traps': [(i['obj'], i['scene']) for i in map.trap_tiles],
 				}
+				
+		self.deck = EncounterDeck(map.encounter_deck)
 	
 		self._init_values()
 		
@@ -295,71 +297,71 @@ class DungeonGenerator:
 		# Made it through, with no collision
 		return False
 		
-class EncounterDeck():
-	def __init__(self, deckfile):
-		self.Deckfile = deckfile
-		self.Deck = []
-		self.build_deck()
+# class EncounterDeck():
+	# def __init__(self, deckfile):
+		# self.Deckfile = deckfile
+		# self.Deck = []
+		# self.build_deck()
 		
-	def build_deck(self):
-		deckfile = DeckFile(self.Deckfile)
-		toclose = []
-		for card in deckfile.root:
-			monster = None
-			role = ""
-			count = 0
-			for element in card:
-				if element.tag == "monster":
-					monster = element.text
-				if element.tag == "role":
-					role = element.text
-				elif element.tag == "count":
-					count = int(element.text)
+	# def build_deck(self):
+		# deckfile = DeckFile(self.Deckfile)
+		# toclose = []
+		# for card in deckfile.root:
+			# monster = None
+			# role = ""
+			# count = 0
+			# for element in card:
+				# if element.tag == "monster":
+					# monster = element.text
+				# if element.tag == "role":
+					# role = element.text
+				# elif element.tag == "count":
+					# count = int(element.text)
 			
-			for i in range(count):
-				self.Deck.append((monster, role))
+			# for i in range(count):
+				# self.Deck.append((monster, role))
 				
-		deckfile.close()
+		# deckfile.close()
 				
-	def generate_encounter(self, num_players):
-		noBrutesSoldiers = True
-		while noBrutesSoldiers:
-			count = num_players
-			MonsterList = []
-			remove = []
-			while count > 0:		#while there are still players left with out cards
-				random.seed()
-				draw = random.choice(self.Deck)
-				while draw in MonsterList:				#If the card was already drawn, draw again
-					if len(remove) >= len(self.Deck):
-						self.build_deck()
-					draw = random.choice(self.Deck)
+	# def generate_encounter(self, num_players):
+		# noBrutesSoldiers = True
+		# while noBrutesSoldiers:
+			# count = num_players
+			# MonsterList = []
+			# remove = []
+			# while count > 0:		#while there are still players left with out cards
+				# random.seed()
+				# draw = random.choice(self.Deck)
+				# while draw in MonsterList:				#If the card was already drawn, draw again
+					# if len(remove) >= len(self.Deck):
+						# self.build_deck()
+					# draw = random.choice(self.Deck)
 					
-				#see what we get and appropriately deal with the card
-				if draw[1] in ('soldier', 'brute'):
-					MonsterList.extend([draw[0] for i in range(2)])
-					remove.append(draw)
-					noBrutesSoldiers = False
-				elif draw[1] == 'minion':
-					MonsterList.extend([draw[0] for i in range(4)])
-					remove.append(draw)
-				elif draw[1] == 'lurker':
-					MonsterList.append(draw[0])
-					remove.append(draw)
-					count += 1
-				elif draw[1]:
-					MonsterList.append(draw[0])
-					remove.append(draw)
-					count -= 1
-				else:
-					MonsterList.append(draw[0])
-					remove.append(draw)
-				count -= 1
+				# # see what we get and appropriately deal with the card
+				# if draw[1] in ('soldier', 'brute'):
+					# MonsterList.extend([draw[0] for i in range(2)])
+					# remove.append(draw)
+					# noBrutesSoldiers = False
+				# elif draw[1] == 'minion':
+					# MonsterList.extend([draw[0] for i in range(4)])
+					# remove.append(draw)
+				# elif draw[1] == 'lurker':
+					# MonsterList.append(draw[0])
+					# remove.append(draw)
+					# count += 1
+				# elif draw[1]:
+					# MonsterList.append(draw[0])
+					# remove.append(draw)
+					# count -= 1
+				# else:
+					# MonsterList.append(draw[0])
+					# remove.append(draw)
+				# count -= 1
 				
-		#Since we have a good encounter, remove the drawn cards from the deck
-		for draw in remove:
-				self.Deck.remove(draw)
-		return MonsterList
+		# # Since we have a good encounter, remove the drawn cards from the deck
+		# for draw in remove:
+				# self.Deck.remove(draw)
+		# return MonsterList
 				
 			
 		

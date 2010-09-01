@@ -1,6 +1,8 @@
 # $Id$
 
 from .base_state import BaseState
+from Scripts.packages import Monster
+import random
 
 # Constants for grid generation
 TILE_SIZE = 1
@@ -22,7 +24,32 @@ class CombatState(BaseState):
 		self.run = self.client_run
 		
 		# Generate the grid
-		self.grid = CombatGrid(main['engine'], main['room'])		
+		self.grid = CombatGrid(main['engine'], main['room'])
+
+		# "Place" the player
+		# player_tile = self.grid.tile_from_point(main['player'].obj.get_position())
+		# main['player'].obj.set_position(player_tile.position)
+		
+		# Place the monsters
+		monster_list = self._generate_encounter(main['dgen'].deck)
+		for monster in [Monster(i) for i in monster_list]:
+			# Load the monster
+			main['engine'].load_library(monster)
+		
+			# Find a place to put the monster
+			x = y = None
+			while not x or not y:
+				x = random.randrange(0, self.grid.x_steps)
+				y = random.randrange(0, self.grid.y_steps)
+				
+				if not self.grid(x, y).valid:
+					x = y = None
+					
+			# Place the monster
+			tile = self.grid(x, y)
+			main['engine'].add_object(monster.name, tile.position)
+			
+			
 		
 	def client_run(self, main):
 		"""Client-side run method"""
@@ -115,7 +142,7 @@ class CombatState(BaseState):
 					msg += "mov-5$0$0 "
 					
 				if 'mov' not in msg:
-					target = self._tile_from_point(main['player'].obj.get_position())
+					target = self.grid.tile_from_point(main['player'].obj.get_position())
 					vec = main['player'].obj.get_local_vector_to(target.position)
 					vec[2] = 0
 					vec = [i * main['player'].speed for i in vec]
@@ -157,31 +184,34 @@ class CombatState(BaseState):
 	# Other
 	##########
 	
-	def _tile_from_point(self, point):
-		# Calculate the offset based on the distance from the origin
-		x_off = abs(point[0] - self.grid.origin[0])
-		y_off = abs(point[1] - self.grid.origin[1])
+	def _generate_encounter(self, deck, num_players=1):
+		"""Generate an encounter by drawing cards from the encounter deck"""
 		
-		# Convert the offset to tiles
-		x = int(x_off/TILE_SIZE)
-		y = int(y_off/TILE_SIZE)
+		random.seed()
 		
-		# Clamp the player's position to be within the grid
-		out_of_bounds = False
+		no_brutes_soldiers = True
+		monsters = []
 		
-		if x > self.grid.x_steps - 1:
-			x = self.grid.x_steps - 1
-		elif x < 0:
-			x = 0
-			
-		if y > self.grid.y_steps - 1:
-			y = self.grid.y_steps - 1 
-		elif y < 1:
-			y = 1
-		
-		tile = self.grid(x, y)
-			
-		return tile
+		while no_brutes_soldiers:
+			while num_players > 0:
+				draw = random.choice(deck.deck)
+				
+				if draw[1] in ('soldier', 'brute'):
+					monsters.extend([draw[0] for i in range(2)])
+					no_brutes_soldiers = False
+				elif draw[1] == 'minion':
+					monsters.extend([draw[0] for i in range(4)])
+				elif draw[1]:
+					monsters.append(draw[0])
+				else:
+					continue
+					
+				num_players -= 1
+				
+		return monsters
+				
+				
+				
 	
 # The following classes are for handling the combat grid
 class CombatGrid:
@@ -230,6 +260,31 @@ class CombatGrid:
 			return self.map[x][y]
 		except IndexError:
 			return None
+			
+	def tile_from_point(self, point):
+		"""Finds the tile that contains the point"""
+		
+		# Calculate the offset based on the distance from the origin
+		x_off = abs(point[0] - self.origin[0])
+		y_off = abs(point[1] - self.origin[1])
+		
+		# Convert the offset to tiles
+		x = int(x_off/TILE_SIZE)
+		y = int(y_off/TILE_SIZE)
+		
+		# Clamp the x, y to be in the grid
+		if x > self.x_steps - 1:
+			x = self.x_steps - 1
+		elif x < 0:
+			x = 0
+			
+		if y > self.y_steps - 1:
+			y = self.y_steps - 1
+		elif y < 0:
+			y = 0
+			
+		# Return the tile
+		return self(x, y)
 
 	def end(self):
 		for x in self.map:
@@ -244,7 +299,7 @@ class CombatTile:
 		self.y = y
 		self.position = (position[0] + TILE_SIZE / 2, position[1] - TILE_SIZE / 2, position[2])
 		self.valid = True
-		self.obj = None
+		self.object = None
 		
 		self.grid_color = Engine.add_object('GridColor', position)
 		self.grid_color.set_color([0, 0, 0, 0])
@@ -271,7 +326,18 @@ class CombatTile:
 			# self.grid_tile = None
 			# self.grid_color.set_color([1, 0, 0, 1])
 			
+	def fill(self, object):
+		"""'Fill' the tile with the given object, or empty it if object is none"""
+		
+		if object:
+			self.object = object
+			self.valid = False
+		else:
+			self.object = None
+			self.valid = True
+		
 	def end(self):
+		"""A method to cleanup the tile when we are done"""
 		if self.grid_tile:
 			self.grid_tile.end()
 		self.grid_color.end()
