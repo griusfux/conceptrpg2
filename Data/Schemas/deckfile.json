@@ -1,0 +1,4 @@
+{
+	"name": "str",
+	"cards": { "monster": "str", "role": "str", "count": "int" }
+}

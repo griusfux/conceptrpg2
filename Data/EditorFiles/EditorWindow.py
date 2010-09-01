@@ -102,7 +102,7 @@ class EditorWindow(QMainWindow):
 			if file.startswith('.'): continue
 			try:
 				arc_file = package(file)
-			except PackageError as e:
+			except Exception as e:
 				print(e)
 				print('Unable to open', file)
 				continue
