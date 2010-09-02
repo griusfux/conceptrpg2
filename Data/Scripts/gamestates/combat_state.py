@@ -2,7 +2,10 @@
 
 from .base_state import BaseState
 from Scripts.packages import Monster
+from Scripts.character_logic import MonsterLogic
+
 import random
+import Scripts.Ai.machine as ai
 
 # Constants for grid generation
 TILE_SIZE = 1
@@ -31,8 +34,8 @@ class CombatState(BaseState):
 		# main['player'].obj.set_position(player_tile.position)
 		
 		# Place the monsters
-		monster_list = self._generate_encounter(main['dgen'].deck)
-		for monster in [Monster(i) for i in monster_list]:
+		self.monster_list = []
+		for monster in [Monster(i) for i in self._generate_encounter(main['dgen'].deck)]:
 			# Load the monster
 			main['engine'].load_library(monster)
 		
@@ -47,7 +50,14 @@ class CombatState(BaseState):
 					
 			# Place the monster
 			tile = self.grid(x, y)
-			main['engine'].add_object(monster.name, tile.position)
+			obj = main['engine'].add_object(monster.name, tile.position)
+			
+			# Setup logic/ai
+			logic = MonsterLogic(obj, monster)
+			logic.ai = ai.Machine(monster.ai_keywords, monster.ai_start_state)
+			
+			# Add the monster to the monster list
+			self.monster_list.append(logic)
 			
 			
 		
@@ -108,6 +118,17 @@ class CombatState(BaseState):
 				print(val)
 					
 			val = main['client'].run()
+			
+		# Handle monster ai
+		machine_input = {
+					'combat_system': self,
+					'foe_list': (main['player'],),
+					'friend_list': self.monster_list
+				}
+				
+		for monster in self.monster_list:
+			machine_input['self'] = monster
+			monster.ai.run(machine_input)
 			
 		# The message we will send to the server
 		pos = main['player'].obj.get_position()

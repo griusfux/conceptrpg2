@@ -282,7 +282,7 @@ class PlayerLogic(CharacterLogic):
 class MonsterLogic(CharacterLogic):
 	def __init__(self, object, monsterdata):
 		CharacterLogic.__init__(self, object)
-		self.id = monsterdata.id
+		# self.id = monsterdata.id
 
 		self.role = ""
 		self.leader = False
@@ -291,20 +291,20 @@ class MonsterLogic(CharacterLogic):
 		self.behaviors = []
 		
 		self.name = monsterdata.name
-		self.level = monsterdata.level
-		self.role = monsterdata.role
-		self.leader = monsterdata.leader
-		self.elite = monsterdata.elite
-		self.str_ab = monsterdata.str_ab
-		self.con_ab = monsterdata.con_ab
-		self.int_ab = monsterdata.int_ab
-		self.wis_ab = monsterdata.wis_ab
-		self.cha_ab = monsterdata.cha_ab
+		# self.level = monsterdata.level
+		# self.role = monsterdata.role
+		# self.leader = monsterdata.leader
+		# self.elite = monsterdata.elite
+		# self.str_ab = monsterdata.str_ab
+		# self.con_ab = monsterdata.con_ab
+		# self.int_ab = monsterdata.int_ab
+		# self.wis_ab = monsterdata.wis_ab
+		# self.cha_ab = monsterdata.cha_ab
 		
 		self.ai_keywords = monsterdata.ai_keywords
 		self.ai_start_state = monsterdata.ai_start_state
 
-		self.recalc_stats()
+		# self.recalc_stats()
 		
 	def __del__(self):
 		if self.object:

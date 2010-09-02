@@ -1,3 +1,5 @@
 {
-	"name": "dire_rat"
+	"name": "dire_rat",
+	"ai_start_state": "spawn",
+	"ai_keywords": [ "movement.happy" ]
 }
