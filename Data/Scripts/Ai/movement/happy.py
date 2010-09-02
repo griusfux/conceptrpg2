@@ -16,15 +16,15 @@ def move_happy(self, input):
 		
 	happy = False
 	for player in input['foe_list']:
-		target_x, target_y, target_z = player.obj.get_position()
-		self_x, self_y, self_z = input['self'].obj.get_position()
+		target_x, target_y, target_z = player.object.position
+		self_x, self_y, self_z = input['self'].object.position
 		range = (target_x - self_x)**2 + (target_y - self_y)**2
 		if range < 25 :
 			happy = True
 			break
 			
 	if happy and self.timer > 30:
-		input['self'].obj.move((0,0,300), 1)
+		input['self'].object.move((0,0,300), 1)
 		self.timer = 0
 	
 	return 'idle'

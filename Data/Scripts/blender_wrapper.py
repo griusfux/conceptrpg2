@@ -68,12 +68,14 @@ class Object:
 		"""Do object rotation"""
 		
 		self.gameobj.applyRotation(vec, local)
-			
-	def get_position(self):
+		
+	@property
+	def position(self):
 		return self.gameobj.worldPosition.copy()
 		
-	def set_position(self, position):
-		self.gameobj.worldPosition = position[:]
+	@position.setter
+	def position(self, value):
+		self.gameobj.worldPosition = value[:]
 		
 	def get_orientation(self):
 		return self.gameobj.worldOrientation
@@ -101,7 +103,8 @@ class Object:
 		else:
 			self.gameobj.worldOrientation = ori[:]
 		
-	def get_forward_vector(self):
+	@property
+	def forward_vector(self):
 		return self.gameobj.getAxisVect((0,1,0))
 		
 	def get_axis_vector(self, axis):
@@ -146,7 +149,12 @@ class Object:
 				
 		return [Vertex(vertex, self.gameobj) for vertex in vertexList]
 		
-	def set_color(self, color):
+	@property
+	def color(self):
+		return self.gameobj.color
+	
+	@color.setter
+	def color(self, color):
 		self.gameobj.color = color
 		
 class Vertex:

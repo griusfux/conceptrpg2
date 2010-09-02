@@ -61,9 +61,9 @@ class DungeonGenerationState(BaseState):
 			print("\nDungeon generation complete with %d rooms\n in %.4f seconds" % (main['dgen'].room_count, time.time() - self.start_time))
 			
 			# Move the player to the start tile
-			pos = main['dgen']._tiles[0].get_position()
+			pos = main['dgen']._tiles[0].position
 			pos[2] += 0.5
-			main['player'].obj.set_position(pos)
+			main['player'].object.position = pos
 			
 			# Switch to the default state now
 			return ("Default", "SWITCH")

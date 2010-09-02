@@ -53,7 +53,7 @@ def act(self, input):
 	
 def death(self, input):
 	input['combat_system'].monster_list.remove(input['self'])
-	input['self'].obj.end()
+	input['self'].object.end()
 	return 'idle'
 
 if __name__ is "__main__":

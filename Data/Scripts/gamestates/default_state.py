@@ -26,7 +26,7 @@ class DefaultState(BaseState, BaseController):
 		# Reset the camera
 		old_ori = main['3p_cam'].world_orientation
 		main['3p_cam'].reset_orientation()
-		main['player'].obj.set_orientation(old_ori, local=True)
+		main['player'].object.set_orientation(old_ori, local=True)
 		main['engine'].set_active_camera(main['3p_cam'])
 		
 		# Update the player's lock
@@ -54,27 +54,27 @@ class DefaultState(BaseState, BaseController):
 				for input in data:
 					if input.startswith('mov'):
 						input = input.replace('mov', '')
-						main['net_players'][cid].obj.move([float(i) for i in input.split('$')], min=[-50, -50, 0], max=[50, 50, 0])
+						main['net_players'][cid].object.move([float(i) for i in input.split('$')], min=[-50, -50, 0], max=[50, 50, 0])
 					elif input.startswith('pos'):
 						input = input.replace('pos', '')
 						server_pos = [float(i) for i in input.split('$')]
-						client_pos = main['net_players'][cid].obj.get_position()
+						client_pos = main['net_players'][cid].object.position
 						
 						for i in range(3):
 							if abs(server_pos[i]-client_pos[i]) > 1.0:
 								client_pos[i] = server_pos[i]
 							
-						main['net_players'][cid].obj.set_position(client_pos)
+						main['net_players'][cid].object.position = client_pos
 					elif input.startswith('anim'):
 						input = input.replace('anim', '')
-						main['net_players'][cid].obj.move((0, 0, 0))
-						main['net_players'][cid].obj.play_animation(input)
+						main['net_players'][cid].object.move((0, 0, 0))
+						main['net_players'][cid].object.play_animation(input)
 					elif input.startswith('to'):
-						main['net_players'][cid].obj.end()
+						main['net_players'][cid].object.end()
 						del main['net_players'][cid]
 						print(cid, "timed out")
 					elif input.startswith('dis'):
-						main['net_players'][cid].obj.end()
+						main['net_players'][cid].object.end()
 						del main['net_players'][cid]
 						print(cid, "disconnected")
 			except ValueError as e:
@@ -84,7 +84,7 @@ class DefaultState(BaseState, BaseController):
 			val = main['client'].run()
 			
 		# The message we will send to the server
-		pos = main['player'].obj.get_position()
+		pos = main['player'].object.position
 		msg = "pos%.4f$%.4f$%.4f " % (pos[0], pos[1], pos[2])
 		
 		if inputs:

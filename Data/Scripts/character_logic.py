@@ -83,7 +83,7 @@ class CharacterLogic:
 		self.equipped_weapon = None
 		
 		# the character's game object
-		self.obj = obj
+		self.object = obj
 		
 		# The character's current "lock", which is represented as the time at which the lock ends
 		self.lock = None
@@ -166,9 +166,9 @@ class CharacterLogic:
 		"""Moves the character toward a given target at it's speed"""
 		
 		# Get the vector to  the target
-		target_vector = self.obj.get_local_vector_to(target)
+		target_vector = self.object.get_local_vector_to(target)
 		
-		self.obj.move((self.speed * target_vector[0], self.speed * target_vector[1], 0), mode=0)
+		self.object.move((self.speed * target_vector[0], self.speed * target_vector[1], 0), mode=0)
 		
 		
 class PlayerLogic(CharacterLogic):
@@ -236,48 +236,6 @@ class PlayerLogic(CharacterLogic):
 				"equipped_weapon" 	: self.equipped_weapon}
 		pickle.dump(save_data, save)
 		
-	# This function should be removed, but CombatSystem is still using it
-	def move_player(self, inputs, mouse, client):
-		"""Move the player"""
-
-		# Handle input
-		if inputs:
-		
-			moving = False
-		
-			if ("MoveForward", "INPUT_ACTIVE") in inputs:
-				self.obj.move((0, 5, 0), min=[None, 0, 0], max=[None, 50, 0])
-				self.obj.play_animation("move")
-				moving = True
-			if ("MoveBackward", "INPUT_ACTIVE") in inputs:
-				self.obj.move((0, -5, 0), min=[None, -50, 0], max=[None, 0, 0])
-				self.obj.play_animation("move")
-				moving = True
-				
-			if not moving:
-				self.obj.play_animation("idle")
-				self.obj.move((0, 0, 0), min=[0, None, 0], max=[0, None, 0])
-			
-			# Rotation is now handled by the mouse look
-			# if "TurnLeft" in inputs:
-				# self.obj.rotate((0, 0, 0.04))
-			# if "TurnRight" in inputs:
-				# self.obj.rotate((0, 0, -0.04))
-				
-		# Send updates if we need to
-		# if client.connected:
-			# pos = self.obj.get_position()
-			# ori = self.obj.get_orientation()
-			# ori = (ori[0][1], ori[1][1], ori[2][1])
-			# lp = self.last_update[0]
-			# lo = self.last_update[1]
-			# if (pos[0] - lp[0]) ** 2 + (pos[1] - lp[1]) ** 2 > 0.0625 or \
-				# Vector(ori[0], ori[1]).angle(Vector(lo[0], lo[1])) > 0.0174:
-				# self.last_update = (pos[:], ori[:])
-				# client.send_message('update_player %s %.3f %.3f %.3f %.3f %.3f %.3f' % (client.user, pos[0], pos[1], pos[2], ori[0], ori[1], ori[2]))
-			
-
-		
 	
 class MonsterLogic(CharacterLogic):
 	def __init__(self, object, monsterdata):
@@ -311,33 +269,3 @@ class MonsterLogic(CharacterLogic):
 		if self.object:
 			self.object.end()
 		
-class ProxyLogic(CharacterLogic):
-	"""Class for handling network proxies"""
-	
-	def __init__(self, obj):
-		CharacterLogic.__init__(self, obj)
-		
-	def update(self, pos_vec, ori_vec):
-		"""Update's the proxy's position and orientation"""
-		
-		# Set the position
-		self.obj.set_position([float(i) for i in pos_vec])
-		
-		# Construct a new orientation matrix
-		ori_vec = [float(i) for i in ori_vec]
-		#self.obj.gameobj.alignAxisToVect(ori_vec, 1)
-		# y = Vector(ori_vec[0], ori_vec[1], ori_vec[2])
-		# z = Vector(0.0, 0.0, 1.0)
-		# x = y.cross(z)
-		# y = z.cross(x)
-		# x.normalize()
-		# y.normalize()
-		# z.normalize()
-		# self.obj.set_orientation([
-						# [x[0], y[0], z[0]],
-						# [x[1], y[1], z[1]],
-						# [x[2], y[2], z[2]]
-						# ])
-						
-	def die(self):
-		self.object.end()
