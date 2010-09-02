@@ -1,6 +1,6 @@
 # $Id$
 
-from .base_state import BaseState
+from .base_state import BaseState, BaseController
 from Scripts.packages import Monster
 from Scripts.character_logic import MonsterLogic
 
@@ -14,7 +14,7 @@ GRID_Z = 0.01
 # We don't need to bother subclassing DefaultState since we are going to mostly override
 # everything anyways, and Python doesn't have abstract classes or interfaces.
 
-class CombatState(BaseState):		
+class CombatState(BaseState, BaseController):		
 	##########
 	# Client
 	##########
@@ -24,7 +24,6 @@ class CombatState(BaseState):
 		print("Init combat...")
 		
 		main['ui_system'].load_layout("combat")
-		self.run = self.client_run
 		
 		# Generate the grid
 		self.grid = CombatGrid(main['engine'], main['room'])
@@ -56,6 +55,8 @@ class CombatState(BaseState):
 			logic = MonsterLogic(obj, monster)
 			logic.ai = ai.Machine(monster.ai_keywords, monster.ai_start_state)
 			
+			tile.fill(logic)
+			
 			# Add the monster to the monster list
 			self.monster_list.append(logic)
 			
@@ -63,6 +64,11 @@ class CombatState(BaseState):
 		
 	def client_run(self, main):
 		"""Client-side run method"""
+		
+		# See if we still need to be in combat
+		if not self.monster_list:
+			main['client'].send('stateDefault')
+			return ("Default", "SWITCH")
 
 		# Reset the camera
 		old_ori = main['3p_cam'].world_orientation
@@ -105,6 +111,10 @@ class CombatState(BaseState):
 								client_pos[i] = server_pos[i]
 							
 						main['net_players'][cid].obj.set_position(client_pos)
+					elif input.startswith('anim'):
+						input = input.replace('anim', '')
+						main['net_players'][cid].obj.move((0, 0, 0))
+						main['net_players'][cid].obj.play_animation(input)
 					elif input.startswith('to'):
 						main['net_players'][cid].obj.end()
 						del main['net_players'][cid]
@@ -146,12 +156,12 @@ class CombatState(BaseState):
 		
 			# Only let the player do stuff while they are not "locked"
 			if not main['player'].lock:
-				if ("Jump", "INPUT_ACTIVE") in inputs:
-					main['client'].send('stateDefault')
-					return ("Default", "SWITCH")
+				# if ("Jump", "INPUT_ACTIVE") in inputs:
+					# main['client'].send('stateDefault')
+					# return ("Default", "SWITCH")
 				if ("UsePower", "INPUT_ACTIVE") in inputs:
 					target = main['player']
-					main['player'].active_power.use(self, main['player'], target)
+					main['player'].active_power.use(self, main['player'])
 
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
 					msg += "mov0$5$0 "
@@ -168,6 +178,15 @@ class CombatState(BaseState):
 					vec[2] = 0
 					vec = [i * main['player'].speed for i in vec]
 					msg += "mov"+"$".join(["%.3f" % i for i in vec])
+			
+			# for row in self.grid.map:
+				# for tile in row:
+					# tile.color((0, 0, 0, 0))
+			# Range check
+			# tiles = self.get_targets("MELEE", 1)
+			# for tile in tiles:
+				# tile.color((1, 0, 0, 1))
+				
 	
 		# Send the message
 		main['client'].send(msg.strip())
@@ -231,7 +250,103 @@ class CombatState(BaseState):
 				
 		return monsters
 				
+		
+	def _find_target_range(self, type, _range, direction, point):
+		# If the point passed in was a 2tuple, then add a z of GRID_SIZE to the end)
+		if len(point) == 2:
+			point += (GRID_SIZE,)
+		# point = (point[0], point[1], point[2])
+		tiles = []
+		if type == 'MELEE':
+			for i in range(_range):
+				if direction == "+x":
+					tiles.append(self.grid.tile_from_point((point[0]+TILE_SIZE*(i+1), point[1])))
+				elif direction == "-x":
+					tiles.append(self.grid.tile_from_point((point[0]-TILE_SIZE*(i+1), point[1])))
+				elif direction == "+y":
+					tiles.append(self.grid.tile_from_point((point[0], point[1]+TILE_SIZE*(i+1))))
+				elif direction == "-y":
+					tiles.append(self.grid.tile_from_point((point[0], point[1]-TILE_SIZE*(i+1))))
+		elif type == 'RANGED':
+			if _range == 'WEAPON':
+				pass
+			elif _range == 'SIGHT':
+				pass
+			else: # It's a number
+				pass
+		elif type == 'BLAST':
+				pass
+		elif type == 'BURST':
+			radius = int(_range)+1
+			y_vals = [sqrt((radius**2) - ((i+0.5)**2)) for i in range(radius)]
+			for x in range(int(_range)+1):
+				for y in range(int(round(y_vals[x]))):
+					tiles.append(self.tile_from_point((point[0]+x*TILE_SIZE, point[1] + y*TILE_SIZE)))
+			point = self.tile_from_point(point)
+			next_quarter = [self.grid(curr.x - (curr.x-point.x)*2, curr.y) for curr in tiles if curr]
+			tiles += next_quarter
+			next_half = [self.grid(curr.x, curr.y - (curr.y-point.y)*2) for curr in tiles if curr]
+			tiles += next_half
+		elif type == 'wall':
+				pass
+		else:
+			print("Invalid range type: %s" % type)
+
+		# Remove invalid tiles
+		while None in tiles:
+			tiles.remove(None)
+		return tiles
+	
+	##########
+	# Controller
+	##########
+	
+	def play_animation(self, character, animation, lock=0):
+		"""Instruct the character to play the animation
+		
+		character -- the charcter who will play the animation
+		animation -- the animation to play
+		lock -- how long to lock for the animation
+		
+		"""
+		
+		character.add_lock(lock)
+		self.main['client'].send('anim'+animation) # XXX should be done based on the supplied character
+		
+	def get_targets(self, type, range):
+		"""Get targets in a range
+		
+		type -- the type of area (line, burst, etc)
+		range -- the range to grab (integer)
+		
+		"""
+		
+		from mathutils import Vector # XXX Calling Blender stuff = bad
+		from math import degrees
+		
+		targets = []
+		
+		# Find the direction
+		vec = Vector(self.main['player'].obj.get_forward_vector())
+		angle = degrees(vec.angle(Vector((0, 1, 0))))
+		
+		if 0 < angle < 45:
+			direction = "+y"
+		elif 135 < angle < 180:
+			direction = "-y"
+		else:
+			if vec[0] > 0:
+				direction = "+x"
+			else:
+				direction = "-x"
+		
+		tiles = self._find_target_range(type, range, direction, self.main['player'].obj.get_position())
+		
+		for tile in tiles:
+			if tile.object:
+				targets.append(tile.object)
 				
+		return targets		
 				
 	
 # The following classes are for handling the combat grid
@@ -347,14 +462,17 @@ class CombatTile:
 			# self.grid_tile = None
 			# self.grid_color.set_color([1, 0, 0, 1])
 			
+	def color(self, color):
+		self.grid_color.set_color(color)
+			
 	def fill(self, object):
 		"""'Fill' the tile with the given object, or empty it if object is none"""
 		
-		if object:
-			self.object = object
+		self.object = object
+		
+		if self.object:
 			self.valid = False
 		else:
-			self.object = None
 			self.valid = True
 		
 	def end(self):

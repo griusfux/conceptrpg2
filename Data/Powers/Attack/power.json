@@ -1,4 +1,5 @@
 {
 	"name": "Attack",
-	"animation": "attack"
+	"animation": "attack",
+	"lock": 1.0
 }

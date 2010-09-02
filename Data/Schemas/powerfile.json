@@ -1,4 +1,5 @@
 {
 	"name": "str",
-	"animation": "str"
+	"animation": "str",
+	"lock": "float"
 }

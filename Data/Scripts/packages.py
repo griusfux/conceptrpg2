@@ -184,5 +184,5 @@ class Power(Package):
 		
 		sys.path.remove(self._path)
 		
-	def use(self, state, user, target):
-		self._use(self, state, user, target)
+	def use(self, controller, user):
+		self._use(self, controller, user)

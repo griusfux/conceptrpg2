@@ -25,6 +25,9 @@ def spawn(self, input):
 	return 'idle'
 	
 def idle(self, input):
+	if input['self'].hp <= 0:
+		return 'death'
+
 	# Keep a list of states in the order to perform them
 	next_state = ['target', 'move', 'act']
 	
@@ -49,6 +52,8 @@ def act(self, input):
 	return 'idle'
 	
 def death(self, input):
+	input['combat_system'].monster_list.remove(input['self'])
+	input['self'].obj.end()
 	return 'idle'
 
 if __name__ is "__main__":

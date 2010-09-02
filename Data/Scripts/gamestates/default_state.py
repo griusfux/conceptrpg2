@@ -1,9 +1,9 @@
 # $Id$
 
 from Scripts.character_logic import PlayerLogic
-from .base_state import BaseState
+from .base_state import BaseState, BaseController
 
-class DefaultState(BaseState):
+class DefaultState(BaseState, BaseController):
 	"""The default state for the game"""
 	
 	def __init__(self, main, is_server=False):
@@ -18,16 +18,10 @@ class DefaultState(BaseState):
 	def client_init(self, main):
 		"""Intialize the client state"""
 		
-		# Store main for the state callbacks to use
-		self.main = main
-		
 		main['ui_system'].load_layout("passive_combat")
 		
 	def client_run(self, main):
 		"""Client-side run method"""
-		
-		# Update self.main for the state callbacks
-		self.main = main
 		
 		# Reset the camera
 		old_ori = main['3p_cam'].world_orientation
@@ -107,7 +101,7 @@ class DefaultState(BaseState):
 			if not main['player'].lock:
 				if ("UsePower", "INPUT_ACTIVE") in inputs:
 					target = main['player']
-					main['player'].active_power.use(self, main['player'], target)
+					main['player'].active_power.use(self, main['player'])
 
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
 					msg += "mov0$5$0 "
@@ -158,11 +152,35 @@ class DefaultState(BaseState):
 			elif input.startswith("state"):
 				input = input.replace('state', '')
 				return (input, 'SWITCH')
-				
+		
 	##########
 	# Other
 	##########
-				
-	def play_animation(self, char, action):
-		self.main['client'].send('anim'+action)
-		#char.obj.play_animation(action)
+	
+	# Empty ---
+	
+	##########
+	# Controller
+	##########
+	
+	def play_animation(self, character, animation, lock=0):
+		"""Instruct the character to play the animation
+		
+		character -- the charcter who will play the animation
+		animation -- the animation to play
+		lock -- how long to lock for the animation
+		
+		"""
+		
+		character.add_lock(lock)
+		self.main['client'].send('anim'+animation) # XXX should be done based on the supplied character
+		
+	def get_targets(self, type, range):
+		"""Get targets in a range
+		
+		type -- the type of area (line, burst, etc)
+		range -- the range to grab (integer)
+		
+		"""
+		
+		return []

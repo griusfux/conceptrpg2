@@ -291,6 +291,7 @@ class MonsterLogic(CharacterLogic):
 		self.behaviors = []
 		
 		self.name = monsterdata.name
+		self.hp = 20
 		# self.level = monsterdata.level
 		# self.role = monsterdata.role
 		# self.leader = monsterdata.leader
