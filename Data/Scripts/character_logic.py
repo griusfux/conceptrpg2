@@ -242,6 +242,8 @@ class MonsterLogic(CharacterLogic):
 		CharacterLogic.__init__(self, object)
 		# self.id = monsterdata.id
 
+		self.target = None
+		
 		self.role = ""
 		self.leader = False
 		self.elite	= False

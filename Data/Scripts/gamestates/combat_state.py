@@ -5,7 +5,8 @@ from Scripts.packages import Monster
 from Scripts.character_logic import MonsterLogic
 
 import random
-import Scripts.Ai.machine as ai
+from Scripts.ai.manager import Manager as AiManager
+from Scripts.ai.state_machine import StateMachine as AiStateMachine
 
 # Constants for grid generation
 TILE_SIZE = 1
@@ -53,12 +54,15 @@ class CombatState(BaseState, BaseController):
 			
 			# Setup logic/ai
 			logic = MonsterLogic(obj, monster)
-			logic.ai = ai.Machine(monster.ai_keywords, monster.ai_start_state)
+			logic.ai = AiStateMachine(monster, (["base_state", []],))
 			
 			tile.fill(logic)
 			
 			# Add the monster to the monster list
 			self.monster_list.append(logic)
+			
+			# Initialize an ai manager
+			self.ai_manager = AiManager(self)
 			
 			
 		
@@ -129,16 +133,16 @@ class CombatState(BaseState, BaseController):
 					
 			val = main['client'].run()
 			
-		# Handle monster ai
-		machine_input = {
-					'combat_system': self,
-					'foe_list': (main['player'],),
-					'friend_list': self.monster_list
-				}
-				
+		####	
+		# ai
+		
+		#Dicision making
 		for monster in self.monster_list:
-			machine_input['self'] = monster
-			monster.ai.run(machine_input)
+			monster.target = main['player']
+			monster.actions = monster.ai.run()
+			
+		# Run the ai manager
+		self.ai_manager.run()
 			
 		# The message we will send to the server
 		pos = main['player'].object.position
@@ -347,7 +351,12 @@ class CombatState(BaseState, BaseController):
 				targets.append(tile.object)
 				
 		return targets		
-				
+	
+	
+	def move(self, character, linear, angular):
+		"""Handles linear and angular movement of a character"""
+		character.object.move(linear)
+		character.object.rotate(angular)
 	
 # The following classes are for handling the combat grid
 class CombatGrid:
