@@ -11,6 +11,7 @@ from Scripts.packages import *
 from Scripts.dungeon_generator import DungeonGenerator
 from Scripts.character_logic import PlayerLogic, MonsterLogic
 from Scripts.gamestate_manager import GameStateManager
+from Scripts.power_manager import PowerManager
 
 from Scripts.race_data import *
 from Scripts.monster_data import *
@@ -207,7 +208,7 @@ def init(own):
 	player.hp = player.max_hp
 	
 	# Give the player an attack power
-	player.active_power = Power('Attack')
+	player.powers = PowerManager([Power('Attack'), Power('Burst')])
 	
 	own['net_players'] = {own['client'].id: player}
 	own['player'] = player

@@ -5,7 +5,7 @@ from Scripts.ui.layouts import *
 
 layouts = {
 	"dun_gen": DunGenLayout,
-	"passive_combat": PassiveCombatLayout,
+	"default_state": DefaultStateLayout,
 	"combat": CombatLayout,
 	
 	"inventory_overlay": InventoryOverlay,

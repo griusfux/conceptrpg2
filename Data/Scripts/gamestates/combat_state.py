@@ -155,17 +155,6 @@ class CombatState(BaseState, BaseController):
 		msg = "pos%.4f$%.4f$%.4f " % (pos[0], pos[1], pos[2])
 		
 		if inputs:
-			if ("Aim", "INPUT_ACTIVE") in inputs:
-				# Switch to the top-down camera
-				main['engine'].set_active_camera(main['top_down_camera'])
-				
-				# Show the range of the active power
-				power = main['player'].active_power
-				point = main['player'].object.position
-				tiles = self._find_target_range(power.range_type, power.range_size, point)
-				for tile in tiles:
-					tile.color((1, 0, 0, 1))
-				
 			if ("Stats", "INPUT_CLICK") in inputs:
 				main['ui_system'].toogle_overlay("stats")				
 				
@@ -177,9 +166,23 @@ class CombatState(BaseState, BaseController):
 				# if ("Jump", "INPUT_ACTIVE") in inputs:
 					# main['client'].send('stateDefault')
 					# return ("Default", "SWITCH")
+				if ("Aim", "INPUT_ACTIVE") in inputs:
+					# Switch to the top-down camera
+					main['engine'].set_active_camera(main['top_down_camera'])
+					
+					# Show the range of the active power
+					power = main['player'].powers.active
+					point = main['player'].object.position
+					tiles = self._find_target_range(power.range_type, power.range_size, point)
+					for tile in tiles:
+						tile.color((1, 0, 0, 1))
 				if ("UsePower", "INPUT_ACTIVE") in inputs:
 					target = main['player']
-					main['player'].active_power.use(self, main['player'])
+					main['player'].powers.active.use(self, main['player'])
+				if ("NextPower", "INPUT_CLICK") in inputs:
+					main['player'].powers.make_next_active()
+				if ("PrevPower", "INPUT_CLICK") in inputs:
+					main['player'].powers.make_prev_active()
 
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
 					msg += "mov0$5$0 "

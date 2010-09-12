@@ -18,7 +18,7 @@ class DefaultState(BaseState, BaseController):
 	def client_init(self, main):
 		"""Intialize the client state"""
 		
-		main['ui_system'].load_layout("passive_combat")
+		main['ui_system'].load_layout("default_state")
 		
 	def client_run(self, main):
 		"""Client-side run method"""
@@ -101,7 +101,11 @@ class DefaultState(BaseState, BaseController):
 			if not main['player'].lock:
 				if ("UsePower", "INPUT_ACTIVE") in inputs:
 					target = main['player']
-					main['player'].active_power.use(self, main['player'])
+					main['player'].powers.active.use(self, main['player'])
+				if ("NextPower", "INPUT_CLICK") in inputs:
+					main['player'].powers.make_next_active()
+				if ("PrevPower", "INPUT_CLICK") in inputs:
+					main['player'].powers.make_prev_active()
 
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
 					msg += "mov0$5$0 "
