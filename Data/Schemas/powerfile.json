@@ -1,5 +1,7 @@
 {
 	"name": "str",
 	"animation": "str",
-	"lock": "float"
+	"lock": "float",
+	"range_type": "str",
+	"range_size": "int"
 }

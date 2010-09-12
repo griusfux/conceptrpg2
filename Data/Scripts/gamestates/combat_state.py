@@ -5,6 +5,7 @@ from Scripts.packages import Monster
 from Scripts.character_logic import MonsterLogic
 
 import random
+from math import degrees, sqrt
 from Scripts.ai.manager import Manager as AiManager
 from Scripts.ai.state_machine import StateMachine as AiStateMachine
 
@@ -79,7 +80,12 @@ class CombatState(BaseState, BaseController):
 		main['3p_cam'].reset_orientation()
 		main['player'].object.set_orientation(old_ori, local=True)
 		main['engine'].set_active_camera(main['3p_cam'])
-		
+
+		# Reset the combat tiles
+		for row in self.grid.map:
+			for tile in row:
+				tile.color((0, 0, 0, 0))
+
 		# Update the player's lock
 		main['player'].update_lock()
 		
@@ -142,15 +148,23 @@ class CombatState(BaseState, BaseController):
 			monster.actions = monster.ai.run()
 			
 		# Run the ai manager
-		self.ai_manager.run()
+		# self.ai_manager.run()
 			
 		# The message we will send to the server
 		pos = main['player'].object.position
 		msg = "pos%.4f$%.4f$%.4f " % (pos[0], pos[1], pos[2])
 		
 		if inputs:
-			if ("SwitchCamera", "INPUT_ACTIVE") in inputs:
+			if ("Aim", "INPUT_ACTIVE") in inputs:
+				# Switch to the top-down camera
 				main['engine'].set_active_camera(main['top_down_camera'])
+				
+				# Show the range of the active power
+				power = main['player'].active_power
+				point = main['player'].object.position
+				tiles = self._find_target_range(power.range_type, power.range_size, point)
+				for tile in tiles:
+					tile.color((1, 0, 0, 1))
 				
 			if ("Stats", "INPUT_CLICK") in inputs:
 				main['ui_system'].toogle_overlay("stats")				
@@ -182,15 +196,6 @@ class CombatState(BaseState, BaseController):
 					vec[2] = 0
 					vec = [i * main['player'].speed for i in vec]
 					msg += "mov"+"$".join(["%.3f" % i for i in vec])
-			
-			# for row in self.grid.map:
-				# for tile in row:
-					# tile.color((0, 0, 0, 0))
-			# Range check
-			# tiles = self.get_targets("MELEE", 1)
-			# for tile in tiles:
-				# tile.color((1, 0, 0, 1))
-				
 	
 		# Send the message
 		main['client'].send(msg.strip())
@@ -255,12 +260,29 @@ class CombatState(BaseState, BaseController):
 		return monsters
 				
 		
-	def _find_target_range(self, type, _range, direction, point):
+	def _find_target_range(self, type, _range, point):		
+		from mathutils import Vector # XXX Calling Blender stuff = bad
+		
 		# If the point passed in was a 2tuple, then add a z of GRID_SIZE to the end)
 		if len(point) == 2:
 			point += (GRID_SIZE,)
-		# point = (point[0], point[1], point[2])
+		
+		# Find the direction
+		vec = Vector(self.main['player'].object.forward_vector)
+		angle = degrees(vec.angle(Vector((0, 1, 0))))
+		
+		if 0 < angle < 45:
+			direction = "+y"
+		elif 135 < angle < 180:
+			direction = "-y"
+		else:
+			if vec[0] > 0:
+				direction = "+x"
+			else:
+				direction = "-x"
+				
 		tiles = []
+		
 		if type == 'MELEE':
 			for i in range(_range):
 				if direction == "+x":
@@ -285,8 +307,8 @@ class CombatState(BaseState, BaseController):
 			y_vals = [sqrt((radius**2) - ((i+0.5)**2)) for i in range(radius)]
 			for x in range(int(_range)+1):
 				for y in range(int(round(y_vals[x]))):
-					tiles.append(self.tile_from_point((point[0]+x*TILE_SIZE, point[1] + y*TILE_SIZE)))
-			point = self.tile_from_point(point)
+					tiles.append(self.grid.tile_from_point((point[0]+x*TILE_SIZE, point[1] + y*TILE_SIZE)))
+			point = self.grid.tile_from_point(point)
 			next_quarter = [self.grid(curr.x - (curr.x-point.x)*2, curr.y) for curr in tiles if curr]
 			tiles += next_quarter
 			next_half = [self.grid(curr.x, curr.y - (curr.y-point.y)*2) for curr in tiles if curr]
@@ -325,26 +347,9 @@ class CombatState(BaseState, BaseController):
 		
 		"""
 		
-		from mathutils import Vector # XXX Calling Blender stuff = bad
-		from math import degrees
-		
 		targets = []
 		
-		# Find the direction
-		vec = Vector(self.main['player'].object.forward_vector)
-		angle = degrees(vec.angle(Vector((0, 1, 0))))
-		
-		if 0 < angle < 45:
-			direction = "+y"
-		elif 135 < angle < 180:
-			direction = "-y"
-		else:
-			if vec[0] > 0:
-				direction = "+x"
-			else:
-				direction = "-x"
-		
-		tiles = self._find_target_range(type, range, direction, self.main['player'].object.position)
+		tiles = self._find_target_range(type, range, self.main['player'].object.position)
 		
 		for tile in tiles:
 			if tile.object:
