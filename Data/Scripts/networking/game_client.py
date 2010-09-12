@@ -3,7 +3,7 @@
 # Description: The game client
 # Contributers: Mitchell Stokes
 
-from Scripts.Networking import NET_ENCODING
+from Scripts.networking import NET_ENCODING
 
 import socket
 import time

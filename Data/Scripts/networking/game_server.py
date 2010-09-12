@@ -5,7 +5,7 @@
 
 # from socketserver import UDPServer, BaseRequestHandler
 
-from Scripts.Networking import NET_ENCODING
+from Scripts.networking import NET_ENCODING
 from Scripts.gamestate_manager import GameStateManager
 
 import socket

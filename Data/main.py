@@ -17,7 +17,7 @@ from Scripts.monster_data import *
 
 from Scripts.blender_input_system import BlenderInputSystem
 
-from Scripts.Networking.game_client import GameClient
+from Scripts.networking.game_client import GameClient
 
 import subprocess
 import pickle
