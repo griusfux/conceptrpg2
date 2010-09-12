@@ -10,12 +10,7 @@ from Scripts.ui.blender_ui_system import *
 from Scripts.packages import *
 from Scripts.dungeon_generator import DungeonGenerator
 from Scripts.character_logic import PlayerLogic, MonsterLogic
-# from Scripts.combat_system import CombatSystem
-# from Scripts.passive_combat_system import PassiveCombatSystem
-# from Scripts.gamestates import *
 from Scripts.gamestate_manager import GameStateManager
-# from Scripts.powers import Power
-# from Scripts.power_data import PowerData
 
 from Scripts.race_data import *
 from Scripts.monster_data import *
@@ -35,9 +30,6 @@ user = 'Kupoman'
 port = 9999
 ip = 'localhost'
 addr = (ip, port)
-
-COMBAT_ACTIVE = 0
-COMBAT_PASSIVE = 1
 
 # Camera globals
 scale_max = 2
@@ -143,45 +135,6 @@ def in_game(cont):
 					init(own)
 			elif own['init']:
 				own['state_manager'].run(own)
-				# Detect combat and switch states if necessary
-				# if own.sensors['encounter_mess'].positive:
-				
-					# Get the room the encounter is taking place in
-					# room = own['dgen'].rooms[own.sensors['encounter_mess'].bodies[0]]
-					
-					# Generate an enemy list using the encounter deck
-					# enemy_list = own['dgen'].encounter_deck.generate_encounter(5)
-					
-					# Replace all the elements in the element list with MonsterLogic objects
-					# for monster in enemy_list:
-						
-						# Load the gameobject for the monster into the scene if it isn't already there
-						# if monster not in gl.getCurrentScene().objects:
-							# monsterfile = MonsterFile(monster)
-							# gl.LibLoad(monsterfile.blend, 'Scene', 'Scene')
-							# monsterfile.close()
-							
-						# monster_object = None #BlenderWrapper.Object(gl.getCurrentScene().addObject(monster, own))
-						# monster_data = MonsterData(MonsterFile(monster))
-						# enemy_list[enemy_list.index(monster)] = MonsterLogic(monster_object, monster_data)
-
-					# own['combat_system'] = CombatSystem(own, own['engine'], enemy_list, BlenderWrapper.Object(room))
-					# own['combat_state'] = COMBAT_ACTIVE
-					# own['game_state'] = CombatState(own)
-					
-					# The combat system is setup, we don't need this anymore
-					# del room['encounter']
-					
-				# Run the correct combat system based on the current combat_state
-				# if own['combat_state'] == COMBAT_ACTIVE:
-					# if not own['combat_system'].update(own):
-						# # Clean up
-						# print("Combat has finished")
-						# own['combat_system'].end()
-						# own['combat_system'] = PassiveCombatSystem(own)
-						# own['combat_state'] = COMBAT_PASSIVE
-				# else:
-				# own['game_state'].run(own)
 	
 	except:
 		import traceback
@@ -222,90 +175,16 @@ def init(own):
 			own['client'].restart(user, ('localhost', port))
 			if hasattr(gl, 'server'):
 				gl.server.terminate()
-			gl.server = subprocess.Popen("python server.py", creationflags=subprocess.CREATE_NEW_CONSOLE)
-			print(gl.server.pid)
-			# del own['client']
-			# own['client'] = GameClient(user, ('localhost', port))
-			# own['init'] = False
+				
+			si = subprocess.STARTUPINFO()
+			si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+			si.wShowWindow = 7 #SW_SHOWMINNOACTIVE
+			gl.server = subprocess.Popen("python server.py", startupinfo=si, creationflags=subprocess.CREATE_NEW_CONSOLE)
 		
 		return		
-			
-	# Try to load the mapfile
-	# if 'mapfile' not in own:
-		# own['mapfile'] = Map('ShipRuins')
-		# own['ui_system'].load_layout('dun_gen')
-		
-		# if not own['mapfile'].init:
-			# print('Could not open the map file!')
-			# own['mapfile'].close()
-			# del own['mapfile']
-			# own['init'] = False
-			
-				
-		# Load the scenes so the dungeon generator can use them
-		# gl.LibLoad(own['mapfile'].name, 'Scene', own['mapfile'].blend)
-
-		# return
-
-	# Start by loading the dungeon
-	# if 'dgen' not in own:		
-		# own['dgen'] = DungeonGenerator(own['mapfile'])
-		
-		# if own['is_host']:
-			# own['dgen'].generate_first(own)
-			# if not own['is_offline']:
-				# own['client'].send_message('reset_map')
-		# else:
-			# result = []
-			# own['client'].send_message('get_map')
-			
-			# cmd, data = own['client'].receive_message()
-			
-			# Hopefully this doesn't lock things for too long
-			# while cmd != 'end_map':
-				# if cmd == 'map' and data:
-					# result.append(pickle.loads(bytes(data, 'utf8')))
-				# cmd, data = own['client'].receive_message()
-			
-			# print("The map size received was " + str(len(result)))
-			# own['dgen'].generate_from_list(own, result)
-			
-		# Give the engine a chance to catch up
-		# return
-		
-	# Keep creating the dungeon if there are more tiles
-	# if own['is_host'] and own['dgen'].has_next():
-		# own['client'].send("")
-		# own['dgen'].generate_next()
-		# return
-	# Only check the dungeon if we're the host
-	# elif own['is_host'] and not own['dgen'].check_dungeon():
-		# The dungeon is unacceptable, delete it and try again
-		# del own['dgen']
-		# for obj in gl.getCurrentScene().objects:
-			# if obj.name not in ("DungeonEmpty", "Lamp.001", "Camera"):
-				# obj.endObject()
-		# return
-	# elif 'mapfile' in own:
-		# own['mapfile'].close()
-		# del own['mapfile']
-
-		# own['ui_system'].load_layout(None)
-		# print("\nDungeon generation complete with %d rooms\n" % own['dgen'].room_count)
-		
-		# If we're the host, send the map data to the server
-		# if own['is_host'] and not own['is_offline']:
-			# print("The map size sent was " + str(len(own['dgen'].result)))
-			# for i in own['dgen'].result:
-				# own['client'].send_message('set_map', pickle.dumps(i, 0), timeout=1)
-		
 	
 	# Setup an input system
 	own['input_system'] = BlenderInputSystem('keys.conf', 'mouse.conf')
-	#own['input_system'].mouse.show(True)
-	
-	# Add the HUD
-	# gl.addScene('HUD')
 	
 	# Add the player
 	scene = gl.getCurrentScene()
@@ -351,25 +230,6 @@ def init(own):
 		scene.active_camera = own['3p_cam'].camera
 		
 	# Setup the passive combat system
-	# own['combat_system'] = PassiveCombatSystem(own)
-	# own['combat_state'] = COMBAT_PASSIVE
-	# own['game_state'] = DefaultState(own)
 	own['state_manager'] = GameStateManager("DungeonGeneration", own)
 	own['init'] = True
 	
-def handle_network(own):
-	# Handle network data
-	cmd, rdata = own['client'].receive_message()
-	if rdata:
-		data = rdata.split()
-		
-		if cmd == 'update_player':
-			if data[0] != own['client'].user and data[0] not in own['net_players']:
-				gameobj = gl.getCurrentScene().addObject("CharacterEmpty", own)				
-				own['net_players'][data[0]] = ProxyLogic(BlenderWrapper.Object(gameobj))
-			
-			own['net_players'][data[0]].update((data[1], data[2], data[3]), (data[4], data[5], data[6]))
-		elif cmd == 'disconnect':
-			if data[0] in own['net_players']:
-				own['net_players'][data[0]].Die()
-				del own['net_players'][data[0]]
