@@ -6,4 +6,5 @@ class Manager:
 	def run(self):
 		for agent in self.agents:
 			for action in agent.actions:
+				action = getattr(__import__("Scripts.ai.actions." + action, fromlist=[action]), action)
 				action(self.game_state, agent)

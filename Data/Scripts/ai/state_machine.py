@@ -1,26 +1,37 @@
+from Scripts.ai.base_state import BaseState
+
 class StateMachine:
 	def __init__(self, agent, state_list, initial_state = None):
-		self.states = []
+		self.states = {}
+		first = None
 		
 		for state in state_list:
-			module = __import__("Scripts.ai.states." + state[0], fromlist=["State"])
-			self.states.append(module.State(state[1]))
+			state_name = state[0]
+			actions = state[1]
+			entry_actions = state[2]
+			exit_actions = state[3]
+			transitions = state[4]
+			new_state = BaseState(agent, actions, entry_actions, exit_actions, transitions)
+			self.states[state_name] = new_state
+			
+			if first == None:
+				first = new_state
 		
-		self.current_state = initial_state if initial_state else self.states[0]
+		self.current_state = initial_state if initial_state else first
 	
 	def run(self):
 		triggered_transition = None
 		actions = []
 		
 		for transition in self.current_state.transitions:
-			if transition.triggered:
+			if transition.triggered():
 				triggered_transition = transition
 				break
-				
+		
 		if triggered_transition:
-			target_state = triggered_transition.target_state
+			target_state = self.states[triggered_transition.target_state]
 			
-			actions += current_state.exit_actions
+			actions += self.current_state.exit_actions
 			actions += triggered_transition.actions
 			actions += target_state.entry_actions
 			
