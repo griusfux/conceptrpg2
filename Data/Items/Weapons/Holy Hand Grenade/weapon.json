@@ -1,0 +1,9 @@
+{
+	"name": "Holy Hand Grenade",
+	"type": "weapon",
+	"cost": 9999,
+	
+	"subtype": "ranged",
+	"damage": "10d100",
+	"bonus": 0
+}

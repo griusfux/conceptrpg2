@@ -36,6 +36,7 @@ class Package:
 	_blend = ''
 	_config = ''
 	_schema = ''
+	_parent_schema = ''
 	_dir = ''
 	
 	def __init__(self, package_name):
@@ -80,9 +81,18 @@ class Package:
 			# raise PackageWarning
 			print("No schema found for {0}, not validating".format(self._path))
 			return
-			
+		
+		schema = {}
+		
+		# First load the parent_schema if there is one
+		if self._parent_schema:
+			with open(self._parent_schema) as f:
+				schema.update(json.loads(f.read()))
+				
+		# Then load the schema (this overwrites old keys)
+		print(self._schema)
 		with open(self._schema) as f:
-			schema = json.loads(f.read())
+			schema.update(json.loads(f.read()))
 		
 		for key, value in schema.items():
 			self._validate_dict(self._dict, key, value)
@@ -93,7 +103,7 @@ class Package:
 			return False
 		elif isinstance(value, dict):
 			if not setting:
-				# This stucture is too nest, break out
+				# This stucture is too nested, break out
 				return False
 			else:
 				l = []
@@ -109,6 +119,17 @@ class Package:
 				
 				# We set here, so return False
 				return False
+		elif isinstance(eval(value), set):
+			items = eval(value)
+			
+			if d[key] not in items:
+				print("Expected item in {0} for {1}, got \"{2}\" instead".format(items, key, d[key]))
+				return False
+			
+			if setting:
+				setattr(self, key, self._dict[key])
+			
+			return True
 		elif not isinstance(d[key], eval(value)):
 			print("Expected {0} for {1}, got {2} instead".format(value, key, type(self._dict[key])))
 			return False
@@ -186,3 +207,28 @@ class Power(Package):
 		
 	def use(self, controller, user):
 		self._use(self, controller, user)
+		
+class Item(Package):
+	"""Item Package"""
+	
+	_ext = 'item'
+	_config = 'item.json'
+	_schema = 'Schemas/itemfile.json'
+	_dir = 'Items'
+	
+class Weapon(Item):
+	"""Weapon Package"""
+	
+	_config = 'weapon.json'
+	_parent_schema = Item._schema
+	_schema = 'Schemas/weaponfile.json'
+	_dir = 'Items/Weapons'
+	
+class Armor(Item):
+	"""Armor Package"""
+	
+	_config = 'armor.json'
+	_parent_schema = Item._schema
+	_schema = 'Schemas/armorfile.json'
+	_dir = 'Items/Armors'
+	

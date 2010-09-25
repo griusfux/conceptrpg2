@@ -1,0 +1,8 @@
+{
+	"name": "Mighty Robes",
+	"type": "armor",
+	"cost": 1337,
+	
+	"subtype": "heavy",
+	"ac": 9999
+}
