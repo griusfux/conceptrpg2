@@ -1,0 +1,4 @@
+{
+	"subtype": "{'light', 'medium', 'heavy'}",
+	"ac": "int"
+}

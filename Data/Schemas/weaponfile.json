@@ -1,0 +1,5 @@
+{
+	"subtype": "{'ranged', 'melee'}",
+	"damage": "str",
+	"bonus": "int"
+}
