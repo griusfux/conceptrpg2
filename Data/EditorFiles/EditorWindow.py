@@ -9,7 +9,10 @@ from EditorFiles.LogWidget import *
 from EditorFiles.Editors import *
 
 EDITORS = {
+	'Armors': ArmorEditor,
+	'Items': ItemEditor,
 	'Maps': MapEditor,
+	'Weapons': WeaponEditor,
 	}
 
 class EditorWindow(QMainWindow):
@@ -24,12 +27,18 @@ class EditorWindow(QMainWindow):
 		logger = LogWidget(self)
 		
 		# Menu
-		exit = QAction(QIcon('icon.png'), 'E&xit', self)
+		save = QAction('&Save', self)
+		save.setShortcut('Ctrl+S')
+		save.setStatusTip('Save the currently selected package')
+		self.connect(save, SIGNAL('triggered()'), self.save_file)
+		
+		exit = QAction('E&xit', self)
 		exit.setShortcut('Ctrl+Q')
 		exit.setStatusTip('Exit the application')
 		self.connect(exit, SIGNAL('triggered()'), SLOT('close()'))
 		
 		file = self.menuBar().addMenu('&File')
+		file.addAction(save)
 		file.addAction(exit)
 		
 		# The current editor
@@ -50,15 +59,16 @@ class EditorWindow(QMainWindow):
 		
 		# Create the sub trees
 		# XXX uncomment subtrees when they are ready
-		# self.create_subtree('Armor', Armor)
+		self.create_subtree('Armors', Armor)
 		# self.create_subtree('Classes', Class)
 		self.create_subtree('Decks', EncounterDeck)
+		self.create_subtree('Items', Item)
 		self.create_subtree('Maps', Map)
 		self.create_subtree('Monsters', Monster)
 		self.create_subtree('Powers', Power)
 		self.create_subtree('Races', Race)
 		# self.create_subtree('Shields', Shield)
-		# self.create_subtree('Weapons', Weapon)
+		self.create_subtree('Weapons', Weapon)
 		
 		left = QTreeView()
 		left.setHeaderHidden(True)
@@ -82,6 +92,12 @@ class EditorWindow(QMainWindow):
 		
 		
 		self.setCentralWidget(splitter)
+		
+	def save_file(self):
+		if hasattr(self.editor, "data"):
+			print("Saving %s..." % self.editor.data.name)
+			self.editor.save()
+			self.editor.data.write()
 		
 	def create_subtree(self, type, package):
 		sub_root = QStandardItem(type)
@@ -113,6 +129,13 @@ class EditorWindow(QMainWindow):
 			self.data_files[type][arc_file.name] = arc_file
 			
 	def change_editor(self, editor):
+		# Save changes so they can be restored
+		if hasattr(self.editor, "save"):
+			self.editor.save()
+		
+		# Now change the editor
+		editor.setFrameShape(QFrame.StyledPanel)
+		self.editor = editor
 		self.right.widget(0).hide()
 		self.right.widget(0).deleteLater()
 		self.right.insertWidget(0, editor)

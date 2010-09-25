@@ -5,7 +5,6 @@ from .MapEditor_ui import Ui_MapEditor
 class MapEditor(QFrame):
 	def __init__(self, parent, data):
 		QWidget.__init__(self, parent)
-		self.setFrameShape(QFrame.StyledPanel)
 		
 		self.data = data
 		
@@ -40,3 +39,7 @@ class MapEditor(QFrame):
 		view.setModel(model)
 		
 		return model
+		
+	def save(self):
+		self.data.name = self.ui.name.text()
+		self.data.encounter_deck = self.ui.encounter_deck.text()

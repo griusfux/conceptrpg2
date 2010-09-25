@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MapEditor.ui'
 #
-# Created: Mon Aug 30 00:43:21 2010
+# Created: Fri Sep 24 23:50:17 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -21,11 +21,11 @@ class Ui_MapEditor(object):
         self.label.setObjectName("label")
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
         self.name = QtGui.QLineEdit(MapEditor)
-        self.name.setEnabled(False)
+        self.name.setEnabled(True)
         self.name.setObjectName("name")
         self.gridLayout.addWidget(self.name, 0, 1, 1, 1)
         self.encounter_deck = QtGui.QLineEdit(MapEditor)
-        self.encounter_deck.setEnabled(False)
+        self.encounter_deck.setEnabled(True)
         self.encounter_deck.setObjectName("encounter_deck")
         self.gridLayout.addWidget(self.encounter_deck, 1, 1, 1, 1)
         self.label_2 = QtGui.QLabel(MapEditor)
