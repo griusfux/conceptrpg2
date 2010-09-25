@@ -94,7 +94,8 @@ class Package:
 			schema.update(json.loads(f.read()))
 		
 		for key, value in schema.items():
-			self._validate_dict(self._dict, key, value)
+			if not self._validate_dict(self._dict, key, value):
+				del self._dict[key]
 				
 	def _validate_dict(self, d, key, value, setting=True):
 		if key not in d:
@@ -116,8 +117,8 @@ class Package:
 						
 				setattr(self, key, l)
 				
-				# We set here, so return False
-				return False
+				# We set here, so return True
+				return True
 		elif isinstance(eval(value), set):
 			items = eval(value)
 			
@@ -137,6 +138,20 @@ class Package:
 			if setting:
 				setattr(self, key, self._dict[key])
 			return True
+			
+	def write(self):
+		"""Write the archive file back out to disk"""
+		
+		# Only do the config for now
+		
+		# First we need the dictionary filled with the newest values
+		for key in self._dict:
+			self._dict[key] = getattr(self, key)
+			
+		config = json.dumps(self._dict, sort_keys=True, indent=4)
+		
+		with open(self._path+'/'+self._config, 'w') as f:
+			f.write(config)
 
 			
 				
@@ -213,7 +228,7 @@ class Item(Package):
 	_ext = 'item'
 	_config = 'item.json'
 	_schema = 'Schemas/itemfile.json'
-	_dir = 'Items'
+	_dir = 'Items/Others'
 	
 class Weapon(Item):
 	"""Weapon Package"""
@@ -222,6 +237,18 @@ class Weapon(Item):
 	_parent_schema = Item._schema
 	_schema = 'Schemas/weaponfile.json'
 	_dir = 'Items/Weapons'
+	
+	def __init__(self, package_name):
+		Item.__init__(self, package_name)
+		
+		# Store the original damage string for possible error printing
+		_damage = self.damage
+		
+		# Split the damage into two parts, separated by a 'd'
+		self.damage = [int(i) for i in self.damage.split('d')]
+		
+		if len(self.damage) != 2:
+			raise PackageError("Malformed damage for Weapon. Expected xdy, got {0} instead".format(_damage))
 	
 class Armor(Item):
 	"""Armor Package"""
