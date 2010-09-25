@@ -12,6 +12,7 @@ from Scripts.dungeon_generator import DungeonGenerator
 from Scripts.character_logic import PlayerLogic, MonsterLogic
 from Scripts.gamestate_manager import GameStateManager
 from Scripts.power_manager import PowerManager
+from Scripts.inventory import Inventory
 
 from Scripts.race_data import *
 from Scripts.monster_data import *
@@ -209,6 +210,19 @@ def init(own):
 	
 	# Give the player an attack power
 	player.powers = PowerManager([Power('Attack'), Power('Burst')])
+	
+	# Setup player inventory
+	player.inventory = Inventory()
+	
+	w = Weapon('Holy Hand Grenade')
+	player.inventory.add(w)
+	player.inventory.weapon = w
+	
+	a = Armor('Mighty Robes')
+	player.inventory.add(a)
+	player.inventory.armor = a
+		
+	player.inventory.add(Item('Bonsai'))
 	
 	own['net_players'] = {own['client'].id: player}
 	own['player'] = player
