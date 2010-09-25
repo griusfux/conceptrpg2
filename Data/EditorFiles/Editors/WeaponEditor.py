@@ -1,5 +1,5 @@
 from PyQt4.QtGui import *
-from .WeaponEditor_ui import Ui_WeaponEditor
+from .ui.WeaponEditor_ui import Ui_WeaponEditor
 
 import json
 

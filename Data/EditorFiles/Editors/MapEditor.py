@@ -1,6 +1,6 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-from .MapEditor_ui import Ui_MapEditor
+from .ui.MapEditor_ui import Ui_MapEditor
 
 class MapEditor(QFrame):
 	def __init__(self, parent, data):

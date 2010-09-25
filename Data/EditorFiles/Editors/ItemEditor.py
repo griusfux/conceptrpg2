@@ -1,5 +1,5 @@
 from PyQt4.QtGui import *
-from .ItemEditor_ui import Ui_ItemEditor
+from .ui.ItemEditor_ui import Ui_ItemEditor
 
 class ItemEditor(QFrame):
 	def __init__(self, parent, data):
