@@ -90,7 +90,6 @@ class Package:
 				schema.update(json.loads(f.read()))
 				
 		# Then load the schema (this overwrites old keys)
-		print(self._schema)
 		with open(self._schema) as f:
 			schema.update(json.loads(f.read()))
 		
