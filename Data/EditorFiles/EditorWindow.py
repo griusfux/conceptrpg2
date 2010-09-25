@@ -12,6 +12,7 @@ EDITORS = {
 	'Armors': ArmorEditor,
 	'Items': ItemEditor,
 	'Maps': MapEditor,
+	'Monsters': MonsterEditor,
 	'Weapons': WeaponEditor,
 	}
 
