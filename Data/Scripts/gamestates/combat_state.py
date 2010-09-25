@@ -55,15 +55,22 @@ class CombatState(BaseState, BaseController):
 			
 			# Setup logic/ai
 			logic = MonsterLogic(obj, monster)
-			logic.ai = AiStateMachine(monster, (["base_state", []],))
+			#([name, state, [(transition, target_state)]], [second_name, second_state, [(tran1, target1), (tran2, target2)]]
+			logic.ai = AiStateMachine(logic, (["idle", ["seek"], [], [], [("hp_lt_zero", "death"),]], ["death", ["die"], [], [], []]))
 			
 			tile.fill(logic)
+			logic.tile = tile
 			
 			# Add the monster to the monster list
 			self.monster_list.append(logic)
 			
 			# Initialize an ai manager
 			self.ai_manager = AiManager(self)
+			
+			player_tile = self.grid.tile_from_point(main["player"].object.position)
+			main["player"].tile = player_tile
+			player_tile.fill(main["player"])
+			
 			
 			
 		
@@ -148,7 +155,7 @@ class CombatState(BaseState, BaseController):
 			monster.actions = monster.ai.run()
 			
 		# Run the ai manager
-		# self.ai_manager.run()
+		self.ai_manager.run()
 			
 		# The message we will send to the server
 		pos = main['player'].object.position
@@ -184,16 +191,25 @@ class CombatState(BaseState, BaseController):
 				if ("PrevPower", "INPUT_CLICK") in inputs:
 					main['player'].powers.make_prev_active()
 
+				move = False
+				player_movement = (0, 0, 0)
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
-					msg += "mov0$5$0 "
+					player_movement = [player_movement[i] + val for i, val in enumerate((0, 5, 0))]
+					move = True
 				if ("MoveBackward", "INPUT_ACTIVE") in inputs:
-					msg += "mov0$-5$0 "
+					player_movement = [player_movement[i] + val for i, val in enumerate((0, -5, 0))]
+					move = True
 				if ("MoveRight", "INPUT_ACTIVE") in inputs:
-					msg += "mov5$0$0 "
+					player_movement = [player_movement[i] + val for i, val in enumerate((5, 0, 0))]
+					move = True
 				if ("MoveLeft", "INPUT_ACTIVE") in inputs:
-					msg += "mov-5$0$0 "
+					player_movement = [player_movement[i] + val for i, val in enumerate((-5, 0, 0))]
+					move = True
 					
-				if 'mov' not in msg:
+				if move:	
+					msg += self.move(main['player'], (player_movement), local = True)
+					
+				else:
 					target = self.grid.tile_from_point(main['player'].object.position)
 					vec = main['player'].object.get_local_vector_to(target.position)
 					vec[2] = 0
@@ -202,6 +218,9 @@ class CombatState(BaseState, BaseController):
 	
 		# Send the message
 		main['client'].send(msg.strip())
+		
+		main['player'].tile.color((0,1,0,1))
+		self.grid.tile_from_point(main["player"].object.position).color((0,0,1,1))
 
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
@@ -361,10 +380,39 @@ class CombatState(BaseState, BaseController):
 		return targets		
 	
 	
-	def move(self, character, linear, angular):
+	def move(self, character, linear = (0,0,0) , angular = (0,0,0) , local = False):
 		"""Handles linear and angular movement of a character"""
-		character.object.move(linear)
-		character.object.rotate(angular)
+		msg = "mov"+"$".join(["%.3f" % i for i in linear])
+		
+		old_position = character.object.position
+		
+		# Predict a forward point to see if the character can move there
+		padding = 10
+		new_position = [old_position[i] + val/60 + padding * (1 if val>0 else -1) for i, val in enumerate(linear)]
+				
+		# Get the predicted tile from the predicted point
+		new_tile = self.grid.tile_from_point(new_position)
+		
+		# Rotation happens even if the character can't move, so handle it now
+		character.object.rotate(angular, local = local)
+		
+		# If the character is to move into an invalid tile, don't move the character
+		if  new_tile.valid or new_tile.object == character:
+			character.object.move(linear, local = local)
+			
+			#update new_tile to accomadate for padding in the prediction
+			new_tile = self.grid.tile_from_point(character.object.position)
+			
+			# If the character has changed tiles, the tiles need to be updated to reflect this
+			if new_tile != character.tile:
+				character.tile.fill(None)
+				new_tile.fill(character)
+				character.tile = new_tile
+			
+			return msg
+			
+		else:
+			return "mov0$0$0"
 	
 # The following classes are for handling the combat grid
 class CombatGrid:
@@ -483,7 +531,7 @@ class CombatTile:
 		self.grid_color.color = color
 			
 	def fill(self, object):
-		"""'Fill' the tile with the given object, or empty it if object is none"""
+		"""'Fill the tile with the given object, or empty it if object is none"""
 		
 		self.object = object
 		
