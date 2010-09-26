@@ -1,0 +1,8 @@
+{
+	"name": "Armor",
+	"type": "armor",
+	"cost": 0,
+
+	"subtype": "light",
+	"ac": 0
+}

@@ -1,0 +1,6 @@
+{
+	"name": "Deck",
+	"cards": [
+		{ "monster": "Monster", "role": "brute", "count": 10 }
+	]
+}

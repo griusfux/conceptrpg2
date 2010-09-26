@@ -1,0 +1,9 @@
+{
+	"name": "Weapon",
+	"type": "weapon",
+	"cost": 0,
+
+	"subtype": "melee",
+	"damage": "1d6",
+	"bonus": 0
+}

@@ -1,0 +1,10 @@
+{
+	"name": "Map",
+	"encounter_deck": "deck",
+	"start_tiles": [{ "scene": "scene", "obj": "object" }],
+	"room_tiles": [{ "scene": "scene", "obj": "object" }],
+	"corridor_tiles": [{ "scene": "scene", "obj": "object" }],
+	"trap_tiles": [{ "scene": "scene", "obj": "object" }],
+	"end_tiles": [{ "scene": "scene", "obj": "object" }],
+	"stair_tiles": [{ "scene": "scene", "obj": "object" }]
+}

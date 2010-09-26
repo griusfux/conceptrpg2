@@ -2,6 +2,7 @@
 
 import json
 import os
+import shutil
 import zipfile
 import gzip
 import io
@@ -37,6 +38,7 @@ class Package:
 	_config = ''
 	_schema = ''
 	_parent_schema = ''
+	_new = ''
 	_dir = ''
 	
 	def __init__(self, package_name):
@@ -75,6 +77,24 @@ class Package:
 		
 		# Validate the file
 		self._validate()
+		
+	@classmethod
+	def create(cls, package_name):
+		path = cls._dir + '/' + package_name
+		
+		try:
+			os.mkdir(path)
+			
+			new_file = cls._schema.split('.')
+			new_file[0] += '_new'
+			shutil.copyfile('.'.join(new_file), path+'/'+cls._config)
+			
+			return cls(package_name)
+		except Exception as e:
+			print(e)
+			print("Unable to create config file in "+path)
+		
+		return None
 		
 	def _validate(self):
 		if not self._schema:
@@ -228,6 +248,7 @@ class Item(Package):
 	_ext = 'item'
 	_config = 'item.json'
 	_schema = 'Schemas/itemfile.json'
+	_new = 'Schemas/itemfile_new.json'
 	_dir = 'Items/Others'
 	
 class Weapon(Item):
@@ -249,6 +270,16 @@ class Weapon(Item):
 		
 		if len(self.damage) != 2:
 			raise PackageError("Malformed damage for Weapon. Expected xdy, got {0} instead".format(_damage))
+			
+	def write(self):
+		# Store the original value so we can restore it
+		_damage = self.damage
+		
+		self.damage = 'd'.join([str(self.damage[0]), str(self.damage[1])])
+		
+		Item.write(self)
+		
+		self.damage = _damage
 	
 class Armor(Item):
 	"""Armor Package"""
