@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ItemEditor.ui'
 #
-# Created: Sat Sep 25 00:20:38 2010
+# Created: Sat Sep 25 21:33:09 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -21,7 +21,6 @@ class Ui_ItemEditor(object):
         self.label.setObjectName("label")
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
         self.name = QtGui.QLineEdit(ItemEditor)
-        self.name.setEnabled(True)
         self.name.setObjectName("name")
         self.gridLayout.addWidget(self.name, 0, 3, 1, 1)
         self.label_2 = QtGui.QLabel(ItemEditor)
@@ -49,6 +48,8 @@ class Ui_ItemEditor(object):
 
         self.retranslateUi(ItemEditor)
         QtCore.QMetaObject.connectSlotsByName(ItemEditor)
+        ItemEditor.setTabOrder(self.name, self.cost)
+        ItemEditor.setTabOrder(self.cost, self.type)
 
     def retranslateUi(self, ItemEditor):
         ItemEditor.setWindowTitle(QtGui.QApplication.translate("ItemEditor", "ItemEditor", None, QtGui.QApplication.UnicodeUTF8))

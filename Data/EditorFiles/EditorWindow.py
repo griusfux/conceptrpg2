@@ -5,18 +5,20 @@ from PyQt4.QtCore import *
 
 from Scripts.packages import *
 
-from EditorFiles.LogWidget import *
-from EditorFiles.Editors import *
-
-EDITORS = {
-	'Armors': ArmorEditor,
-	'Items': ItemEditor,
-	'Maps': MapEditor,
-	'Monsters': MonsterEditor,
-	'Weapons': WeaponEditor,
-	}
+from .LogWidget import *
+from .Editors import *
+from .NewDialog import NewDialog
 
 class EditorWindow(QMainWindow):
+
+	EDITORS = {
+		'Armors': ArmorEditor,
+		'Items': ItemEditor,
+		'Maps': MapEditor,
+		'Monsters': MonsterEditor,
+		'Weapons': WeaponEditor,
+		}
+
 	def __init__(self):
 		QMainWindow.__init__(self)
 		
@@ -28,6 +30,11 @@ class EditorWindow(QMainWindow):
 		logger = LogWidget(self)
 		
 		# Menu
+		new = QAction('&New', self)
+		new.setShortcut('Ctrl+N')
+		new.setStatusTip('Create a new package')
+		self.connect(new, SIGNAL('triggered()'), self.new_file)
+		
 		save = QAction('&Save', self)
 		save.setShortcut('Ctrl+S')
 		save.setStatusTip('Save the currently selected package')
@@ -39,6 +46,7 @@ class EditorWindow(QMainWindow):
 		self.connect(exit, SIGNAL('triggered()'), SLOT('close()'))
 		
 		file = self.menuBar().addMenu('&File')
+		file.addAction(new)
 		file.addAction(save)
 		file.addAction(exit)
 		
@@ -94,6 +102,10 @@ class EditorWindow(QMainWindow):
 		
 		self.setCentralWidget(splitter)
 		
+	def new_file(self):
+		dialog = NewDialog(self)
+		dialog.exec()
+		
 	def save_file(self):
 		if hasattr(self.editor, "data"):
 			print("Saving %s..." % self.editor.data.name)
@@ -124,11 +136,11 @@ class EditorWindow(QMainWindow):
 				print('Unable to open', file)
 				continue
 
-			item =  QStandardItem(arc_file.name)
+			item =  QStandardItem(file)
 			item.setEditable(False)
 			sub_root.appendRow(item)
-			self.data_files[type][arc_file.name] = arc_file
-			
+			self.data_files[type][file] = arc_file		
+		
 	def change_editor(self, editor):
 		# Save changes so they can be restored
 		if hasattr(self.editor, "save"):
@@ -150,8 +162,8 @@ class EditorWindow(QMainWindow):
 		if item.parent():
 			text = item.parent().text()
 
-			if text in EDITORS:
-				self.change_editor(EDITORS[text](self, self.data_files[text][item.text()]))
+			if text in self.EDITORS:
+				self.change_editor(self.EDITORS[text](self, self.data_files[text][item.text()]))
 			else:
 				print("No editor found for", text)
 				

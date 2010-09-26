@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'WeaponEditor.ui'
 #
-# Created: Sat Sep 25 00:20:53 2010
+# Created: Sat Sep 25 21:33:06 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -21,7 +21,6 @@ class Ui_WeaponEditor(object):
         self.label.setObjectName("label")
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
         self.name = QtGui.QLineEdit(WeaponEditor)
-        self.name.setEnabled(True)
         self.name.setObjectName("name")
         self.gridLayout.addWidget(self.name, 0, 2, 1, 1)
         self.label_2 = QtGui.QLabel(WeaponEditor)
@@ -43,7 +42,6 @@ class Ui_WeaponEditor(object):
         self.label_5.setObjectName("label_5")
         self.gridLayout.addWidget(self.label_5, 6, 0, 1, 1)
         self.subtype = QtGui.QComboBox(WeaponEditor)
-        self.subtype.setEnabled(True)
         self.subtype.setEditable(False)
         self.subtype.setObjectName("subtype")
         self.gridLayout.addWidget(self.subtype, 5, 2, 1, 1)
@@ -89,6 +87,12 @@ class Ui_WeaponEditor(object):
 
         self.retranslateUi(WeaponEditor)
         QtCore.QMetaObject.connectSlotsByName(WeaponEditor)
+        WeaponEditor.setTabOrder(self.name, self.cost)
+        WeaponEditor.setTabOrder(self.cost, self.type)
+        WeaponEditor.setTabOrder(self.type, self.subtype)
+        WeaponEditor.setTabOrder(self.subtype, self.damage0)
+        WeaponEditor.setTabOrder(self.damage0, self.damage1)
+        WeaponEditor.setTabOrder(self.damage1, self.bonus)
 
     def retranslateUi(self, WeaponEditor):
         WeaponEditor.setWindowTitle(QtGui.QApplication.translate("WeaponEditor", "WeaponEditor", None, QtGui.QApplication.UnicodeUTF8))

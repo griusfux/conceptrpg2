@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ArmorEditor.ui'
 #
-# Created: Sat Sep 25 00:20:40 2010
+# Created: Sat Sep 25 21:33:07 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -22,7 +22,6 @@ class Ui_ArmorEditor(object):
         self.label.setObjectName("label")
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
         self.name = QtGui.QLineEdit(ArmorEditor)
-        self.name.setEnabled(True)
         self.name.setObjectName("name")
         self.gridLayout.addWidget(self.name, 0, 3, 1, 1)
         self.label_2 = QtGui.QLabel(ArmorEditor)
@@ -44,7 +43,6 @@ class Ui_ArmorEditor(object):
         self.label_5.setObjectName("label_5")
         self.gridLayout.addWidget(self.label_5, 6, 0, 1, 1)
         self.subtype = QtGui.QComboBox(ArmorEditor)
-        self.subtype.setEnabled(True)
         self.subtype.setEditable(False)
         self.subtype.setObjectName("subtype")
         self.gridLayout.addWidget(self.subtype, 5, 3, 1, 1)
@@ -72,6 +70,10 @@ class Ui_ArmorEditor(object):
 
         self.retranslateUi(ArmorEditor)
         QtCore.QMetaObject.connectSlotsByName(ArmorEditor)
+        ArmorEditor.setTabOrder(self.name, self.cost)
+        ArmorEditor.setTabOrder(self.cost, self.type)
+        ArmorEditor.setTabOrder(self.type, self.subtype)
+        ArmorEditor.setTabOrder(self.subtype, self.ac)
 
     def retranslateUi(self, ArmorEditor):
         ArmorEditor.setWindowTitle(QtGui.QApplication.translate("ArmorEditor", "ArmorEditor", None, QtGui.QApplication.UnicodeUTF8))
