@@ -6,6 +6,8 @@ import shutil
 import zipfile
 import gzip
 import io
+import traceback
+import tempfile
 
 class PackageError(Exception):
 	"""Package file related errors"""
@@ -40,6 +42,7 @@ class Package:
 	_parent_schema = ''
 	_new = ''
 	_dir = ''
+	_img = ''
 	
 	def __init__(self, package_name):
 		# Combine the package name and the directory to get the filepath
@@ -66,6 +69,14 @@ class Package:
 			except IOError as e:
 				pass
 			
+		# If there is an image file, copy it to a temp location
+		if self._img:
+			with open(os.path.join(path, self._img), 'rb') as img:
+				self._image = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+				self._image.write(img.read())
+		else:
+			self._image = None
+			
 		try:
 			self._dict = json.loads(str(package.read(self._config), encoding='utf8'))
 		except ValueError as e:
@@ -77,6 +88,11 @@ class Package:
 		
 		# Validate the file
 		self._validate()
+		
+	def __del__(self):
+		if self._image:
+			self._image.file.close()
+			os.remove(self.image)
 		
 	@classmethod
 	def create(cls, package_name):
@@ -95,6 +111,23 @@ class Package:
 			print("Unable to create config file in "+path)
 		
 		return None
+		
+	@classmethod
+	def get_package_list(cls):
+		packages = []
+		
+		for f in os.listdir(cls._dir):
+			if f.startswith('.'): continue
+		
+			if os.path.isdir(os.path.join(cls._dir, f)):
+				try:
+					packages.append(cls(f))
+				except Exception as e:
+					print(f, e)
+				
+		return packages
+	
+		# return [cls(p) for p in os.listdir(cls._dir) if os.path.isdir(p) and not p.startswith('.')]
 		
 	def _validate(self):
 		if not self._schema:
@@ -173,6 +206,12 @@ class Package:
 		with open(self._path+'/'+self._config, 'w') as f:
 			f.write(config)
 
+	@property
+	def image(self):
+		if self._image:
+			return self._image.name
+		else:
+			return None
 			
 				
 class Map(Package):
@@ -219,6 +258,16 @@ class Race(Package):
 	_config = 'race.json'
 	_schema = 'Schemas/racefile.json'
 	_dir = 'Races'
+	_img = 'race.png'
+	
+class Class(Package):
+	"""Player class package"""
+	
+	_ext = 'class'
+	_config = 'class.json'
+	_schema = 'Schemas/classfile.json'
+	_dir = 'Classes'
+	_img = 'class.png'
 
 class Power(Package):
 	"""Power package"""
