@@ -187,64 +187,9 @@ def init(own):
 	
 	# Setup an input system
 	own['input_system'] = BlenderInputSystem('keys.conf', 'mouse.conf')
-	
-	# Add the player
-	scene = gl.getCurrentScene()
-	gameobj = scene.addObject("CharacterEmpty", own)
-	
-	# Now add the mesh and armature based on race data
-	race = Race("DarkKnight")
-	own['engine'].load_library(race)
-	
-	root_ob = scene.addObject(race.root_object, own)
-	root_ob.setParent(gameobj)
-	
-	# Store the player
-	player = PlayerLogic(BlenderWrapper.Object(gameobj, root_ob))
-	
-	# Load stats for the player
-	player.load_stats(open('Kupoman.save', 'rb'))
-	
-	# Fill the player's hit points
-	player.hp = player.max_hp
-	
-	# Give the player an attack power
-	player.powers = PowerManager([Power('Attack'), Power('Burst')])
-	
-	# Setup player inventory
-	player.inventory = Inventory()
-	
-	w = Weapon('Holy Hand Grenade')
-	player.inventory.add(w)
-	player.inventory.weapon = w
-	
-	a = Armor('Mighty Robes')
-	player.inventory.add(a)
-	player.inventory.armor = a
-		
-	player.inventory.add(Item('Bonsai'))
-	
-	own['net_players'] = {own['client'].id: player}
-	own['player'] = player
-	
-	# Parent the camera to the player
-	cam = scene.objects["Camera"]
-	cam.setParent(scene.objects["TopDownEmpty"])
-	cam_empty = scene.objects['CamEmpty']
-	
-	# Switch to the 3rd person camera
-	cam3p = None
-	for child in gameobj.childrenRecursive:
-		if child.name == '3PCam':
-			cam3p = child
-			break
-			
-	if cam3p:
-		own['3p_cam'] = BlenderWrapper.Camera(cam3p, cam_empty)
-		own['top_down_camera'] = BlenderWrapper.Camera(scene.active_camera)
-		scene.active_camera = own['3p_cam'].camera
+
 		
 	# Setup the passive combat system
-	own['state_manager'] = GameStateManager("DungeonGeneration", own)
+	own['state_manager'] = GameStateManager("CharacterCreation", own)
 	own['init'] = True
 	

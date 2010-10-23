@@ -4,6 +4,7 @@ import bge
 from Scripts.ui.layouts import *
 
 layouts = {
+	"char_creation": CharacterCreationLayout,
 	"dun_gen": DunGenLayout,
 	"default_state": DefaultStateLayout,
 	"combat": CombatLayout,
@@ -19,6 +20,8 @@ class BlenderUISystem(bgui.System):
 		# Init the system
 		bgui.System.__init__(self)
 		
+		self.mouse = bge.logic.mouse
+		
 		# All layouts will be a widget subclass, so we can just keep track of one widget
 		self.layout = Layout(self, "none_layout")
 		
@@ -29,7 +32,7 @@ class BlenderUISystem(bgui.System):
 		self.keymap = {getattr(bge.events, val): getattr(bgui, val) for val in dir(bge.events) if val.endswith('KEY') or val.startswith('PAD')}
 		
 	def load_layout(self, layout):
-		self._widgets = {}
+		self._remove_widget(self.layout)
 		self.layout = layouts[layout](self) if layout else Layout(self, "none_layout")
 		
 	def toogle_overlay(self, layout):
@@ -66,7 +69,7 @@ class BlenderUISystem(bgui.System):
 			value.update(main)
 		
 		# Handle the mouse
-		mouse = bge.logic.mouse
+		mouse = self.mouse
 		mouse_events = mouse.events
 		
 		pos = list(mouse.position[:])

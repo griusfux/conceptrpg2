@@ -18,7 +18,7 @@ class Object:
 	
 	def __init__(self, gameobj, armature=None):
 		self.gameobj = gameobj
-		self.armature = armature
+		self._armature = armature
 		# used for servo motion
 		self.prev_error = Vector((0.0, 0.0, 0.0));
 		self.tot_error = Vector((0.0, 0.0, 0.0));
@@ -131,8 +131,8 @@ class Object:
 		return self.gameobj.getVectTo(position)[arg]	
 		
 	def play_animation(self, anim):
-		if self.armature:
-			self.gameobj.sendMessage("animation", anim, self.armature.name)
+		if self._armature:
+			self.gameobj.sendMessage("animation", anim, self._armature.name)
 			
 	def end(self):
 		if not self.gameobj.invalid:
@@ -148,6 +148,17 @@ class Object:
 				vertexList.append(mesh.getVertex(matID, array))
 				
 		return [Vertex(vertex, self.gameobj) for vertex in vertexList]
+		
+	def set_parent(self, parent):
+		self.gameobj.setParent(parent.gameobj)
+	
+	@property
+	def armature(self):
+		return Object(self._armature)
+		
+	@armature.setter
+	def armature(self, value):
+		self._armature = value.gameobj
 		
 	@property
 	def color(self):

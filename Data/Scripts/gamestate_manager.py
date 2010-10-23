@@ -5,6 +5,7 @@ from .gamestates import *
 # A dictionary to map strings to states
 STATES = {
 		"Default": DefaultState,
+		"CharacterCreation": CharacterCreationState,
 		"DungeonGeneration": DungeonGenerationState,
 		"Combat": CombatState
 		}
