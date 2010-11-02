@@ -35,25 +35,30 @@ class CharacterCreationLayout(Layout):
 		
 		self.race_idx = self.class_idx = 0
 		
+		bg = bgui.Image(self, "cgen_bg", "Textures/ui/character select/bg_color.png", size=[1, 1], pos=[0, 0])
+		grid = bgui.Image(self, "cgen_grid", "Textures/ui/character select/grid.png", aspect=(4/3), size=[1, 1], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+		
 		# Name
 		
-		self.name_lbl = bgui.Label(self, "name", text="Name", pos=[0, .9], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+		# self.name_lbl = bgui.Label(self, "name", text="Name", pos=[0, .9], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		
-		bgui.Label(self, "race_lbl", text="Choose your race", pos=[0, 0.85], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+		# bgui.Label(self, "race_lbl", text="Choose your race", pos=[0, 0.85], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		
 		# Race
 		
-		self.race_frame = bgui.Frame(self, "races", size=[1, .33], pos=[0, .50])
-		self.race_frame.colors = [[0, 0, 0, 0] for i in range(4)]
+		# self.race_frame = bgui.Frame(self, "races", size=[1, .33], pos=[0, .50])
+		# self.race_frame.colors = [[0, 0, 0, 0] for i in range(4)]
 		
 		# replace these with images
-		self.race_scroll = [
-			bgui.Frame(self.race_frame, "race_scroll_left", size=[.07, .21], pos=[0.06, 0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY),
-			bgui.Frame(self.race_frame, "race_scroll_right", size=[.07, .21], pos=[0.87, 0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
-			]
+		# self.race_scroll = [
+			# bgui.Image(self.race_frame, "race_scroll_left", "Textures/ui/character select/left_arrow.png", aspect=1, size=[.07, .21], pos=[0.06, 0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY),
+			# bgui.Image(self.race_frame, "race_scroll_right", "Textures/ui/character select/right_arrow.png", aspect=1, size=[.07, .21], pos=[0.87, 0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
+			# bgui.Frame(self.race_frame, "race_scroll_left", size=[.07, .21], pos=[0.06, 0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY),
+			# bgui.Frame(self.race_frame, "race_scroll_right", size=[.07, .21], pos=[0.87, 0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
+			# ]
 			
-		self.race_scroll[0].on_click = self.race_left
-		self.race_scroll[1].on_click = self.race_right
+		# self.race_scroll[0].on_click = self.race_left
+		# self.race_scroll[1].on_click = self.race_right
 		
 		# Class
 		
@@ -64,12 +69,17 @@ class CharacterCreationLayout(Layout):
 		
 		# replace these with images
 		self.class_scroll = [
-			bgui.Frame(self.class_frame, "class_scroll_left", size=[.07, .21], pos=[0.06, 0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY),
-			bgui.Frame(self.class_frame, "class_scroll_right", size=[.07, .21], pos=[0.87, 0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
+			bgui.Image(self.class_frame, "class_scroll_left", "Textures/ui/character select/left_arrow.png", aspect=1, size=[.07, .21], pos=[0.06, 0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY),
+			bgui.Image(self.class_frame, "class_scroll_right", "Textures/ui/character select/right_arrow.png", aspect=1, size=[.07, .21], pos=[0.87, 0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
+			# bgui.Frame(self.class_frame, "class_scroll_left", size=[.07, .21], pos=[0.06, 0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY),
+			# bgui.Frame(self.class_frame, "class_scroll_right", size=[.07, .21], pos=[0.87, 0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
 			]
 			
 		self.class_scroll[0].on_click = self.class_left
 		self.class_scroll[1].on_click = self.class_right
+		
+		foo = bgui.TextBlock(self, "foo", pt_size=18, size=[0.55, .6], pos=[.33, .33], options=bgui.BGUI_DEFAULT)
+		foo.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum vitae enim in erat porttitor imperdiet. Pellentesque vestibulum, lectus eget consectetur aliquam, ligula enim accumsan mauris, id sollicitudin mauris metus eu purus. Etiam dapibus hendrerit tincidunt. Vestibulum ut urna mi, at tincidunt nunc. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Suspendisse potenti. Maecenas ac mi nunc. Nullam sed posuere augue. Donec massa lorem, gravida et dictum ut, luctus a lorem. Sed urna risus, sollicitudin ut gravida et, vulputate sit amet massa. Curabitur auctor neque at orci pulvinar commodo. In molestie mattis lectus, ac tincidunt nisi suscipit ac. Nam convallis laoreet cursus. Phasellus pharetra vestibulum odio id consequat."
 		
 		# Go!
 		start_btn = bgui.FrameButton(self, "start_btn", text="Start", pt_size=24, size=[0.1, 0.05], pos=[.85, .05])
@@ -78,8 +88,8 @@ class CharacterCreationLayout(Layout):
 	def update(self, main):
 		self.main = main
 	
-		if not self.races:
-			self.update_races()
+		# if not self.races:
+			# self.update_races()
 		if not self.classes:
 			self.update_classes()
 
@@ -90,7 +100,7 @@ class CharacterCreationLayout(Layout):
 			max = self.race_idx+3
 			
 		if self.race_idx < 0:
-			self.race_id
+			self.race_idx = 0
 
 		self.races = []
 	
