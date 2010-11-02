@@ -2,6 +2,7 @@ import bgui
 import bge
 
 from Scripts.ui.layouts import *
+from Scripts.ui.cgen_layouts import *
 
 layouts = {
 	"char_creation": CharacterCreationLayout,
