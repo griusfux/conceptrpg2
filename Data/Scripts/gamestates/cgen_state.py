@@ -20,17 +20,20 @@ class CharacterCreationState(BaseState):
 		# Load some packages for the ui to make use of
 		main['races'] = Race.get_package_list()
 		main['classes'] = Class.get_package_list()
+		
+		main['last_layout'] = 'char_creation'
+		main['next_layout'] = 'cgen_name'
 		main['creation_done'] = False
 		
 		# Load the ui
-		main['ui_system'].load_layout('char_creation')
+		main['ui_system'].load_layout(main['next_layout'])
 		
 	def client_run(self, main):
 		"""Client-side run method"""
 		
 		inputs = main['input_system'].run()
 		
-		if main['creation_done'] or ("Jump", "INPUT_CLICK") in inputs:
+		if main['next_layout'] == 'start' or ("Jump", "INPUT_CLICK") in inputs:
 			
 			# Add the player empty
 			gameobj = main['engine'].add_object("CharacterEmpty")
@@ -98,6 +101,12 @@ class CharacterCreationState(BaseState):
 				
 			# Switch to the dungeon generation state
 			return ("DungeonGeneration", "SWITCH")
+		
+		# If the set layout differs from the previous layout, switch to the new layout.
+		# The new current layout is saved in last layout to continue checking.
+		if main['next_layout'] != main['last_layout']:
+			main['last_layout'] = main['next_layout']
+			main['ui_system'].load_layout(main['next_layout'])
 			
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
@@ -105,6 +114,9 @@ class CharacterCreationState(BaseState):
 		# We added these so we need to get rid of them too
 		del main['races']
 		del main['classes']
+		
+		del main['last_layout']
+		del main['next_layout']
 		del main['creation_done']
 			
 	##########
