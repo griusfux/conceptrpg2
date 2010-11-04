@@ -30,11 +30,10 @@ class MapEditor(QFrame):
 		
 	def _create_tab(self, tiles, view):
 		model = QStandardItemModel(self)
-		model.setHorizontalHeaderLabels(['Scene', 'Object'])
+		model.setHorizontalHeaderLabels([''])
 		
 		for i, tile in enumerate(tiles):
-			model.setItem(i, 0, QStandardItem(tile['scene']))
-			model.setItem(i, 1, QStandardItem(tile['obj']))
+			model.setItem(i, 0, QStandardItem(tile['obj']))
 			
 		view.setModel(model)
 		

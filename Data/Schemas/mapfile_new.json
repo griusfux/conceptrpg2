@@ -1,10 +1,10 @@
 {
 	"name": "Map",
 	"encounter_deck": "deck",
-	"start_tiles": [{ "scene": "scene", "obj": "object" }],
-	"room_tiles": [{ "scene": "scene", "obj": "object" }],
-	"corridor_tiles": [{ "scene": "scene", "obj": "object" }],
-	"trap_tiles": [{ "scene": "scene", "obj": "object" }],
-	"end_tiles": [{ "scene": "scene", "obj": "object" }],
-	"stair_tiles": [{ "scene": "scene", "obj": "object" }]
+	"start_tiles": [{ "obj": "object" }],
+	"room_tiles": [{ "obj": "object" }],
+	"corridor_tiles": [{ "obj": "object" }],
+	"trap_tiles": [{ "obj": "object" }],
+	"end_tiles": [{ "obj": "object" }],
+	"stair_tiles": [{ "obj": "object" }]
 }

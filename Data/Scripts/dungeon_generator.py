@@ -35,12 +35,12 @@ class DungeonGenerator:
 		# self.tiles is a dictionary of lists
 		# The lists are a list of tuples [(obj, scene)]
 		self.tiles = {
-				'Starts': [(i['obj'], i['scene']) for i in map.start_tiles],
-				'Rooms': [(i['obj'], i['scene']) for i in map.room_tiles],
-				'Corridors': [(i['obj'], i['scene']) for i in map.corridor_tiles],
-				'Ends': [(i['obj'], i['scene']) for i in map.end_tiles],
-				'Stairs': [(i['obj'], i['scene']) for i in map.stair_tiles],
-				'Traps': [(i['obj'], i['scene']) for i in map.trap_tiles],
+				'Starts': [i['obj'] for i in map.start_tiles],
+				'Rooms': [i['obj'] for i in map.room_tiles],
+				'Corridors': [i['obj'] for i in map.corridor_tiles],
+				'Ends': [i['obj'] for i in map.end_tiles],
+				'Stairs': [i['obj'] for i in map.stair_tiles],
+				'Traps': [i['obj'] for i in map.trap_tiles],
 				}
 				
 		self.deck = EncounterDeck(map.encounter_deck)
@@ -86,11 +86,11 @@ class DungeonGenerator:
 			tile = self.tiles[type][index]
 			
 			# First try to add the object; if it doesn't exist, merge the scene and try again
-			try:
-				tile_node = self.scene.addObject(tile[0], obj)
-			except ValueError:
-				GameLogic.LibLoad(self.blend, 'Scene', tile[1])
-				tile_node = self.scene.addObject(tile[0], obj)
+			# try:
+				# tile_node = self.scene.addObject(tile[0], obj)
+			# except ValueError:
+				# GameLogic.LibLoad(self.blend, 'Scene', tile[1])
+				# tile_node = self.scene.addObject(tile[0], obj)
 				
 			tile_node.worldPosition = position
 			tile_node.worldOrientation = ori
@@ -197,7 +197,7 @@ class DungeonGenerator:
 		#print('\nAttempting to place %s...' % type)
 		# First try to add the object; if it doesn't exist, merge the scene and try again
 		# try:
-		tile_node = scene.addObject(tile[0], node.object)
+		tile_node = scene.addObject(tile, node.object)
 		# except ValueError:
 			# GameLogic.LibLoad(self.blend, 'Scene', tile[1])
 			# tile_node = scene.addObject(tile[0], node.object)
