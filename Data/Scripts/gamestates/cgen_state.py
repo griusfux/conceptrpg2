@@ -23,6 +23,7 @@ class CharacterCreationState(BaseState):
 		
 		main['last_layout'] = 'char_creation'
 		main['next_layout'] = 'cgen_name'
+		main['cgen_input'] = {}
 		main['creation_done'] = False
 		
 		# Load the ui
@@ -117,6 +118,7 @@ class CharacterCreationState(BaseState):
 		
 		del main['last_layout']
 		del main['next_layout']
+		del main['cgen_input']
 		del main['creation_done']
 			
 	##########
