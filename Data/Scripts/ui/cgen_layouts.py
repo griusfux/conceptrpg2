@@ -43,10 +43,14 @@ class CgenLayout(Layout):
 		self.main = main
 		
 	def prev_page(self, parent):
+		self.main['cgen_input'][self.name] = self.input()
 		self.main['next_layout'] = self.prev
 		
 	def next_page(self, parent):
+		self.main['cgen_input'][self.name] = self.input()
 		self.main['next_layout'] = self.next
+		
+		print(self.main['cgen_input'][self.name])
 					
 class CgenName(CgenLayout):
 	"""Character Generation page for setting the character's name"""
@@ -57,10 +61,13 @@ class CgenName(CgenLayout):
 		self.title.text = "What is your name?"
 		
 		# Get the Player's name
-		self.input = bgui.TextInput(self.grid, "name_input", pos = [.33, .5],
+		self.name_input = bgui.TextInput(self.grid, "name_input", pos = [.33, .5],
 									size = [.33, .033], text='Kupoman',
 									options = bgui.BGUI_DEFAULT)
-		self.input.frame.colors = [(1, 1, 1, .5)]*4
+		self.name_input.frame.colors = [(1, 1, 1, .5)]*4
+		
+		# Set the input for this page
+		self.input = lambda : self.name_input.text
 		
 		# Set the next page
 		self.next = 'cgen_race'
@@ -72,6 +79,9 @@ class CgenRace(CgenLayout):
 		
 		# Set the title
 		self.title.text = "Who are your people?"
+		
+		# Set the input for this page
+		self.input = lambda: None
 		
 		# Set the previous page
 		self.prev = 'cgen_name'
@@ -85,8 +95,8 @@ class CgenRace(CgenLayout):
 		self.label.text = "Race Foo"
 		
 		# Info text
-		self.class_info = bgui.TextBlock(self.grid, "class_info", pt_size=20, size=[0.44, .27],
-										pos=[.46, .4], options=bgui.BGUI_DEFAULT)
+		self.class_info = bgui.TextBlock(self.grid, "class_info", pt_size=20, size=[0.44, .30],
+										pos=[.46, .5], options=bgui.BGUI_DEFAULT)
 		self.class_info.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum vitae enim in erat porttitor imperdiet. Pellentesque vestibulum, lectus eget consectetur aliquam, ligula enim accumsan mauris, id sollicitudin mauris metus eu purus. Etiam dapibus hendrerit tincidunt. Vestibulum ut urna mi, at tincidunt nunc. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Suspendisse potenti. Maecenas ac mi nunc. Nullam sed posuere augue. Donec massa lorem, gravida et dictum ut, luctus a lorem. Sed urna risus, sollicitudin ut gravida et, vulputate sit amet massa. Curabitur auctor neque at orci pulvinar commodo. In molestie mattis lectus, ac tincidunt nisi suscipit ac. Nam convallis laoreet cursus. Phasellus pharetra vestibulum odio id consequat."		
 		
 class CgenClass(CgenLayout):
@@ -96,6 +106,9 @@ class CgenClass(CgenLayout):
 		
 		# Set the title
 		self.title.text = "What is your profession?"
+		
+		# Set the input for this page
+		self.input = lambda: None
 		
 		# Set the previous page
 		self.prev = 'cgen_race'

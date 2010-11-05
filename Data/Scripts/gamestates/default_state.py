@@ -29,8 +29,6 @@ class DefaultState(BaseState, BaseController):
 		main['player'].object.set_orientation(old_ori, local=True)
 		main['engine'].set_active_camera(main['3p_cam'])
 		
-		print("Still safe")
-		
 		# Update the player's lock
 		main['player'].update_lock()
 		
