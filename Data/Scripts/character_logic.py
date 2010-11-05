@@ -120,8 +120,9 @@ class CharacterLogic:
 		self.initiative = self.dex_mod + self.level//2 + self.initiative_buff
 		
 		#hit points
-		if isinstance(self, PlayerLogic):
-			self.max_hp		= int(self.player_class.hp_first_level) + (self.level - 1) * int(self.player_class.hp_per_level)
+		# if isinstance(self, PlayerLogic):
+			# self.max_hp = int(self.player_class.hp_first_level) + (self.level - 1) * int(self.player_class.hp_per_level)
+		self.max_hp = 12
 		self.bloodied	= self.max_hp // 2
 		self.surge_value= self.max_hp // 4
 		
@@ -169,6 +170,10 @@ class CharacterLogic:
 		target_vector = self.object.get_local_vector_to(target)
 		
 		self.object.move((self.speed * target_vector[0], self.speed * target_vector[1], 0), mode=0)
+
+	###################
+	## Load functions
+	def load_class(self, classfile):
 		
 		
 class PlayerLogic(CharacterLogic):

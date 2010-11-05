@@ -43,14 +43,13 @@ class CgenLayout(Layout):
 		self.main = main
 		
 	def prev_page(self, parent):
-		self.main['cgen_input'][self.name] = self.input()
+		self.main['cgen_input'][self.name[5:]] = self.input()
 		self.main['next_layout'] = self.prev
 		
 	def next_page(self, parent):
-		self.main['cgen_input'][self.name] = self.input()
+		self.main['cgen_input'][self.name[5:]] = self.input()
 		self.main['next_layout'] = self.next
-		
-		print(self.main['cgen_input'][self.name])
+		print(self.name[5:])
 					
 class CgenName(CgenLayout):
 	"""Character Generation page for setting the character's name"""
@@ -81,7 +80,7 @@ class CgenRace(CgenLayout):
 		self.title.text = "Who are your people?"
 		
 		# Set the input for this page
-		self.input = lambda: None
+		self.input = lambda: 'DarkKnight'
 		
 		# Set the previous page
 		self.prev = 'cgen_name'
@@ -108,7 +107,7 @@ class CgenClass(CgenLayout):
 		self.title.text = "What is your profession?"
 		
 		# Set the input for this page
-		self.input = lambda: None
+		self.input = lambda: 'ClassOne'
 		
 		# Set the previous page
 		self.prev = 'cgen_race'
@@ -118,9 +117,15 @@ class CgenClass(CgenLayout):
 		self.next = 'start'
 		
 		# Display currently selected race's name
-		self.label = bgui.Label(self.grid, "class_lbl", text="", pos=[.45, .85],
+		self.label = bgui.Label(self.grid, "class_lbl", text="", pos=[.46, .85],
 								pt_size=36, options = bgui.BGUI_DEFAULT)
 		self.label.text = "Class Bar"
+		
+		# Info text
+		self.class_info = bgui.TextBlock(self.grid, "class_info", pt_size=20, size=[0.44, .30],
+										pos=[.46, .5], options=bgui.BGUI_DEFAULT)
+		self.class_info.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum vitae enim in erat porttitor imperdiet. Pellentesque vestibulum, lectus eget consectetur aliquam, ligula enim accumsan mauris, id sollicitudin mauris metus eu purus. Etiam dapibus hendrerit tincidunt. Vestibulum ut urna mi, at tincidunt nunc. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Suspendisse potenti. Maecenas ac mi nunc. Nullam sed posuere augue. Donec massa lorem, gravida et dictum ut, luctus a lorem. Sed urna risus, sollicitudin ut gravida et, vulputate sit amet massa. Curabitur auctor neque at orci pulvinar commodo. In molestie mattis lectus, ac tincidunt nisi suscipit ac. Nam convallis laoreet cursus. Phasellus pharetra vestibulum odio id consequat."		
+		
 		
 class CharacterCreationLayout(Layout):
 	def __init__(self, parent):

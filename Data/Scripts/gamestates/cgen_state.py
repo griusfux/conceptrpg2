@@ -6,6 +6,8 @@ from Scripts.power_manager import *
 from Scripts.inventory import *
 from .base_state import BaseState
 
+from Scripts.class_data import ClassData
+
 
 class CharacterCreationState(BaseState):
 	"""A state that handles creating a new character"""
@@ -40,7 +42,7 @@ class CharacterCreationState(BaseState):
 			gameobj = main['engine'].add_object("CharacterEmpty")
 			
 			# Now add the mesh and armature based on race data
-			race = Race("DarkKnight")
+			race = Race(main['cgen_input']['race'])
 			main['engine'].load_library(race)
 			
 			root_ob = main['engine'].add_object(race.root_object)
@@ -53,8 +55,35 @@ class CharacterCreationState(BaseState):
 			# Setup the player logic
 			player = PlayerLogic(gameobj)
 			
+			# Set the player's name
+			player.name = main['cgen_input']['name']
+			
+			# Set the player's race
+			player.race = race
+			
+			# Set the player's class
+			# player.player_class = main['cgen_input']['class']
+			# player.player_class = Class('ClassOne')
+			# player.player_class = ClassData(player.player_class)
+			# print(player.player_class)
+			
+			
 			# Load stats for the player
-			player.load_stats(open('Kupoman.save', 'rb'))
+			# player.load_stats(open('Kupoman.save', 'rb'))# Set the player's level
+			player.level = 1
+			
+			# Set the player's abilities
+			player.str_ab = 10
+			player.con_ab = 10
+			player.dex_ab = 10
+			player.int_ab = 10
+			player.wis_ab = 10
+			player.cha_ab = 10
+			
+			player.speed_base = 5
+			
+			# Now it is time to fill in the rest of the stats
+			player.recalc_stats()
 			
 			# Fill the player's hit points
 			player.hp = player.max_hp
