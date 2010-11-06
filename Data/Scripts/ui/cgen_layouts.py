@@ -14,6 +14,8 @@ class CgenLayout(Layout):
 		self.prev = 'cgen_name'
 		self.next = 'cgen_name'
 		
+		self.new = True
+		
 		Layout.__init__(self, parent, "cgen_"+name, use_mouse=True)
 		
 		# Background image
@@ -60,7 +62,7 @@ class CgenName(CgenLayout):
 		
 		# Get the Player's name
 		self.name_input = bgui.TextInput(self.grid, "name_input", pos = [.33, .5],
-									size = [.33, .033], text='Kupoman',
+									size = [.33, .033], text='Hero',
 									options = bgui.BGUI_DEFAULT)
 		self.name_input.frame.colors = [(1, 1, 1, .5)]*4
 		
@@ -70,11 +72,18 @@ class CgenName(CgenLayout):
 		# Set the next page
 		self.next = 'cgen_race'
 		
+	def update(self, main):
+		CgenLayout.update(self, main)
+		
+		# Load a previous value if there is one
+		if self.new and "name" in self.main['cgen_input']:
+			self.name_input.text = self.main['cgen_input']['name']
+			self.new = False
+		
 class CgenRace(CgenLayout):
 	"""Character Generation page for selecting the player's race"""
 	def __init__(self, parent):
-		CgenLayout.__init__(self, parent, "race")
-		
+		CgenLayout.__init__(self, parent, "race")		
 		# Set the title
 		self.title.text = "Who are your people?"
 		
@@ -84,27 +93,43 @@ class CgenRace(CgenLayout):
 		# Set the next page
 		self.next = 'cgen_class'
 		
+		# Race selector
+		self.selector = PackageSelector(self.grid, "race_selector", Race, size=[0.95, 0.3],
+										pos=[0, .05], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+		
 		# Display currently selected race's name
 		self.label = bgui.Label(self.grid, "race_lbl", text="", pos=[.46, .85],
 								pt_size=36, options = bgui.BGUI_DEFAULT)
-		self.label.text = "Race Foo"
+		self.label.text = self.selector.current_package.name
 		
+		# Display the currently selected race's image
+		self.image = bgui.Image(self.grid, "race_img", self.selector.current_package.image,
+								aspect = 0.75, size = [.45, .45], pos = [.12, .4])
+								
 		# Info text
 		self.class_info = bgui.TextBlock(self.grid, "class_info", pt_size=20, size=[0.44, .30],
 										pos=[.46, .5], options=bgui.BGUI_DEFAULT)
 		self.class_info.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum vitae enim in erat porttitor imperdiet. Pellentesque vestibulum, lectus eget consectetur aliquam, ligula enim accumsan mauris, id sollicitudin mauris metus eu purus. Etiam dapibus hendrerit tincidunt. Vestibulum ut urna mi, at tincidunt nunc. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Suspendisse potenti. Maecenas ac mi nunc. Nullam sed posuere augue. Donec massa lorem, gravida et dictum ut, luctus a lorem. Sed urna risus, sollicitudin ut gravida et, vulputate sit amet massa. Curabitur auctor neque at orci pulvinar commodo. In molestie mattis lectus, ac tincidunt nisi suscipit ac. Nam convallis laoreet cursus. Phasellus pharetra vestibulum odio id consequat."		
-				
-		# Race selector
-		self.selector = PackageSelector(self.grid, "race_selector", Race, size=[0.95, 0.3],
-										pos=[0, .05], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 										
 		# Set the input for this page
 		self.input = lambda: self.selector.current_package
 		
 	def update(self, main):
 		CgenLayout.update(self, main)
+		
+		# Load a previous value if there is one
+		if self.new and "race" in self.main['cgen_input']:
+			for i, package in enumerate(self.selector.packages):
+				if package.name == self.main['cgen_input']['race'].name:
+					self.selector.selected = i
+					break
+			else:
+				print("Previous race selection not found")
+				self.selector.selected = 0
+			self.new = False
 	
 		self.label.text = self.selector.current_package.name
+		self.image.update_image(self.selector.current_package.image)
 		
 class CgenClass(CgenLayout):
 	"""Character Generation page for selecting the player's race"""
@@ -120,11 +145,19 @@ class CgenClass(CgenLayout):
 		# Set the next page
 		self.next_btn.text = "Start!"
 		self.next = 'start'
-		
-		# Display currently selected race's name
+				
+		# Class selector
+		self.selector = PackageSelector(self.grid, "class_selector", Class, size=[0.95, 0.3],
+										pos=[0, .05], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+										
+		# Display currently selected class's name
 		self.label = bgui.Label(self.grid, "class_lbl", text="", pos=[.46, .85],
 								pt_size=36, options = bgui.BGUI_DEFAULT)
-		self.label.text = "Class Bar"
+		self.label.text = self.selector.current_package.name
+		
+		# Display the currently selected race's image
+		self.image = bgui.Image(self.grid, "class_img", self.selector.current_package.image,
+								aspect = 0.75, size = [.45, .45], pos = [.12, .4])
 		
 		# Info text
 		self.class_info = bgui.TextBlock(self.grid, "class_info", pt_size=20, size=[0.44, .30],
@@ -140,8 +173,25 @@ class CgenClass(CgenLayout):
 		
 	def update(self, main):
 		CgenLayout.update(self, main)
+		
+		# Load a previous value if there is one
+		if self.new and "class" in self.main['cgen_input']:
+			for i, package in enumerate(self.selector.packages):
+				if package.name == self.main['cgen_input']['class'].name:
+					self.selector.selected = i
+					break
+			else:
+				print("Previous class selection not found")
+				self.selector.selected = 0
+			self.new = False
 	
 		self.label.text = self.selector.current_package.name
+		self.image.update_image(self.selector.current_package.image)
+		
+
+######################################################################
+#########################      OLD CODE      #########################
+######################################################################
 		
 class CharacterCreationLayout(Layout):
 	def __init__(self, parent):
