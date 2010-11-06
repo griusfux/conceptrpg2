@@ -14,7 +14,43 @@ class DefaultState(BaseState, BaseController):
 	##########
 	# Client
 	##########
+				
+	# Client functions
+	def position(self, main, cid, x, y, z):
+		server_pos = [x, y, z]
+		client_pos = main['net_players'][cid].object.position
+		
+		for i in range(3):
+			if abs(server_pos[i]-client_pos[i]) > 1.0:
+				client_pos[i] = server_pos[i]
 			
+		main['net_players'][cid].object.position = client_pos
+		
+	def move(self, main, cid, x, y, z):
+		main['net_players'][cid].object.move([x, y, z], min=[-50, -50, 0], max=[50, 50, 0])
+		
+	# Override BaseState's to
+	def to(self, main, id):
+		if id not in main['net_players']: return
+		
+		main['net_players'][cid].end()
+		del main['net_players'][cid]
+		print(cid, "timed out.")
+		
+	# Override BaseState's dis
+	def dis(self, main, id):
+		if id not in main['net_players']: return
+		
+		main['net_players'][cid].end()
+		del main['net_players'][cid]
+		print(cid, "diconnected.")
+	
+	# Register the functions
+	client_functions = {
+				position: (str, float, float, float),
+				move: (str, float, float, float)
+			}
+	
 	def client_init(self, main):
 		"""Intialize the client state"""
 		
@@ -35,57 +71,60 @@ class DefaultState(BaseState, BaseController):
 		# Handles input
 		inputs = main['input_system'].run()
 		
-		# Keep our connection to the server alive
-		val = main['client'].run()
-		
-		while val != None:
-			cid, data = val
+		# while val != None:
+			# cid, data = val
 			
 			# XXX This needs to be cleaned up
-			if cid not in main['net_players']:
-				main['net_players'][cid] = PlayerLogic(main['engine'].add_network_player("DarkKnightArm"))
+			# if cid not in main['net_players']:
+				# main['net_players'][cid] = PlayerLogic(main['engine'].add_network_player("DarkKnightArm"))
 				# root = main['engine'].add_object("NetEmpty")
 				# player = main['engine'].add_object("DarkKnightArm")
 				# player.gameobj.setParent(root.gameobj)
 				# main['net_players'][cid] = PlayerLogic(root)
 			
 			# Parse the inputs from the server
-			try:
-				for input in data:
-					if input.startswith('mov'):
-						input = input.replace('mov', '')
-						main['net_players'][cid].object.move([float(i) for i in input.split('$')], min=[-50, -50, 0], max=[50, 50, 0])
-					elif input.startswith('pos'):
-						input = input.replace('pos', '')
-						server_pos = [float(i) for i in input.split('$')]
-						client_pos = main['net_players'][cid].object.position
+			# try:
+				# for input in data:
+					# if input.startswith('mov'):
+						# input = input.replace('mov', '')
+						# main['net_players'][cid].object.move([float(i) for i in input.split('$')], min=[-50, -50, 0], max=[50, 50, 0])
+					# elif input.startswith('pos'):
+						# input = input.replace('pos', '')
+						# server_pos = [float(i) for i in input.split('$')]
+						# client_pos = main['net_players'][cid].object.position
 						
-						for i in range(3):
-							if abs(server_pos[i]-client_pos[i]) > 1.0:
-								client_pos[i] = server_pos[i]
+						# for i in range(3):
+							# if abs(server_pos[i]-client_pos[i]) > 1.0:
+								# client_pos[i] = server_pos[i]
 							
-						main['net_players'][cid].object.position = client_pos
-					elif input.startswith('anim'):
-						input = input.replace('anim', '')
-						main['net_players'][cid].object.move((0, 0, 0))
-						main['net_players'][cid].object.play_animation(input)
-					elif input.startswith('to'):
-						main['net_players'][cid].object.end()
-						del main['net_players'][cid]
-						print(cid, "timed out")
-					elif input.startswith('dis'):
-						main['net_players'][cid].object.end()
-						del main['net_players'][cid]
-						print(cid, "disconnected")
-			except ValueError as e:
-				print(e)
-				print(val)
+						# main['net_players'][cid].object.position = client_pos
+					# elif input.startswith('anim'):
+						# input = input.replace('anim', '')
+						# main['net_players'][cid].object.move((0, 0, 0))
+						# main['net_players'][cid].object.play_animation(input)
+					# elif input.startswith('to'):
+						# main['net_players'][cid].object.end()
+						# del main['net_players'][cid]
+						# print(cid, "timed out")
+					# elif input.startswith('dis'):
+						# main['net_players'][cid].object.end()
+						# del main['net_players'][cid]
+						# print(cid, "disconnected")
+			# except ValueError as e:
+				# print(e)
+				# print(val)
 					
-			val = main['client'].run()
+			# val = main['client'].run()
+		# Our id so we can talk with the server
+		id = main['client'].id
 			
-		# The message we will send to the server
+		# Update our position
 		pos = main['player'].object.position
-		msg = "pos%.4f$%.4f$%.4f " % (pos[0], pos[1], pos[2])
+		# self.server.invoke('position', id, *pos)
+		
+		# Our movement vector
+		movement = [0.0, 0.0, 0.0]
+		# msg = "pos%.4f$%.4f$%.4f " % (pos[0], pos[1], pos[2])
 		
 		if inputs:
 			if ("SwitchCamera", "INPUT_ACTIVE") in inputs:
@@ -108,22 +147,24 @@ class DefaultState(BaseState, BaseController):
 					main['player'].powers.make_prev_active()
 
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
-					msg += "mov0$5$0 "
+					movement[1] = 5.0
 				if ("MoveBackward", "INPUT_ACTIVE") in inputs:
-					msg += "mov0$-5$0 "
+					movement[1] = -5.0
 				if ("MoveRight", "INPUT_ACTIVE") in inputs:
-					msg += "mov5$0$0 "
+					movement[0] = 5.0
 				if ("MoveLeft", "INPUT_ACTIVE") in inputs:
-					msg += "mov-5$0$0 "
+					movement[0] = -5.0
 					
-				if 'mov' not in msg:
-					msg += "mov0$0$0"
+				# if 'mov' not in msg:
+					# msg += "mov0$0$0"
 					# self.play_animation(None, "idle")
 				# else:
 					# self.play_animation(None, "move")
 	
 		# Send the message
-		main['client'].send(msg.strip())
+		# if movement != [0.0, 0.0, 0.0]:
+		self.server.invoke("move", id, *movement)
+		# main['client'].send(msg.strip())
 		
 		# Check to see if we need to move to the combat state
 		# XXX This needs cleanup, we shouldn't be accessing KX_GameObject attributes
@@ -139,23 +180,39 @@ class DefaultState(BaseState, BaseController):
 	# Server
 	##########
 		
+	# Server functions
+	def position(self, main, client, cid, x, y, z):
+		# We could run checks here, but for now we just rebroadcast
+		self.clients.invoke('position', cid, x, y, z)
+		
+	def move(self, main, client, cid, x, y, z):
+		# We could run checks here, but for now we just rebroadcast
+		self.clients.invoke('move', cid, x, y, z)
+		
+	# Register the functions
+	server_functions = {
+				position: (str, float, float, float),
+				move: (str, float, float, float)
+			}
 	def server_init(self, main):
 		"""Initialize the server state"""
 		pass
 		
 	def server_run(self, main, client):
 		"""Server-side run method"""
+		pass
 
 		# Here we just need to broadcast the data to the other clients
-		client.server.broadcast(client.id + " " + client.data)
+		# if client.data:
+			# client.server.broadcast(client.id + " " + client.data)
 		
 		
-		for input in client.data.split():
-			if input.startswith("dis"):
-				client.server.drop_client(client.id, "Disconnected")
-			elif input.startswith("state"):
-				input = input.replace('state', '')
-				return (input, 'SWITCH')
+		# for input in client.data.split():
+			# if input.startswith("dis"):
+				# client.server.drop_client(client.id, "Disconnected")
+			# elif input.startswith("state"):
+				# input = input.replace('state', '')
+				# return (input, 'SWITCH')
 		
 	##########
 	# Other

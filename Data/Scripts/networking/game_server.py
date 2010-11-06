@@ -34,7 +34,7 @@ class ClientHandle():
 			self.id = data.split()[0]
 			self.data = " ".join([i for i in data.split()[1:]])
 		
-			print("Message %s from %s" % (data, client_addr))
+			# print("Message %s from %s" % (data, client_addr))
 			
 			# for input in self.data.split():
 				# if input.startswith('state'):
@@ -57,6 +57,9 @@ class GameServer():
 				
 		# The "main" dict for storing globals
 		self.main = {}
+		
+		# Store the server itself (for RPC stuff)
+		self.main['server'] = self
 		
 		# Client info
 		self.main['clients'] = {}
@@ -85,9 +88,9 @@ class GameServer():
 					data = ""
 				
 				if data:
-					client_id = data.split()[0]
+					d = data.split()
+					client_id = d[0]
 					
-					print(client_addr)
 					if client_id not in self.main['clients']:
 						self.register_client(client_id, client_addr)
 					elif self.main['clients'][client_id].addr != client_addr:
@@ -95,32 +98,44 @@ class GameServer():
 						while client_id in self.main['clients']:
 							client_id = client_id + "_"
 							
-						self.register_client(self, client_id, client_addr)
-						
-					self.main['clients'][client_id].handle_request(data, client_addr)
+						self.register_client(client_id, client_addr)
+					
+					if len(d) > 1 and d[1] == "ping":
+						self.socket.sendto(b"pong", client_addr)
+						self.main['clients'][client_id].last_update = time.time()
+					else:
+						self.main['clients'][client_id].handle_request(data, client_addr)
 				
 			# Check the status of the clients
 			for cid in [i for i in self.main['clients'].keys()]:
 				if time.time() - self.main['clients'][cid].last_update > self.timeout:
-					self.broadcast(cid + " to")
+					self.broadcast("to:"+cid)
 					self.drop_client(cid, "Timed Out")
 					
 	def register_client(self, client_id, client_addr):
 		"""Registers a client"""
 		
 		print(client_id, "Registered")
+		self.socket.sendto(b"cid:"+bytes(client_id, NET_ENCODING), client_addr)
 		self.main['clients'][client_id] = ClientHandle(self, client_addr)
 					
 	def drop_client(self, client_id, reason):
 		"""Drop a client"""
 		
-		print(client_id, reason)
-		del self.main['clients'][client_id]
+		if client_id in self.main['clients']:
+			print(client_id, reason)
+			del self.main['clients'][client_id]
+		
+	def send(self, data):
+		"""Alias to broadcast for use with RPC"""
+		self.broadcast(data)
 		
 	def broadcast(self, data):
 		"""Broadcast a message to all of the clients"""
 		
-		print("BROADCAST:", data)
+		# Uncomment to get debug prints
+		# print("BROADCAST:", data)
 		
 		for cid, client in self.main['clients'].items():
 			self.socket.sendto(bytes(data, NET_ENCODING), client.addr)
+			

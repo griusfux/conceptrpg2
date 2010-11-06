@@ -25,7 +25,8 @@ import subprocess
 import pickle
 
 # Create a shorthand for gl
-import GameLogic as gl
+import bge
+gl = bge.logic
 
 # Globals for networking
 user = 'Kupoman'
@@ -108,13 +109,21 @@ def camera(cont):
 	# Reset the mouse
 	mouse.position = (0.5, 0.5)
 
-def exit_game():
+def exit_game(main):
 	print("Exiting...")
+	
+	# We use try/except so that we always reach gl.endGame()
 	try:
+		if 'client' in main:
+			main['client'].send("dis:"+main['client'].id)
+			
 		if hasattr(gl, "server"):
 			gl.server.terminate()
-	except:
-		pass
+			del gl.server
+	except Exception as e:
+		print(e)
+	
+	gl.error = True
 	gl.endGame()
 					
 def in_game(cont):
@@ -127,7 +136,7 @@ def in_game(cont):
 		
 		# Check for and handle exits
 		if cont.sensors['exit'].positive:
-			exit_game()
+			exit_game(own)
 		else:
 			# Update the ui
 			if 'ui_system' in own:

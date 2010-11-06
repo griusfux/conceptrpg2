@@ -7,11 +7,6 @@ import time
 
 class DungeonGenerationState(BaseState):
 	"""A state used to build dungeons"""
-	
-	def __init__(self, main, is_server=False):
-		"""DungeonBuildingState constructor"""
-		
-		BaseState.__init__(self, main, is_server)
 			
 	##########
 	# Client
@@ -43,9 +38,6 @@ class DungeonGenerationState(BaseState):
 		
 	def client_run(self, main):
 		"""Client-side run method"""
-		
-		# Keep our connection to the server up
-		main['client'].send('')
 		
 		if not main['dgen'].rooms:
 			main['dgen'].generate_first(main)
