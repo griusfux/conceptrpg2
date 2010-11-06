@@ -170,10 +170,6 @@ class CharacterLogic:
 		target_vector = self.object.get_local_vector_to(target)
 		
 		self.object.move((self.speed * target_vector[0], self.speed * target_vector[1], 0), mode=0)
-
-	###################
-	## Load functions
-	def load_class(self, classfile):
 		
 		
 class PlayerLogic(CharacterLogic):

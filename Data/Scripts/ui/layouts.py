@@ -38,7 +38,7 @@ class DefaultStateLayout(Layout):
 	def __init__(self, sys):
 		Layout.__init__(self, sys, "default_state_layout")
 		
-		self.name = bgui.Label(self, "ds_name", pt_size=42, pos=[0.05, .2])
+		self.player_name = bgui.Label(self, "ds_name", pt_size=42, pos=[0.05, .2])
 		self.hp = bgui.Label(self, "ds_hp", pt_size=42, pos=[0.05, 0.05])
 		self.power = bgui.Label(self, "ds_power", pt_size=42, pos=[0.05, 0.15])
 		self.lock_msg = bgui.Label(self, "lock_msg", pt_size=42, pos=[0.25, 0.05])
