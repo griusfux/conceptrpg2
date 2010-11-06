@@ -187,7 +187,7 @@ class Camera:
 		return [[x,y,z] for x, y, z in self.pivot.worldOrientation]
 
 	@world_orientation.setter
-	def set_world_orientation(self, value):
+	def world_orientation(self, value):
 		self.pivot.worldOrientation = value
 		
 	@property
@@ -196,7 +196,7 @@ class Camera:
 		return [[x,y,z] for x, y, z in self.pivot.localOrientation]
 
 	@local_orientation.setter
-	def set_local_orientation(self, value):
+	def local_orientation(self, value):
 		self.pivot.localOrientation = value
 
 	def reset_orientation(self):
