@@ -19,10 +19,6 @@ class CharacterCreationState(BaseState):
 	def client_init(self, main):
 		"""Intialize the client state"""
 		
-		# Load some packages for the ui to make use of
-		main['races'] = Race.get_package_list()
-		main['classes'] = Class.get_package_list()
-		
 		main['last_layout'] = 'char_creation'
 		main['next_layout'] = 'cgen_name'
 		main['cgen_input'] = {}
@@ -42,7 +38,7 @@ class CharacterCreationState(BaseState):
 			gameobj = main['engine'].add_object("CharacterEmpty")
 			
 			# Now add the mesh and armature based on race data
-			race = Race(main['cgen_input']['race'])
+			race = main['cgen_input']['race']
 			main['engine'].load_library(race)
 			
 			root_ob = main['engine'].add_object(race.root_object)
@@ -62,11 +58,7 @@ class CharacterCreationState(BaseState):
 			player.race = race
 			
 			# Set the player's class
-			# player.player_class = main['cgen_input']['class']
-			# player.player_class = Class('ClassOne')
-			# player.player_class = ClassData(player.player_class)
-			# print(player.player_class)
-			
+			player.player_class = main['cgen_input']['class']			
 			
 			# Load stats for the player
 			# player.load_stats(open('Kupoman.save', 'rb'))# Set the player's level
@@ -142,8 +134,6 @@ class CharacterCreationState(BaseState):
 		"""Cleanup the client state"""
 		
 		# We added these so we need to get rid of them too
-		del main['races']
-		del main['classes']
 		
 		del main['last_layout']
 		del main['next_layout']

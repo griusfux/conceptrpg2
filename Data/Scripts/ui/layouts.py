@@ -45,7 +45,7 @@ class DefaultStateLayout(Layout):
 		
 	def update(self, main):
 		player = main['player']
-		self.name.text = player.name
+		self.player_name.text = player.name
 		self.hp.text = "HP: %d/%d" % (player.hp, player.max_hp)
 		self.power.text = player.powers.active.name
 		self.lock_msg.text = "LOCKED: %s" % (main['player'].lock - time()) if main['player'].lock else ""
