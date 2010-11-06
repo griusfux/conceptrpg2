@@ -55,7 +55,7 @@ class CombatState(BaseState, BaseController):
 			
 			# Setup logic/ai
 			logic = MonsterLogic(obj, monster)
-			#([name, state, [(transition, target_state)]], [second_name, second_state, [(tran1, target1), (tran2, target2)]]
+			#([name, [actions], [entry_actions], [exit_actions], [(transition, target_state)]], [second_name, [actions], [entry_actions], [exit_actions], [(tran1, target1), (tran2, target2)]]
 			logic.ai = AiStateMachine(logic, (["idle", ["seek"], [], [], [("hp_lt_zero", "death"),]], ["death", ["die"], [], [], []]))
 			
 			tile.fill(logic)
@@ -155,7 +155,13 @@ class CombatState(BaseState, BaseController):
 			monster.actions = monster.ai.run()
 			
 		# Run the ai manager
-		self.ai_manager.run()
+		#self.ai_manager.run()
+		
+		# Get rid of any dead guys
+		for monster in self.monster_list:
+			if monster.hp <= 0:
+				self.monster_list.remove(monster)
+				monster.object.end()
 			
 		# The message we will send to the server
 		pos = main['player'].object.position
@@ -384,6 +390,8 @@ class CombatState(BaseState, BaseController):
 		"""Handles linear and angular movement of a character"""
 		msg = "mov"+"$".join(["%.3f" % i for i in linear])
 		
+		return msg
+		
 		old_position = character.object.position
 		
 		# Predict a forward point to see if the character can move there
@@ -400,7 +408,7 @@ class CombatState(BaseState, BaseController):
 		if  new_tile.valid or new_tile.object == character:
 			character.object.move(linear, local = local)
 			
-			#update new_tile to accomadate for padding in the prediction
+			# update new_tile to accomadate for padding in the prediction
 			new_tile = self.grid.tile_from_point(character.object.position)
 			
 			# If the character has changed tiles, the tiles need to be updated to reflect this
