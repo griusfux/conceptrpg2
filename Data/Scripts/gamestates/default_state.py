@@ -1,5 +1,6 @@
 # $Id$
 
+from Scripts.mathutils import Vector
 from Scripts.character_logic import PlayerLogic
 from .base_state import BaseState, BaseController
 
@@ -70,61 +71,17 @@ class DefaultState(BaseState, BaseController):
 		
 		# Handles input
 		inputs = main['input_system'].run()
-		
-		# while val != None:
-			# cid, data = val
-			
-			# XXX This needs to be cleaned up
-			# if cid not in main['net_players']:
-				# main['net_players'][cid] = PlayerLogic(main['engine'].add_network_player("DarkKnightArm"))
-				# root = main['engine'].add_object("NetEmpty")
-				# player = main['engine'].add_object("DarkKnightArm")
-				# player.gameobj.setParent(root.gameobj)
-				# main['net_players'][cid] = PlayerLogic(root)
-			
-			# Parse the inputs from the server
-			# try:
-				# for input in data:
-					# if input.startswith('mov'):
-						# input = input.replace('mov', '')
-						# main['net_players'][cid].object.move([float(i) for i in input.split('$')], min=[-50, -50, 0], max=[50, 50, 0])
-					# elif input.startswith('pos'):
-						# input = input.replace('pos', '')
-						# server_pos = [float(i) for i in input.split('$')]
-						# client_pos = main['net_players'][cid].object.position
-						
-						# for i in range(3):
-							# if abs(server_pos[i]-client_pos[i]) > 1.0:
-								# client_pos[i] = server_pos[i]
-							
-						# main['net_players'][cid].object.position = client_pos
-					# elif input.startswith('anim'):
-						# input = input.replace('anim', '')
-						# main['net_players'][cid].object.move((0, 0, 0))
-						# main['net_players'][cid].object.play_animation(input)
-					# elif input.startswith('to'):
-						# main['net_players'][cid].object.end()
-						# del main['net_players'][cid]
-						# print(cid, "timed out")
-					# elif input.startswith('dis'):
-						# main['net_players'][cid].object.end()
-						# del main['net_players'][cid]
-						# print(cid, "disconnected")
-			# except ValueError as e:
-				# print(e)
-				# print(val)
-					
-			# val = main['client'].run()
+
 		# Our id so we can talk with the server
 		id = main['client'].id
 			
 		# Update our position
-		pos = main['player'].object.position
+		# pos = main['player'].object.position
 		# self.server.invoke('position', id, *pos)
 		
-		# Our movement vector
+		# Our movement vector and player speed
 		movement = [0.0, 0.0, 0.0]
-		# msg = "pos%.4f$%.4f$%.4f " % (pos[0], pos[1], pos[2])
+		speed = main['player'].speed
 		
 		if inputs:
 			if ("SwitchCamera", "INPUT_ACTIVE") in inputs:
@@ -147,24 +104,20 @@ class DefaultState(BaseState, BaseController):
 					main['player'].powers.make_prev_active()
 
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
-					movement[1] = 5.0
+					movement[1] = speed
 				if ("MoveBackward", "INPUT_ACTIVE") in inputs:
-					movement[1] = -5.0
+					movement[1] = -speed
 				if ("MoveRight", "INPUT_ACTIVE") in inputs:
-					movement[0] = 5.0
+					movement[0] = speed
 				if ("MoveLeft", "INPUT_ACTIVE") in inputs:
-					movement[0] = -5.0
-					
-				# if 'mov' not in msg:
-					# msg += "mov0$0$0"
-					# self.play_animation(None, "idle")
-				# else:
-					# self.play_animation(None, "move")
+					movement[0] = -speed
 	
+		# Normalize the vector to the character's speed
+		if movement != [0.0, 0.0, 0.0]:
+			movement = [float(i) for i in (Vector(movement).normalize()*speed)]
+			print(movement)
 		# Send the message
-		# if movement != [0.0, 0.0, 0.0]:
 		self.server.invoke("move", id, *movement)
-		# main['client'].send(msg.strip())
 		
 		# Check to see if we need to move to the combat state
 		# XXX This needs cleanup, we shouldn't be accessing KX_GameObject attributes
@@ -201,18 +154,6 @@ class DefaultState(BaseState, BaseController):
 	def server_run(self, main, client):
 		"""Server-side run method"""
 		pass
-
-		# Here we just need to broadcast the data to the other clients
-		# if client.data:
-			# client.server.broadcast(client.id + " " + client.data)
-		
-		
-		# for input in client.data.split():
-			# if input.startswith("dis"):
-				# client.server.drop_client(client.id, "Disconnected")
-			# elif input.startswith("state"):
-				# input = input.replace('state', '')
-				# return (input, 'SWITCH')
 		
 	##########
 	# Other
