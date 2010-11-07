@@ -7,8 +7,6 @@ import pickle
 import random
 import time
 
-from Scripts.monster_data import MonsterData
-
 class CharacterLogic:
 	"""A logic object that stores all the information and methods of the player"""
 	

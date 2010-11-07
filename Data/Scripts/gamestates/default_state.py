@@ -115,7 +115,7 @@ class DefaultState(BaseState, BaseController):
 		# Normalize the vector to the character's speed
 		if movement != [0.0, 0.0, 0.0]:
 			movement = [float(i) for i in (Vector(movement).normalize()*speed)]
-			print(movement)
+
 		# Send the message
 		self.server.invoke("move", id, *movement)
 		

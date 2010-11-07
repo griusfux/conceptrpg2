@@ -14,9 +14,6 @@ from Scripts.gamestate_manager import GameStateManager
 from Scripts.power_manager import PowerManager
 from Scripts.inventory import Inventory
 
-from Scripts.race_data import *
-from Scripts.monster_data import *
-
 from Scripts.blender_input_system import BlenderInputSystem
 
 from Scripts.networking.game_client import GameClient
