@@ -84,10 +84,10 @@ class BaseState:
 		self.main = main
 		
 		# Merge function dicts
-		if hasattr(self, "client_functions") and hasattr(super(BaseState), "client_functions"):
-			self.client_functions.update(super(BaseState).client_functions)
-		if hasattr(self, "server_functions") and hasattr(super(BaseState), "server_functions"):
-			self.server_functions.update(super(BaseState).server_functions)
+		if hasattr(self, "client_functions") and type(self) is not BaseState:
+			self.client_functions.update(BaseState.client_functions)
+		if hasattr(self, "server_functions") and type(self) is not BaseState:
+			self.server_functions.update(BaseState.server_functions)
 		
 		# Setup the Remote Procedure Calls
 		c = main['server'] if is_server else main['client']
