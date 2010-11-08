@@ -105,10 +105,18 @@ class Package:
 			new_file[0] += '_new'
 			shutil.copyfile('.'.join(new_file), path+'/'+cls._config)
 			
+			# Create an empty blendfile
+			if cls._blend:
+				open(path+'/'+cls._blend, "wb").close()
+				
+			# Create an empty image file
+			if cls._img:
+				open(path+'/'+cls._img, "wb").close()
+			
 			return cls(package_name)
 		except Exception as e:
 			print(e)
-			print("Unable to create config file in "+path)
+			print("Unable to create package in "+path)
 		
 		return None
 		
