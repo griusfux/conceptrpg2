@@ -69,7 +69,7 @@ class EditorWindow(QMainWindow):
 		# Create the sub trees
 		# XXX uncomment subtrees when they are ready
 		self.create_subtree('Armors', Armor)
-		# self.create_subtree('Classes', Class)
+		self.create_subtree('Classes', Class)
 		self.create_subtree('Decks', EncounterDeck)
 		self.create_subtree('Items', Item)
 		self.create_subtree('Maps', Map)
