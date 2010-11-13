@@ -37,6 +37,13 @@ scale_min = 0.25
 
 # Error handling global
 gl.error = False
+
+# Server script/runtime (in order of precedence)
+servers = [
+	"python server.py",
+	"python server.pyc",
+	"server.exe"
+]
 	
 def animation(cont):
 	mess = cont.sensors['mess']
@@ -184,10 +191,17 @@ def init(own):
 			if hasattr(gl, 'server'):
 				gl.server.terminate()
 				
+			# Find something to run
+			server = ""
+			for s in servers:
+				if os.path.exists(s.split()[-1]):
+					server = s
+					break
+
 			si = subprocess.STARTUPINFO()
 			si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 			si.wShowWindow = 7 #SW_SHOWMINNOACTIVE
-			gl.server = subprocess.Popen("python server.py", startupinfo=si, creationflags=subprocess.CREATE_NEW_CONSOLE)
+			gl.server = subprocess.Popen(s, startupinfo=si, creationflags=subprocess.CREATE_NEW_CONSOLE)
 		
 		return		
 	
