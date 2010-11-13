@@ -71,9 +71,8 @@ class Package:
 			
 		# If there is an image file, copy it to a temp location
 		if self._img:
-			with open(os.path.join(path, self._img), 'rb') as img:
-				self._image = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
-				self._image.write(img.read())
+			self._image = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+			self._image.write(package.read(self._img))
 		else:
 			self._image = None
 			
@@ -85,6 +84,9 @@ class Package:
 		
 		# Store the path for possible later use
 		self._path = path
+		
+		# Store the package
+		self._package = package
 		
 		# Validate the file
 		self._validate()
@@ -127,9 +129,9 @@ class Package:
 		for f in os.listdir(cls._dir):
 			if f.startswith('.'): continue
 		
-			if os.path.isdir(os.path.join(cls._dir, f)):
+			if os.path.isdir(os.path.join(cls._dir, f)) or f.endswith(cls._ext):
 				try:
-					packages.append(cls(f))
+					packages.append(cls(f.replace("."+cls._ext, "")))
 				except Exception as e:
 					print(f, e)
 				
@@ -200,6 +202,22 @@ class Package:
 				setattr(self, key, self._dict[key])
 			return True
 			
+	def pack(self, path):
+		zip = zipfile.ZipFile(path+'.'+self._ext, "w", zipfile.ZIP_DEFLATED)
+		
+		# Write config
+		zip.write(os.path.join(self._path, self._config), arcname=self._config)
+		
+		# Write blend
+		if self._blend:
+			zip.write(os.path.join(self._path, self._blend), arcname=self._blend)
+			
+		# Write image
+		if self._img:
+			zip.write(os.path.join(self._path, self._img), arcname=self._img)
+			
+		zip.close()
+		
 	def write(self):
 		"""Write the archive file back out to disk"""
 		
@@ -289,15 +307,30 @@ class Power(Package):
 	def __init__(self, package_name):
 		Package.__init__(self, package_name)
 		
-		import sys
-		sys.path.append(self._path)
-		import power
-		self._use = power.power
-		
-		sys.path.remove(self._path)
+		if not os.path.exists(os.path.join(self._path, self._ext)):
+			import sys
+			sys.path.append(self._path)
+			import power as p
+			sys.path.remove(self._path)
+		else:
+			import zipimport
+			zi = zipimport.zipimporter(os.path.join(self._path, self._ext))
+			p = zi.load_module("power")
+			
+		self._use = p.power
 		
 	def use(self, controller, user):
 		self._use(self, controller, user)
+		
+	def pack(self, path):
+		Package.pack(self, path)
+		
+		zip = zipfile.ZipFile(path+'.'+self._ext, "a", zipfile.ZIP_DEFLATED)
+		
+		# Copy py file
+		zip.write(os.path.join(self._path, 'power.py'), arcname='power.py')
+		
+		zip.close()
 		
 class Item(Package):
 	"""Item Package"""
