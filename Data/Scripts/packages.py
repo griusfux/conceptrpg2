@@ -2,12 +2,15 @@
 
 import json
 import os
+import imp
 import shutil
 import zipfile
 import gzip
 import io
 import traceback
 import tempfile
+
+from . import rc4
 
 class PackageError(Exception):
 	"""Package file related errors"""
@@ -44,6 +47,8 @@ class Package:
 	_dir = ''
 	_img = ''
 	
+	key = None
+	
 	def __init__(self, package_name):
 		# Combine the package name and the directory to get the filepath
 		path = self._dir + '/' + package_name
@@ -52,7 +57,15 @@ class Package:
 		if not os.path.exists(path):
 			if os.path.exists(path+'.'+self._ext):
 				path += '.'+self._ext
-				package = zipfile.ZipFile(path)
+				if zipfile.is_zipfile(path):
+					package = zipfile.ZipFile(path)
+				elif self.key:
+					# Assume the package is encrypted
+					cipher = rc4.rc4(self.key, 0)
+					with open(path, 'rb') as f:
+						data = cipher.decode(f.read())
+						
+					package = zipfile.ZipFile(io.BytesIO(data))
 			else:
 				raise PackageError("Could not find package: "+package_name)
 		else:
@@ -307,16 +320,19 @@ class Power(Package):
 	def __init__(self, package_name):
 		Package.__init__(self, package_name)
 		
-		if not os.path.exists(os.path.join(self._path, self._ext)):
-			import sys
-			sys.path.append(self._path)
-			import power as p
-			sys.path.remove(self._path)
-		else:
-			import zipimport
-			zi = zipimport.zipimporter(os.path.join(self._path, self._ext))
-			p = zi.load_module("power")
-			
+		# Write the script to a temp file
+		pyfile = tempfile.NamedTemporaryFile(suffix=".py", delete=False)
+		pyfile.write(self._package.read("power.py"))
+		pyfile.read() # Not sure why this is needed, but the module isn't properly loaded otherwise
+		
+		# Load the module
+		p = imp.load_source("power", pyfile.name)
+		
+		# We don't need the temp file anymore, so clean up
+		pyfile.close()
+		os.remove(pyfile.name)
+
+		# Grab the method from the module
 		self._use = p.power
 		
 	def use(self, controller, user):
