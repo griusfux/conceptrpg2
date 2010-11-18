@@ -19,6 +19,11 @@ class Object:
 	def __init__(self, gameobj, armature=None):
 		self.gameobj = gameobj
 		self._armature = armature
+		
+		# Create the socket dictionary
+		if self._armature and self_armature.children:
+			self.initialize_sockets()
+		
 		# used for servo motion
 		self.prev_error = Vector((0.0, 0.0, 0.0));
 		self.tot_error = Vector((0.0, 0.0, 0.0));
@@ -159,6 +164,9 @@ class Object:
 	@armature.setter
 	def armature(self, value):
 		self._armature = value.gameobj
+		# If the new object has children, try initializing sockets
+		if self._armature.children:
+			self.initialize_sockets()
 		
 	@property
 	def color(self):
@@ -167,6 +175,48 @@ class Object:
 	@color.setter
 	def color(self, color):
 		self.gameobj.color = color
+		
+	def initialize_sockets(self):
+		if not self._armature:
+			print("WARNING: %s has no armature to contain sockets" % (self.gameobj.name))
+			return
+			
+		if self._armature.children:
+			self._sockets = {child.name.lower()[7:] : child for child in self._armature.children if child.name.lower().startswith("socket_")}
+			print()
+			print(self._sockets)
+			print()
+		else:
+			print("WARNING: %s has no sockets" % self.gameobj.name)
+		
+	def socket_fill(self, socket_string, object):
+		"""Fills the given socket with the given object"""
+		if socket_string not in self._sockets:
+			print("WARNING: No socket named %s" % socket_string)
+			return
+			
+		socket = self._sockets[socket_string]
+		object.position = socket.worldPosition
+		object.set_orientation(socket.worldOrientation[:])
+		object.gameobj.setParent(socket)
+		
+	def socket_clear(self, socket_string, object = None):
+		"""Clears the given item from the given socket. An object argument of None removes all items from the socket"""
+		if socket_string not in self._sockets:
+			print("WARNING: No socket named %s" % socket_string)
+			return
+			
+		socket = self._sockets[socket_string]
+		if object == None:
+			for child in socket.children:
+				child.removeParent()
+			return
+			
+		if object.gameobj in socket.children:
+			socket[object.gameobj].removeParent()
+		else:
+			print("WARNING: Object %s not in socket %s." % (object, socket_string))
+		
 		
 class Vertex:
 	"""KX_VertexProxy wrapper"""

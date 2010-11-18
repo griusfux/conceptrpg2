@@ -10,7 +10,18 @@ import time
 class CharacterLogic:
 	"""A logic object that stores all the information and methods of the player"""
 	
-	def __init__(self, obj):	
+	class Dummy:
+		"""A dummy item to represent a null for an equipment slot"""
+		def __init__(self):
+			self.name = "null"
+			self.type = "none"
+			self.weight = self.ac = self.bonus = self.speed = 0
+			
+	def __init__(self, obj):
+		# Set up weapon sockets
+		if obj.armature:
+			self.armature = obj.armature
+			
 		#Player information
 		self.name		= ""
 		self.level		= 0
@@ -75,10 +86,13 @@ class CharacterLogic:
 		#senses
 		#skills
 		
-		#equipment
-		self.equipped_armor	= None
-		self.equipped_shield = None
-		self.equipped_weapon = None
+		#inventory and equipment
+		self.inventory = []
+		self._armor	= self.Dummy()
+		self._shield = self.Dummy()
+		self._weapon = self.Dummy()
+		self.gold	= 0
+		self.inventory_weight = 0
 		
 		# the character's game object
 		self.object = obj
@@ -104,8 +118,8 @@ class CharacterLogic:
 		self.cha_mod = -5 + self.cha_ab // 2
 		
 		#defenses
-		self.ac	= 10 + self.level//2 + self.ac_bonus + self.shield_bonus + self.ac_buff
-		if self.equipped_armor == None or self.equipped_armor.type == "light":
+		self.ac	= 10 + self.level//2 + self.armor.ac + self.shield.bonus + self.ac_buff
+		if self.armor.type in ("light", "none"):
 			self.ac	= self.ac + self.dex_mod if(self.dex_ab > self.int_ab) else self.int_mod
 		self.fortitude = 10 + self.level//2 + self.fort_buff
 		self.fortitude += self.str_mod if(self.str_ab > self.con_ab) else self.con_mod
@@ -125,25 +139,66 @@ class CharacterLogic:
 		self.surge_value= self.max_hp // 4
 		
 		#speed
-		self.speed = self.speed_base + self.speed_armor_penalty + self.speed_item_mod + self.speed_misc_mod
+		self.speed = self.speed_base + self.armor.speed + self.speed_item_mod + self.speed_misc_mod
+	
+	######################
+	# Equipment properties
+	
+	@property
+	def armor(self):
+		return self._armor
+	@armor.setter
+	def armor(self, value):
+		self.ac -= self._armor.ac
+		self.speed -= self._armor.speed
+		self._armor = self.Dummy() if value == None else value
+		self.ac += self._armor.ac
+		self.speed += self._armor.speed
+	
+	@property
+	def shield(self):
+		return self._shield	
+	@shield.setter
+	def shield(self, value):
+		self.ac -= self._shield.bonus
+		self._shield = self.Dummy() if value == None else value
+		self.ac += self._shield.bonus
+	
+	@property
+	def weapon(self):
+		if self._weapon.type == "none":
+			self._weapon.type == "unarmed"
+		return self._weapon
+	@weapon.setter
+	def weapon(self, value):
+		self._weapon = self.Dummy() if value == None else value
+	
+	#######################
+	# Hand socket functions
+	
+	def set_left_hand(self, object):
+		if self.armature:
+			self.object.socket_fill("left_hand", object)
+		else:
+			print("WARNING: Character %s has no armature to contain sockets" % self.name)
+			
+	def clear_left_hand(self, object = None):
+		if self.armature:
+			self.object.socket_clear("left_hand", object)
+		else:
+			print("WARNING: Character %s has no armature to contain sockets" % self.name)
 		
-		
-	def equip_armor(self, armor):
-		"""Changes stats to newly equipped armor and then recalculates stats"""
-		self.equipped_armor = armor
-		self.ac_bonus = armor.ac_bonus
-		self.speed_armor_penalty = armor.speed
-		self.recalc_stats()
-		
-	def equip_shield(self, shield):
-		"""Changes stats to newly equipped shield and then recalculates stats"""
-		self.equipped_shield = shield
-		self.shield_bonus = shield.shield_bonus
-		self.recalc_stats()
-		
-	def equip_weapon(self, weapon):
-		"""Changes stats to newly equipped weapon"""
-		self.equipped_weapon = weapon
+	def set_right_hand(self, object):
+		if self.armature:
+			self.object.socket_fill("right_hand", object)
+		else:
+			print("WARNING: Character %s has no armature to contain sockets" % self.name)
+			
+	def clear_right_hand(self, object = None):
+		if self.armature:
+			self.object.socket_clear("right_hand", object)
+		else:
+			print("WARNING: Character %s has no armature to contain sockets" % self.name)
 		
 	def save_against(self, roll, defense, type=None):
 		"""Checks to see if a player saves against a roll of optional type with the specified defense"""
@@ -168,6 +223,23 @@ class CharacterLogic:
 		target_vector = self.object.get_local_vector_to(target)
 		
 		self.object.move((self.speed * target_vector[0], self.speed * target_vector[1], 0), mode=0)
+		
+	############## DEPRICATED ###############
+	def equip_armor(self, armor):
+		"""Changes stats to newly equipped armor and then recalculates stats"""
+		self.armor = armor
+		self.ac_bonus = armor.ac_bonus
+		self.recalc_stats()
+		
+	def equip_shield(self, shield):
+		"""Changes stats to newly equipped shield and then recalculates stats"""
+		self.shield = shield
+		self.recalc_stats()
+		
+	def equip_weapon(self, weapon):
+		"""Changes stats to newly equipped weapon"""
+		self.weapon = weapon
+	##########################################
 		
 		
 class PlayerLogic(CharacterLogic):

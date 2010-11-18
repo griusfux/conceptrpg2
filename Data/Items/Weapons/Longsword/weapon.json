@@ -1,0 +1,9 @@
+{
+	"name": "Longsword",
+	"type": "weapon",
+	"cost": 5,
+	
+	"subtype": "melee",
+	"damage": "1d6",
+	"bonus": 0
+}

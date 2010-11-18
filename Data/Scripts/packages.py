@@ -361,6 +361,7 @@ class Weapon(Item):
 	"""Weapon Package"""
 	
 	_config = 'weapon.json'
+	_blend = 'weapon.blend'
 	_parent_schema = Item._schema
 	_schema = 'Schemas/weaponfile.json'
 	_dir = 'Items/Weapons'
@@ -395,3 +396,12 @@ class Armor(Item):
 	_schema = 'Schemas/armorfile.json'
 	_dir = 'Items/Armors'
 	
+class ActionSet(Item):
+	"""Action Set Package"""
+	
+	_ext = 'as'
+	_blend = 'actionset.blend'
+	_config = 'actionset.json'
+	_schema = 'Schemas/actionsetfile.json'
+	_new = 'Schemas/actionsetfile_new.json'
+	_dir = 'Actions'

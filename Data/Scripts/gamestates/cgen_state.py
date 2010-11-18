@@ -6,8 +6,6 @@ from Scripts.power_manager import *
 from Scripts.inventory import *
 from .base_state import BaseState
 
-from Scripts.class_data import ClassData
-
 
 class CharacterCreationState(BaseState):
 	"""A state that handles creating a new character"""
@@ -86,9 +84,13 @@ class CharacterCreationState(BaseState):
 			# Setup player inventory
 			player.inventory = Inventory()
 			
-			w = Weapon('Holy Hand Grenade')
+			w = Weapon('Longsword')
 			player.inventory.add(w)
 			player.inventory.weapon = w
+			
+			main['engine'].load_library(w)
+			w_obj = main['engine'].add_object('longsword')
+			player.set_left_hand(w_obj)
 			
 			a = Armor('Mighty Robes')
 			player.inventory.add(a)
