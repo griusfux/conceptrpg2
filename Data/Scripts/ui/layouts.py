@@ -3,7 +3,7 @@ from time import time
 
 class Layout(bgui.Widget):
 	def __init__(self, sys, name, use_mouse=False):
-		bgui.Widget.__init__(self, sys, name, [1,1])
+		bgui.Widget.__init__(self, sys, name, size=[1,1])
 		
 		sys.mouse.visible = use_mouse
 		

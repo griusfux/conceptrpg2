@@ -2,7 +2,7 @@
 
 from bgui import *
 
-# A quick way to get to the textures for the character selection screens
+# This file holds widgets custom made for CRPG2
 
 class PackageSelector(Widget):
 	"""A widget for handling selection from packages (such as race and class selection)"""

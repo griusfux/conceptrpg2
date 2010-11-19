@@ -17,7 +17,7 @@ class CharacterCreationState(BaseState):
 	def client_init(self, main):
 		"""Intialize the client state"""
 		
-		main['last_layout'] = 'char_creation'
+		main['last_layout'] = ''
 		main['next_layout'] = 'cgen_name'
 		main['cgen_input'] = {}
 		main['creation_done'] = False
@@ -30,7 +30,7 @@ class CharacterCreationState(BaseState):
 		
 		inputs = main['input_system'].run()
 		
-		if main['next_layout'] == 'start' or ("Jump", "INPUT_CLICK") in inputs:
+		if main['next_layout'] == 'start':
 			
 			# Add the player empty
 			gameobj = main['engine'].add_object("CharacterEmpty")
