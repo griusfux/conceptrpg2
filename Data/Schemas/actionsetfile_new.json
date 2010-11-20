@@ -1,0 +1,11 @@
+{
+	"name" : "Action Set",
+	"action_set" :
+	[
+		{
+				"name" : "action",
+				"start" : 0,
+				"end" : 1,
+		}
+	]
+}
