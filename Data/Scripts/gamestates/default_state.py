@@ -55,16 +55,18 @@ class DefaultState(BaseState, BaseController):
 	def client_init(self, main):
 		"""Intialize the client state"""
 		
-		main['ui_system'].load_layout("default_state")
+		main['ui_system'].load_layout(None)
+		main['camera'].change_mode("frankie")
 		
 	def client_run(self, main):
 		"""Client-side run method"""
 		
 		# Reset the camera
-		old_ori = main['3p_cam'].world_orientation
-		main['3p_cam'].reset_orientation()
-		main['player'].object.set_orientation(old_ori, local=True)
-		main['engine'].set_active_camera(main['3p_cam'])
+		# old_ori = main['3p_cam'].world_orientation
+		# main['3p_cam'].reset_orientation()
+		# main['player'].object.set_orientation(old_ori, local=True)
+		main['engine'].set_active_camera(main['camera'])
+		main['camera'].update()
 		
 		# Update the player's lock
 		main['player'].update_lock()
@@ -84,8 +86,12 @@ class DefaultState(BaseState, BaseController):
 		speed = main['player'].speed
 		
 		if inputs:
-			if ("SwitchCamera", "INPUT_ACTIVE") in inputs:
-				main['engine'].set_active_camera(main['top_down_camera'])
+			if ("SwitchCamera", "INPUT_CLICK") in inputs:
+				# main['engine'].set_active_camera(main['top_down_camera'])
+				if main['camera'].mode == "frankie":
+					main['camera'].change_mode("topdown", 90)
+				else:
+					main['camera'].change_mode("frankie", 90)
 				
 			if ("Stats", "INPUT_CLICK") in inputs:
 				main['ui_system'].toogle_overlay("stats")				
@@ -111,6 +117,9 @@ class DefaultState(BaseState, BaseController):
 					movement[0] = speed
 				if ("MoveLeft", "INPUT_ACTIVE") in inputs:
 					movement[0] = -speed
+				if ("MoveForward", "MoveBackward", "MoveRight", "MoveLeft", "INPUT_ACTIVE") not in inputs:
+					act = main['default_actions']['default_idle']
+					main['player'].object.play_animation(act['name'], act['start'], act['end'])
 	
 		# Normalize the vector to the character's speed
 		if movement != [0.0, 0.0, 0.0]:

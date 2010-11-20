@@ -107,21 +107,26 @@ class CharacterCreationState(BaseState):
 			scene = bge.logic.getCurrentScene()
 			
 			# Parent the camera to the player
-			cam = scene.active_camera
-			cam.setParent(scene.objects["TopDownEmpty"])
-			cam_empty = scene.objects['CamEmpty']
+			# cam = scene.active_camera
+			# cam.setParent(scene.objects["TopDownEmpty"])
+			# cam_empty = scene.objects['CamEmpty']
+			
+			camera = scene.objects['Camera']
+			pivot = scene.objects['pivot']
+			
+			main['camera'] = BlenderWrapper.Camera(camera, pivot)
 			
 			# Switch to the 3rd person camera
-			cam3p = None
-			for child in gameobj.gameobj.childrenRecursive:
-				if child.name == '3PCam':
-					cam3p = child
-					break
+			# cam3p = None
+			# for child in gameobj.gameobj.childrenRecursive:
+				# if child.name == '3PCam':
+					# cam3p = child
+					# break
 					
-			if cam3p:
-				main['3p_cam'] = BlenderWrapper.Camera(cam3p, cam_empty)
-				main['top_down_camera'] = BlenderWrapper.Camera(scene.active_camera)
-				scene.active_camera = main['3p_cam'].camera
+			# if cam3p:
+				# main['3p_cam'] = BlenderWrapper.Camera(cam3p, cam_empty)
+				# main['top_down_camera'] = BlenderWrapper.Camera(scene.active_camera)
+				# scene.active_camera = main['3p_cam'].camera
 				
 			# Switch to the dungeon generation state
 			return ("DungeonGeneration", "SWITCH")

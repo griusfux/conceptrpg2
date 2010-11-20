@@ -4,6 +4,7 @@
 # Contributers: Mitchell Stokes
 
 from mathutils import Matrix, Vector
+from math import radians
 import GameLogic as gl
 
 # Movement modes
@@ -135,9 +136,10 @@ class Object:
 	def get_local_vector_to(self, position, arg = 2):
 		return self.gameobj.getVectTo(position)[arg]	
 		
-	def play_animation(self, anim):
+	def play_animation(self, anim, start=0, end=0, layer=0, blending=0):
 		if self._armature:
-			self.gameobj.sendMessage("animation", anim, self._armature.name)
+			self._armature.playAction(anim, start, end)#, layer, blending)
+#			self.gameobj.sendMessage("animation", anim, self._armature.name)
 			
 	def end(self):
 		if not self.gameobj.invalid:
@@ -183,9 +185,6 @@ class Object:
 			
 		if self._armature.children:
 			self._sockets = {child.name.lower()[7:] : child for child in self._armature.children if child.name.lower().startswith("socket_")}
-			print()
-			print(self._sockets)
-			print()
 		else:
 			print("WARNING: %s has no sockets" % self.gameobj.name)
 		
@@ -231,6 +230,155 @@ class Camera:
 		self.camera = camera
 		self.pivot = pivot if pivot else camera
 		
+		self.lens = self.camera.lens
+		
+		# Make sure the camera has no local transformations
+		self.camera.localPosition = (0, 0, 0)
+		self.camera.localOrientation = (0, 0, 0)
+		
+		# A transition_point of 0 indicates no transitioning
+		self._transition_point = 0
+		self._transition_speed = 1
+		
+		self._old_position = 0
+		self._old_orientation = 0
+		self._old_distance = 0
+		
+		self.mode = ""
+		self._mode_init = self.init_dummy
+		self._mode_update = self.update_dummy
+		
+		self._target_position = 0
+		self._target_orientation = 0
+		self.camera.localPosition = (0, 0, 0)
+		self._target_distance = 0
+		
+		self.camera.parent.timeOffset = 0
+		
+		self._first_frame = False
+	
+	def update(self):
+		if self._transition_point != 0:
+			# For the first frame save old data and run the mode's init function
+			if self._first_frame:
+				self._old_position = self.position.copy()
+				self._old_orientation = self.camera.worldOrientation.copy()
+				self._old_distance = self.camera.parent.localPosition[2]
+				self._mode_init()
+				self._first_frame = False
+				
+			# Interpolate camera transition
+			self.blend()
+			self.camera.worldOrientation = self.pivot.worldOrientation.copy()
+
+			# Increment the transition point
+			self._transition_point += self._transition_speed
+			# Flags the transition as finished
+			if self._transition_point >= 1:
+				self._transition_point = 0
+		else:
+			self._mode_update()
+			
+	def blend(self):
+		x_diff = self._target_position - self._old_position
+		ori_diff = self._target_orientation - self._old_orientation
+		d_diff = self._target_distance - self._old_distance
+		
+		
+		self.position = self._old_position + x_diff * self._transition_point
+		self.pivot.worldOrientation = self._old_orientation + (ori_diff * self._transition_point)
+		self.camera.parent.localPosition = (0, 0, d_diff*self._transition_point)
+			
+	def change_mode(self, mode_string="dummy", transition_time = 1):
+		# Don't change modes if a change is already occuring
+		if self._transition_point != 0:
+			return
+	
+		# Make sure we don't get a number < 1
+		if transition_time < 1:
+			transition_time = 1
+		# Check if the mode functions are defined
+		if not hasattr(self, "init_" + mode_string) or not hasattr(self, "update_" + mode_string):
+			print("WARNING: Mode %s not properly defined. Doing nothing." %s (mode_string))
+			return 
+		
+		self.mode = mode_string
+		
+		# Set mode functions
+		self._mode_init = getattr(self, "init_" + mode_string)
+		self._mode_update = getattr(self, "update_" + mode_string)
+		
+		# Set the transition point and speed
+		self._transition_speed = 1/transition_time
+		self._transition_point = 1/transition_time
+		
+		# Some defaults
+		self.camera.perspective = 1
+		self.camera.parent.timeOffset = 0
+		self.camera.lens = 35
+		
+		self.pivot.scaling = (1, 1, 1)
+		
+		self._first_frame = True
+		
+	def init_dummy(self):
+		self._target_position = Vector((0, -2, 1.5))
+		self._target_orientation = Matrix.Rotation(radians(90), 3, 'X')
+		self._target_distance = 0
+		return
+		
+	def update_dummy(self):
+		return
+		
+	def init_topdown(self):
+		rotation = Matrix.Rotation(0, 3, 'X')
+		
+		self._target_orientation = rotation
+		self._target_position = Vector((0, 0, 42))
+		self._target_distance = 0
+		
+	def update_topdown(self):
+		return
+	def init_frankie(self):
+		self.camera.perspective = 1
+		
+		self._target_distance = 4
+		self._target_position = Vector((0, 0, 1.5))
+		
+		
+		self._target_orientation = Matrix.Rotation(radians(80), 3, 'X')
+
+		self.camera.parent.timeOffset =25
+		self.camera.lens = 25
+		return
+		
+	def update_frankie(self):
+		# Move the camera in closer if something is in the way
+		ray_hit = self.camera.rayCast(self.camera, self.pivot, self._target_distance, "", 0, 0, 0,)[0]
+		if ray_hit:
+			scale = (self.pivot.getDistanceTo(ray_hit))/self._target_distance**2
+			if scale > 1:
+				scale = 1
+		else:
+			scale = 1
+			
+		self.pivot.scaling = [scale, scale, scale]
+		
+		return
+		
+	def init_isometric(self):
+		rotation = Matrix.Rotation(radians(45), 3, 'Z') * Matrix.Rotation(radians(35.246), 3, 'X') 
+		
+		self._target_orientation = rotation
+		self._target_position = Vector((7, -7, 15))
+		self._target_distance = 0
+		
+		self.camera.perspective = 0
+		return
+		
+	def update_isometric(self):
+		return
+		
 	@property
 	def world_orientation(self):
 		"""The camera's world orientation"""
@@ -251,6 +399,17 @@ class Camera:
 
 	def reset_orientation(self):
 		self.pivot.localOrientation.identity()
+		
+	@property
+	def position(self):
+		return self.pivot.localPosition
+	@position.setter
+	def position(self, value):
+		self.pivot.localPosition = value
+		
+	@property
+	def distance(self):
+		return self.camera.localPosition.length
 
 class Engine:
 	"""Wrapper for engine functionality"""

@@ -20,6 +20,8 @@ from Scripts.networking.game_client import GameClient
 
 import subprocess
 import pickle
+import os
+import json
 
 # Create a shorthand for gl
 import bge
@@ -208,7 +210,31 @@ def init(own):
 	# Setup an input system
 	own['input_system'] = BlenderInputSystem('keys.conf', 'mouse.conf')
 
-		
+	# Build the actions list
+	print("\nLoading Actions . . .")
+	own['actions'] = {}
+	for set in ActionSet.get_package_list():
+		for action in set.action_set:
+			if action['name'] in own['actions']:
+				print("\nERROR: An action with the name %s already exists!\n" % action.name)
+				continue
+			# Load the action into the dictionary
+			own['actions'][action['name']] = {"name" : action['name'], "start" : action['start'], "end" : action['end']}
+		# Now load the library so it can be found by the engine
+		gl.LibLoad(set.name, "Action", set.blend)
+	print()
+
+	# Load default actions		
+	own['default_actions'] = {}
+	defaults_path = os.getcwd() + "/Actions/.config/"
+	for file in os.listdir(defaults_path):
+		actions = json.load(open(defaults_path+file))
+		for action in actions:
+			if action in own['default_actions']:
+				print("\nERROR: A default action with the name %s already exists!\n" % action)
+				continue
+			own['default_actions'][action] = own['actions'][actions[action]]	
+	
 	# Setup the passive combat system
 	own['state_manager'] = GameStateManager("CharacterCreation", own)
 	own['init'] = True

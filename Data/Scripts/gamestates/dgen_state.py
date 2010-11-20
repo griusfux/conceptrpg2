@@ -54,7 +54,7 @@ class DungeonGenerationState(BaseState):
 			
 			# Move the player to the start tile
 			pos = main['dgen']._tiles[0].position
-			pos[2] += 0.5
+			pos[2] += 1
 			main['player'].object.position = pos
 			
 			# Switch to the default state now
