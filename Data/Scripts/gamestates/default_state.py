@@ -30,6 +30,13 @@ class DefaultState(BaseState, BaseController):
 	def move(self, main, cid, x, y, z):
 		main['net_players'][cid].object.move([x, y, z], min=[-50, -50, 0], max=[50, 50, 0])
 		
+	def rotate(self, main, cid, x, y, z):
+		main['net_players'][cid].object.rotate((x, y, z))
+			
+	def anim(self, main, cid, action, start, end, layer, blending):
+		print("Playing", action)
+		main['net_players'][cid].object.play_animation(action, start, end, layer, blending)
+		
 	# Override BaseState's to
 	def to(self, main, id):
 		if id not in main['net_players']: return
@@ -49,13 +56,15 @@ class DefaultState(BaseState, BaseController):
 	# Register the functions
 	client_functions = {
 				position: (str, float, float, float),
-				move: (str, float, float, float)
+				move: (str, float, float, float),
+				rotate: (str, float, float, float),
+				anim: (str, str, int, int, int, int)
 			}
 	
 	def client_init(self, main):
 		"""Intialize the client state"""
 		
-		main['ui_system'].load_layout(None)
+		main['ui_system'].load_layout("default_state")
 		main['camera'].change_mode("frankie")
 		
 	def client_run(self, main):
@@ -101,6 +110,12 @@ class DefaultState(BaseState, BaseController):
 		
 			# Only let the player do stuff while they are not "locked"
 			if not main['player'].lock:
+				# Update rotations (mouse look)
+				dx = 0.5 - main['input_system'].mouse.position[0]
+				if abs(dx) > 0:
+					self.server.invoke("rotate", id, 0, 0, dx)
+				main['input_system'].mouse.position = (0.5, 0.5)
+				
 				if ("UsePower", "INPUT_ACTIVE") in inputs:
 					target = main['player']
 					main['player'].powers.active.use(self, main['player'])
@@ -151,10 +166,19 @@ class DefaultState(BaseState, BaseController):
 		# We could run checks here, but for now we just rebroadcast
 		self.clients.invoke('move', cid, x, y, z)
 		
+	def rotate(self, main, client, cid, x, y, z):
+		# We could run checks here, but for now we just rebroadcast
+		self.clients.invoke('rotate', cid, x, y, z)
+		
+	def anim(self, main, client, action, start, end, layer, blending):
+		self.clients.invoke("anim", client.id, action, start, end, layer, blending)
+
 	# Register the functions
 	server_functions = {
 				position: (str, float, float, float),
-				move: (str, float, float, float)
+				move: (str, float, float, float),
+				rotate: (str, float, float, float),
+				anim: (str, int, int, int, int)
 			}
 	def server_init(self, main):
 		"""Initialize the server state"""
@@ -177,14 +201,15 @@ class DefaultState(BaseState, BaseController):
 	def play_animation(self, character, animation, lock=0):
 		"""Instruct the character to play the animation
 		
-		character -- the charcter who will play the animation
+		character -- the character who will play the animation
 		animation -- the animation to play
 		lock -- how long to lock for the animation
 		
 		"""
 		
 		character.add_lock(lock)
-		self.main['client'].send('anim'+animation) # XXX should be done based on the supplied character
+		self.server.invoke("anim", animation, 1, 20, 0, 0)
+#		self.main['client'].send('anim:'+animation) # XXX should be done based on the supplied character
 		
 	def get_targets(self, type, range):
 		"""Get targets in a range

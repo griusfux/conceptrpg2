@@ -83,11 +83,13 @@ class BlenderMouseInput(BlenderInput):
 					
 		return val
 		
-	def set_position(self, x, y):
-		self.sensor.position = (x, y)
-		
-	def get_position(self):
+	@property
+	def position(self):
 		return self.sensor.position
+		
+	@position.setter
+	def position(self, value):
+		self.sensor.position = value
 		
 	def show(self, val):
 		self.sensor.visible = val

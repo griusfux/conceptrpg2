@@ -353,6 +353,8 @@ class Camera:
 		return
 		
 	def update_frankie(self):
+	
+		self.camera.worldOrientation = self.pivot.worldOrientation.copy()
 		# Move the camera in closer if something is in the way
 		ray_hit = self.camera.rayCast(self.camera, self.pivot, self._target_distance, "", 0, 0, 0,)[0]
 		if ray_hit:

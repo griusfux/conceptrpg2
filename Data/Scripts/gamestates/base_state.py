@@ -23,11 +23,11 @@ class RPC:
 		for i in range(len(args)):
 			t = self.funcs[f][1][i]
 			v = args[i]
-			if not isinstance(v, t):
+			if t is float:
+				v = "%.4f" % v
+			elif not isinstance(v, t):
 				print("Function:", f, "\nArgs:", args)
 				raise ValueError("Argument "+str(i)+" should have been of type "+t.__name__+" got "+v.__class__.__name__+" instead.")
-			elif t is float:
-				v = "%.4f" % v
 			else:
 				v = str(v)
 				
@@ -63,8 +63,7 @@ class RPC:
 		for i in range(len(self.funcs[f][1])):
 			t = self.funcs[f][1][i]
 			
-			if t is float:
-				args[i] = float(args[i])
+			args[i] = t(args[i])
 		
 		if client:
 			self.funcs[f][0](self.state, main, client, *args)
