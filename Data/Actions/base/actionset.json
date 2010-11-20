@@ -1,0 +1,12 @@
+{
+	"name" : "base",
+	
+	"action_set":
+	[
+		{
+				"name" : "base.idle",
+				"start" : 0,
+				"end" : 79
+		}
+	]
+}
