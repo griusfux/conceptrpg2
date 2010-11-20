@@ -263,13 +263,13 @@ class Camera:
 			if self._first_frame:
 				self._old_position = self.position.copy()
 				self._old_orientation = self.camera.worldOrientation.copy()
-				self._old_distance = self.camera.parent.localPosition[2]
+				self._old_camera_pos = self.camera.localPosition.copy()
+				# self._old_distance = self.camera.localPosition.copy()[2]
 				self._mode_init()
 				self._first_frame = False
 				
 			# Interpolate camera transition
 			self.blend()
-			self.camera.worldOrientation = self.pivot.worldOrientation.copy()
 
 			# Increment the transition point
 			self._transition_point += self._transition_speed
@@ -282,12 +282,12 @@ class Camera:
 	def blend(self):
 		x_diff = self._target_position - self._old_position
 		ori_diff = self._target_orientation - self._old_orientation
-		d_diff = self._target_distance - self._old_distance
+		d_diff = self._target_distance - self._old_camera_pos[2]
 		
 		
-		self.position = self._old_position + x_diff * self._transition_point
+		self.position += x_diff * self._transition_speed
 		self.pivot.worldOrientation = self._old_orientation + (ori_diff * self._transition_point)
-		self.camera.parent.localPosition = (0, 0, d_diff*self._transition_point)
+		self.camera.localPosition += Vector((0, 0, d_diff)) * self._transition_speed
 			
 	def change_mode(self, mode_string="dummy", transition_time = 1):
 		# Don't change modes if a change is already occuring
@@ -338,33 +338,35 @@ class Camera:
 		self._target_distance = 0
 		
 	def update_topdown(self):
+		# self.camera.localOrientation = self.pivot.localOrientation.copy().invert()
 		return
 	def init_frankie(self):
 		self.camera.perspective = 1
 		
-		self._target_distance = 4
+		self._target_distance = 8
 		self._target_position = Vector((0, 0, 1.5))
 		
 		
 		self._target_orientation = Matrix.Rotation(radians(80), 3, 'X')
 
-		self.camera.parent.timeOffset =25
+		self.camera.parent.timeOffset = 30
 		self.camera.lens = 25
 		return
 		
 	def update_frankie(self):
-	
-		self.camera.worldOrientation = self.pivot.worldOrientation.copy()
 		# Move the camera in closer if something is in the way
 		ray_hit = self.camera.rayCast(self.camera, self.pivot, self._target_distance, "", 0, 0, 0,)[0]
 		if ray_hit:
-			scale = (self.pivot.getDistanceTo(ray_hit))/self._target_distance**2
+			scale = (self.pivot.getDistanceTo(ray_hit))/self._target_distance
 			if scale > 1:
 				scale = 1
+			# elif scale < 0.1:
+				# scale = 0.1
 		else:
 			scale = 1
 			
 		self.pivot.scaling = [scale, scale, scale]
+		self.camera.scaling = [1/scale, 1/scale, 1/scale]
 		
 		return
 		
@@ -404,14 +406,10 @@ class Camera:
 		
 	@property
 	def position(self):
-		return self.pivot.localPosition
+		return self.pivot.localPosition.copy()
 	@position.setter
 	def position(self, value):
 		self.pivot.localPosition = value
-		
-	@property
-	def distance(self):
-		return self.camera.localPosition.length
 
 class Engine:
 	"""Wrapper for engine functionality"""

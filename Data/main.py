@@ -228,6 +228,9 @@ def init(own):
 	own['default_actions'] = {}
 	defaults_path = os.getcwd() + "/Actions/.config/"
 	for file in os.listdir(defaults_path):
+		if file.startswith("."):
+			continue
+			
 		actions = json.load(open(defaults_path+file))
 		for action in actions:
 			if action in own['default_actions']:
