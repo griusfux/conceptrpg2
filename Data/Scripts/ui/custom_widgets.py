@@ -7,7 +7,7 @@ from bgui import *
 class PackageSelector(Widget):
 	"""A widget for handling selection from packages (such as race and class selection)"""
 	
-	def __init__(self, parent, name, package_cls, size=[0, 0], pos=[0, 0], options=BGUI_DEFAULT):
+	def __init__(self, parent, name, package_cls, aspect=None, size=[0, 0], pos=[0, 0], options=BGUI_DEFAULT):
 		"""The PackageSelector constructor
 		
 		Arguments:
@@ -21,7 +21,7 @@ class PackageSelector(Widget):
 
 		"""
 		
-		Widget.__init__(self, parent, name, size, pos, options)
+		Widget.__init__(self, parent, name, aspect, size, pos, options)
 		
 		# The list of packages we'll be using
 		self.packages = package_cls.get_package_list()
