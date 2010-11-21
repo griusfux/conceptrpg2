@@ -104,8 +104,10 @@ class CgenRace(CgenLayout):
 		self.label.text = self.selector.current_package.name
 		
 		# Display the currently selected race's image
-		self.image = bgui.Image(self.grid, "race_img", self.selector.current_package.image,
+		img_name = self.selector.current_package.open_image()
+		self.image = bgui.Image(self.grid, "race_img", img_name,
 								aspect = 0.75, size = [.45, .45], pos = [.12, .4])
+		self.selector.current_package.close_image()
 								
 		# Info text
 		self.class_info = bgui.TextBlock(self.grid, "class_info", pt_size=20, size=[0.44, .30],
@@ -131,7 +133,9 @@ class CgenRace(CgenLayout):
 	
 		self.label.text = self.selector.current_package.name
 		if self.last_selected != self.selector.selected:
-			self.image.update_image(self.selector.current_package.image)
+			img_name = self.selector.current_package.open_image()
+			self.image.update_image(img_name)
+			self.selector.current_package.close_image()
 			self.last_selected = self.selector.selected
 		
 class CgenClass(CgenLayout):
@@ -159,8 +163,10 @@ class CgenClass(CgenLayout):
 		self.label.text = self.selector.current_package.name
 		
 		# Display the currently selected race's image
-		self.image = bgui.Image(self.grid, "class_img", self.selector.current_package.image,
+		img_name = self.selector.current_package.open_image()
+		self.image = bgui.Image(self.grid, "class_img", img_name,
 								aspect = 0.75, size = [.45, .45], pos = [.12, .4])
+		self.selector.current_package.close_image()
 		
 		# Info text
 		self.class_info = bgui.TextBlock(self.grid, "class_info", pt_size=20, size=[0.44, .30],
@@ -191,5 +197,7 @@ class CgenClass(CgenLayout):
 	
 		self.label.text = self.selector.current_package.name
 		if self.last_selected != self.selector.selected:
-			self.image.update_image(self.selector.current_package.image)
+			img_name = self.selector.current_package.open_image()
+			self.image.update_image(img_name)
+			self.selector.current_package.close_image()
 			self.last_selected = self.selector.selected

@@ -82,18 +82,14 @@ class Package:
 			except IOError as e:
 				pass
 			
-		# If there is an image file, copy it to a temp location
-		if self._img:
-			self._image = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
-			self._image.write(package.read(self._img))
-		else:
-			self._image = None
-			
 		try:
 			self._dict = json.loads(str(package.read(self._config), encoding='utf8'))
 		except ValueError as e:
 			print(self._config)
 			raise PackageError("Problem parsing the JSON file: "+str(e))
+		
+		# This is used for handling temporary image files
+		self._image = None
 		
 		# Store the path for possible later use
 		self._path = path
@@ -103,11 +99,6 @@ class Package:
 		
 		# Validate the file
 		self._validate()
-		
-	def __del__(self):
-		if self._image:
-			self._image.file.close()
-			os.remove(self.image)
 		
 	@classmethod
 	def create(cls, package_name):
@@ -245,13 +236,27 @@ class Package:
 		with open(self._path+'/'+self._config, 'w') as f:
 			f.write(config)
 
-	@property
-	def image(self):
-		if self._image:
-			return self._image.name
-		else:
-			return None
+	def open_image(self):		
+		# If there is an image file, copy it to a temp location
+		if self._img:
+			# Remove any previously opened images
+			if self._image:
+				self._image.file.close()
+				os.remove(self._image.name)
+				
+			self._image = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+			self._image.write(self._package.read(self._img))
 			
+			return self._image.name
+		
+		# No image, return None
+		return None
+		
+	def close_image(self):
+		if self._image:
+			self._image.file.close()
+			os.remove(self._image.name)
+			self._image = None
 				
 class Map(Package):
 	"""Map package"""
@@ -331,6 +336,7 @@ class Power(Package):
 		# We don't need the temp file anymore, so clean up
 		pyfile.close()
 		os.remove(pyfile.name)
+		os.remove(pyfile.name.replace('.py', '.pyc'))
 
 		# Grab the method from the module
 		self._use = p.power

@@ -84,8 +84,10 @@ class PackageSelector(Widget):
 		# Create the new images
 		
 		for i in range(self.idx, max):
-			img = Image(self, "pkg_img"+str(i), self.packages[i].image, aspect=0.75,
+			img_name = self.packages[i].open_image()
+			img = Image(self, "pkg_img"+str(i), img_name, aspect=0.75,
 						size=[1, .9], pos=[.18+(.25*(i-self.idx)), 0], options=BGUI_DEFAULT|BGUI_CENTERY)
+			self.packages[i].close_image()
 			img.idx = i
 			img.on_click = self.package_image
 			self.pkg_imgs.append(img)
