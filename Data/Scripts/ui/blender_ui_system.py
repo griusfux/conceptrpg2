@@ -3,6 +3,7 @@ import bge
 
 from Scripts.ui.layouts import *
 from Scripts.ui.cgen_layouts import *
+from Scripts.ui.shop_layout import *
 
 layouts = {
 	"cgen_name": CgenName,
@@ -12,6 +13,7 @@ layouts = {
 	"dun_gen": DunGenLayout,
 	"default_state": DefaultStateLayout,
 	"combat": CombatLayout,
+	"shop" : ShopLayout,
 	
 	"inventory_overlay": InventoryOverlay,
 	"stats": StatsOverlay,
@@ -39,7 +41,7 @@ class BlenderUISystem(bgui.System):
 		self._remove_widget(self.layout)
 		self.layout = layouts[layout](self) if layout else Layout(self, "none_layout")
 		
-	def toogle_overlay(self, layout):
+	def toggle_overlay(self, layout):
 		if layout in self.overlays:
 			self.remove_overlay(layout)
 		else:
@@ -52,13 +54,13 @@ class BlenderUISystem(bgui.System):
 			print("Overlay: %s, is already added" % layout)
 			return
 	
-		self.overlays[layout] = layouts[layout](self.layout)
+		self.overlays[layout] = layouts[layout](self)
 		
 	def remove_overlay(self, layout):
 		"""Remove an overlay layout by name"""
 		
 		if layout in self.overlays:
-			self.layout._remove_widget(self.overlays[layout])
+			self._remove_widget(self.overlays[layout])
 			del self.overlays[layout]
 		else:
 			print("WARNING: Overlay: %s was not found, nothing was removed" % layout)

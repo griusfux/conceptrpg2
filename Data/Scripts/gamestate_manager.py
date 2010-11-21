@@ -7,7 +7,8 @@ STATES = {
 		"Default": DefaultState,
 		"CharacterCreation": CharacterCreationState,
 		"DungeonGeneration": DungeonGenerationState,
-		"Combat": CombatState
+		"Combat": CombatState,
+		"Shop": ShopState,
 		}
 		
 
@@ -55,8 +56,8 @@ class GameStateManager:
 		
 		if val:
 			# Make sure the state is good
-			if val[1] != 'END' and val[0] not in STATES:
-				RuntimeWarning(val+" is not in the states list, ignoring")
+			if val[1] != 'POP' and val[0] not in STATES:
+				RuntimeWarning(val[0]+" is not in the states list, ignoring")
 				return
 			
 			if val[1] == 'SWITCH':

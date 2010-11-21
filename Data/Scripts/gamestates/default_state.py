@@ -66,6 +66,7 @@ class DefaultState(BaseState, BaseController):
 		"""Intialize the client state"""
 		
 		main['ui_system'].load_layout("default_state")
+		main['engine'].set_active_camera(main['camera'])
 		main['camera'].change_mode("frankie")
 		
 		# Add the shop keeper
@@ -79,12 +80,14 @@ class DefaultState(BaseState, BaseController):
 	def client_run(self, main):
 		"""Client-side run method"""
 		
-		# Reset the camera
-		# old_ori = main['3p_cam'].world_orientation
-		# main['3p_cam'].reset_orientation()
-		# main['player'].object.set_orientation(old_ori, local=True)
-		main['engine'].set_active_camera(main['camera'])
+		# Make sure the camera is in the right mode
+		if main['camera'].mode != "frankie":
+			main['camera'].change_mode("frankie", 60)
 		main['camera'].update()
+		
+		# While the camera is still transitioning, do nothing
+		if main['camera']._transition_point != 0:
+			return
 
 		# Update the player's lock
 		main['player'].update_lock()
@@ -108,20 +111,20 @@ class DefaultState(BaseState, BaseController):
 					main['camera'].change_mode("frankie", 30)
 				
 			if ("Stats", "INPUT_CLICK") in inputs:
-				main['ui_system'].toogle_overlay("stats")				
+				main['ui_system'].toogle_overlay("stats")
+
+			if ("Inventory", "INPUT_CLICK") in inputs:
+				main['ui_system'].toggle_overlay("inventory_overlay")
 				
-			if ("Inventory", "INPUT_CLICK") in inputs and not self.in_shop and (self.shopkeeper.object.position - main['player'].object.position).length < 3:
-				# main['ui_system'].toggle_overlay("inventory_overlay")
-				main['camera'].target = self.shopkeeper.object
-				main['camera'].change_mode("shop", 60)
-				# main['ui_system'].toggle_overlay("shop_overlay")
-				self.in_shop = True
+			if ("Action", "INPUT_CLICK") in inputs and not self.in_shop \
+				and (self.shopkeeper.object.position - main['player'].object.position).length < 3:
+				main['shop_keeper'] = self.shopkeeper
+				return ("Shop", "PUSH")
 				
-			elif ("Inventory", "INPUT_CLICK") in inputs and self.in_shop:
-				main['camera'].target = main['player'].object
-				main['camera'].change_mode("frankie", 60)
-				# main['ui_system'].toggle_overlay("shop_overlay")
-				self.in_shop = False
+			# elif ("Action", "INPUT_CLICK") in inputs and self.in_shop:
+				# main['camera'].target = main['player'].object
+				# main['camera'].change_mode("frankie", 60)
+				# self.in_shop = False
 			
 			# Camera switching
 			cam_speed = 60
