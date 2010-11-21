@@ -1,7 +1,8 @@
 # $Id$
 
+from Scripts.packages import *
 from Scripts.mathutils import Vector
-from Scripts.character_logic import PlayerLogic
+from Scripts.character_logic import PlayerLogic, MonsterLogic
 from .base_state import BaseState, BaseController
 
 class DefaultState(BaseState, BaseController):
@@ -67,6 +68,12 @@ class DefaultState(BaseState, BaseController):
 		main['ui_system'].load_layout("default_state")
 		main['camera'].change_mode("frankie")
 		
+		# Add the shop keeper
+		npc_data = Monster("dire_rat")
+		main['engine'].load_library(npc_data)
+		npc = main['engine'].add_object("dire_rat", (7, 7, 0.1))
+		self.shopkeeper = MonsterLogic(npc, npc_data)
+		
 	def client_run(self, main):
 		"""Client-side run method"""
 		
@@ -76,7 +83,7 @@ class DefaultState(BaseState, BaseController):
 		# main['player'].object.set_orientation(old_ori, local=True)
 		main['engine'].set_active_camera(main['camera'])
 		main['camera'].update()
-		
+
 		# Update the player's lock
 		main['player'].update_lock()
 		
@@ -94,16 +101,34 @@ class DefaultState(BaseState, BaseController):
 			if ("SwitchCamera", "INPUT_CLICK") in inputs:
 				# main['engine'].set_active_camera(main['top_down_camera'])
 				if main['camera'].mode == "frankie":
-					main['camera'].change_mode("topdown", 90)
+					main['camera'].change_mode("topdown", 30)
 				else:
-					main['camera'].change_mode("frankie", 90)
+					main['camera'].change_mode("frankie", 30)
 				
 			if ("Stats", "INPUT_CLICK") in inputs:
 				main['ui_system'].toogle_overlay("stats")				
 				
-			if ("Inventory", "INPUT_CLICK") in inputs:
-				main['ui_system'].toogle_overlay("inventory_overlay")
-		
+			if ("Inventory", "INPUT_CLICK") in inputs and (self.shopkeeper.object.position - main['player'].object.position).length < 3:
+				# main['ui_system'].toogle_overlay("inventory_overlay")
+				main['camera'].target = self.shopkeeper.object
+				main['camera'].change_mode("shop", 60)
+			
+			# Camera switching
+			cam_speed = 60
+			if ("cam1", "INPUT_CLICK") in inputs:
+				main['camera'].change_mode("frankie", cam_speed)
+				
+			if ("cam2", "INPUT_CLICK") in inputs:
+				main['camera'].change_mode("topdown", cam_speed)
+				
+			if ("cam3", "INPUT_CLICK") in inputs:
+				main['camera'].change_mode("isometric", cam_speed)
+				
+			if ("cam4", "INPUT_CLICK") in inputs:
+				main['camera'].change_mode("dummy", cam_speed)
+				
+			if ("cam5", "INPUT_CLICK") in inputs:
+				main['camera'].change_mode("shop", cam_speed)
 			# Only let the player do stuff while they are not "locked"
 			if not main['player'].lock:
 				# Update rotations (mouse look)

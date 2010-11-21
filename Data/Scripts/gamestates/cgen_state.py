@@ -111,10 +111,12 @@ class CharacterCreationState(BaseState):
 			# cam.setParent(scene.objects["TopDownEmpty"])
 			# cam_empty = scene.objects['CamEmpty']
 			
-			camera = scene.objects['Camera']
-			pivot = scene.objects['pivot']
+			# camera = scene.objects['Camera']
+			# pivot = scene.objects['pivot']
 			
-			main['camera'] = BlenderWrapper.Camera(camera, pivot)
+			camera_pivot = main['engine'].add_object("pivot")
+			
+			main['camera'] = BlenderWrapper.Camera(camera_pivot, main['player'].object)
 			
 			# Switch to the 3rd person camera
 			# cam3p = None

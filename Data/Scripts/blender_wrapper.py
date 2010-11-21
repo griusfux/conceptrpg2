@@ -226,11 +226,19 @@ class Vertex:
 class Camera:
 	"""Wrapper for KX_Camera"""
 	
-	def __init__(self, camera, pivot=None):
-		self.camera = camera
-		self.pivot = pivot if pivot else camera
-		
-		self.lens = self.camera.lens
+	def __init__(self, pivot, target = None):
+		# Set the pivot point, and try to find a camera
+		self.pivot = pivot.gameobj
+		for child in self.pivot.childrenRecursive:
+			if child.name == "Camera":
+				self.camera = child
+				break
+		else:
+			print("WARNING: No camera found, assuming given pivot is camera")
+			self.camera = self.pivot
+			
+		# Set up the target
+		self.target = target
 		
 		# Make sure the camera has no local transformations
 		self.camera.localPosition = (0, 0, 0)
@@ -286,12 +294,16 @@ class Camera:
 		
 		
 		self.position += x_diff * self._transition_speed
-		self.pivot.worldOrientation = self._old_orientation + (ori_diff * self._transition_point)
+		self.pivot.localOrientation = self._old_orientation + (ori_diff * self._transition_point)
 		self.camera.localPosition += Vector((0, 0, d_diff)) * self._transition_speed
 			
 	def change_mode(self, mode_string="dummy", transition_time = 1):
 		# Don't change modes if a change is already occuring
 		if self._transition_point != 0:
+			return
+		
+		# Don't change if already in the target mode
+		if self.mode == mode_string:
 			return
 	
 		# Make sure we don't get a number < 1
@@ -299,7 +311,7 @@ class Camera:
 			transition_time = 1
 		# Check if the mode functions are defined
 		if not hasattr(self, "init_" + mode_string) or not hasattr(self, "update_" + mode_string):
-			print("WARNING: Mode %s not properly defined. Doing nothing." %s (mode_string))
+			print("WARNING: Mode %s not properly defined. Doing nothing." % (mode_string))
 			return 
 		
 		self.mode = mode_string
@@ -316,6 +328,9 @@ class Camera:
 		self.camera.perspective = 1
 		self.camera.parent.timeOffset = 0
 		self.camera.lens = 35
+		self.camera.ortho_scale = 35
+		
+		self.pivot.setParent(self.target.gameobj)
 		
 		self.pivot.scaling = (1, 1, 1)
 		
@@ -330,6 +345,17 @@ class Camera:
 	def update_dummy(self):
 		return
 		
+	def init_shop(self):
+		self._target_distance = 0
+		self._target_position = Vector((-2, -5, 2.5))		
+		self._target_orientation = Matrix.Rotation(radians(80), 3, 'X')
+		
+		self.camera.lens = 25
+		
+	def update_shop(self):
+		return
+		
+		
 	def init_topdown(self):
 		rotation = Matrix.Rotation(0, 3, 'X')
 		
@@ -337,33 +363,40 @@ class Camera:
 		self._target_position = Vector((0, 0, 42))
 		self._target_distance = 0
 		
-	def update_topdown(self):
-		# self.camera.localOrientation = self.pivot.localOrientation.copy().invert()
-		return
-	def init_frankie(self):
-		self.camera.perspective = 1
+		self.camera.perspective = 0
+		self.camera.parent.timeOffset = 25
 		
+	def update_topdown(self):
+		# Avoid rotations
+		if self.pivot.parent:
+			self.pivot.removeParent()
+			self.pivot.worldOrientation = self._target_orientation
+		
+		position = self.target.position + self._target_position
+		self.pivot.worldPosition = position
+		return
+		
+	def init_frankie(self):		
 		self._target_distance = 8
 		self._target_position = Vector((0, 0, 1.5))
-		
-		
 		self._target_orientation = Matrix.Rotation(radians(80), 3, 'X')
 
-		self.camera.parent.timeOffset = 30
+		self.camera.parent.timeOffset = 35
 		self.camera.lens = 25
 		return
 		
 	def update_frankie(self):
 		# Move the camera in closer if something is in the way
-		ray_hit = self.camera.rayCast(self.camera, self.pivot, self._target_distance, "", 0, 0, 0,)[0]
+		ray_hit = self.camera.rayCast(self.camera.worldPosition, self.pivot.worldPosition, self.camera.localPosition[2], "", 0, 0, 0,)[1]
 		if ray_hit:
-			scale = (self.pivot.getDistanceTo(ray_hit))/self._target_distance
+			scale = (ray_hit - self.pivot.worldPosition).length/self.camera.localPosition[2]
 			if scale > 1:
 				scale = 1
-			# elif scale < 0.1:
-				# scale = 0.1
+			elif scale < 0.1:
+				scale = 0.1
 		else:
 			scale = 1
+			
 			
 		self.pivot.scaling = [scale, scale, scale]
 		self.camera.scaling = [1/scale, 1/scale, 1/scale]
@@ -381,7 +414,23 @@ class Camera:
 		return
 		
 	def update_isometric(self):
+		# Avoid rotations
+		if self.pivot.parent:
+			self.pivot.removeParent()
+			self.pivot.worldOrientation = self._target_orientation
+		
+		position = self.target.position + self._target_position
+		self.pivot.worldPosition = position
 		return
+		
+	@property
+	def target(self):
+		return self._target
+	
+	@target.setter
+	def target(self, value):
+		self._target = value
+		self.pivot.setParent(value.gameobj)
 		
 	@property
 	def world_orientation(self):
