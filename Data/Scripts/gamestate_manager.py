@@ -64,10 +64,10 @@ class GameStateManager:
 				self.states[0].cleanup(main)
 				self.states.pop(0)
 				self.states.insert(0, STATES[val[0]](main, self.is_server))
-			elif val[1] == 'SUSPEND':
+			elif val[1] == 'PUSH':
 				# Suspend the current state and push the new state
 				self.states.insert(0, STATES[val[0]](main, self.is_server))
-			elif val[1] == 'END':
+			elif val[1] == 'POP':
 				# Pop the state from the stack
 				self.states[0].cleanup(main)
 				self.states.pop(0)
