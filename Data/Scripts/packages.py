@@ -247,6 +247,9 @@ class Package:
 			self._image = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
 			self._image.write(self._package.read(self._img))
 			
+			# I'm not sure why, but reading the file helps prevent lock ups with the OS
+			self._image.read()
+			
 			return self._image.name
 		
 		# No image, return None
@@ -321,6 +324,7 @@ class Power(Package):
 	_config = 'power.json'
 	_schema = 'Schemas/powerfile.json'
 	_dir = 'Powers'
+	_img = 'power.png'
 	
 	def __init__(self, package_name):
 		Package.__init__(self, package_name)

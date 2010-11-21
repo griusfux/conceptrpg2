@@ -39,7 +39,7 @@ class DefaultStateLayout(Layout):
 		Layout.__init__(self, sys, "default_state_layout")
 		
 		# Player data frame
-		self.pframe = bgui.Frame(self, "ds_pframe", size=[0.25, 0.20], pos=[0.01, 0.01], sub_theme="HUD")
+		self.pframe = bgui.Frame(self, "ds_pframe", aspect=(5/2), size=[0.25, 0.20], pos=[0.01, 0.01], sub_theme="HUD")
 		self.player_name = bgui.Label(self.pframe, "ds_name", pt_size=34, pos=[0.05, 0.80])
 		
 		# HP
@@ -52,8 +52,44 @@ class DefaultStateLayout(Layout):
 		self.exp_bar = bgui.ProgressBar(self.pframe, "ds_exp_bar", size=[0.90, 0.03], pos=[0.05, 0.35],
 									sub_theme='Exp')#, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)		
 		
-		self.power = bgui.Label(self, "ds_power", pt_size=42, pos=[0.35, 0.15])
-		self.lock_msg = bgui.Label(self, "lock_msg", pt_size=42, pos=[0.35, 0.05])
+		# Skill Bar
+		self.skill_imgs = []
+		self.skill_bar_selection=-1
+		self.skill_frame = bgui.Frame(self, "ds_sframe", aspect=8, size=[0.1, 0.1], pos=[0.35, 0.01])
+		self.skill_frame.colors = [(0, 0, 0, 0)]*4
+		
+		# Locked message
+		self.lock_msg = bgui.Label(self, "lock_msg", pt_size=42, pos=[0.35, 0.90])
+		
+	def update_skillbar(self, main):
+		psys = main['player'].powers
+		powers = psys.all
+	
+		# Clear the old images
+		for i in self.skill_imgs:
+			self.skill_frame._remove_widget(i)
+		self.skill_imgs = []
+	
+		# Create new images
+		for i in range(min(8, len(powers))):
+			# Background
+			img = bgui.Image(self.skill_frame, "sbg"+str(i), "Textures/ui/hex_tile.png",
+							 size=[1/8, 1], pos=[(1/8)*i, 0.5 if i == psys.active_index else 0])
+							 
+			# Label
+			if i == psys.active_index:
+				lbl = bgui.Label(img, "slbl"+str(i), powers[i].name,
+								pt_size=20 if i == psys.active_index else 14,
+								pos=[0, 1 if i == psys.active_index else -0.05],
+								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+			
+			# Skill icon
+			img_name = powers[i].open_image()
+			simg = bgui.Image(img, powers[i].name, img_name, size=[1, 1], pos=[0, 0])
+			powers[i].close_image()
+			self.skill_imgs.append(img)
+								
+		self.skill_bar_selection = psys.active_index
 		
 	def update(self, main):
 		player = main['player']
@@ -66,7 +102,9 @@ class DefaultStateLayout(Layout):
 		self.exp_text.text = "EXP (%d/%d)" % (player.xp, player.xp+100-(player.xp%100))
 		self.exp_bar.percent = player.xp/(player.xp + 100-(player.xp%100))
 		
-		self.power.text = player.powers.active.name
+		if self.skill_bar_selection != main['player'].powers.active_index:
+			self.update_skillbar(main)
+		
 		self.lock_msg.text = "LOCKED: %s" % (main['player'].lock - time()) if main['player'].lock else ""
 		
 class CombatLayout(DefaultStateLayout):

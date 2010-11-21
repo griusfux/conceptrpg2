@@ -45,6 +45,16 @@ class PowerManager:
 			self._current_power -= 1
 			
 	@property
+	def all(self):
+		"""All the powers returned as a list"""
+		return self._powers
+		
+	@property
+	def active_index(self):
+		"""The index of the active power"""
+		return self._current_power
+		
+	@property
 	def active(self):
 		"""The  currently active power"""
 		
