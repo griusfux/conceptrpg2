@@ -22,7 +22,7 @@ class BlenderUISystem(bgui.System):
 	
 	def __init__(self):
 		# Init the system
-		bgui.System.__init__(self, "Scripts/ui/theme")
+		bgui.System.__init__(self, bge.logic.expandPath("//Scripts/ui/theme"))
 		
 		self.mouse = bge.logic.mouse
 		
