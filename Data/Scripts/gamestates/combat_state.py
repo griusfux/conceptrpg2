@@ -1,6 +1,7 @@
 # $Id$
 
 from .base_state import BaseState, BaseController
+from .default_state import DefaultState
 from Scripts.packages import Monster
 from Scripts.character_logic import MonsterLogic
 
@@ -8,6 +9,7 @@ import random
 from math import degrees, sqrt
 from Scripts.ai.manager import Manager as AiManager
 from Scripts.ai.state_machine import StateMachine as AiStateMachine
+from Scripts.mathutils import Vector
 
 # Constants for grid generation
 TILE_SIZE = 1
@@ -16,7 +18,7 @@ GRID_Z = 0.01
 # We don't need to bother subclassing DefaultState since we are going to mostly override
 # everything anyways, and Python doesn't have abstract classes or interfaces.
 
-class CombatState(BaseState, BaseController):		
+class CombatState(DefaultState, BaseController):		
 	##########
 	# Client
 	##########
@@ -77,16 +79,12 @@ class CombatState(BaseState, BaseController):
 	def client_run(self, main):
 		"""Client-side run method"""
 		
+		main['camera'].update()
+		
 		# See if we still need to be in combat
 		if not self.monster_list:
 			main['client'].send('stateDefault')
 			return ("Default", "SWITCH")
-
-		# Reset the camera
-		old_ori = main['3p_cam'].world_orientation
-		main['3p_cam'].reset_orientation()
-		main['player'].object.set_orientation(old_ori, local=True)
-		main['engine'].set_active_camera(main['3p_cam'])
 
 		# Reset the combat tiles
 		for row in self.grid.map:
@@ -99,52 +97,6 @@ class CombatState(BaseState, BaseController):
 		# Handles input
 		inputs = main['input_system'].run()
 		
-		# Keep our connection to the server alive
-		val = main['client'].run()
-		
-		while val != None:
-			cid, data = val
-			
-			# XXX This needs to be cleaned up
-			if cid not in main['net_players']:
-				root = main['engine'].add_object("NetEmpty")
-				player = main['engine'].add_object("DarkKnightArm")
-				player.gameobj.setParent(root.gameobj)
-				main['net_players'][cid] = PlayerLogic(root)
-			
-			# Parse the inputs from the server
-			try:
-				for input in data:
-					if input.startswith('mov'):
-						input = input.replace('mov', '')
-						main['net_players'][cid].object.move([float(i) for i in input.split('$')], min=[-50, -50, 0], max=[50, 50, 0])
-					elif input.startswith('pos'):
-						input = input.replace('pos', '')
-						server_pos = [float(i) for i in input.split('$')]
-						client_pos = main['net_players'][cid].object.position
-						
-						for i in range(3):
-							if abs(server_pos[i]-client_pos[i]) > 1.0:
-								client_pos[i] = server_pos[i]
-							
-						main['net_players'][cid].object.position = client_pos
-					elif input.startswith('anim'):
-						input = input.replace('anim', '')
-						main['net_players'][cid].object.move((0, 0, 0))
-						main['net_players'][cid].object.play_animation(input)
-					elif input.startswith('to'):
-						main['net_players'][cid].object.end()
-						del main['net_players'][cid]
-						print(cid, "timed out")
-					elif input.startswith('dis'):
-						main['net_players'][cid].object.end()
-						del main['net_players'][cid]
-						print(cid, "disconnected")
-			except ValueError as e:
-				print(e)
-				print(val)
-					
-			val = main['client'].run()
 			
 		####	
 		# ai
@@ -163,11 +115,21 @@ class CombatState(BaseState, BaseController):
 				self.monster_list.remove(monster)
 				monster.object.end()
 			
-		# The message we will send to the server
-		pos = main['player'].object.position
-		msg = "pos%.4f$%.4f$%.4f " % (pos[0], pos[1], pos[2])
+		# Our id so we can talk with the server
+		id = main['client'].id
+		
+		# Our movement vector and player speed
+		movement = [0.0, 0.0, 0.0]
+		speed = main['player'].speed
 		
 		if inputs:
+			if ("SwitchCamera", "INPUT_CLICK") in inputs:
+				# main['engine'].set_active_camera(main['top_down_camera'])
+				if main['camera'].mode == "frankie":
+					main['camera'].change_mode("topdown", 90)
+				else:
+					main['camera'].change_mode("frankie", 90)
+				
 			if ("Stats", "INPUT_CLICK") in inputs:
 				main['ui_system'].toogle_overlay("stats")				
 				
@@ -176,12 +138,22 @@ class CombatState(BaseState, BaseController):
 		
 			# Only let the player do stuff while they are not "locked"
 			if not main['player'].lock:
-				# if ("Jump", "INPUT_ACTIVE") in inputs:
-					# main['client'].send('stateDefault')
-					# return ("Default", "SWITCH")
+				# Update rotations (mouse look)
+				dx = 0.5 - main['input_system'].mouse.position[0]
+				if abs(dx) > 0:
+					self.server.invoke("rotate", id, 0, 0, dx)
+				main['input_system'].mouse.position = (0.5, 0.5)
+				
+				if ("UsePower", "INPUT_ACTIVE") in inputs:
+					target = main['player']
+					main['player'].powers.active.use(self, main['player'])
+				if ("NextPower", "INPUT_CLICK") in inputs:
+					main['player'].powers.make_next_active()
+				if ("PrevPower", "INPUT_CLICK") in inputs:
+					main['player'].powers.make_prev_active()				
 				if ("Aim", "INPUT_ACTIVE") in inputs:
 					# Switch to the top-down camera
-					main['engine'].set_active_camera(main['top_down_camera'])
+					main['camera'].change_mode("topdown")
 					
 					# Show the range of the active power
 					power = main['player'].powers.active
@@ -189,41 +161,25 @@ class CombatState(BaseState, BaseController):
 					tiles = self._find_target_range(power.range_type, power.range_size, point)
 					for tile in tiles:
 						tile.color((1, 0, 0, 1))
-				if ("UsePower", "INPUT_ACTIVE") in inputs:
-					target = main['player']
-					main['player'].powers.active.use(self, main['player'])
-				if ("NextPower", "INPUT_CLICK") in inputs:
-					main['player'].powers.make_next_active()
-				if ("PrevPower", "INPUT_CLICK") in inputs:
-					main['player'].powers.make_prev_active()
 
-				move = False
-				player_movement = (0, 0, 0)
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
-					player_movement = [player_movement[i] + val for i, val in enumerate((0, 5, 0))]
-					move = True
+					movement[1] = speed
 				if ("MoveBackward", "INPUT_ACTIVE") in inputs:
-					player_movement = [player_movement[i] + val for i, val in enumerate((0, -5, 0))]
-					move = True
+					movement[1] = -speed
 				if ("MoveRight", "INPUT_ACTIVE") in inputs:
-					player_movement = [player_movement[i] + val for i, val in enumerate((5, 0, 0))]
-					move = True
+					movement[0] = speed
 				if ("MoveLeft", "INPUT_ACTIVE") in inputs:
-					player_movement = [player_movement[i] + val for i, val in enumerate((-5, 0, 0))]
-					move = True
-					
-				if move:	
-					msg += self.move(main['player'], (player_movement), local = True)
-					
-				else:
-					target = self.grid.tile_from_point(main['player'].object.position)
-					vec = main['player'].object.get_local_vector_to(target.position)
-					vec[2] = 0
-					vec = [i * main['player'].speed for i in vec]
-					msg += "mov"+"$".join(["%.3f" % i for i in vec])
+					movement[0] = -speed
+				if ("MoveForward", "MoveBackward", "MoveRight", "MoveLeft", "INPUT_ACTIVE") not in inputs:
+					act = main['default_actions']['default_idle']
+					main['player'].object.play_animation(act['name'], act['start'], act['end'])
 	
+		# Normalize the vector to the character's speed
+		if movement != [0.0, 0.0, 0.0]:
+			movement = [float(i) for i in (Vector(movement).normalize()*speed)]
+
 		# Send the message
-		main['client'].send(msg.strip())
+		self.server.invoke("move", id, *movement)
 		
 		main['player'].tile.color((0,1,0,1))
 		self.grid.tile_from_point(main["player"].object.position).color((0,0,1,1))

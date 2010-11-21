@@ -85,10 +85,6 @@ class DefaultState(BaseState, BaseController):
 
 		# Our id so we can talk with the server
 		id = main['client'].id
-			
-		# Update our position
-		# pos = main['player'].object.position
-		# self.server.invoke('position', id, *pos)
 		
 		# Our movement vector and player speed
 		movement = [0.0, 0.0, 0.0]
