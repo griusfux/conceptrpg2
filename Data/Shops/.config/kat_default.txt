@@ -1,0 +1,5 @@
+[Items]
+Bonsai
+
+[Weapons]
+Longsword

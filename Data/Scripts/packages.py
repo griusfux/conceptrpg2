@@ -406,7 +406,7 @@ class Armor(Item):
 	_schema = 'Schemas/armorfile.json'
 	_dir = 'Items/Armors'
 	
-class ActionSet(Item):
+class ActionSet(Package):
 	"""Action Set Package"""
 	
 	_ext = 'as'
@@ -415,3 +415,52 @@ class ActionSet(Item):
 	_schema = 'Schemas/actionsetfile.json'
 	_new = 'Schemas/actionsetfile_new.json'
 	_dir = 'Actions'
+	
+class Shop(Package):
+	"""Shop package"""
+	
+	_ext = 'shop'
+	_blend = 'shop.blend'
+	_config = 'shop.json'
+	_schema = 'Schemas/shopfile.json'
+	_new = 'Schemas/shopfile_new.json'
+	_dir = 'Shops'
+	
+	def __init__(self, package_name):
+		Package.__init__(self, package_name)
+		
+		# Build item lists
+		self.items = []
+		self.weapons = []
+		self.armors = []
+		
+		for f in os.listdir(os.path.join('Shops', '.config')):
+			if f.lower().startswith(package_name.lower()):
+				self._parse_conf(os.path.join('Shops', '.config', f))
+					
+	def _parse_conf(self, path):
+		curr_list = self.items
+		curr_package = Item
+	
+		with open(path) as conf:
+			for line in conf.readlines():
+				line = line.strip()
+				
+				if not line:
+					continue
+				elif line == "[Items]":
+					curr_list = self.items
+					curr_package = Item
+				elif line == "[Weapons]":
+					curr_list = self.weapons
+					curr_package = Weapon
+				elif line == "[Armors]":
+					curr_list = self.armors
+					curr_package = Armor
+				else:
+					try:
+						curr_list.append(curr_package(line))
+					except Exception as e:
+						print(e)
+						print("Failed to load package:", line)
+						
