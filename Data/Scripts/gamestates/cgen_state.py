@@ -90,7 +90,7 @@ class CharacterCreationState(BaseState):
 			
 			main['engine'].load_library(w)
 			w_obj = main['engine'].add_object('longsword')
-			player.set_left_hand(w_obj)
+			player.set_right_hand(w_obj)
 			
 			a = Armor('Mighty Robes')
 			player.inventory.add(a)
