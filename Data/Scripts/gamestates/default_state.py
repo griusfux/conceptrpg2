@@ -74,6 +74,8 @@ class DefaultState(BaseState, BaseController):
 		npc = main['engine'].add_object("dire_rat", (7, 7, 0.1))
 		self.shopkeeper = MonsterLogic(npc, npc_data)
 		
+		self.in_shop = False
+		
 	def client_run(self, main):
 		"""Client-side run method"""
 		
@@ -108,10 +110,18 @@ class DefaultState(BaseState, BaseController):
 			if ("Stats", "INPUT_CLICK") in inputs:
 				main['ui_system'].toogle_overlay("stats")				
 				
-			if ("Inventory", "INPUT_CLICK") in inputs and (self.shopkeeper.object.position - main['player'].object.position).length < 3:
-				# main['ui_system'].toogle_overlay("inventory_overlay")
+			if ("Inventory", "INPUT_CLICK") in inputs and not self.in_shop and (self.shopkeeper.object.position - main['player'].object.position).length < 3:
+				# main['ui_system'].toggle_overlay("inventory_overlay")
 				main['camera'].target = self.shopkeeper.object
 				main['camera'].change_mode("shop", 60)
+				# main['ui_system'].toggle_overlay("shop_overlay")
+				self.in_shop = True
+				
+			elif ("Inventory", "INPUT_CLICK") in inputs and self.in_shop:
+				main['camera'].target = main['player'].object
+				main['camera'].change_mode("frankie", 60)
+				# main['ui_system'].toggle_overlay("shop_overlay")
+				self.in_shop = False
 			
 			# Camera switching
 			cam_speed = 60
