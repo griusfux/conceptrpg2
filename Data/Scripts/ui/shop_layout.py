@@ -119,7 +119,7 @@ class ShopLayout(Layout):
 		item = self.items[self.selected]
 		print(self.selected)
 		self.main['player'].gold -= item.cost
-		self.main['shop_purchase'] = item
+		self.main['player'].inventory.add(item)
 		
 		self.confirm.visible = False
 		self.main_frame.frozen = False
