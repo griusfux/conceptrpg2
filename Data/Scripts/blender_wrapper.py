@@ -347,7 +347,7 @@ class Camera:
 		
 	def init_shop(self):
 		self._target_distance = 0
-		self._target_position = Vector((-2, -5, 2.5))		
+		self._target_position = Vector((-2, -10, 2.5))		
 		self._target_orientation = Matrix.Rotation(radians(80), 3, 'X')
 		
 		self.camera.lens = 25

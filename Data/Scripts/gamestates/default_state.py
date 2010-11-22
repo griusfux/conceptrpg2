@@ -73,7 +73,8 @@ class DefaultState(BaseState, BaseController):
 		npc_data = Monster("dire_rat")
 		main['engine'].load_library(npc_data)
 		npc = main['engine'].add_object("dire_rat", (7, 7, 0.1))
-		self.shopkeeper = MonsterLogic(npc, npc_data)
+		self.npc = MonsterLogic(npc, npc_data)
+		main['shop_keeper'] = Shop("Kat")
 		
 		self.in_shop = False
 		
@@ -117,8 +118,8 @@ class DefaultState(BaseState, BaseController):
 				main['ui_system'].toggle_overlay("inventory_overlay")
 				
 			if ("Action", "INPUT_CLICK") in inputs and not self.in_shop \
-				and (self.shopkeeper.object.position - main['player'].object.position).length < 3:
-				main['shop_keeper'] = self.shopkeeper
+				and (self.npc.object.position - main['player'].object.position).length < 3:
+				main['shop_spot'] = self.npc
 				return ("Shop", "PUSH")
 				
 			# elif ("Action", "INPUT_CLICK") in inputs and self.in_shop:

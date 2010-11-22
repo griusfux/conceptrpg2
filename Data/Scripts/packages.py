@@ -366,7 +366,7 @@ class Item(Package):
 	_schema = 'Schemas/itemfile.json'
 	_new = 'Schemas/itemfile_new.json'
 	_dir = 'Items/Others'
-	_img = 'Items/Others/item.png'
+	_img = 'item.png'
 	
 class Weapon(Item):
 	"""Weapon Package"""
@@ -376,7 +376,7 @@ class Weapon(Item):
 	_parent_schema = Item._schema
 	_schema = 'Schemas/weaponfile.json'
 	_dir = 'Items/Weapons'
-	_img = 'Items/Weapons/item.png'
+	_img = 'weapon.png'
 	
 	def __init__(self, package_name):
 		Item.__init__(self, package_name)
@@ -407,7 +407,7 @@ class Armor(Item):
 	_parent_schema = Item._schema
 	_schema = 'Schemas/armorfile.json'
 	_dir = 'Items/Armors'
-	_img = 'Items/Armors/item.png'
+	_img = 'armor.png'
 	
 class ActionSet(Package):
 	"""Action Set Package"""
