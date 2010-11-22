@@ -67,7 +67,7 @@ class DefaultState(BaseState, BaseController):
 		
 		main['ui_system'].load_layout("default_state")
 		main['engine'].set_active_camera(main['camera'])
-		main['camera'].change_mode("frankie")
+		self.camera_mode = "frankie"
 		
 		# Add the shop keeper
 		npc_data = Monster("dire_rat")
@@ -82,8 +82,8 @@ class DefaultState(BaseState, BaseController):
 		"""Client-side run method"""
 		
 		# Make sure the camera is in the right mode
-		if main['camera'].mode != "frankie":
-			main['camera'].change_mode("frankie", 60)
+		if main['camera'].mode != self.camera_mode:
+			main['camera'].change_mode(self.camera_mode, 60)
 		main['camera'].update()
 		
 		# While the camera is still transitioning, do nothing
@@ -107,9 +107,9 @@ class DefaultState(BaseState, BaseController):
 			if ("SwitchCamera", "INPUT_CLICK") in inputs:
 				# main['engine'].set_active_camera(main['top_down_camera'])
 				if main['camera'].mode == "frankie":
-					main['camera'].change_mode("topdown", 30)
+					self.camera_mode = "topdown"
 				else:
-					main['camera'].change_mode("frankie", 30)
+					self.camera_mode = "frankie"
 				
 			if ("Stats", "INPUT_CLICK") in inputs:
 				main['ui_system'].toogle_overlay("stats")
@@ -128,21 +128,21 @@ class DefaultState(BaseState, BaseController):
 				# self.in_shop = False
 			
 			# Camera switching
-			cam_speed = 60
 			if ("cam1", "INPUT_CLICK") in inputs:
-				main['camera'].change_mode("frankie", cam_speed)
+					self.camera_mode = "frankie"
 				
 			if ("cam2", "INPUT_CLICK") in inputs:
-				main['camera'].change_mode("topdown", cam_speed)
+					self.camera_mode = "topdown"
 				
 			if ("cam3", "INPUT_CLICK") in inputs:
-				main['camera'].change_mode("isometric", cam_speed)
+					self.camera_mode = "isometric"
 				
 			if ("cam4", "INPUT_CLICK") in inputs:
-				main['camera'].change_mode("dummy", cam_speed)
+					self.camera_mode = "dummy"
 				
 			if ("cam5", "INPUT_CLICK") in inputs:
-				main['camera'].change_mode("shop", cam_speed)
+					self.camera_mode = "shop"
+					
 			# Only let the player do stuff while they are not "locked"
 			if not main['player'].lock:
 				# Update rotations (mouse look)
