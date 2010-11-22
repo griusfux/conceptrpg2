@@ -96,17 +96,17 @@ class ShopLayout(Layout):
 			# Save the current selection
 			self.last_selected = self.selected
 			
-			# Make sure some first time text is displayed
-			self.cost.text = "Cost: "
-			self.button.visible = True
-			
 			# Create a shorthand for the item
 			item = self.items[self.selected]
 			
+			# Display missing elements if valid item is selected
+			self.cost.text = "Cost: " if item else "\t"
+			self.button.visible = True if item else False
+			
 			# Fill in the stats for the item
-			self.item_name.text = item.name
-			self.item_cost.text = str(item.cost) + "g"
-			self.item_description.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean sed orci neque. Cras eget neque lacinia leo sodales suscipit sed."
+			self.item_name.text = item.name if item else ""
+			self.item_cost.text = str(item.cost) + "g" if item else ""
+			self.item_description.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean sed orci neque. Cras eget neque lacinia leo sodales suscipit sed." if item else ""
 		
 	def set_selected(self, widget):
 		self.selected = int(widget.name[-1])
