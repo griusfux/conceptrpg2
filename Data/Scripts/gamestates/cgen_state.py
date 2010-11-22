@@ -98,6 +98,9 @@ class CharacterCreationState(BaseState):
 				
 			player.inventory.add(Item('Bonsai'))
 			
+			# Give the player some starting gold
+			player.gold = 100
+			
 			main['net_players'] = {main['client'].id: player}
 			main['player'] = player
 			

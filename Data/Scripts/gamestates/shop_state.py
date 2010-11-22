@@ -9,7 +9,6 @@ class ShopState(BaseState):
 	
 	def client_init(self, main):
 		"""Intialize the client state"""
-		main['shop_purchase'] = None
 		main['shop_exit'] = False
 		
 		main['camera'].target = main['shop_spot'].object
@@ -32,14 +31,6 @@ class ShopState(BaseState):
 		# Get inputs
 		inputs = main['input_system'].run()
 		
-		# Deal with purchases
-		if main['shop_purchase']:
-			# Process purchase
-			print(main['shop_purchase'].name)
-			
-			# Clear purchase
-			main['shop_purchase'] = None
-		
 		# Exiting the shop
 		if ("Action", "INPUT_CLICK") in inputs or main['shop_exit']:
 			return ("", "POP")
@@ -48,7 +39,6 @@ class ShopState(BaseState):
 		"""Cleanup the client state"""
 		main['camera'].target = main['player'].object
 		main['ui_system'].load_layout("default_state")
-		del main['shop_purchase']
 		del main['shop_exit']
 		
 	##########

@@ -22,24 +22,23 @@ class ShopLayout(Layout):
 						[None, None, None]]
 		
 		# Setup a main frame
-		self.main = bgui.Frame(self, "shop_main", size=[1,1], aspect=(4/3),
+		self.main_frame = bgui.Frame(self, "shop_main", size=[1,1], aspect=(4/3),
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
-		self.main.colors = [[0, 0, 0, 0],
+		self.main_frame.colors = [[0, 0, 0, 0],
 							[0, 0, 0, 0],
 							[0, 0, 0, 0],
 							[0, 0, 0, 0],]
 		
 		# Shop Name
-		name_bg = bgui.Frame(self.main, "shop_name_bg", size=[.56, .08], pos=[.025, .875], sub_theme="HUD")
+		name_bg = bgui.Frame(self.main_frame, "shop_name_bg", size=[.56, .08], pos=[.025, .875], sub_theme="HUD")
 		self.shop_name = bgui.Label(name_bg, "shop_name_text", pt_size=40, pos=[.05,0],
 								options = bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
 		self.shop_name.text = "It's a trap!!"
 		
 		# Shop Inventory
-		inventory_bg = bgui.Frame(self.main, "shop_inv_bg", size=[.56, .37], pos=[.025, .3], sub_theme="HUD")
-		# bgui.Image(inventory_bg, "shop_item", TEXTURES("null_item"),
-					# size=[1/3, 0.5],
-					# pos=[0, 0.5], aspect=1)
+		inventory_bg = bgui.Frame(self.main_frame, "shop_inv_bg", size=[.5, 1/3], pos=[.025, .3],)
+		inventory_bg.colors = [[0, 0, 0, 0]] * 4
+		# Scrollbar of x size = 0.06
 		
 		# Character limit on name = 19
 		for i in range(6):
@@ -50,7 +49,7 @@ class ShopLayout(Layout):
 			self.display[i][0].on_click = self.set_selected
 		
 		# Item info
-		info = bgui.Frame(self.main, "shop_info_bg", size=[.56, .275], pos=[.025, .025], sub_theme="HUD")
+		info = bgui.Frame(self.main_frame, "shop_info_bg", size=[.56, .275], pos=[.025, .025], sub_theme="HUD")
 		self.item_name = bgui.Label(info, "item_name", pt_size=30, pos=[.05, .8])
 		self.cost = bgui.Label(info, "item_cost_disp", text="\t", pt_size=25, pos=[.7, .8])
 		self.item_cost = bgui.Label(self.cost, "item_cost", text="", pt_size=20, pos=[1, 0])
@@ -65,11 +64,71 @@ class ShopLayout(Layout):
 		exit = bgui.FrameButton(info, "shop_exit", text="Exit", pt_size=25, size=[.15, .15], pos=[.7, .05])
 		exit.on_click = self.exit_on_click
 		
+		# Purchase confirmation dialouge box
+		self.confirm = bgui.Frame(self, "purchase_confirm", size=[.15, .2], sub_theme="HUD",
+								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+		self.confirm_mess = bgui.Label(self.confirm, "confirm_mess", pt_size=25, pos=[.17, .8], text="Purchase: ")
+		self.confirm_item = bgui.Label(self.confirm_mess, "confirm_item", pt_size=25, pos=[0, -1.25])
+		self.confirm_cost = bgui.Label(self.confirm_mess, "confrim_cost", pt_size=25, pos=[0, -2.5])
+		self.confirm_yes = bgui.FrameButton(self.confirm, "confirm_yes", text="Yes", pt_size=25,
+											size=[.3, .2], pos=[.17, .1])
+		self.confirm_no = bgui.FrameButton(self.confirm, "confirm_no", text="No", pt_size=25,
+											size=[.3, .2], pos=[.57, .1])
+		self.confirm.visible = False
+		
+		self.confirm_yes.on_click = self.purchase
+		self.confirm_no.on_click = self.cancel
+		
+		# Not enough gold dialouge
+		self.neg = bgui.Frame(self, "not_enough_gold", size=[.25, .15], sub_theme="HUD",
+								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+		self.neg_mess = bgui.TextBlock(self.neg, "neg_mess", pt_size=25, size=[.8, .55],
+								pos=[0, .25], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+		self.neg_cancel = bgui.FrameButton(self.neg, "neg_cancel", pt_size=25, text="Cancel",
+								size=[.3, .2], pos=[0, .1], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+		self.neg_mess.text = "You do not have enough gold for that."
+		self.neg.visible = False
+		
+		self.neg_cancel.on_click = self.cancel
+		
 	def btn_on_click(self, widget):
-		self.main['shop_purchase'] = self.items[self.selected]
+		# Get item
+		item = self.items[self.selected]
+		
+		# If the item is somehow None, don't continue
+		if item == None:
+			return
+			
+		self.main_frame.frozen = True
+		
+		# Check to see if the player can't afford the item
+		if self.main['player'].gold < item.cost:
+			self.neg.visible = True
+			return
+		
+		# Display confirmation
+		self.confirm_item.text = item.name
+		self.confirm_cost.text = "For " + str(item.cost) + "g ?"
+		self.confirm.visible = True
+
 		
 	def exit_on_click(self, widget):
 		self.main['shop_exit'] = True
+		
+	def purchase(self, widget):
+		item = self.items[self.selected]
+		print(self.selected)
+		self.main['player'].gold -= item.cost
+		self.main['shop_purchase'] = item
+		
+		self.confirm.visible = False
+		self.main_frame.frozen = False
+
+	def cancel(self, widget):
+		self.confirm.visible = False
+		self.neg.visible = False
+		
+		self.main_frame.frozen = False
 		
 	def update(self, main):
 		self.main = main
