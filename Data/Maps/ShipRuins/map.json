@@ -17,9 +17,6 @@
 			{ "obj": "turnLeft" },
 			{ "obj": "turnRight" }
 		],
-	"trap_tiles": [
-			{ "obj": "trap" }
-		],
 	"end_tiles": [
 			{ "obj": "end" }
 		],

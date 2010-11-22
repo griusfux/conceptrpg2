@@ -21,7 +21,6 @@ class MapEditor(QFrame):
 		self.start_tiles = self._create_tab(data.start_tiles, self.ui.start_view)
 		self.room_tiles = self._create_tab(data.room_tiles, self.ui.room_view)
 		self.corridor_tiles = self._create_tab(data.corridor_tiles, self.ui.corridor_view)
-		self.trap_tiles = self._create_tab(data.trap_tiles, self.ui.trap_view)
 		self.end_tiles = self._create_tab(data.end_tiles, self.ui.end_view)
 		self.stair_tiles = self._create_tab(data.stair_tiles, self.ui.stair_view)
 		
@@ -45,7 +44,7 @@ class MapEditor(QFrame):
 		idx = self.ui.tile_tabs.currentIndex()
 		view = None
 		
-		# This cold probably be a bit nicer...
+		# This could probably be a bit nicer...
 		if idx == 0:
 			view = self.start_tiles
 		elif idx == 1:
@@ -53,10 +52,8 @@ class MapEditor(QFrame):
 		elif idx == 2:
 			view = self.corridor_tiles
 		elif idx == 3:
-			view = self.trap_tiles
-		elif idx == 4:
 			view = self.end_tiles
-		elif idx == 5:
+		elif idx == 4:
 			view = self.stair_tiles
 		
 		if view:
@@ -72,8 +69,6 @@ class MapEditor(QFrame):
 		self.data.room_tiles = [{"obj": view.itemFromIndex(view.index(i, 0)).text()} for i in range(view.rowCount())]
 		view = self.corridor_tiles
 		self.data.corridor_tiles = [{"obj": view.itemFromIndex(view.index(i, 0)).text()} for i in range(view.rowCount())]
-		view = self.trap_tiles
-		self.data.trap_tiles = [{"obj": view.itemFromIndex(view.index(i, 0)).text()} for i in range(view.rowCount())]
 		view = self.end_tiles
 		self.data.end_tiles = [{"obj": view.itemFromIndex(view.index(i, 0)).text()} for i in range(view.rowCount())]
 		view = self.stair_tiles

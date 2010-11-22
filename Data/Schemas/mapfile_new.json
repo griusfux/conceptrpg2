@@ -4,7 +4,6 @@
 	"start_tiles": [{ "obj": "object" }],
 	"room_tiles": [{ "obj": "object" }],
 	"corridor_tiles": [{ "obj": "object" }],
-	"trap_tiles": [{ "obj": "object" }],
 	"end_tiles": [{ "obj": "object" }],
 	"stair_tiles": [{ "obj": "object" }]
 }

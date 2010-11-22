@@ -39,8 +39,7 @@ class DungeonGenerator:
 				'Rooms': [i['obj'] for i in map.room_tiles],
 				'Corridors': [i['obj'] for i in map.corridor_tiles],
 				'Ends': [i['obj'] for i in map.end_tiles],
-				'Stairs': [i['obj'] for i in map.stair_tiles],
-				'Traps': [i['obj'] for i in map.trap_tiles],
+				'Stairs': [i['obj'] for i in map.stair_tiles]
 				}
 				
 		self.deck = EncounterDeck(map.encounter_deck)
@@ -147,23 +146,19 @@ class DungeonGenerator:
 			
 			if node.type == EN_DOOR:
 				if roll == 20:
-					tile = 'Traps'
-				elif roll == 19:
 					if not self.has_stairs: tile = 'Stairs'
 					else: tile = 'Corridors'
-				elif roll < 19 and roll >= 9:
+				elif roll < 20 and roll >= 9:
 					tile = 'Rooms'
 				else:
 					tile = 'Corridors'	
 			else:
 				if roll == 20:
-					tile = 'Traps'
-				elif roll == 19:
 					tile = 'Ends'
-				elif roll == 18:
+				elif roll == 19:
 					if not self.has_stairs: tile = 'Stairs'
 					else: tile = 'Corridors'
-				elif roll < 18 and roll >= 13:
+				elif roll < 19 and roll >= 13:
 					tile = 'Rooms'
 				elif roll <13 and roll >= 10:
 					tile = 'Rooms'

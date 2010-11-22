@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'MapEditor.ui'
+# Form implementation generated from reading ui file 'D:\Desktop\crpg2\Data\EditorFiles\Editors\ui\MapEditor.ui'
 #
-# Created: Sun Nov 07 23:15:05 2010
+# Created: Sun Nov 21 20:30:11 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -69,14 +69,6 @@ class Ui_MapEditor(object):
         self.corridor_view.setObjectName("corridor_view")
         self.verticalLayout_4.addWidget(self.corridor_view)
         self.tile_tabs.addTab(self.tab_3, "")
-        self.tab_4 = QtGui.QWidget()
-        self.tab_4.setObjectName("tab_4")
-        self.verticalLayout_5 = QtGui.QVBoxLayout(self.tab_4)
-        self.verticalLayout_5.setObjectName("verticalLayout_5")
-        self.trap_view = QtGui.QTreeView(self.tab_4)
-        self.trap_view.setObjectName("trap_view")
-        self.verticalLayout_5.addWidget(self.trap_view)
-        self.tile_tabs.addTab(self.tab_4, "")
         self.tab_5 = QtGui.QWidget()
         self.tab_5.setObjectName("tab_5")
         self.verticalLayout_6 = QtGui.QVBoxLayout(self.tab_5)
@@ -96,7 +88,7 @@ class Ui_MapEditor(object):
         self.verticalLayout.addWidget(self.tile_tabs)
 
         self.retranslateUi(MapEditor)
-        self.tile_tabs.setCurrentIndex(0)
+        self.tile_tabs.setCurrentIndex(3)
         QtCore.QMetaObject.connectSlotsByName(MapEditor)
 
     def retranslateUi(self, MapEditor):
@@ -108,7 +100,6 @@ class Ui_MapEditor(object):
         self.tile_tabs.setTabText(self.tile_tabs.indexOf(self.tab), QtGui.QApplication.translate("MapEditor", "Start", None, QtGui.QApplication.UnicodeUTF8))
         self.tile_tabs.setTabText(self.tile_tabs.indexOf(self.tab_2), QtGui.QApplication.translate("MapEditor", "Room", None, QtGui.QApplication.UnicodeUTF8))
         self.tile_tabs.setTabText(self.tile_tabs.indexOf(self.tab_3), QtGui.QApplication.translate("MapEditor", "Corridor", None, QtGui.QApplication.UnicodeUTF8))
-        self.tile_tabs.setTabText(self.tile_tabs.indexOf(self.tab_4), QtGui.QApplication.translate("MapEditor", "Trap", None, QtGui.QApplication.UnicodeUTF8))
         self.tile_tabs.setTabText(self.tile_tabs.indexOf(self.tab_5), QtGui.QApplication.translate("MapEditor", "End", None, QtGui.QApplication.UnicodeUTF8))
         self.tile_tabs.setTabText(self.tile_tabs.indexOf(self.tab_6), QtGui.QApplication.translate("MapEditor", "Stair", None, QtGui.QApplication.UnicodeUTF8))
 
