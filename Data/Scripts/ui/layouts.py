@@ -32,7 +32,36 @@ class DunGenLayout(Layout):
 		
 		Layout.__init__(self, sys, "dun_gen_layout")
 		
-		self.screen = bgui.Image(self, 'dun_gen_img', 'Textures/generatingw.png', size=[1, 1])
+		# A timer for animation
+		self.timer = 1
+		
+		# Background image
+		bgui.Image(self, "dun_gen_bg", "Textures/ui/character select/bg_color.png", size=[1, 1], pos=[0, 0])
+		
+		# Grid we will place everything on
+		self.grid = bgui.Image(self, "dun_gen_grid", "Textures/ui/character select/grid.png", aspect=(4/3), size=[1,1],
+					options = bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+		
+		# Tell the user what's going on
+		self.label = bgui.Label(self.grid, 'dun_gen_lbl', text="Generating dungeon",
+								pt_size=60, pos=[0,0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+		
+		# An elipsis for animatino
+		self.elipsis = bgui.Label(self.label, 'dun_gen_elps', text="",
+								pt_size=60, pos=[1, 0],)
+					
+		# self.screen = bgui.Image(self, 'dun_gen_img', 'Textures/generatingw.png', size=[1, 1])
+		
+	def update(self, main):
+		self.timer += 1
+		
+		if self.timer % 15 == 0:
+			self.elipsis.text += " ."
+			
+		if self.timer == 59:
+			self.elipsis.text = ""
+			self.timer = 1
+			
 		
 class DefaultStateLayout(Layout):
 	def __init__(self, sys):
