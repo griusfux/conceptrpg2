@@ -13,6 +13,9 @@ class ShopLayout(Layout):
 		self.update_items = True
 		self.last_selected = -1
 		self.selected = -1
+		self.weapons = []
+		self.armors = []
+		self.misc  = []
 		self.items = []
 		self.display = [[None, None, None],
 						[None, None, None],
@@ -30,10 +33,25 @@ class ShopLayout(Layout):
 							[0, 0, 0, 0],]
 		
 		# Shop Name
-		name_bg = bgui.Frame(self.main_frame, "shop_name_bg", size=[.56, .08], pos=[.025, .875], sub_theme="HUD")
+		name_bg = bgui.Frame(self.main_frame, "shop_name_bg", size=[.56, .13], pos=[.025, .85], sub_theme="HUD")
 		self.shop_name = bgui.Label(name_bg, "shop_name_text", pt_size=40, pos=[.05,0],
 								options = bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
 		self.shop_name.text = "It's a trap!!"
+		
+		# Category Selector
+		cat_bg= bgui.Frame(self.main_frame, "cat_sel_bg", size =[.56, .1], pos=[.025, .7])
+		cat_bg.colors = [[0,0,0,0]] * 4
+		self.weapon_btn = bgui.Image(cat_bg, "cat_weap", "Textures/ui/hex_tile.png",  size=[1, 1], aspect=1, pos=[0,0])
+		self.weapon_btn.on_click = self.weap_sel
+		self.weapon_btn.visible = False
+		
+		self.armor_btn = bgui.Image(cat_bg, "cat_armor", "Textures/ui/hex_tile.png",  size=[1, 1], aspect=1, pos=[.13,0])
+		self.armor_btn.on_click = self.armor_sel
+		self.armor_btn.visible = False
+		
+		self.misc_btn = bgui.Image(cat_bg, "cat_misc", "Textures/ui/hex_tile.png",  size=[1, 1], aspect=1, pos=[.26,0])
+		self.misc_btn.on_click = self.misc_sel
+		self.misc_btn.visible = False
 		
 		# Shop Inventory
 		inventory_bg = bgui.Frame(self.main_frame, "shop_inv_bg", size=[.5, 1/3], pos=[.025, .3],)
@@ -59,7 +77,7 @@ class ShopLayout(Layout):
 		self.button = bgui.FrameButton(info, "shop_btn", text="Buy", pt_size=25,
 										size=[.15, .15], pos=[.5, .05])
 		self.button.visible = False
-		self.button.on_click = self.btn_on_click
+		self.button.on_click = self.buy_on_click
 		
 		exit = bgui.FrameButton(info, "shop_exit", text="Exit", pt_size=25, size=[.15, .15], pos=[.7, .05])
 		exit.on_click = self.exit_on_click
@@ -91,7 +109,20 @@ class ShopLayout(Layout):
 		
 		self.neg_cancel.on_click = self.cancel
 		
-	def btn_on_click(self, widget):
+	def weap_sel(self, widget):
+		self.items = self.weapons
+		self.update_items = True
+		
+	def armor_sel(self, widget):
+		self.items = self.armors
+		self.update_items = True
+		
+	def misc_sel(self, widget):
+		self.items = self.misc
+		self.update_items = True
+		
+	def buy_on_click(self, widget):
+		"""Brings up the purchase confirmation dialouge box"""
 		# Get item
 		item = self.items[self.selected]
 		
@@ -112,12 +143,19 @@ class ShopLayout(Layout):
 		self.confirm.visible = True
 
 		
+	def set_selected(self, widget):
+		"""On click event to handle selecting an item"""
+		self.selected = int(widget.name[-1])
+		
 	def exit_on_click(self, widget):
+		"""On click event for exiting the shop"""
+		
 		self.main['shop_exit'] = True
 		
 	def purchase(self, widget):
+		"""On click event for purchasing an item"""
+		
 		item = self.items[self.selected]
-		print(self.selected)
 		self.main['player'].gold -= item.cost
 		self.main['player'].inventory.add(item)
 		
@@ -125,6 +163,8 @@ class ShopLayout(Layout):
 		self.main_frame.frozen = False
 
 	def cancel(self, widget):
+		"""On click event to return to the shop window"""
+		
 		self.confirm.visible = False
 		self.neg.visible = False
 		
@@ -134,24 +174,55 @@ class ShopLayout(Layout):
 		self.main = main
 		self.shop_name.text = main['shop_keeper'].name
 		
+		# Load the shops items if none are loaded yet
 		if not self.items:
+			# Create an alias
 			shopkeeper = main['shop_keeper']
-			self.items = shopkeeper.items + shopkeeper.weapons + shopkeeper.armors
 			
+			# Fill the lists
+			self.weapons = shopkeeper.weapons
+			self.armors = shopkeeper.armors
+			self.misc = shopkeeper.items
+			
+			# Display icons that have items in them
+			if self.weapons:
+				self.weapon_btn.visible = True
+			if self.armors:
+				self.armor_btn.visible = True
+			if self.misc:
+				self.misc_btn.visible = True
+			
+			# Set a default list
+			self.items = self.weapons
+		
+			self.init = True
+			
+		# Pad the item list to insure it is always a multiple of 6
 		if len(self.items)%6 != 0 or len(self.items) == 0:
 			self.items.extend([None]*(6-len(self.items)%6))
-			
+		
+		# Updates the item display
 		if self.update_items:
 			for i, item in enumerate(self.items):
+				# Ignore anything over 6 for now
 				if i > 6:
-					break #No support for overflow yet :P
+					break
+				
+				# Update the display elements, and save the item into a convenient location
 				self.display[i][0].update_image(item.open_image() if item else TEXTURES("null_item"))
 				self.display[i][1].text = item.name if item else ""
 				self.display[i][2] = item if item else None
+				
+			# The display no longer needs updating since it was just updated
 			self.update_items = False
+			
+			# Make sure we can select a new item
+			self.selected = -1
 		
 		# Update selection info
-		if self.selected != self.last_selected:
+		if self.selected != self.last_selected or self.selected == -1:
+			if self.selected == -1:
+				self.selected = 0
 			# Save the current selection
 			self.last_selected = self.selected
 			
@@ -166,6 +237,4 @@ class ShopLayout(Layout):
 			self.item_name.text = item.name if item else ""
 			self.item_cost.text = str(item.cost) + "g" if item else ""
 			self.item_description.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean sed orci neque. Cras eget neque lacinia leo sodales suscipit sed." if item else ""
-		
-	def set_selected(self, widget):
-		self.selected = int(widget.name[-1])
+			
