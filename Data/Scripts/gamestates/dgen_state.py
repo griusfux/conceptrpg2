@@ -22,7 +22,7 @@ class DungeonGenerationState(BaseState):
 		
 		# Load up the map file and load the scene
 		self.map = Map('ShipRuins')
-		main['engine'].load_library(map)
+		main['engine'].load_library(self.map)
 		
 		# We want to time the generator
 		self.start_time = time.time()
