@@ -11,7 +11,7 @@ class ShopState(BaseState):
 		"""Intialize the client state"""
 		main['shop_exit'] = False
 		
-		main['camera'].target = main['shop_spot'].object
+		main['camera'].target = main['shop_spot']
 		main['camera'].change_mode("shop", 60)
 		self.layout_loaded = False
 	

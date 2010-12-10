@@ -1,6 +1,7 @@
 {
 	"name": "Map",
 	"encounter_deck": "deck",
+	"shop": "Kat",
 	"start_tiles": [{ "obj": "object" }],
 	"room_tiles": [{ "obj": "object" }],
 	"corridor_tiles": [{ "obj": "object" }],

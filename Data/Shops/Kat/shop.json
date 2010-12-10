@@ -1,3 +1,4 @@
 {
-	"name": "Kat's Shop"
+	"name": "Kat's Shop",
+	"root_object": "kat_root"
 }

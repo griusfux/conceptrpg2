@@ -78,6 +78,9 @@ class DungeonGenerator:
 		
 		# This is used so we can clear the dungeon if we need to
 		self._tiles = []
+		
+		# Where to place the shop keeper
+		self.shop_node = None
 
 	def generate_from_list(self, obj, result):
 		"""Use a result list to generate the dungeon"""		
@@ -202,6 +205,8 @@ class DungeonGenerator:
 			if ob.name.endswith('_tile'):
 				tile_obj = ob
 				break
+		else:
+			raise ValueError("No tile found for "+tile_node.name)
 				
 		# Use the meshes to test for collision
 		if (check_collision and self.check_collision(tile_obj, tile_obj.meshes)):
@@ -238,6 +243,8 @@ class DungeonGenerator:
 					self.exit_nodes.append(ExitNode(ob, n_type))
 				elif ob.name.startswith('encounter'):
 					self.encounter_nodes.append(ob)
+				elif ob.name.startswith('shop'):
+					self.shop_node = BlenderWrapper.Object(ob)
 					
 			# See if anything needs to be done based on the type of tile placed
 			if type == 'Rooms':
@@ -286,7 +293,7 @@ class DungeonGenerator:
 
 					if hit_tuple[0] and hit_tuple[0].name.endswith('_tile') and hit_tuple[0] != tile:
 						# Collision!
-						#print('Collision with %s and %s at %s' % (hit_tuple[0], tile, hit_tuple[1]))
+						# print('Collision with %s and %s at %s' % (hit_tuple[0], tile, hit_tuple[1]))
 						return True
 						
 		# Made it through, with no collision

@@ -69,13 +69,6 @@ class DefaultState(BaseState, BaseController):
 		main['engine'].set_active_camera(main['camera'])
 		self.camera_mode = "frankie"
 		
-		# Add the shop keeper
-		npc_data = Monster("dire_rat")
-		main['engine'].load_library(npc_data)
-		npc = main['engine'].add_object("dire_rat", (7, 7, 0.1))
-		self.npc = MonsterLogic(npc, npc_data)
-		main['shop_keeper'] = Shop("Kat")
-		
 		self.in_shop = False
 		
 	def client_run(self, main):
@@ -117,10 +110,12 @@ class DefaultState(BaseState, BaseController):
 			if ("Inventory", "INPUT_CLICK") in inputs:
 				main['ui_system'].toggle_overlay("inventory_overlay")
 				
-			if ("Action", "INPUT_CLICK") in inputs and not self.in_shop \
-				and (self.npc.object.position - main['player'].object.position).length < 3:
-				main['shop_spot'] = self.npc
-				return ("Shop", "PUSH")
+			if ("Action", "INPUT_CLICK") in inputs and not self.in_shop:
+				for shop, obj in main['shop_keepers'].items():
+					if (Vector(obj.position) - main['player'].object.position).length < 3:
+						main['shop_keeper'] = shop
+						main['shop_spot'] = obj
+						return ("Shop", "PUSH")
 				
 			# elif ("Action", "INPUT_CLICK") in inputs and self.in_shop:
 				# main['camera'].target = main['player'].object

@@ -1,6 +1,7 @@
 {
 	"name": "Ship Ruins",
 	"encounter_deck": "test",
+	"shop": "Kat",
 	"start_tiles":[
 			{ "obj": "cmbStart" }
 		],

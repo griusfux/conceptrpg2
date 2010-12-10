@@ -1,6 +1,6 @@
 # $Id$
 
-from Scripts.packages import Map
+from Scripts.packages import Map, Shop
 from .base_state import BaseState
 
 import time
@@ -21,7 +21,7 @@ class DungeonGenerationState(BaseState):
 		main['ui_system'].load_layout('dun_gen')
 		
 		# Load up the map file and load the scene
-		map = Map('ShipRuins')
+		self.map = Map('ShipRuins')
 		main['engine'].load_library(map)
 		
 		# We want to time the generator
@@ -29,12 +29,12 @@ class DungeonGenerationState(BaseState):
 		
 		# Now startup the generator
 		if 'dgen' not in main:
-			main['dgen'] = DungeonGenerator(map)
+			main['dgen'] = DungeonGenerator(self.map)
 		else:
 			main['dgen'].clear()
 		
 		# Save an encounter deck
-		main['encounter_deck'] = map.encounter_deck
+		main['encounter_deck'] = self.map.encounter_deck
 		
 	def client_run(self, main):
 		"""Client-side run method"""
@@ -56,6 +56,18 @@ class DungeonGenerationState(BaseState):
 			pos = main['dgen']._tiles[0].position
 			pos[2] += 1
 			main['player'].object.position = pos
+			
+			# Add the shop keeper
+			if (main['dgen'].shop_node):
+				shop_node = main['dgen'].shop_node
+				shop = Shop(self.map.shop)
+				main['engine'].load_library(shop)
+				shop_obj = main['engine'].add_object(shop.root_object, shop_node.position)
+				shop_obj.set_orientation(shop_node.get_orientation())
+				main['shop_keepers'] = {shop: shop_obj}
+			else:
+				main['shop_keepers'] = {}
+				print("Could not find a shop empty!")
 			
 			# Switch to the default state now
 			return ("Default", "SWITCH")
