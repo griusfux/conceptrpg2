@@ -7,6 +7,8 @@ import pickle
 import random
 import time
 
+from Scripts.packages import *
+
 class CharacterLogic:
 	"""A logic object that stores all the information and methods of the player"""
 	
@@ -209,19 +211,14 @@ class CharacterLogic:
 class PlayerLogic(CharacterLogic):		
 	def load_stats(self, save):
 		"""Fills in stats from a SaveData object"""
-		try:
-			save_data = pickle.load(save)
-		except pickle.UnpicklingError:
-			print("Invalid save file")
+		
+		save_data = Save(save).data
 		
 		self.name		= save_data["name"]
 		self.level		= save_data["level"]
-		self.race		= save_data["race"]
-		self.player_class = save_data["player_class"]
-		self.paragon_path = save_data["paragon_path"]
-		self.epic_destiny = save_data["epic_destiny"]
+		self.race		= Race(save_data["race"])
+		self.player_class = Class(save_data["player_class"])
 		self.xp			= save_data["xp"]
-		self.alignment	= save_data["alignment"]
 		
 		self.str_ab		= save_data["str_ab"]
 		self.con_ab		= save_data["con_ab"]
@@ -232,25 +229,17 @@ class PlayerLogic(CharacterLogic):
 		
 		self.speed_base = save_data["speed_base"]
 		
-		if save_data["equipped_armor"]:
-			self.equip_armor(save_data["equipped_armor"])
-		if save_data["equipped_shield"]:
-			self.equip_shield(save_data["equipped_shield"])
-		if save_data["equipped_weapon"]:
-			self.equip_weapon(save_data["equipped_weapon"])
+		self.inventory = save_data["inventory"]
 
 		self.recalc_stats()
 		
-	def save_stats(self, save):
+	def save_stats(self):
 		save_data = {
 				"name"	: self.name,
 				"level"	: self.level,
-				"race"	: self.race,
-				"player_class" : self.player_class,
-				"paragon_path" : self.paragon_path,
-				"epic_destiny" : self.epic_destiny,
+				"race"	: self.race.name,
+				"player_class" : self.player_class.name,
 				"xp"		: self.xp,
-				"alignment" : self.alignment,
 				
 				"str_ab"	: self.str_ab,
 				"con_ab"	: self.con_ab,
@@ -261,11 +250,18 @@ class PlayerLogic(CharacterLogic):
 				
 				"speed_base" : self.speed_base,
 				
-				"equipped_armor"	: self.equipped_armor,
-				"equipped_shield"	: self.equipped_shield,
-				"equipped_weapon" 	: self.equipped_weapon}
-		pickle.dump(save_data, save)
+				"inventory"	: self.inventory,
+			}
 		
+		if Save.exists(self.name):
+			# We'll open and overwrite the old one
+			save = Save(self.name)
+		else:
+			# Create a new savefile
+			save = Save.create(self.name)
+			
+		save.data = save_data
+		save.write()		
 	
 class MonsterLogic(CharacterLogic):
 	def __init__(self, object, monsterdata):

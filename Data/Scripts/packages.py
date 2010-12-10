@@ -1,6 +1,7 @@
 # $Id$
 
 import json
+import pickle
 import os
 import imp
 import shutil
@@ -470,3 +471,37 @@ class Shop(Package):
 						print(e)
 						print("Failed to load package:", line)
 						
+class Save(Package):
+	"""Save package"""
+	
+	_ext = 'save'
+	_config = 'save.json'
+	_schema = 'Schemas/savefile.json'
+	_new = 'Schemas/savefile_new.json'
+	_dir = 'Saves'
+	_img = 'save.png'
+	
+	def __init__(self, package_name):
+		Package.__init__(self, package_name)
+		
+		# Load up the data file
+		try:
+			self.data = pickle.loads(self._package.read("data"))
+		except IOError:
+			self.data = {}
+		
+	def pack(self, path):
+		Package.pack(self, path)
+		
+		zip = zipfile.ZipFile(path+'.'+self._ext, "a", zipfile.ZIP_DEFLATED)
+		
+		# Copy data file
+		zip.write(os.path.join(self._path, 'data'), arcname='data')
+		
+		zip.close()
+		
+	def write(self):
+		Package.write(self)
+	
+		with open(os.path.join(self._path, 'data'), 'wb') as f:
+			pickle.dump(self.data, f)
