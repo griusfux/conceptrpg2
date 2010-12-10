@@ -117,11 +117,6 @@ class DefaultState(BaseState, BaseController):
 						main['shop_spot'] = obj
 						return ("Shop", "PUSH")
 				
-			# elif ("Action", "INPUT_CLICK") in inputs and self.in_shop:
-				# main['camera'].target = main['player'].object
-				# main['camera'].change_mode("frankie", 60)
-				# self.in_shop = False
-				
 			if ("Exp", "INPUT_CLICK") in inputs:
 				main['player'].xp += 30
 			
@@ -149,13 +144,8 @@ class DefaultState(BaseState, BaseController):
 					self.server.invoke("rotate", id, 0, 0, dx)
 				main['input_system'].mouse.position = (0.5, 0.5)
 				
-				if ("UsePower", "INPUT_ACTIVE") in inputs:
-					target = main['player']
-					main['player'].powers.active.use(self, main['player'])
-				if ("NextPower", "INPUT_CLICK") in inputs:
-					main['player'].powers.make_next_active()
-				if ("PrevPower", "INPUT_CLICK") in inputs:
-					main['player'].powers.make_prev_active()
+				if ("UsePower", "INPUT_CLICK") in inputs:
+					main['player'].hp -= 1
 
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
 					movement[1] = speed
@@ -165,9 +155,9 @@ class DefaultState(BaseState, BaseController):
 					movement[0] = speed
 				if ("MoveLeft", "INPUT_ACTIVE") in inputs:
 					movement[0] = -speed
-				if ("MoveForward", "MoveBackward", "MoveRight", "MoveLeft", "INPUT_ACTIVE") not in inputs:
-					act = main['default_actions']['default_idle']
-					main['player'].object.play_animation(act['name'], act['start'], act['end'])
+				# if ("MoveForward", "MoveBackward", "MoveRight", "MoveLeft", "INPUT_ACTIVE") not in inputs:
+					# act = main['default_actions']['default_idle']
+					# main['player'].object.play_animation(act['name'], act['start'], act['end'])
 	
 		# Normalize the vector to the character's speed
 		if movement != [0.0, 0.0, 0.0]:
