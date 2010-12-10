@@ -24,8 +24,18 @@ class InventoryOverlay(Layout):
 	def __init__(self, parent):
 		Layout.__init__(self, parent, "inventory_overlay")
 		
-		self.frame = bgui.Frame(self, "inv_frame", size=[0.25, 0.25], pos=[0.6, 0.4])
+		self.frame = bgui.Frame(self, "inv_frame", size=[0.25, 0.25], pos=[0.6, 0.4], sub_theme="HUD")
+		
+		self.items = None
+		
+	def update(self, main):
+		
+		# Generate the item list
+		if not self.items:
+			item_str = "\n".join([item.name for item in main['player'].inventory.items])
 
+			self.items = bgui.TextBlock(self.frame, "inv_items", text=item_str, size=[0.96, 0.96], pos=[0.04, 0])
+			
 class DunGenLayout(Layout):
 	
 	def __init__(self, sys):

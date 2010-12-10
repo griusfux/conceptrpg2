@@ -1,5 +1,4 @@
 # $Id$
-import collections
 
 class Inventory:
 	"""This class represents a player's inventory and stores items"""
@@ -7,7 +6,7 @@ class Inventory:
 	def __init__(self):
 		"""Inventory constructor"""
 		
-		self.items = collections.OrderedDict()
+		self.items = []
 		self.armor = None
 		self.weapon = None
 		self.monies = 0
@@ -19,7 +18,7 @@ class Inventory:
 		
 		"""
 		
-		self.items[item] = self.items.get(item, 0) + 1
+		self.items.append(item)
 		
 	def remove(self, item):
 		"""Remove an item from the inventory
@@ -28,7 +27,4 @@ class Inventory:
 		
 		"""
 		
-		self.items[item] -= 1
-		
-		if self.items[item] < 1:
-			del self.items[item]
+		self.items.remove(item)
