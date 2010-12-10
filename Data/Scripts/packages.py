@@ -141,7 +141,10 @@ class Package:
 				
 		return packages
 	
-		# return [cls(p) for p in os.listdir(cls._dir) if os.path.isdir(p) and not p.startswith('.')]
+	@classmethod
+	def exists(cls, package):
+		return os.path.exists(os.path.join(cls._dir, package)) or \
+				os.path.exists(os.path.join(cls._dir, package)+"."+cls._ext)
 		
 	def _validate(self):
 		if not self._schema:
