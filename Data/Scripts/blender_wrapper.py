@@ -270,7 +270,7 @@ class Camera:
 			# For the first frame save old data and run the mode's init function
 			if self._first_frame:
 				self._old_position = self.position.copy()
-				self._old_orientation = self.camera.worldOrientation.copy()
+				self._old_orientation = self.pivot.localOrientation.copy()
 				self._old_camera_pos = self.camera.localPosition.copy()
 				# self._old_distance = self.camera.localPosition.copy()[2]
 				self._mode_init()
@@ -347,10 +347,10 @@ class Camera:
 		
 	def init_shop(self):
 		self._target_distance = 0
-		self._target_position = Vector((-2, -10, 2.5))		
-		self._target_orientation = Matrix.Rotation(radians(80), 3, 'X')
+		self._target_position = Vector((1, 5, 2))		
+		self._target_orientation = Matrix.Rotation(radians(100), 3, 'X') * Matrix.Rotation(radians(180), 3, 'Y')
 		
-		self.camera.lens = 25
+		self.camera.lens = 40
 		
 	def update_shop(self):
 		return
