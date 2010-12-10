@@ -132,9 +132,13 @@ class CharacterLogic:
 		self.initiative = self.dex_mod + self.level//2 + self.initiative_buff
 		
 		#hit points
-		# if isinstance(self, PlayerLogic):
-			# self.max_hp = int(self.player_class.hp_first_level) + (self.level - 1) * int(self.player_class.hp_per_level)
-		self.max_hp = 12
+		hp_percent = (self.hp / self.max_hp) if self.max_hp else 1
+		if self.player_class:
+			if hasattr(self.player_class, "hp_per_level"):
+				self.max_hp = int(self.player_class.hp_first_level) + (self.level - 1) * int(self.player_class.hp_per_level)
+			else:
+				self.max_hp = 6 + (self.level-1) * 3
+		self.hp = self.max_hp * hp_percent
 		self.bloodied	= self.max_hp // 2
 		self.surge_value= self.max_hp // 4
 		
@@ -152,6 +156,7 @@ class CharacterLogic:
 		if self._xp >= 100:
 			self.level += self._xp // 100
 			self._xp = self._xp % 100
+			self.recalc_stats()
 	
 	######################
 	# Equipment properties
