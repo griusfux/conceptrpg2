@@ -31,7 +31,7 @@ class Object:
 		self.pid = [30.0, 0.5, 0.0]
 		
 	def __eq__(self, other):
-		self.gameobj == other.gamobj
+		self.gameobj == other.gameobj
 	
 	def __ne__(self, other):
 		self.gameobj != other.gameobj
