@@ -27,11 +27,8 @@ class CharacterLogic:
 		self.level		= 0
 		self.race		= ""
 		self.player_class= ""
-		self.paragon_path= ""
-		self.epic_destiny= ""
 		self._xp			= 0
 		self.size		= ""
-		self.alignment	= ""
 		
 		#ability scores
 		self.str_ab		= 0
@@ -59,10 +56,6 @@ class CharacterLogic:
 		self.will		= 0
 		self.will_buff	= 0
 		
-		#initiative
-		self.initiative			= 0
-		self.initiative_buff	= 0
-		
 		#hit points
 		self.max_hp		= 0
 		self.bloodied	= 0
@@ -71,10 +64,8 @@ class CharacterLogic:
 		self.hp			= 0
 		self.surges		= 0
 		self.second_wind= False
-		self.death_throw_fails = 0
 		self.resistances= {}
 		self.saving_throw_mods = {}
-		self.conditions = []
 		
 		#speed
 		self.speed		= 5
@@ -82,9 +73,6 @@ class CharacterLogic:
 		self.speed_armor_penalty = 0
 		self.speed_item_mod	= 0
 		self.speed_misc_mod	= 0
-		
-		#senses
-		#skills
 		
 		#inventory and equipment
 		self.inventory = []
@@ -100,6 +88,10 @@ class CharacterLogic:
 		# The character's current "lock", which is represented as the time at which the lock ends
 		self.lock = None
 		
+	def __del__(self):
+		if self.object:
+			self.object.end()
+
 	def add_lock(self, duration):
 		self.lock = time.time()+duration
 		
@@ -127,9 +119,6 @@ class CharacterLogic:
 		self.reflex	+= self.dex_mod if(self.dex_ab > self.int_ab) else self.int_mod
 		self.will	= 10 + self.level//2 + self.will_buff
 		self.will	+= self.wis_mod if(self.wis_ab > self.cha_ab) else self.cha_mod
-		
-		#intiative
-		self.initiative = self.dex_mod + self.level//2 + self.initiative_buff
 		
 		#hit points
 		hp_percent = (self.hp / self.max_hp) if self.max_hp else 1
@@ -217,54 +206,7 @@ class CharacterLogic:
 		else:
 			print("WARNING: Character %s has no armature to contain sockets" % self.name)
 		
-	def save_against(self, roll, defense, type=None):
-		"""Checks to see if a player saves against a roll of optional type with the specified defense"""
-		mod = 0
-		if type in self.saving_throw_mods:
-			mod += saving_throw_mods[type]			
-		return self.defense + mod > roll
-	
-	def roll_dice(self, dice):
-		x, y = [int(i) for i in dice.split("d")]
-		roll = 0
-		
-		for die in range(x):
-			random.seed()
-			roll += random.randint(1, y)
-		return roll
-		
-	def move_to_point(self, target):
-		"""Moves the character toward a given target at it's speed"""
-		
-		# Get the vector to  the target
-		target_vector = self.object.get_local_vector_to(target)
-		
-		self.object.move((self.speed * target_vector[0], self.speed * target_vector[1], 0), mode=0)
-		
-	############## DEPRICATED ###############
-	def equip_armor(self, armor):
-		"""Changes stats to newly equipped armor and then recalculates stats"""
-		self.armor = armor
-		self.ac_bonus = armor.ac_bonus
-		self.recalc_stats()
-		
-	def equip_shield(self, shield):
-		"""Changes stats to newly equipped shield and then recalculates stats"""
-		self.shield = shield
-		self.recalc_stats()
-		
-	def equip_weapon(self, weapon):
-		"""Changes stats to newly equipped weapon"""
-		self.weapon = weapon
-	##########################################
-		
-		
-class PlayerLogic(CharacterLogic):
-	
-	def __init__(self, obj):
-		CharacterLogic.__init__(self, obj)
-		self.last_update = [(0, 0, 0), (1, 1, 1)]
-		
+class PlayerLogic(CharacterLogic):		
 	def load_stats(self, save):
 		"""Fills in stats from a SaveData object"""
 		try:
@@ -354,8 +296,4 @@ class MonsterLogic(CharacterLogic):
 		self.ai_start_state = monsterdata.ai_start_state
 
 		# self.recalc_stats()
-		
-	def __del__(self):
-		if self.object:
-			self.object.end()
 		
