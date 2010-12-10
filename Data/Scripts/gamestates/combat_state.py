@@ -30,7 +30,7 @@ class CombatState(DefaultState, BaseController):
 		main['ui_system'].load_layout("combat")
 		
 		# Generate the grid
-		self.grid = CombatGrid(main['engine'], main['room'])
+		self.grid = CombatGrid(main, main['engine'], main['room'])
 
 		# "Place" the player
 		# player_tile = self.grid.tile_from_point(main['player'].object.position)
@@ -179,13 +179,15 @@ class CombatState(DefaultState, BaseController):
 			movement = [float(i) for i in (Vector(movement).normalize()*speed)]
 
 		# Send the message
-		self.server.invoke("move", id, *movement)
+		# self.server.invoke("move", id, *movement)
 		
-		main['player'].tile.color((0,1,0,1))
-		self.grid.tile_from_point(main["player"].object.position).color((0,0,1,1))
+		self.move(id, main['player'], movement, local=True)
+		
+		main['player'].tile.color((1, 0, 0, 1))
 
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
+		del main['player'].tile
 		self.grid.end()
 
 	##########
@@ -342,47 +344,61 @@ class CombatState(DefaultState, BaseController):
 		return targets		
 	
 	
-	def move(self, character, linear = (0,0,0) , angular = (0,0,0) , local = False):
+	def move(self, id, character, linear = (0,0,0) , angular = (0,0,0) , local = False):
 		"""Handles linear and angular movement of a character"""
-		msg = "mov"+"$".join(["%.3f" % i for i in linear])
 		
-		return msg
+		# Movement blocking mostly works, but there are still some small issues.
+		# Blocking feels weak around the zero range
+		# Rotation may allow the user to leave the area, this could also be because of the above problem
 		
-		old_position = character.object.position
+		linear = Vector(linear)
+		if linear.length > 0:
+			# Convert to a world vector if local is true
+			if local:
+				angle = Vector((0,1,0)).angle(character.object.forward_vector)
+				linear.rotate(Vector((0,0,1)), angle)
+			
+			# Ensure we are using a normalized vector
+			linear.normalize()
+			
+			# Find the new position relative to the grid origin
+			position = character.object.position - Vector(self.grid.origin) + linear
 		
-		# Predict a forward point to see if the character can move there
-		padding = 10
-		new_position = [old_position[i] + val/60 + padding * (1 if val>0 else -1) for i, val in enumerate(linear)]
+			# Convert to grid coordinates
+			position = [int(i/TILE_SIZE) for i in position]
+			position[1] *= -1
+			
+			# Get the tile that corresponds with the character's position
+			tile = self.grid(position[0], position[1])
+			
+			if tile != None and tile.valid:
+				# Convert to local space
+				angle = character.object.forward_vector.angle(Vector((0,1,0)))
+				linear.rotate(Vector((0,0,1)), -angle)
 				
-		# Get the predicted tile from the predicted point
-		new_tile = self.grid.tile_from_point(new_position)
+				# Apply the characters speed
+				linear *= character.speed
+			else:
+				# The character can't move that way, so eliminate any movement in linear
+				linear *= 0
 		
-		# Rotation happens even if the character can't move, so handle it now
-		character.object.rotate(angular, local = local)
+		self.server.invoke("rotate", id, *angular)
+		self.server.invoke("move", id, *linear)
+			# print(position)
 		
-		# If the character is to move into an invalid tile, don't move the character
-		if  new_tile.valid or new_tile.object == character:
-			character.object.move(linear, local = local)
-			
-			# update new_tile to accomadate for padding in the prediction
-			new_tile = self.grid.tile_from_point(character.object.position)
-			
-			# If the character has changed tiles, the tiles need to be updated to reflect this
-			if new_tile != character.tile:
-				character.tile.fill(None)
-				new_tile.fill(character)
-				character.tile = new_tile
-			
-			return msg
-			
-		else:
-			return "mov0$0$0"
-	
+
+		# If the character has changed tiles, the tiles need to be updated to reflect this
+		new_tile = self.grid.tile_from_point(character.object.position)
+		if new_tile != character.tile:
+			character.tile.fill(None)
+			new_tile.fill(character)
+			character.tile = new_tile
+
 # The following classes are for handling the combat grid
 class CombatGrid:
 	"""This object handles the grid aspect of combat, and is made up of CombatTile objects"""
 	
-	def __init__(self, Engine, room):
+	def __init__(self, main, Engine, room):
 		vert_list = [i for i in room.get_vertex_list() if i.z <=0]
 		
 		# Find the smallest and largest x and y
@@ -415,7 +431,7 @@ class CombatGrid:
 		# Now fill the 2D list/array
 		for x in range(self.x_steps):
 			for y in range(self.y_steps):
-				self.map[x][y] = CombatTile(Engine, x, y, (self.origin[0] + x, self.origin[1] - y, GRID_Z), room, self.x_steps, self.y_steps)
+				self.map[x][y] = CombatTile(main, Engine, x, y, (self.origin[0] + x, self.origin[1] - y, GRID_Z), room, self.x_steps, self.y_steps)
 	
 	def __call__(self, x, y):
 		if x < 0 or y < 0:
@@ -459,7 +475,7 @@ class CombatGrid:
 class CombatTile:
 	"""The individual squares of the CombatGrid object"""
 	
-	def __init__(self, Engine, x, y, position, room, x_steps, y_steps):
+	def __init__(self, main, Engine, x, y, position, room, x_steps, y_steps):
 		self.x = x
 		self.y = y
 		self.position = (position[0] + TILE_SIZE / 2, position[1] - TILE_SIZE / 2, position[2])
@@ -485,11 +501,6 @@ class CombatTile:
 			
 		# Place the appropriate tile based on validity
 		self.grid_tile = Engine.add_object('GridTile', position) if self.valid else None
-		# if self.valid:
-			# self.grid_tile = Engine.add_object('GridTile', position)
-		# else:
-			# self.grid_tile = None
-			# self.grid_color.set_color([1, 0, 0, 1])
 			
 	def color(self, color):
 		self.grid_color.color = color
