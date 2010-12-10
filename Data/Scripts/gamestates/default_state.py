@@ -126,6 +126,9 @@ class DefaultState(BaseState, BaseController):
 				# main['camera'].target = main['player'].object
 				# main['camera'].change_mode("frankie", 60)
 				# self.in_shop = False
+				
+			if ("Exp", "INPUT_CLICK") in inputs:
+				main['player'].xp += 30
 			
 			# Camera switching
 			if ("cam1", "INPUT_CLICK") in inputs:

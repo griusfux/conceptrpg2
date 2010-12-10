@@ -29,7 +29,7 @@ class CharacterLogic:
 		self.player_class= ""
 		self.paragon_path= ""
 		self.epic_destiny= ""
-		self.xp			= 0
+		self._xp			= 0
 		self.size		= ""
 		self.alignment	= ""
 		
@@ -140,6 +140,18 @@ class CharacterLogic:
 		
 		#speed
 		self.speed = self.speed_base + self.armor.speed + self.speed_item_mod + self.speed_misc_mod
+	
+	# Managed access to xp
+	@property
+	def xp(self): return self._xp
+	
+	@xp.setter
+	def xp(self, value):
+		self._xp = value
+		
+		if self._xp >= 100:
+			self.level += self._xp // 100
+			self._xp = self._xp % 100
 	
 	######################
 	# Equipment properties

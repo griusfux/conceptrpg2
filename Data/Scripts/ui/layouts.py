@@ -122,8 +122,7 @@ class DefaultStateLayout(Layout):
 		
 	def update(self, main):
 		player = main['player']
-		player.xp = 20
-		self.player_name.text = player.name
+		self.player_name.text = "%s (Lvl %d)" % (player.name, player.level)
 		self.hp_text.text = "HP (%d/%d)" % (player.hp, player.max_hp)
 		self.hp_bar._update_position([0.90*((player.max_hp/100)%1), 0.03], self.hp_bar._base_pos)
 		self.hp_bar.percent = player.hp/player.max_hp
