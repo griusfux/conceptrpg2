@@ -478,7 +478,7 @@ class Save(Package):
 	_config = 'save.json'
 	_schema = 'Schemas/savefile.json'
 	_new = 'Schemas/savefile_new.json'
-	_dir = 'Saves'
+	_dir = '../Saves'
 	_img = 'save.png'
 	
 	def __init__(self, package_name):
