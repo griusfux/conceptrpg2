@@ -499,8 +499,8 @@ class CombatTile:
 		if hit_ob:
 			self.valid = False
 			
-		# Place the appropriate tile based on validity
-		self.grid_tile = Engine.add_object('GridTile', position) if self.valid else None
+		# Uncomment to add lines to valid tiles
+		# self.grid_lines = Engine.add_object('GridTile', position) if self.valid else None
 			
 	def color(self, color):
 		self.grid_color.color = color
@@ -517,7 +517,10 @@ class CombatTile:
 		
 	def end(self):
 		"""A method to cleanup the tile when we are done"""
-		if self.grid_tile:
-			self.grid_tile.end()
+		# If grid lines are uncommented remove them
+		if hasattr(self, "grid_lines"):
+			# Ensure the Tile has lines before attempting to remove it
+			if self.grid_lines:
+				self.grid_lines.end()
 		self.grid_color.end()
 	
