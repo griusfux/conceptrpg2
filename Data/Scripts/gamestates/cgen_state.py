@@ -18,7 +18,7 @@ class CharacterCreationState(BaseState):
 		"""Intialize the client state"""
 		
 		main['last_layout'] = ''
-		main['next_layout'] = 'cgen_name'
+		main['next_layout'] = 'cgen_select'
 		main['cgen_input'] = {}
 		main['creation_done'] = False
 		
@@ -30,13 +30,26 @@ class CharacterCreationState(BaseState):
 		
 		inputs = main['input_system'].run()
 		
-		if main['next_layout'] == 'start':
-			
+		# Check for cgen start
+		if main['next_layout'] == 'start' and main['cgen_input']['character'].package_name == "&new":
+			main['next_layout'] = 'cgen_name'
+		
+		# Check for cgen end
+		elif main['next_layout'] in ('end_cgen', 'start'):	
 			# Add the player empty
 			gameobj = main['engine'].add_object("CharacterEmpty")
 			
+			# Setup the player logic
+			player = PlayerLogic(gameobj)
+			
+			race = None
+			if main['next_layout'] == 'start':
+				player.load(main['cgen_input']['character'])
+				race = player.race
+			else:
+				race = main['cgen_input']['race']
+				
 			# Now add the mesh and armature based on race data
-			race = main['cgen_input']['race']
 			main['engine'].load_library(race)
 			
 			root_ob = main['engine'].add_object(race.root_object)
@@ -46,63 +59,97 @@ class CharacterCreationState(BaseState):
 			# Setup the armature
 			gameobj.armature = root_ob
 			
-			# Setup the player logic
-			player = PlayerLogic(gameobj)
+			if main['next_layout'] == 'end_cgen':
+				# Set the player's name
+				player.name = main['cgen_input']['name']
+				
+				# Set the player's race
+				player.race = main['cgen_input']['race']
+				
+				# Set the player's class
+				player.player_class = main['cgen_input']['class']			
+				
+				# Set the player's level
+				player.level = 1
+				
+				# Set the player's abilities
+				player.str_ab = 10
+				player.con_ab = 10
+				player.dex_ab = 10
+				player.int_ab = 10
+				player.wis_ab = 10
+				player.cha_ab = 10
+				
+				player.speed_base = 5
+				
+				# Now it is time to fill in the rest of the stats
+				player.recalc_stats()
+				
+				# Give the player an attack power
+				player.powers = PowerManager([Power('Attack'), Power('Burst')])
+				
+				# Setup player inventory
+				player.inventory = Inventory()
+				
+				w = Weapon('Longsword')
+				player.inventory.add(w)
+				player.inventory.weapon = w
+				
+				main['engine'].load_library(w)
+				w_obj = main['engine'].add_object('longsword')
+				player.set_right_hand(w_obj)
+				
+				a = Armor('Mighty Robes')
+				player.inventory.add(a)
+				player.inventory.armor = a
+					
+				player.inventory.add(Item('Bonsai'))
+				
+				# Give the player some starting gold
+				player.gold = 100
+				
+				# Save the new player
+				player.save()
 			
-			# Set the player's name
-			player.name = main['cgen_input']['name']
-			
-			# Set the player's race
-			player.race = race
-			
-			# Set the player's class
-			player.player_class = main['cgen_input']['class']			
-			
-			# Load stats for the player
-			# player.load_stats(open('Kupoman.save', 'rb'))# Set the player's level
-			player.level = 1
-			
-			# Set the player's abilities
-			player.str_ab = 10
-			player.con_ab = 10
-			player.dex_ab = 10
-			player.int_ab = 10
-			player.wis_ab = 10
-			player.cha_ab = 10
-			
-			player.speed_base = 5
-			
-			# Now it is time to fill in the rest of the stats
-			player.recalc_stats()
+			main['net_players'] = {main['client'].id: player}
+			main['player'] = player
 			
 			# Fill the player's hit points
 			player.hp = player.max_hp
 			
-			# Give the player an attack power
-			player.powers = PowerManager([Power('Attack'), Power('Burst')])
+			# Set up the camera
+			from Scripts.blender_wrapper import Camera
+			camera_pivot = main['engine'].add_object("pivot")
+			main['camera'] = Camera(camera_pivot, main['player'].object)
 			
-			# Setup player inventory
-			player.inventory = Inventory()
+			return ("DungeonGeneration", "SWITCH")
+		
+		# Check for game start
+		elif False and main['next_layout'] == 'start':
 			
-			w = Weapon('Longsword')
-			player.inventory.add(w)
-			player.inventory.weapon = w
+			# Add the player empty
+			gameobj = main['engine'].add_object("CharacterEmpty")
 			
-			main['engine'].load_library(w)
-			w_obj = main['engine'].add_object('longsword')
-			player.set_right_hand(w_obj)
+			# Setup the player logic
+			player = PlayerLogic(gameobj)
+			player.load(main['cgen_input']['character'])
 			
-			a = Armor('Mighty Robes')
-			player.inventory.add(a)
-			player.inventory.armor = a
-				
-			player.inventory.add(Item('Bonsai'))
+			# Now add the mesh and armature based on race data
+			race = player.race
+			main['engine'].load_library(race)
 			
-			# Give the player some starting gold
-			player.gold = 100
+			root_ob = main['engine'].add_object(race.root_object)
+			root_ob.position = gameobj.position
+			root_ob.set_parent(gameobj)
+			
+			# Setup the armature
+			gameobj.armature = root_ob
 			
 			main['net_players'] = {main['client'].id: player}
 			main['player'] = player
+			
+			# Fill the player's hit points
+			player.hp = player.max_hp
 			
 			# Set up the camera
 			from Scripts.blender_wrapper import Camera

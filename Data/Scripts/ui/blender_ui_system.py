@@ -6,6 +6,7 @@ from Scripts.ui.cgen_layouts import *
 from Scripts.ui.shop_layout import *
 
 layouts = {
+	"cgen_select": CgenSelect,
 	"cgen_name": CgenName,
 	"cgen_race": CgenRace,
 	"cgen_class": CgenClass,

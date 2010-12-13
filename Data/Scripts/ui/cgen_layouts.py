@@ -51,6 +51,61 @@ class CgenLayout(Layout):
 	def next_page(self, parent):
 		self.main['cgen_input'][self.name[5:]] = self.input()
 		self.main['next_layout'] = self.next
+		
+class CgenSelect(CgenLayout):
+	"""Character Generation page for selecting the player's race"""
+	def __init__(self, parent):
+		CgenLayout.__init__(self, parent, "character")		
+		# Set the title
+		self.title.text = "Who are you?"
+		
+		# Set the next page
+		self.next = 'start'
+		
+		# Character selector
+		self.selector = PackageSelector(self.grid, "char_selector", Save, size=[0.95, 0.3],
+										pos=[0, .05], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+		self.last_selected = -1
+		
+		# Display currently selected character's name
+		self.label = bgui.Label(self.grid, "char_lbl", text="", pos=[.46, .85],
+								pt_size=36, options = bgui.BGUI_DEFAULT)
+		self.label.text = self.selector.current_package.name
+		
+		# Display the currently selected character's image
+		img_name = self.selector.current_package.open_image()
+		self.image = bgui.Image(self.grid, "char_img", img_name,
+								aspect = 0.75, size = [.45, .45], pos = [.12, .4])
+		self.selector.current_package.close_image()
+								
+		# Info text
+		self.class_info = bgui.TextBlock(self.grid, "char_info", pt_size=20, size=[0.44, .30],
+										pos=[.46, .5], options=bgui.BGUI_DEFAULT)
+		self.class_info.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum vitae enim in erat porttitor imperdiet. Pellentesque vestibulum, lectus eget consectetur aliquam, ligula enim accumsan mauris, id sollicitudin mauris metus eu purus. Etiam dapibus hendrerit tincidunt. Vestibulum ut urna mi, at tincidunt nunc. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Suspendisse potenti. Maecenas ac mi nunc. Nullam sed posuere augue. Donec massa lorem, gravida et dictum ut, luctus a lorem. Sed urna risus, sollicitudin ut gravida et, vulputate sit amet massa. Curabitur auctor neque at orci pulvinar commodo. In molestie mattis lectus, ac tincidunt nisi suscipit ac. Nam convallis laoreet cursus. Phasellus pharetra vestibulum odio id consequat."		
+										
+		# Set the input for this page
+		self.input = lambda: self.selector.current_package
+		
+	def update(self, main):
+		CgenLayout.update(self, main)
+		
+		# Load a previous value if there is one
+		# if self.new and "race" in self.main['cgen_input']:
+			# for i, package in enumerate(self.selector.packages):
+				# if package.name == self.main['cgen_input']['race'].name:
+					# self.selector.selected = i
+					# break
+			# else:
+				# print("Previous race selection not found")
+				# self.selector.selected = 0
+			# self.new = False
+	
+		self.label.text = self.selector.current_package.name
+		if self.last_selected != self.selector.selected:
+			img_name = self.selector.current_package.open_image()
+			self.image.update_image(img_name)
+			self.selector.current_package.close_image()
+			self.last_selected = self.selector.selected
 					
 class CgenName(CgenLayout):
 	"""Character Generation page for setting the character's name"""
@@ -110,7 +165,7 @@ class CgenRace(CgenLayout):
 		self.selector.current_package.close_image()
 								
 		# Info text
-		self.class_info = bgui.TextBlock(self.grid, "class_info", pt_size=20, size=[0.44, .30],
+		self.class_info = bgui.TextBlock(self.grid, "race_info", pt_size=20, size=[0.44, .30],
 										pos=[.46, .5], options=bgui.BGUI_DEFAULT)
 		self.class_info.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum vitae enim in erat porttitor imperdiet. Pellentesque vestibulum, lectus eget consectetur aliquam, ligula enim accumsan mauris, id sollicitudin mauris metus eu purus. Etiam dapibus hendrerit tincidunt. Vestibulum ut urna mi, at tincidunt nunc. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Suspendisse potenti. Maecenas ac mi nunc. Nullam sed posuere augue. Donec massa lorem, gravida et dictum ut, luctus a lorem. Sed urna risus, sollicitudin ut gravida et, vulputate sit amet massa. Curabitur auctor neque at orci pulvinar commodo. In molestie mattis lectus, ac tincidunt nisi suscipit ac. Nam convallis laoreet cursus. Phasellus pharetra vestibulum odio id consequat."		
 										
@@ -150,8 +205,8 @@ class CgenClass(CgenLayout):
 		self.prev = 'cgen_race'
 		
 		# Set the next page
-		self.next_btn.text = "Start!"
-		self.next = 'start'
+		self.next_btn.text = "Finish"
+		self.next = 'end_cgen'
 				
 		# Class selector
 		self.selector = PackageSelector(self.grid, "class_selector", Class, size=[0.95, 0.3],

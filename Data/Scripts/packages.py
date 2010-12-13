@@ -68,7 +68,7 @@ class Package:
 						
 					package = zipfile.ZipFile(io.BytesIO(data))
 			else:
-				raise PackageError("Could not find package: "+package_name)
+				raise PackageError("Could not find package: "+package_name+"(%s)"%path)
 		else:
 			package = Directory(path)
 			
@@ -95,6 +95,9 @@ class Package:
 		# Store the path for possible later use
 		self._path = path
 		
+		# Store the real name of the package
+		self.package_name = package_name
+		
 		# Store the package
 		self._package = package
 		
@@ -118,7 +121,8 @@ class Package:
 				
 			# Create an empty image file
 			if cls._img:
-				open(path+'/'+cls._img, "wb").close()
+				shutil.copyfile('Schemas/dummy.png', path+'/'+cls._img)
+				# open(path+'/'+cls._img, "wb").close()
 			
 			return cls(package_name)
 		except Exception as e:
