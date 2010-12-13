@@ -118,7 +118,7 @@ class DefaultState(BaseState, BaseController):
 						return ("Shop", "PUSH")
 				
 			if ("Exp", "INPUT_CLICK") in inputs:
-				main['player'].xp += 30
+				main['player'].xp += 500
 			
 			# Camera switching
 			if ("cam1", "INPUT_CLICK") in inputs:

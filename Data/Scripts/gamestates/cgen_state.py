@@ -69,8 +69,8 @@ class CharacterCreationState(BaseState):
 				# Set the player's class
 				player.player_class = main['cgen_input']['class']			
 				
-				# Set the player's level
-				player.level = 1
+				# This levels the player to 1
+				player.xp += 0
 				
 				# Set the player's abilities
 				player.str_ab = 10

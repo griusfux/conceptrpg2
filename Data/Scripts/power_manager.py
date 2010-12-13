@@ -1,10 +1,16 @@
 # $Id$
 
+from Scripts.packages import Power
+
 class PowerManager:
 	"""This class is used to manage a player's powers"""
 	
 	def __init__(self, powers):
 		"""PowerManager constructor"""
+		
+		# If the first item is a string, assume the rest are and load the powers
+		if type(powers[0]) == str:
+			powers = [Power(string) for string in powers]
 		
 		self._powers = powers
 		

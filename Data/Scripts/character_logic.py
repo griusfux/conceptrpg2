@@ -8,6 +8,13 @@ import random
 import time
 
 from Scripts.packages import *
+from Scripts.power_manager import PowerManager
+
+XP_TABLE =	[0,
+			1000,
+			2250,
+			3750,
+			5500]
 
 class CharacterLogic:
 	"""A logic object that stores all the information and methods of the player"""
@@ -30,6 +37,8 @@ class CharacterLogic:
 		self.race		= ""
 		self.player_class= ""
 		self._xp			= 0
+		self.last_level = 0
+		self.next_level = 0
 		self.size		= ""
 		
 		#ability scores
@@ -144,9 +153,18 @@ class CharacterLogic:
 	def xp(self, value):
 		self._xp = value
 		
-		if self._xp >= 100:
-			self.level += self._xp // 100
-			self._xp = self._xp % 100
+		# if self._xp >= 100:
+			# self.level += self._xp // 100
+			# self._xp = self._xp % 100
+			# self.recalc_stats()
+		
+		while self.level < len(XP_TABLE) and self._xp >= self.next_level:
+			self.level += 1
+			self.last_level = self.next_level
+			if self.level < len(XP_TABLE):
+				self.next_level = XP_TABLE[self.level]
+			else:
+				print("Level cap reached")
 			self.recalc_stats()
 	
 	######################
@@ -230,6 +248,9 @@ class PlayerLogic(CharacterLogic):
 		self.speed_base = save_data["speed_base"]
 		
 		self.inventory = save_data["inventory"]
+		self.gold 		= save_data["gold"]
+		
+		self.powers		= PowerManager(save_data["powers"])
 
 		self.recalc_stats()
 		
@@ -251,6 +272,9 @@ class PlayerLogic(CharacterLogic):
 				"speed_base" : self.speed_base,
 				
 				"inventory"	: self.inventory,
+				"gold"		: self.gold,
+				
+				"powers"	: [power.package_name for power in self.powers.all]
 			}
 		
 		if Save.exists(self.name):
