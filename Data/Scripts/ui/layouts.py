@@ -91,11 +91,17 @@ class DefaultStateLayout(Layout):
 		self.exp_bar = bgui.ProgressBar(self.pframe, "ds_exp_bar", size=[0.90, 0.03], pos=[0.05, 0.35],
 									sub_theme='Exp')#, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)		
 		
-		# Power Bar
-		self.power_imgs = []
-		self.power_bar_selection=-1
-		self.power_frame = bgui.Frame(self, "ds_sframe", aspect=8, size=[0.1, 0.1], pos=[0.35, 0.01])
-		self.power_frame.colors = [(0, 0, 0, 0)]*4
+		# Menu frame
+		# mframe = bgui.Frame(self, "ds_mframe", aspect=1.3, size=[0.2, 0.2], pos=[0.85, 0.01])
+		# self.btn1 = bgui.Image(mframe, "menu1", "Textures/ui/hex_tile.png", aspect=1,
+								# size=[0.5, 0.5], pos=[0, .25])
+		# self.btn2 = bgui.Image(mframe, "menu2", "Textures/ui/hex_tile.png", aspect=1,
+								# size=[0.5, 0.5], pos=[0.55, .25])
+		# self.btn3 = bgui.Image(mframe, "menu3", "Textures/ui/hex_tile.png", aspect=1,
+								# size=[0.5, 0.5], pos=[0.275, 0.05])
+		# self.btn4 = bgui.Image(mframe, "menu4", "Textures/ui/hex_tile.png", aspect=1,
+								# size=[0.5, 0.5], pos=[0.275, 0.45])
+		# mframe.colors = [(0,0,0,0)]*4
 		
 		# Locked message
 		self.lock_msg = bgui.Label(self, "lock_msg", pt_size=42, pos=[0.35, 0.90])
@@ -107,8 +113,8 @@ class DefaultStateLayout(Layout):
 		self.hp_bar._update_position([0.90*min(player.max_hp/100, 1), 0.03], self.hp_bar._base_pos)
 		self.hp_bar.percent = player.hp/player.max_hp
 		
-		self.exp_text.text = "EXP (%d/%d)" % (player.xp, player.xp+100-(player.xp%100))
-		self.exp_bar.percent = player.xp/(player.xp + 100-(player.xp%100))
+		self.exp_text.text = "EXP (%d/%d)" % (player.xp, player.next_level)#player.xp+100-(player.xp%100))
+		self.exp_bar.percent = (player.xp-player.last_level)/(player.next_level-player.last_level+1)
 		
 		self.lock_msg.text = "LOCKED: %s" % (main['player'].lock - time()) if main['player'].lock else ""
 		

@@ -199,7 +199,7 @@ class Object:
 		object.set_orientation(socket.worldOrientation[:])
 		object.gameobj.setParent(socket)
 		
-	def socket_clear(self, socket_string, object = None):
+	def socket_clear(self, socket_string, object = None, delete=True):
 		"""Clears the given item from the given socket. An object argument of None removes all items from the socket"""
 		if socket_string not in self._sockets:
 			print("WARNING: No socket named %s" % socket_string)
@@ -209,10 +209,14 @@ class Object:
 		if object == None:
 			for child in socket.children:
 				child.removeParent()
+				if delete:
+					child.endObject()
 			return
 			
 		if object.gameobj in socket.children:
 			socket[object.gameobj].removeParent()
+			if delete:
+				socket[object.gameobj].endObject()
 		else:
 			print("WARNING: Object %s not in socket %s." % (object, socket_string))
 		

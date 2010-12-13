@@ -31,7 +31,7 @@ class CgenLayout(Layout):
 								options = bgui.BGUI_DEFAULT)
 								
 		# Back button
-		if name != "name":
+		if name != "character":
 			self.next_btn = bgui.FrameButton(self.grid, name+"back_btn", text="Back",
 												pt_size=30, size=[0.2, 0.05], pos=[.5, .4])
 			self.next_btn.on_click = self.prev_page
@@ -61,6 +61,7 @@ class CgenSelect(CgenLayout):
 		
 		# Set the next page
 		self.next = 'start'
+		self.next_btn.text = "Start!"
 		
 		# Character selector
 		self.selector = PackageSelector(self.grid, "char_selector", Save, size=[0.95, 0.3],
@@ -88,17 +89,6 @@ class CgenSelect(CgenLayout):
 		
 	def update(self, main):
 		CgenLayout.update(self, main)
-		
-		# Load a previous value if there is one
-		# if self.new and "race" in self.main['cgen_input']:
-			# for i, package in enumerate(self.selector.packages):
-				# if package.name == self.main['cgen_input']['race'].name:
-					# self.selector.selected = i
-					# break
-			# else:
-				# print("Previous race selection not found")
-				# self.selector.selected = 0
-			# self.new = False
 	
 		self.label.text = self.selector.current_package.name
 		if self.last_selected != self.selector.selected:
@@ -106,6 +96,11 @@ class CgenSelect(CgenLayout):
 			self.image.update_image(img_name)
 			self.selector.current_package.close_image()
 			self.last_selected = self.selector.selected
+			
+		if self.selector.current_package.package_name == "&new":
+			self.next_btn.text = "Create!"
+		else:
+			self.next_btn.text = "Start!"
 					
 class CgenName(CgenLayout):
 	"""Character Generation page for setting the character's name"""
@@ -126,6 +121,9 @@ class CgenName(CgenLayout):
 		
 		# Set the next page
 		self.next = 'cgen_race'
+		
+		# Set teh previous page
+		self.prev = 'cgen_select'
 		
 	def update(self, main):
 		CgenLayout.update(self, main)
@@ -205,7 +203,7 @@ class CgenClass(CgenLayout):
 		self.prev = 'cgen_race'
 		
 		# Set the next page
-		self.next_btn.text = "Finish"
+		self.next_btn.text = "Finish!"
 		self.next = 'end_cgen'
 				
 		# Class selector

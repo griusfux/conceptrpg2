@@ -95,9 +95,6 @@ class CharacterCreationState(BaseState):
 				player.inventory.add(w)
 				player.inventory.weapon = w
 				
-				main['engine'].load_library(w)
-				w_obj = main['engine'].add_object('longsword')
-				player.set_right_hand(w_obj)
 				
 				a = Armor('Mighty Robes')
 				player.inventory.add(a)
@@ -116,6 +113,7 @@ class CharacterCreationState(BaseState):
 			
 			# Fill the player's hit points
 			player.hp = player.max_hp
+			
 			
 			# Set up the camera
 			from Scripts.blender_wrapper import Camera

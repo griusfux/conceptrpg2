@@ -70,12 +70,17 @@ class CombatState(DefaultState, BaseController):
 			self.ai_manager = AiManager(self)
 		
 		# Set up the players
-		self.player_list = [main['player']]
+		self.hero_list = [main['player']]
 		player_tile = self.grid.tile_from_point(main["player"].object.position)
 		main["player"].tile = player_tile
 		player_tile.fill(main["player"])
-			
-			
+		
+		# If the player has a weapon, socket it
+		if main['player'].inventory.weapon:
+				weapon = main['player'].inventory.weapon
+				main['engine'].load_library(weapon)
+				obj = main['engine'].add_object('longsword')
+				main['player'].set_right_hand(obj)
 			
 		
 	def client_run(self, main):
@@ -114,9 +119,10 @@ class CombatState(DefaultState, BaseController):
 		# Get rid of any dead guys
 		for monster in self.monster_list:
 			if monster.hp <= 0:
+				monster.tile.fill(None)
 				self.monster_list.remove(monster)
-				for player in self.player_list:
-					player.xp += monster.xp_reward/len(self.player_list)
+				for hero in self.hero_list:
+					hero.xp += monster.xp_reward/len(self.hero_list)
 				monster.object.end()
 			
 		# Our id so we can talk with the server
@@ -157,7 +163,7 @@ class CombatState(DefaultState, BaseController):
 					main['player'].powers.make_prev_active()				
 				if ("Aim", "INPUT_ACTIVE") in inputs:
 					# Switch to the top-down camera
-					main['camera'].change_mode("topdown")
+					# main['camera'].change_mode("topdown")
 					
 					# Show the range of the active power
 					power = main['player'].powers.active
@@ -174,9 +180,9 @@ class CombatState(DefaultState, BaseController):
 					movement[0] = speed
 				if ("MoveLeft", "INPUT_ACTIVE") in inputs:
 					movement[0] = -speed
-				if ("MoveForward", "MoveBackward", "MoveRight", "MoveLeft", "INPUT_ACTIVE") not in inputs:
-					act = main['default_actions']['default_idle']
-					main['player'].object.play_animation(act['name'], act['start'], act['end'])
+			if ("MoveForward", "MoveBackward", "MoveRight", "MoveLeft", "UsePower") not in inputs:
+				act = main['default_actions']['default_idle']
+				main['player'].object.play_animation(act['name'], act['start'], act['end'])
 	
 		# Normalize the vector to the character's speed
 		if movement != [0.0, 0.0, 0.0]:
@@ -192,6 +198,9 @@ class CombatState(DefaultState, BaseController):
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
 		del main['player'].tile
+		
+		# Put away the player's weapon
+		main['player'].clear_right_hand()
 		self.grid.end()
 
 	##########
@@ -337,11 +346,17 @@ class CombatState(DefaultState, BaseController):
 		character.add_lock(lock)
 		self.main['client'].send('anim'+animation) # XXX should be done based on the supplied character
 		
-	def get_targets(self, type, range):
+	def get_targets(self, character, type, range, mask=0):
 		"""Get targets in a range
 		
+		character -- character using the power
 		type -- the type of area (line, burst, etc)
 		range -- the range to grab (integer)
+		mask -- a bit field indicating target types to exclude
+		
+		1	- self
+		2	- allies
+		4	- enemies
 		
 		"""
 		
@@ -351,6 +366,18 @@ class CombatState(DefaultState, BaseController):
 		
 		for tile in tiles:
 			if tile.object:
+				if mask & 1 and tile.object == self.main['player']:
+					continue
+				if mask & 2:
+					if character in self.monster_list and tile.object in self.monster_list:
+						continue
+					elif character in self.hero_list and tile.object in self.hero_list:
+						continue
+				if mask & 4:
+					if character in self.monster_list and tile.object in self.hero_list:
+						continue
+					elif character in self.hero_list and tile.object in self.monster_list:
+						continue
 				targets.append(tile.object)
 				
 		return targets		
