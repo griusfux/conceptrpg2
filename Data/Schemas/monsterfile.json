@@ -1,5 +1,8 @@
 {
 	"name": "str",
+	"role" : "str",
+	
+	"xp_reward" : "int",
 	"ai_start_state": "str",
 	"ai_keywords": "list"
 }

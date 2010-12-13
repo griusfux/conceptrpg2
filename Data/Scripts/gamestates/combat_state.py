@@ -68,10 +68,12 @@ class CombatState(DefaultState, BaseController):
 			
 			# Initialize an ai manager
 			self.ai_manager = AiManager(self)
-			
-			player_tile = self.grid.tile_from_point(main["player"].object.position)
-			main["player"].tile = player_tile
-			player_tile.fill(main["player"])
+		
+		# Set up the players
+		self.player_list = [main['player']]
+		player_tile = self.grid.tile_from_point(main["player"].object.position)
+		main["player"].tile = player_tile
+		player_tile.fill(main["player"])
 			
 			
 			
@@ -113,6 +115,8 @@ class CombatState(DefaultState, BaseController):
 		for monster in self.monster_list:
 			if monster.hp <= 0:
 				self.monster_list.remove(monster)
+				for player in self.player_list:
+					player.xp += monster.xp_reward/len(self.player_list)
 				monster.object.end()
 			
 		# Our id so we can talk with the server
@@ -221,28 +225,36 @@ class CombatState(DefaultState, BaseController):
 	
 	def _generate_encounter(self, deck, num_players=1):
 		"""Generate an encounter by drawing cards from the encounter deck"""
-		
 		random.seed()
 		
 		no_brutes_soldiers = True
 		monsters = []
+
+		
+		self.xp_reward = 0
 		
 		while no_brutes_soldiers:
-			while num_players > 0:
-				draw = random.choice(deck.deck)
+			self.xp_reward = 0		
+			remaining = num_players
+			while remaining > 0:
+				draw = random.choice(deck.cards)
 				
-				if draw[1] in ('soldier', 'brute'):
-					monsters.extend([draw[0] for i in range(2)])
+				if draw['role'] in ('soldier', 'brute'):
+					monsters.extend([draw['monster'] for i in range(2)])
+					self.xp_reward += 200 / num_players
 					no_brutes_soldiers = False
-				elif draw[1] == 'minion':
-					monsters.extend([draw[0] for i in range(4)])
-				elif draw[1]:
+				elif draw['role'] == 'minion':
+					monsters.extend([draw['monster'] for i in range(4)])
+					self.xp_reward += 100 / num_players
+				elif draw['role']:
 					monsters.append(draw[0])
+					self.xp_reward += 100 / num_players
 				else:
 					continue
 					
-				num_players -= 1
-				
+				remaining -= 1
+		
+		print(self.xp_reward)
 		return monsters
 				
 		

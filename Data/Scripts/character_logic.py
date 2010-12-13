@@ -209,10 +209,10 @@ class CharacterLogic:
 			print("WARNING: Character %s has no armature to contain sockets" % self.name)
 		
 class PlayerLogic(CharacterLogic):		
-	def load_stats(self, save):
+	def load(self, save):
 		"""Fills in stats from a SaveData object"""
 		
-		save_data = Save(save).data
+		save_data = save.data
 		
 		self.name		= save_data["name"]
 		self.level		= save_data["level"]
@@ -233,12 +233,12 @@ class PlayerLogic(CharacterLogic):
 
 		self.recalc_stats()
 		
-	def save_stats(self):
+	def save(self):
 		save_data = {
 				"name"	: self.name,
 				"level"	: self.level,
-				"race"	: self.race.name,
-				"player_class" : self.player_class.name,
+				"race"	: self.race.package_name,
+				"player_class" : self.player_class.package_name,
 				"xp"		: self.xp,
 				
 				"str_ab"	: self.str_ab,
@@ -261,6 +261,7 @@ class PlayerLogic(CharacterLogic):
 			save = Save.create(self.name)
 			
 		save.data = save_data
+		save.name = self.name
 		save.write()		
 	
 class MonsterLogic(CharacterLogic):
@@ -270,7 +271,8 @@ class MonsterLogic(CharacterLogic):
 
 		self.target = None
 		
-		self.role = ""
+		self.xp_reward = monsterdata.xp_reward
+		self.role = monsterdata.role
 		self.leader = False
 		self.elite	= False
 		self.object = object
