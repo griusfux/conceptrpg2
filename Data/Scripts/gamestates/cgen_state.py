@@ -103,7 +103,7 @@ class CharacterCreationState(BaseState):
 				player.inventory.add(Item('Bonsai'))
 				
 				# Give the player some starting gold
-				player.gold = 100
+				player.inventory.gold = 100
 				
 				# Save the new player
 				player.save()

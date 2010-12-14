@@ -133,7 +133,7 @@ class ShopLayout(Layout):
 		self.main_frame.frozen = True
 		
 		# Check to see if the player can't afford the item
-		if self.main['player'].gold < item.cost:
+		if self.main['player'].inventory.gold < item.cost:
 			self.neg.visible = True
 			return
 		
@@ -156,7 +156,7 @@ class ShopLayout(Layout):
 		"""On click event for purchasing an item"""
 		
 		item = self.items[self.selected]
-		self.main['player'].gold -= item.cost
+		self.main['player'].inventory.gold -= item.cost
 		self.main['player'].inventory.add(item)
 		
 		self.confirm.visible = False
