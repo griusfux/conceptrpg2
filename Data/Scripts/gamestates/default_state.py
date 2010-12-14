@@ -106,6 +106,9 @@ class DefaultState(BaseState, BaseController):
 				
 			if ("Stats", "INPUT_CLICK") in inputs:
 				main['ui_system'].toogle_overlay("stats")
+				
+			if main['player'].unspent_levels and ("LevelUp", "INPUT_CLICK") in inputs:
+				return("LevelUp", "PUSH")
 
 			if ("Inventory", "INPUT_CLICK") in inputs:
 				main['ui_system'].toggle_overlay("inventory_overlay")

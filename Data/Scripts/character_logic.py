@@ -9,6 +9,7 @@ import time
 
 from Scripts.packages import *
 from Scripts.power_manager import PowerManager
+from Scripts.levels import UnspentLevel
 
 XP_TABLE =	[0,
 			1000,
@@ -44,6 +45,7 @@ class CharacterLogic:
 		self._xp			= 0
 		self.last_level = 0
 		self.next_level = 0
+		self.unspent_levels = []
 		self.size		= ""
 		
 		#ability scores
@@ -165,6 +167,7 @@ class CharacterLogic:
 		
 		while self.level < len(XP_TABLE) and self._xp >= self.next_level:
 			self.level += 1
+			self.unspent_levels.append(UnspentLevel(self.level, self.player_class))
 			self.last_level = self.next_level
 			if self.level < len(XP_TABLE):
 				self.next_level = XP_TABLE[self.level]
@@ -241,7 +244,8 @@ class PlayerLogic(CharacterLogic):
 		self.level		= save_data["level"]
 		self.race		= Race(save_data["race"])
 		self.player_class = Class(save_data["player_class"])
-		self.xp			= save_data["xp"]
+		self._xp			= save_data["xp"]
+		self.unspent_levels = save_data["unspent_levels"]
 		
 		self.str_ab		= save_data["str_ab"]
 		self.con_ab		= save_data["con_ab"]
@@ -266,6 +270,7 @@ class PlayerLogic(CharacterLogic):
 				"race"	: self.race.package_name,
 				"player_class" : self.player_class.package_name,
 				"xp"		: self.xp,
+				"unspent_levels" : self.unspent_levels,
 				
 				"str_ab"	: self.str_ab,
 				"con_ab"	: self.con_ab,

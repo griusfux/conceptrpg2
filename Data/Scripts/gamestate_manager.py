@@ -9,6 +9,7 @@ STATES = {
 		"DungeonGeneration": DungeonGenerationState,
 		"Combat": CombatState,
 		"Shop": ShopState,
+		"LevelUp": LevelUpState,
 		}
 		
 

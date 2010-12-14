@@ -91,17 +91,13 @@ class DefaultStateLayout(Layout):
 		self.exp_bar = bgui.ProgressBar(self.pframe, "ds_exp_bar", size=[0.90, 0.03], pos=[0.05, 0.35],
 									sub_theme='Exp')#, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)		
 		
-		# Menu frame
-		# mframe = bgui.Frame(self, "ds_mframe", aspect=1.3, size=[0.2, 0.2], pos=[0.85, 0.01])
-		# self.btn1 = bgui.Image(mframe, "menu1", "Textures/ui/hex_tile.png", aspect=1,
-								# size=[0.5, 0.5], pos=[0, .25])
-		# self.btn2 = bgui.Image(mframe, "menu2", "Textures/ui/hex_tile.png", aspect=1,
-								# size=[0.5, 0.5], pos=[0.55, .25])
-		# self.btn3 = bgui.Image(mframe, "menu3", "Textures/ui/hex_tile.png", aspect=1,
-								# size=[0.5, 0.5], pos=[0.275, 0.05])
-		# self.btn4 = bgui.Image(mframe, "menu4", "Textures/ui/hex_tile.png", aspect=1,
-								# size=[0.5, 0.5], pos=[0.275, 0.45])
-		# mframe.colors = [(0,0,0,0)]*4
+		# Level Up Message Frame
+		self.mframe = bgui.Frame(self, "ds_mframe", aspect=8, size=[0, 0.05], pos=[0.75, 0.01])
+		self.mframe.colors = [(0,0,0,0,)]*4
+		self.mimg = bgui.Image(self.mframe, "ds_mimg", "Textures/ui/hex_tile.png", aspect=1,
+								size=[0, 1],)
+		self.mtext = bgui.Label(self.mframe, "ds_mtext", pt_size=22, pos=[.15, .2])
+		
 		
 		# Locked message
 		self.lock_msg = bgui.Label(self, "lock_msg", pt_size=42, pos=[0.35, 0.90])
@@ -117,6 +113,18 @@ class DefaultStateLayout(Layout):
 		self.exp_bar.percent = (player.xp-player.last_level)/(player.next_level-player.last_level+1)
 		
 		self.lock_msg.text = "LOCKED: %s" % (main['player'].lock - time()) if main['player'].lock else ""
+		
+		if not self.mtext.text:
+			import bge #XXX This needs to go :P
+			
+			key = main['input_system'].keyboard.dict["LevelUp"]
+			key = bge.events.EventToString(key)
+			key = key[:-3].title()
+			self.mtext.text = "Press %s to level up!" % key
+		if main['player'].unspent_levels:
+			self.mframe.visible = True
+		else:
+			self.mframe.visible = False
 		
 class CombatLayout(DefaultStateLayout):
 	def __init__(self, sys):
