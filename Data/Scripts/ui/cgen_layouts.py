@@ -32,9 +32,9 @@ class CgenLayout(Layout):
 								
 		# Back button
 		if name != "character":
-			self.next_btn = bgui.FrameButton(self.grid, name+"back_btn", text="Back",
+			self.prev_btn = bgui.FrameButton(self.grid, name+"back_btn", text="Back",
 												pt_size=30, size=[0.2, 0.05], pos=[.5, .4])
-			self.next_btn.on_click = self.prev_page
+			self.prev_btn.on_click = self.prev_page
 								
 		# Next button
 		self.next_btn = bgui.FrameButton(self.grid, name+"next_btn", text="Next",
@@ -111,10 +111,12 @@ class CgenName(CgenLayout):
 		self.title.text = "What is your name?"
 		
 		# Get the Player's name
-		self.name_input = bgui.TextInput(self.grid, "name_input", pos = [.33, .5],
-									size = [.33, .033], text='Hero',
+		self.name_img = bgui.Image(self.grid, "name_input_img", "Textures/ui/text_input_hover.png",
+								pos=[.33, .5], size=[.33, .05])
+		self.name_input = bgui.TextInput(self.name_img, "name_input",pos=[.05, 0.3],
+									size = [1,.9], text='Hero',
 									options = bgui.BGUI_DEFAULT)
-		self.name_input.frame.colors = [(1, 1, 1, .5)]*4
+		# self.name_input.frame.colors = [(1, 1, 1, .5)]*4
 		
 		# Set the input for this page
 		self.input = lambda : self.name_input.text
