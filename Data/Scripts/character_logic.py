@@ -51,16 +51,22 @@ class CharacterLogic:
 		#ability scores
 		self.str_ab		= 0
 		self.str_mod	= 0
+		self.str_bonus	= 0
 		self.con_ab		= 0
 		self.con_mod	= 0
+		self.con_bonus	= 0
 		self.dex_ab		= 0
 		self.dex_mod	= 0
+		self.dex_bonus	= 0
 		self.int_ab		= 0
 		self.int_mod	= 0
+		self.int_bonus	= 0
 		self.wis_ab		= 0
 		self.wis_mod	= 0
+		self.wis_bonus	= 0
 		self.cha_ab		= 0
 		self.cha_mod	= 0
+		self.cha_bonus	= 0
 		
 		#defenses
 		self.ac			= 0
@@ -140,11 +146,11 @@ class CharacterLogic:
 		
 		#hit points
 		hp_percent = (self.hp / self.max_hp) if self.max_hp else 1
-		if self.player_class:
-			if hasattr(self.player_class, "hp_per_level"):
-				self.max_hp = int(self.player_class.hp_first_level) + (self.level - 1) * int(self.player_class.hp_per_level)
-			else:
-				self.max_hp = 6 + (self.level-1) * 3
+		if self.player_class and hasattr(self.player_class, "hp_per_level"):
+			self.max_hp = int(self.player_class.hp_first_level) + (self.level - 1) * int(self.player_class.hp_per_level)
+		else:
+			self.max_hp = 6 + (self.level-1) * 3
+		self.max_hp += self.con_ab
 		self.hp = self.max_hp * hp_percent
 		self.bloodied	= self.max_hp // 2
 		self.surge_value= self.max_hp // 4
@@ -260,6 +266,11 @@ class PlayerLogic(CharacterLogic):
 		self.gold 		= save_data["gold"]
 		
 		self.powers		= PowerManager(save_data["powers"])
+		
+		if self.level == 0:
+			self.xp += 0
+		self.next_level = XP_TABLE[self.level]
+		self.last_level = XP_TABLE[self.level-1]
 
 		self.recalc_stats()
 		

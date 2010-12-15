@@ -13,11 +13,15 @@ class LevelUpState(BaseState):
 		# Get inputs
 		inputs = main['input_system'].run()
 		
-		# Exiting the shop
-		if ("Stats", "INPUT_CLICK") in inputs or main['level_exit']:
+		# Done leveling
+		if main['level_exit']:
+			main['player'].recalc_stats()
 			return ("", "POP")
 		
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
 		main['ui_system'].load_layout("default_state")
 		del main['level_exit']
+		
+		# Reset the mouse position
+		main['input_system'].mouse.position = (0.5, 0.5)
