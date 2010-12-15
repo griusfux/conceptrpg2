@@ -146,9 +146,6 @@ class DefaultState(BaseState, BaseController):
 				if abs(dx) > 0:
 					self.server.invoke("rotate", id, 0, 0, dx)
 				main['input_system'].mouse.position = (0.5, 0.5)
-				
-				if ("UsePower", "INPUT_CLICK") in inputs:
-					main['player'].hp -= 1
 
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
 					movement[1] = speed
