@@ -5,14 +5,21 @@ from Scripts.packages import Power
 class PowerManager:
 	"""This class is used to manage a player's powers"""
 	
-	def __init__(self, powers):
+	def __init__(self, owner, powers):
 		"""PowerManager constructor"""
+		self.owner = owner
+		self._powers = []
+		self._passives = []
 		
-		# If the first item is a string, assume the rest are and load the powers
-		if type(powers[0]) == str:
-			powers = [Power(string) for string in powers]
-		
-		self._powers = powers
+		for power in powers:
+			# If power is a string, load up the power package
+			if type(power) == str:
+				power = Power(power)
+			# Filter the power into the appropriate list
+			if "PASSIVE" in power.flags:
+				self._passives.append(power)
+			else:
+				self._powers.append(power)
 		
 		self._current_power = 0
 		
@@ -23,7 +30,11 @@ class PowerManager:
 		
 		"""
 		
-		self._powers.append(power)
+		if "PASSIVE" in power.flags:
+			self._passives.append(power)
+			power.push(self.owner)
+		else:
+			self._powers.append(power)
 		
 	def remove(self, power):
 		"""Remove a power from the manager
@@ -32,6 +43,9 @@ class PowerManager:
 		
 		"""
 		
+		if "PASSIVE" in power.flags:
+			self._passivs.remove(power)
+			power.pop(self.owner)
 		self._powers.remove(power)
 		
 	def make_next_active(self):

@@ -1,4 +1,6 @@
 {
-	"name": "Nezumi",
-	"root_object": "NezumiArm"
+	"name": "Zumi",
+	"root_object": "NezumiArm",
+	
+	"traits": "traits_zumi"
 }

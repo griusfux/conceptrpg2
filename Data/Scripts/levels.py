@@ -23,4 +23,32 @@ class UnspentLevel:
 			self.ability_points = 0
 			self.ability_spend = "NONE"
 		
+		#######
+		# Feats
+		if level % 2 == 0 or level in (1, 1, 21):
+			self.feats = 1
+		else:
+			self.feats = 0
+		
+		########
+		# Powers
+		
+		# At wills
+		if level == 1:
+			self.at_wills = 2
+		else:
+			self.at_wills = 0
+			
+		# Encounters
+		if level in (1, 3, 7):
+			self.encounters = 1
+		else:
+			self.encounters = 0
+			
+		# Dailies
+		if level in (1, 5, 9):
+			self.dailies = 1
+		else:
+			self.dailies = 0
+		
 		

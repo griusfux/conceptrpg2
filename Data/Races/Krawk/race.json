@@ -1,4 +1,6 @@
 {
 	"name": "Krawk",
-	"root_object": "KrawkArm"
+	"root_object": "KrawkArm",
+	
+	"traits": "traits_krawk"
 }

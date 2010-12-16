@@ -1,4 +1,6 @@
 {
 	"name": "Race",
-	"root_object": "root_object"
+	"root_object": "root_object",
+	
+	"traits": ""
 }

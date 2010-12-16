@@ -3,5 +3,8 @@
 	"animation": "attack",
 	"lock": 1.0,
 	"range_type": "MELEE",
-	"range_size": 1
+	"range_size": 1,
+	"damage_types": [],
+	"effect_types": [],
+	"flags": []
 }

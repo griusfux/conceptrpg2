@@ -112,6 +112,8 @@ class CharacterLogic:
 		# The character's current "lock", which is represented as the time at which the lock ends
 		self.lock = None
 		
+		self.powers = PowerManager(self, [])
+		
 	def __del__(self):
 		if self.object:
 			self.object.end()
@@ -265,7 +267,7 @@ class PlayerLogic(CharacterLogic):
 		self.inventory = save_data["inventory"]
 		self.gold 		= save_data["gold"]
 		
-		self.powers		= PowerManager(save_data["powers"])
+		self.powers		= PowerManager(self, save_data["powers"])
 		
 		if self.level == 0:
 			self.xp += 0

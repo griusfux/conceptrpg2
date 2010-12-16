@@ -352,9 +352,27 @@ class Power(Package):
 
 		# Grab the method from the module
 		self._use = p.power
+		self._push = None
+		self._pop = None
+		
+		if "PASSIVE" in self.flags:
+			self._push = p.push
+			self._pop = p.pop
 		
 	def use(self, controller, user):
 		self._use(self, controller, user)
+		
+	def push(self, user):
+		if self._push:
+			self._push(self, user)
+		else:
+			pass
+			
+	def pop(self, user):
+		if self._pop:
+			self._pop(self, user)
+		else:
+			pass		
 		
 	def pack(self, path):
 		Package.pack(self, path)
@@ -365,6 +383,10 @@ class Power(Package):
 		zip.write(os.path.join(self._path, 'power.py'), arcname='power.py')
 		
 		zip.close()
+		
+class Feat(Power):
+	_dir = 'Powers/Feats'
+	
 		
 class Item(Package):
 	"""Item Package"""

@@ -1,4 +1,6 @@
 {
 	"name": "str",
-	"root_object": "str"
+	"root_object": "str",
+	
+	"traits": "str"
 }

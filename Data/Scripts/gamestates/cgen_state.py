@@ -86,7 +86,17 @@ class CharacterCreationState(BaseState):
 				player.recalc_stats()
 				
 				# Give the player an attack power
-				player.powers = PowerManager([Power('Attack'), Power('Burst')])
+				player.powers.add(Power('Attack'))
+				player.powers.add(Power('Burst'))
+				
+				# Give the player racial traits
+				# This needs to be done after giving the player xp to ensure there
+				# is already an unspent level for level 1
+				traits = player.race.traits
+				try:
+					player.powers.add(Feat(traits))
+				except PackageError:
+					print("Unable to open up the file %s for %s's racial traits" % (traits, player.race.name))
 				
 				# Setup player inventory
 				player.inventory = Inventory()

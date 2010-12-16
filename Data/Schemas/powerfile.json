@@ -3,5 +3,8 @@
 	"animation": "str",
 	"lock": "float",
 	"range_type": "str",
-	"range_size": "int"
+	"range_size": "int",
+	"damage_types": "list",
+	"effect_types": "list",
+	"flags": "list"
 }

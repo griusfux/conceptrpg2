@@ -1,4 +1,6 @@
 {
 	"name": "Dark Knight",
-	"root_object": "DarkKnightArm"
+	"root_object": "DarkKnightArm",
+	
+	"traits": "traits_kat"
 }
