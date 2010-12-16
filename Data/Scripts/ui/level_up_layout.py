@@ -32,22 +32,11 @@ class LevelUpLayout(Layout):
 		self.lvl_cancel = bgui.FrameButton(btn_frame, "lvl_cancel", text="Cancel", pt_size=25,
 										size=[.15, .6], pos=[.6, .2])
 		self.lvl_cancel.on_click = self.cancel_on_click
-		
-		################
-		# Abililty Frame
-		ability_frame = bgui.Frame(main_frame, "lvl_ab_frame", size=[1, 0.45], pos=[0, 0.55])
-		ability_frame.colors = [(0,0,0,0)]*4
-		
-		## Archetype Frame
-		arch_frame = bgui.Frame(ability_frame, "lvl_arch_frame", size=[1/3, 1], pos=[0, 0], sub_theme="Level")
-		arch_header = bgui.Frame(arch_frame, "lvl_arch_head", size=[1, .11], pos=[0,.89], sub_theme="Lvl_Header")
-		arch_lbl = bgui.Label(arch_header, "lvl_arch_lbl", pos=[0,0], pt_size=20,text="Archetypes",
-								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
-								
-								
-		
-		## Abillity Points Frame
-		points_frame = bgui.Frame(ability_frame, "lvl_points_frame", size=[1/3, 1], pos=[1/3, 0], sub_theme="Level")
+
+
+		#######################
+		# Abillity Points Panel
+		points_frame = bgui.Frame(main_frame, "lvl_points_frame", size=[1/3, .45], pos=[0, 0.55], sub_theme="Level")
 		points_header = bgui.Frame(points_frame, "lvl_points_head", size=[1, .11], pos=[0,.89], sub_theme="Lvl_Header")
 		points_lbl = bgui.Label(points_header, "lvl_points_lbl", pos=[0,0], pt_size=20,text="Ability Scores",
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
@@ -89,44 +78,44 @@ class LevelUpLayout(Layout):
 		base_lbl = bgui.Label(points_frame, "lvl_base_lbl", text="Base Score", pt_size=12, pos=[1/3+0.05, .625])
 		bonus_lbl = bgui.Label(points_frame, "lvl_bonus_lbl", text="Bonuses", pt_size=12, pos=[.625, .625])
 		final_lbl = bgui.Label(points_frame, "lvl_final_lbl", text="Final Score", pt_size=12, pos=[.8, .625])
-								
-								
-		
-		## Ability Info Frame
-		ab_info_frame = bgui.Frame(ability_frame, "lvl_ab_info_frame", size=[1/3, 1], pos=[2/3, 0], sub_theme="Level")
-		ab_info_header = bgui.Frame(ab_info_frame, "lvl_ab_info_head", size=[1, .11], pos=[0,.89], sub_theme="Lvl_Header")
-		ab_info_lbl = bgui.Label(ab_info_header, "lvl_ab_info_lbl", pos=[0,0], pt_size=20,text="Ability Details",
-								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
-		
-		self.ab_info_name = bgui.Label(ab_info_frame, "lvl_ab_info_name", pos=[0.05, .8], pt_size=24)
-		self.ab_info_name.text = "Strength"
-		self.ab_info = bgui.TextBlock(ab_info_frame, "lvl_ab_info", pos=[0.05, 0.15], size=[0.9, .6], pt_size=18)
-		self.ab_info.text = levels.STR_INFO
-		
 		
 		
 		#############
-		# Power Frame
-		power_frame = bgui.Frame(main_frame, "lvl_power_frame", size=[1, 0.45], pos=[0, 0.1])
-		power_frame.colors = [(0,0,0,0)]*4
+		# Feats Panel
+		feat_frame = bgui.Frame(main_frame, "lvl_feat_frame", size=[1/3, .45], pos=[1/3, .55], sub_theme="Level")
+		feat_header = bgui.Frame(feat_frame, "lvl_feat_head", size=[1, .11], pos=[0,.89], sub_theme="Lvl_Header")
+		feat_lbl = bgui.Label(feat_header, "lvl_feat_lbl", pos=[0,0], pt_size=20,text="Feats",
+								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+
+
+		###############
+		# Details Panel
+		info_frame = bgui.Frame(main_frame, "lvl_info_frame", size=[1/3, .45], pos=[2/3, 0.55], sub_theme="Level")
+		info_header = bgui.Frame(info_frame, "lvl_info_head", size=[1, .11], pos=[0,.89], sub_theme="Lvl_Header")
+		info_lbl = bgui.Label(info_header, "lvl_info_lbl", pos=[0,0], pt_size=20,text="Details",
+								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
 		
-		## Available Powers Frame
-		available_frame = bgui.Frame(power_frame, "lvl_avail_frame", size=[1/3, 1], pos=[0, 0], sub_theme="Level")
+		self.info_name = bgui.Label(info_frame, "lvl_info_name", pos=[0.05, .8], pt_size=24)
+		self.info_name.text = "Strength"
+		self.info = bgui.TextBlock(info_frame, "lvl_info", pos=[0.05, 0.15], size=[0.9, .6], pt_size=18)
+		self.info.text = levels.STR_INFO
+		
+		
+		########################
+		# Available Powers Panel
+		available_frame = bgui.Frame(main_frame, "lvl_avail_frame", size=[1/3, .45], pos=[0, .1], sub_theme="Level")
 		available_header = bgui.Frame(available_frame, "lvl_available_head", size=[1, .11], pos=[0,.89], sub_theme="Lvl_Header")
 		available_lbl = bgui.Label(available_header, "lvl_available_lbl", pos=[0,0], pt_size=20,text="Available Powers",
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
-		
-		## Known Powers Frame
-		known_frame = bgui.Frame(power_frame, "lvl_known_frame", size=[1/3, 1], pos=[1/3, 0], sub_theme="Level")
+
+
+		####################
+		# Known Powers Panel
+		known_frame = bgui.Frame(main_frame, "lvl_known_frame", size=[1/3, .45], pos=[1/3, .1], sub_theme="Level")
 		known_header = bgui.Frame(known_frame, "lvl_known_head", size=[1, .11], pos=[0,.89], sub_theme="Lvl_Header")
 		known_lbl = bgui.Label(known_header, "lvl_known_lbl", pos=[0,0], pt_size=20,text="Known Powers",
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
-		
-		## Power Info Frame
-		pow_info_frame = bgui.Frame(power_frame, "lvl_pow_info_frame", size=[1/3, 1], pos=[2/3, 0], sub_theme="Level")
-		pow_info_header = bgui.Frame(pow_info_frame, "lvl_pow_info_head", size=[1, .11], pos=[0,.89], sub_theme="Lvl_Header")
-		pow_info_lbl = bgui.Label(pow_info_header, "lvl_pow_info_lbl", pos=[0,0], pt_size=20,text="Power Details",
-								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+								
 	def ab_lbl_on_click(self, widget):
 		ab = widget.name[4:7]
 		
