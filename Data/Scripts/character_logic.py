@@ -256,11 +256,17 @@ class PlayerLogic(CharacterLogic):
 		self.unspent_levels = save_data["unspent_levels"]
 		
 		self.str_ab		= save_data["str_ab"]
+		self.str_bonus	= save_data["str_bonus"]
 		self.con_ab		= save_data["con_ab"]
+		self.con_bonus	= save_data["con_bonus"]
 		self.dex_ab		= save_data["dex_ab"]
+		self.dex_bonus	= save_data["dex_bonus"]
 		self.int_ab		= save_data["int_ab"]
+		self.int_bonus	= save_data["int_bonus"]
 		self.wis_ab		= save_data["wis_ab"]
+		self.wis_bonus	= save_data["wis_bonus"]
 		self.cha_ab		= save_data["cha_ab"]
+		self.cha_bonus	= save_data["cha_bonus"]
 		
 		self.speed_base = save_data["speed_base"]
 		
@@ -286,11 +292,17 @@ class PlayerLogic(CharacterLogic):
 				"unspent_levels" : self.unspent_levels,
 				
 				"str_ab"	: self.str_ab,
+				"str_bonus"	: self.str_bonus,
 				"con_ab"	: self.con_ab,
+				"con_bonus"	: self.con_bonus,
 				"dex_ab"	: self.dex_ab,
+				"dex_bonus"	: self.dex_bonus,
 				"int_ab"	: self.int_ab,
+				"int_bonus" : self.int_bonus,
 				"wis_ab"	: self.wis_ab,
+				"wis_bonus" : self.wis_bonus,
 				"cha_ab"	: self.cha_ab,
+				"cha_bonus"	: self.cha_bonus,
 				
 				"speed_base" : self.speed_base,
 				
