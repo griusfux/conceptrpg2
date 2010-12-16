@@ -1,7 +1,5 @@
 {
 	"name": "Attack",
-	"animation": "attack",
-	"lock": 1.0,
 	"range_type": "MELEE",
 	"range_size": 1,
 	"damage_types": [],

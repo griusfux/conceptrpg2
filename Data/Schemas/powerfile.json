@@ -1,7 +1,5 @@
 {
 	"name": "str",
-	"animation": "str",
-	"lock": "float",
 	"range_type": "str",
 	"range_size": "int",
 	"damage_types": "list",

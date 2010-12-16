@@ -1,7 +1,5 @@
 {
 	"name": "Burst",
-	"animation": "attack",
-	"lock": 1.0,
 	"range_type": "BURST",
 	"range_size": 3,
 	"damage_types": [],
