@@ -96,7 +96,6 @@ class CombatState(DefaultState, BaseController):
 		
 		# See if we still need to be in combat
 		if not self.monster_list:
-			main['client'].send('stateDefault')
 			return ("Default", "SWITCH")
 
 		# Reset the combat tiles
@@ -277,8 +276,7 @@ class CombatState(DefaultState, BaseController):
 					continue
 					
 				remaining -= 1
-		
-		print(self.xp_reward)
+
 		return monsters
 				
 		
@@ -359,7 +357,7 @@ class CombatState(DefaultState, BaseController):
 		"""
 		
 		character.add_lock(lock)
-		self.main['client'].send('anim'+animation) # XXX should be done based on the supplied character
+		self.server.invoke("anim", animation, 1, 20, 0, 0) # XXX should be done based on the supplied character
 		
 	def get_targets(self, character, type, range, mask=0):
 		"""Get targets in a range

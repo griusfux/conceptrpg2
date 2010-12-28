@@ -175,7 +175,6 @@ class DefaultState(BaseState, BaseController):
 			room = main['dgen'].rooms[main.sensors['encounter_mess'].bodies[0]]
 			del room['encounter']
 			main['room'] = Blender.Object(room)
-			main['client'].send('stateCombat')
 			return ('Combat', 'SWITCH')
 			
 	##########
