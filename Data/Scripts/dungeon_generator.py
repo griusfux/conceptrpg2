@@ -269,7 +269,7 @@ class DungeonGenerator:
 				for v_index in range(mesh.getVertexArrayLength(mat)):
 					vert = mesh.getVertex(mat, v_index)
 					
-					vert_pos = vert.getXYZ()[:]
+					vert_pos = vert.getXYZ().copy()
 					
 					# Scale the vert_pos on the x and y a bit to account for slight overlaps (where the tiles connect)
 					vert_pos[0] *= 0.9
@@ -285,7 +285,7 @@ class DungeonGenerator:
 
 					
 					# The to position is just x units below the vert
-					to_pos = from_pos[:]
+					to_pos = from_pos.copy()
 					to_pos[2] -= self.ray_length
 					
 					# Cast a ray from the vert down
