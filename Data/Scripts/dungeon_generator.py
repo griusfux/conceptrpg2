@@ -20,6 +20,13 @@ class ExitNode:
 	def __init__(self, obj, type):
 		self.object = obj
 		self.type = type
+		
+class ShopNode:
+	"""A class to store shop node information"""
+	
+	def __init__(self, pos, ori):
+		self.position = pos
+		self.orientation = ori
 
 class DungeonGenerator:
 	"""A class for generating dungeons"""
@@ -81,26 +88,37 @@ class DungeonGenerator:
 		
 		# Where to place the shop keeper
 		self.shop_node = None
+	
+	def generate_from_list(self, main, result):
+		"""Use a result list to generate the dungeon"""	
+		
+		self.clear()
+		
+		for type, index, room_id, position, ori in result:
+			if type == "Shop":
+				self.shop_node = ShopNode(position, ori)
+			else:
+				tile = self.tiles[type][index]
 
-	def generate_from_list(self, obj, result):
-		"""Use a result list to generate the dungeon"""		
-		for type, index, position, ori in result:		
-			tile = self.tiles[type][index]
-			
-			# First try to add the object; if it doesn't exist, merge the scene and try again
-			# try:
-				# tile_node = self.scene.addObject(tile[0], obj)
-			# except ValueError:
-				# GameLogic.LibLoad(self.blend, 'Scene', tile[1])
-				# tile_node = self.scene.addObject(tile[0], obj)
+				tile_node = main['engine'].add_object(tile, position, ori)
+					
+				# Get the mesh
+				for ob in tile_node.gameobj.childrenRecursive:
+					if ob.name.endswith('_tile'):
+						tile_obj = ob
+						break
+				else:
+					raise ValueError("No tile found for "+tile_node.name)
 				
-			tile_node.worldPosition = position
-			tile_node.worldOrientation = ori
-			
-			if type == "Rooms":
-				self.room_count += 1
-			elif type == "Stairs":
-				self.has_stairs = True
+				if type == "Rooms":
+					self.room_count += 1
+					self.rooms[str(room_id)] = tile_obj
+					tile_obj['room_id'] = room_id
+					tile_obj['encounter'] = True
+				elif type == "Stairs":
+					self.has_stairs = True
+					
+				self._tiles.append(tile_node)
 				
 		self.result = result
 			
@@ -244,11 +262,17 @@ class DungeonGenerator:
 				elif ob.name.startswith('encounter'):
 					self.encounter_nodes.append(ob)
 				elif ob.name.startswith('shop'):
-					self.shop_node = BlenderWrapper.Object(ob)
+					pos = [i for i in ob.worldPosition]
+					ori = [[a, b, c] for a, b, c in ob.worldOrientation]
+					self.result.append(("Shop", 0, 0, pos, ori))
+					
+					self.shop_node = ShopNode(pos, ori)
 					
 			# See if anything needs to be done based on the type of tile placed
 			if type == 'Rooms':
 				self.room_count += 1
+				self.rooms[str(self.room_count)] = tile_obj
+				tile_obj['room_id'] = self.room_count
 				tile_obj['encounter'] = True
 			elif type == 'Stairs':
 				self.has_stairs = True
@@ -258,8 +282,7 @@ class DungeonGenerator:
 			ori = [[a, b, c] for a, b, c in tile_node.worldOrientation]
 			
 			# Add the tile name and position to the result list
-			self.result.append((type, index, pos, ori))
-			self.rooms[str(tile_obj.getPhysicsId())] = tile_obj
+			self.result.append((type, index, self.room_count, pos, ori))
 			self._tiles.append(BlenderWrapper.Object(tile_node))
 				
 	def check_collision(self, tile, meshes):

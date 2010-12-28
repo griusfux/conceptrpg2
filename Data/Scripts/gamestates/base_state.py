@@ -1,5 +1,7 @@
 # $Id$
 
+import pickle
+
 # This is used to implement RPC like functionality
 class RPC:
 	def __init__(self, state, client, rdict):
@@ -15,7 +17,8 @@ class RPC:
 		
 	def invoke(self, f, *args):
 		if f not in self.funcs:
-			raise ValueError(f+" is not a registered function")
+			raise ValueError(f+" is not a registered function.\nAvailable functions: "+
+								", ".join([v[0].__name__ for k, v in self.funcs.items()]))
 	
 		p = []
 		
@@ -25,6 +28,8 @@ class RPC:
 			v = args[i]
 			if t is float:
 				v = "%.4f" % v
+			elif t == "pickle":
+				v = str(pickle.dumps(v, 0), "ascii")
 			elif not isinstance(v, t):
 				print("Function:", f, "\nArgs:", args)
 				raise ValueError("Argument "+str(i)+" should have been of type "+t.__name__+" got "+v.__class__.__name__+" instead.")
@@ -39,8 +44,6 @@ class RPC:
 		if not data:
 			return
 
-		# if data.startswith("move"):
-			# print(data)
 		# Grab the functions and arguments
 		s = data.split(':')
 		if len(s) != 2:
@@ -55,7 +58,7 @@ class RPC:
 			return
 		
 		# Make sure we have the correct number of arguments
-		if len(args) != len(self.funcs[f][1]):
+		if len(self.funcs[f][1]) != 0 and len(args) != len(self.funcs[f][1]):
 			print("Invalid command string (incorrect number of arguments)", data)
 			return
 		
@@ -63,12 +66,21 @@ class RPC:
 		for i in range(len(self.funcs[f][1])):
 			t = self.funcs[f][1][i]
 			
-			args[i] = t(args[i])
+			if t == "pickle":
+				args[i] = pickle.loads(bytes(args[i].replace(' ', '\n'), "ascii"))
+			else:
+				args[i] = t(args[i])
 		
 		if client:
-			self.funcs[f][0](self.state, main, client, *args)
+			if len(self.funcs[f][1]) != 0:
+				self.funcs[f][0](self.state, main, client, *args)
+			else:
+				self.funcs[f][0](self.state, main, client)
 		else:
-			self.funcs[f][0](self.state, main, *args)
+			if len(self.funcs[f][1]) != 0:
+				self.funcs[f][0](self.state, main, *args)
+			else:
+				self.funcs[f][0](self.state, main)
 		
 
 # This class shouldn't be used directly, but rather subclassed
@@ -81,6 +93,9 @@ class BaseState:
 		
 		# Store main
 		self.main = main
+		
+		# This variable allows for switching states without a return (used for RPC functions)
+		self._next_state = ""
 		
 		# Merge function dicts
 		if hasattr(self, "client_functions") and type(self) is not BaseState:
@@ -103,11 +118,14 @@ class BaseState:
 		self._is_server = is_server
 		
 	def run(self, main, client=None):
+		if self._next_state: return (self._next_state, "SWITCH")
+	
 		# Update main
 		self.main = main
 		
 		# Run the appropriate method
 		if self._is_server:
+			self.client = RPC(self, client, self.client_functions)
 			self.server.parse_command(main, client.data, client)
 			return self.server_run(main, client)
 		else:
@@ -162,9 +180,13 @@ class BaseState:
 		client.server.broadcast("dis:"+cid)
 		client.server.drop_client(cid, "Disconnected")
 		
+	def switch_state(self, main, client, state):
+		self._next_state = state
+		
 	# Register the functions
 	server_functions = {
-			dis: (str,)
+			dis: (str,),
+			switch_state: (str,),
 			}
 		
 	def server_init(self, main):

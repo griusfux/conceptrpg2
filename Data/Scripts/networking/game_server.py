@@ -20,10 +20,13 @@ BUFFER = 4096
 class ClientHandle():
 	"""Class for handling client requests"""
 	
-	def __init__(self, server, client_addr):
+	def __init__(self, server, client_id, client_addr):
 		self.server = server
 		self.last_update = time.time()
+		self.id = client_id
 		self.addr = client_addr
+		
+		self.state_manager = GameStateManager("DungeonGeneration", self.server.main, is_server=True)
 		
 	def handle_request(self, data, client_addr):
 		self.last_update = time.time()
@@ -47,7 +50,12 @@ class ClientHandle():
 					# self.server.main['state'] = state(self.server.main, True)
 			
 			# self.server.main['state'].run(self, self.server.main)
-			self.server.state_manager.run(self.server.main, self)
+			self.state_manager.run(self.server.main, self)
+			
+	def send(self, data):
+		"""Send a message to the client"""
+		
+		self.server.socket.sendto(bytes(data, NET_ENCODING), self.addr)
 
 class GameServer():
 	"""The game server"""
@@ -64,6 +72,9 @@ class GameServer():
 		# Client info
 		self.main['clients'] = {}
 		
+		# The current dungeon
+		self.main['dungeon'] = []
+		
 		# Create the socket
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.socket.bind(('', port))
@@ -72,7 +83,7 @@ class GameServer():
 		self.timeout = timeout
 		
 		# Startup the state manager with the default state
-		self.state_manager = GameStateManager("Default", self.main, is_server=True)
+		# self.state_manager = GameStateManager("Default", self.main, is_server=True)
 		
 		print("Server ready")
 		
@@ -117,7 +128,7 @@ class GameServer():
 		
 		print(client_id, "Registered")
 		self.socket.sendto(b"cid:"+bytes(client_id, NET_ENCODING), client_addr)
-		self.main['clients'][client_id] = ClientHandle(self, client_addr)
+		self.main['clients'][client_id] = ClientHandle(self, client_id, client_addr)
 					
 	def drop_client(self, client_id, reason):
 		"""Drop a client"""
