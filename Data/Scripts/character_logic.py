@@ -114,6 +114,8 @@ class CharacterLogic:
 		
 		self.powers = PowerManager(self, [])
 		
+		self.targets = []
+		
 	def __del__(self):
 		if self.object:
 			self.object.end()
@@ -327,8 +329,6 @@ class MonsterLogic(CharacterLogic):
 	def __init__(self, object, monsterdata):
 		CharacterLogic.__init__(self, object)
 		# self.id = monsterdata.id
-
-		self.target = None
 		
 		self.xp_reward = monsterdata.xp_reward
 		self.role = monsterdata.role

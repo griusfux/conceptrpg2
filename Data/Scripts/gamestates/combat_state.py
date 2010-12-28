@@ -81,12 +81,18 @@ class CombatState(DefaultState, BaseController):
 				main['engine'].load_library(weapon)
 				obj = main['engine'].add_object('longsword')
 				main['player'].set_right_hand(obj)
+				self.camera = 'frankie'
+				self.last_camera = 'frankie'
 			
 		
 	def client_run(self, main):
 		"""Client-side run method"""
-		
-		main['camera'].update()
+		if self.camera != self.last_camera:
+			main['camera'].change_mode(self.camera, 15)
+			self.last_camera = self.camera
+		else:
+			main['camera'].update()
+		self.camera = 'frankie'
 		
 		# See if we still need to be in combat
 		if not self.monster_list:
@@ -104,20 +110,35 @@ class CombatState(DefaultState, BaseController):
 		# Handles input
 		inputs = main['input_system'].run()
 		
+		# Targeting
+		active_power = main['player'].powers.active
+		range_type = active_power.range_type
+		range_size = active_power.range_size
+		mask = active_power.mask if hasattr(active_power, "mask") else 0
+		main['player'].targets = self.get_targets(main['player'], range_type, range_size, mask)
+		# print(main['player'].targets)
+		
+		
 			
 		####	
 		# ai
 		
 		#Dicision making
 		for monster in self.monster_list:
-			monster.target = main['player']
+			monster.target = [main['player']]
 			monster.actions = monster.ai.run()
 			
 		# Run the ai manager
 		#self.ai_manager.run()
 		
-		# Get rid of any dead guys
+		# Maintain monsters
 		for monster in self.monster_list:
+			# Highlight any targets
+			if monster in main['player'].targets:
+				monster.object.color = [0.75, 0.15, 0.15, 1]
+			else:
+				monster.object.color = [1, 1, 1, 1]
+			# Get rid of any dead guys
 			if monster.hp <= 0:
 				monster.tile.fill(None)
 				self.monster_list.remove(monster)
@@ -132,14 +153,7 @@ class CombatState(DefaultState, BaseController):
 		movement = [0.0, 0.0, 0.0]
 		speed = main['player'].speed
 		
-		if inputs:
-			if ("SwitchCamera", "INPUT_CLICK") in inputs:
-				# main['engine'].set_active_camera(main['top_down_camera'])
-				if main['camera'].mode == "frankie":
-					main['camera'].change_mode("topdown", 90)
-				else:
-					main['camera'].change_mode("frankie", 90)
-				
+		if inputs:				
 			if ("Stats", "INPUT_CLICK") in inputs:
 				main['ui_system'].toogle_overlay("stats")				
 				
@@ -162,15 +176,15 @@ class CombatState(DefaultState, BaseController):
 				if ("PrevPower", "INPUT_CLICK") in inputs:
 					main['player'].powers.make_prev_active()				
 				if ("Aim", "INPUT_ACTIVE") in inputs:
-					# Switch to the top-down camera
-					# main['camera'].change_mode("topdown")
-					
-					# Show the range of the active power
-					power = main['player'].powers.active
-					point = main['player'].object.position
-					tiles = self._find_target_range(power.range_type, power.range_size, point)
-					for tile in tiles:
-						tile.color((1, 0, 0, 1))
+					if main['player'].powers.active.range_type == "RANGED":
+						self.camera = 'shoulder'
+					else:					
+						# Show the range of the active power
+						power = main['player'].powers.active
+						point = main['player'].object.position
+						tiles = self._find_target_range(power.range_type, power.range_size, point)
+						for tile in tiles:
+							tile.color((1, 0, 0, 0.25))
 
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
 					movement[1] = speed
@@ -193,7 +207,8 @@ class CombatState(DefaultState, BaseController):
 		
 		self.move(id, main['player'], movement, local=True)
 		
-		main['player'].tile.color((1, 0, 0, 1))
+		# DEBUG: Uncomment to see the player's tile
+		# main['player'].tile.color((1, 0, 0, 1))
 
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""

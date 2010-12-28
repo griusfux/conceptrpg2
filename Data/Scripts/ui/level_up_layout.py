@@ -128,8 +128,8 @@ class LevelUpLayout(Layout):
 			'cha' : 'Charisma'
 			}
 			
-		self.ab_info_name.text = full[ab]
-		self.ab_info.text = getattr(levels, ab.upper()+"_INFO")
+		self.info_name.text = full[ab]
+		self.info.text = getattr(levels, ab.upper()+"_INFO")
 		
 	def arrow_on_click(self, widget):
 		ab = widget.name[4:7]

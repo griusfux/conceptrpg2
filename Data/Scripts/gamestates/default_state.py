@@ -138,6 +138,8 @@ class DefaultState(BaseState, BaseController):
 				
 			if ("cam5", "INPUT_CLICK") in inputs:
 					self.camera_mode = "shop"
+			if ("cam6", "INPUT_CLICK") in inputs:
+					self.camera_mode = "shoulder"
 					
 			# Only let the player do stuff while they are not "locked"
 			if not main['player'].lock:

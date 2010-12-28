@@ -382,7 +382,7 @@ class Camera:
 		
 	def init_frankie(self):		
 		self._target_distance = 8
-		self._target_position = Vector((0, 0, 1.5))
+		self._target_position = Vector((0, 0, 1))
 		self._target_orientation = Matrix.Rotation(radians(80), 3, 'X')
 
 		self.camera.parent.timeOffset = 35
@@ -406,6 +406,16 @@ class Camera:
 		self.camera.scaling = [1/scale, 1/scale, 1/scale]
 		
 		return
+		
+	def init_shoulder(self):
+		self._target_distance = 0
+		self._target_position = Vector((0.3, -1, 1.5))
+		self._target_rotation = Matrix.Rotation(radians(90), 3, 'X')
+		
+	def update_shoulder(self):
+		return
+		
+		
 		
 	def init_isometric(self):
 		rotation = Matrix.Rotation(radians(45), 3, 'Z') * Matrix.Rotation(radians(35.246), 3, 'X') 
