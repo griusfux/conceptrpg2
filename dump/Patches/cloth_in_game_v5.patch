@@ -1,0 +1,279 @@
+Index: release/scripts/ui/properties_physics_cloth.py
+===================================================================
+--- release/scripts/ui/properties_physics_cloth.py	(revision 33931)
++++ release/scripts/ui/properties_physics_cloth.py	(working copy)
+@@ -36,8 +36,11 @@
+     preset_subdir = "cloth"
+     preset_operator = "script.execute_preset"
+     draw = bpy.types.Menu.draw_preset
+-
+-
++    
++class CLOTH_MT_solver(bpy.types.Menu):
++    bl_label = "Cloth Solver"
++    draw = bpy.types.Menu.draw_preset
++    
+ class PhysicButtonsPanel():
+     bl_space_type = 'PROPERTIES'
+     bl_region_type = 'WINDOW'
+@@ -47,7 +50,7 @@
+     def poll(cls, context):
+         ob = context.object
+         rd = context.scene.render
+-        return (ob and ob.type == 'MESH') and (not rd.use_game_engine)
++        return (ob and ob.type == 'MESH')
+ 
+ 
+ class PHYSICS_PT_cloth(PhysicButtonsPanel, bpy.types.Panel):
+@@ -88,6 +91,9 @@
+             sub.menu("CLOTH_MT_presets", text=bpy.types.CLOTH_MT_presets.bl_label)
+             sub.operator("cloth.preset_add", text="", icon="ZOOMIN")
+             sub.operator("cloth.preset_add", text="", icon="ZOOMOUT").remove_active = True
++            
++            col.label(text="Solver:")
++            col.prop(cloth, "solver", text="")
+ 
+             col.label(text="Quality:")
+             col.prop(cloth, "quality", text="Steps", slider=True)
+@@ -100,7 +106,8 @@
+             col = split.column()
+ 
+             col.label(text="Damping:")
+-            col.prop(cloth, "spring_damping", text="Spring")
++            if cloth.solver != "VERLET":
++                col.prop(cloth, "spring_damping", text="Spring")
+             col.prop(cloth, "air_damping", text="Air")
+ 
+             col.prop(cloth, "use_pin_cloth", text="Pinning")
+@@ -203,7 +210,7 @@
+         ob = context.object
+         cloth = context.cloth.settings
+ 
+-        layout.active = cloth.use_stiffness_scale	and cloth_panel_enabled(md)
++        layout.active = cloth.use_stiffness_scale    and cloth_panel_enabled(md)
+ 
+         split = layout.split()
+ 
+Index: release/scripts/ui/properties_physics_field.py
+===================================================================
+--- release/scripts/ui/properties_physics_field.py	(revision 33931)
++++ release/scripts/ui/properties_physics_field.py	(working copy)
+@@ -32,7 +32,7 @@
+     @classmethod
+     def poll(cls, context):
+         rd = context.scene.render
+-        return (context.object) and (not rd.use_game_engine)
++        return (context.object)
+ 
+ 
+ class PHYSICS_PT_field(PhysicButtonsPanel, bpy.types.Panel):
+Index: source/blender/blenkernel/intern/DerivedMesh.c
+===================================================================
+--- source/blender/blenkernel/intern/DerivedMesh.c	(revision 33931)
++++ source/blender/blenkernel/intern/DerivedMesh.c	(working copy)
+@@ -1710,7 +1710,6 @@
+ 			md->scene= scene;
+ 			
+ 			if(!modifier_isEnabled(scene, md, required_mode)) continue;
+-			if(useDeform < 0 && mti->dependsOnTime && mti->dependsOnTime(md)) continue;
+ 
+ 			if(mti->type == eModifierTypeType_OnlyDeform) {
+ 				if(!deformedVerts)
+@@ -1766,7 +1765,6 @@
+ 			continue;
+ 		}
+ 		if(needMapping && !modifier_supportsMapping(md)) continue;
+-		if(useDeform < 0 && mti->dependsOnTime && mti->dependsOnTime(md)) continue;
+ 
+ 		/* add an orco layer if needed by this modifier */
+ 		if(mti->requiredDataMask)
+Index: source/gameengine/Converter/BL_ModifierDeformer.cpp
+===================================================================
+--- source/gameengine/Converter/BL_ModifierDeformer.cpp	(revision 33931)
++++ source/gameengine/Converter/BL_ModifierDeformer.cpp	(working copy)
+@@ -49,10 +49,12 @@
+ #include "DNA_curve_types.h"
+ #include "DNA_modifier_types.h"
+ #include "DNA_scene_types.h"
++#include "BKE_object.h"
+ #include "BKE_armature.h"
+ #include "BKE_action.h"
+ #include "BKE_key.h"
+ #include "BKE_ipo.h"
++#include "BKE_mesh.h"
+ #include "MT_Point3.h"
+ 
+ extern "C"{
+@@ -69,7 +71,28 @@
+ #define __NLA_DEFNORMALS
+ //#undef __NLA_DEFNORMALS
+ 
++BL_ModifierDeformer::BL_ModifierDeformer(BL_DeformableGameObject *gameobj,
++					Scene *scene,
++					Object *bmeshobj,
++					RAS_MeshObject *mesh)
++					:	
++					BL_ShapeDeformer(gameobj,bmeshobj, mesh),
++					m_lastModifierUpdate(-1),
++					m_scene(scene),
++					m_dm(NULL)
++{
++	m_recalcNormal = false;
++	ModifierData* md;
++	for (md = (ModifierData*)bmeshobj->modifiers.first; md; md = (ModifierData*)md->next) {
++		if (modifier_dependsOnTime(md))
++			m_bDynamic = true;
++	}
+ 
++	//Save the mesh incase things get ugly later
++	Object* blendobj = m_gameobj->GetBlendObject();
++	m_savedMesh = copy_mesh((Mesh*)blendobj->data);
++};
++
+ BL_ModifierDeformer::~BL_ModifierDeformer()
+ {
+ 	if (m_dm) {
+@@ -79,6 +102,10 @@
+ 			m_dm->release(m_dm);
+ 		}
+ 	}
++
++	//Restore the mesh incase the old one got dirty along the way
++	Object* blendobj = m_gameobj->GetBlendObject();
++	blendobj->data = m_savedMesh;
+ };
+ 
+ RAS_Deformer *BL_ModifierDeformer::GetReplica()
+@@ -110,8 +137,6 @@
+ 		return false;
+ 	ModifierData* md;
+ 	for (md = (ModifierData*)ob->modifiers.first; md; md = (ModifierData*)md->next) {
+-		if (modifier_dependsOnTime(md))
+-			continue;
+ 		if (!(md->mode & eModifierMode_Realtime))
+ 			continue;
+ 		/* armature modifier are handled by SkinDeformer, not ModifierDeformer */
+@@ -138,7 +163,7 @@
+ {
+ 	bool bShapeUpdate = BL_ShapeDeformer::Update();
+ 
+-	if (bShapeUpdate || m_lastModifierUpdate != m_gameobj->GetLastFrame()) {
++	//if (bShapeUpdate || m_lastModifierUpdate != m_gameobj->GetLastFrame()) {
+ 		// static derived mesh are not updated
+ 		if (m_dm == NULL || m_bDynamic) {
+ 			/* execute the modifiers */
+@@ -147,10 +172,19 @@
+ 			   It may not be the case here because of replace mesh actuator */
+ 			Mesh *oldmesh = (Mesh*)blendobj->data;
+ 			blendobj->data = m_bmesh;
++			float save[4][4];
++			if (m_bDynamic) {
++				/* the blender object's matrix needs to be saved and updated with the gameobject's matrix*/
++				memcpy(save, blendobj->obmat, sizeof(float)*16);
++				m_gameobj->UpdateBlenderObjectMatrix(blendobj);
++			}
+ 			/* execute the modifiers */		
+ 			DerivedMesh *dm = mesh_create_derived_no_virtual(m_scene, blendobj, m_transverts, CD_MASK_MESH);
+ 			/* restore object data */
+ 			blendobj->data = oldmesh;
++			if (m_bDynamic) {
++				memcpy(blendobj->obmat, save, sizeof(float)*16);
++			}
+ 			/* free the current derived mesh and replace, (dm should never be NULL) */
+ 			if (m_dm != NULL) {
+ 				// HACK! use deformedOnly as a user counter
+@@ -173,10 +207,10 @@
+ 				m_dm->getMinMax(m_dm, min_r, max_r);
+ 				ctrl->setLocalAabb(min_r, max_r);
+ 			}
+-		}
+ 		m_lastModifierUpdate=m_gameobj->GetLastFrame();
+ 		bShapeUpdate = true;
+-	}
++		}
++	//}
+ 	return bShapeUpdate;
+ }
+ 
+Index: source/gameengine/Converter/BL_ModifierDeformer.h
+===================================================================
+--- source/gameengine/Converter/BL_ModifierDeformer.h	(revision 33931)
++++ source/gameengine/Converter/BL_ModifierDeformer.h	(working copy)
+@@ -51,15 +51,7 @@
+ 	BL_ModifierDeformer(BL_DeformableGameObject *gameobj,
+ 						Scene *scene,
+ 						Object *bmeshobj,
+-						RAS_MeshObject *mesh)
+-						:	
+-						BL_ShapeDeformer(gameobj,bmeshobj, mesh),
+-						m_lastModifierUpdate(-1),
+-						m_scene(scene),
+-						m_dm(NULL)
+-	{
+-		m_recalcNormal = false;
+-	};
++						RAS_MeshObject *mesh);
+ 
+ 	/* this second constructor is needed for making a mesh deformable on the fly. */
+ 	BL_ModifierDeformer(BL_DeformableGameObject *gameobj,
+@@ -101,6 +93,7 @@
+ 	double					 m_lastModifierUpdate;
+ 	Scene					*m_scene;
+ 	DerivedMesh				*m_dm;
++	Mesh					*m_savedMesh;
+ 
+ 
+ #ifdef WITH_CXX_GUARDEDALLOC
+Index: source/gameengine/Converter/BL_SkinDeformer.cpp
+===================================================================
+--- source/gameengine/Converter/BL_SkinDeformer.cpp	(revision 33931)
++++ source/gameengine/Converter/BL_SkinDeformer.cpp	(working copy)
+@@ -182,7 +182,7 @@
+ 		/* but it requires the blender object pointer... */
+ 		Object* par_arma = m_armobj->GetArmatureObject();
+ 
+-		if(!shape_applied) {
++		if(!shape_applied || !m_transverts) {
+ 			/* store verts locally */
+ 			VerifyStorage();
+ 		
+Index: source/gameengine/Converter/KX_BlenderSceneConverter.cpp
+===================================================================
+--- source/gameengine/Converter/KX_BlenderSceneConverter.cpp	(revision 33931)
++++ source/gameengine/Converter/KX_BlenderSceneConverter.cpp	(working copy)
+@@ -82,6 +82,7 @@
+ #include "BLI_blenlib.h"
+ #include "MEM_guardedalloc.h"
+ #include "BKE_global.h"
++#include "BKE_pointcache.h"
+ #include "BKE_animsys.h"
+ #include "BKE_library.h"
+ #include "BKE_material.h" // copy_material
+@@ -283,6 +284,7 @@
+ 											class RAS_IRenderTools* rendertools,
+ 											class RAS_ICanvas* canvas)
+ {
++
+ 	//find out which physics engine
+ 	Scene *blenderscene = destinationscene->GetBlenderScene();
+ 
+@@ -293,6 +295,9 @@
+ 	destinationscene->SetSceneConverter(this);
+ 	SG_SetActiveStage(SG_STAGE_CONVERTER);
+ 
++	//Turn continous physics on for the pointcache
++	BKE_ptcache_set_continue_physics(m_maggie, blenderscene, 1);
++
+ 	if (blenderscene)
+ 	{
+ 	
+@@ -390,6 +395,9 @@
+ // (see KX_BlenderSceneConverter::ConvertScene)
+ void KX_BlenderSceneConverter::RemoveScene(KX_Scene *scene)
+ {
++	//Turn continuous physics for pointcahce back off
++	BKE_ptcache_set_continue_physics(m_maggie, scene->GetBlenderScene(), 0);
++
+ 	int i, size;
+ 	// delete the scene first as it will stop the use of entities
+ 	delete scene;

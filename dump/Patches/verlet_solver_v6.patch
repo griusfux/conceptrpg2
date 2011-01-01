@@ -1,0 +1,846 @@
+Index: release/scripts/ui/properties_physics_cloth.py
+===================================================================
+--- release/scripts/ui/properties_physics_cloth.py	(revision 33920)
++++ release/scripts/ui/properties_physics_cloth.py	(working copy)
+@@ -36,8 +36,11 @@
+     preset_subdir = "cloth"
+     preset_operator = "script.execute_preset"
+     draw = bpy.types.Menu.draw_preset
+-
+-
++    
++class CLOTH_MT_solver(bpy.types.Menu):
++    bl_label = "Cloth Solver"
++    draw = bpy.types.Menu.draw_preset
++    
+ class PhysicButtonsPanel():
+     bl_space_type = 'PROPERTIES'
+     bl_region_type = 'WINDOW'
+@@ -88,6 +91,9 @@
+             sub.menu("CLOTH_MT_presets", text=bpy.types.CLOTH_MT_presets.bl_label)
+             sub.operator("cloth.preset_add", text="", icon="ZOOMIN")
+             sub.operator("cloth.preset_add", text="", icon="ZOOMOUT").remove_active = True
++            
++            col.label(text="Solver:")
++            col.prop(cloth, "solver", text="")
+ 
+             col.label(text="Quality:")
+             col.prop(cloth, "quality", text="Steps", slider=True)
+@@ -100,7 +106,8 @@
+             col = split.column()
+ 
+             col.label(text="Damping:")
+-            col.prop(cloth, "spring_damping", text="Spring")
++            if cloth.solver != "VERLET":
++                col.prop(cloth, "spring_damping", text="Spring")
+             col.prop(cloth, "air_damping", text="Air")
+ 
+             col.prop(cloth, "use_pin_cloth", text="Pinning")
+@@ -203,7 +210,7 @@
+         ob = context.object
+         cloth = context.cloth.settings
+ 
+-        layout.active = cloth.use_stiffness_scale	and cloth_panel_enabled(md)
++        layout.active = cloth.use_stiffness_scale    and cloth_panel_enabled(md)
+ 
+         split = layout.split()
+ 
+Index: source/blender/blenkernel/BKE_cloth.h
+===================================================================
+--- source/blender/blenkernel/BKE_cloth.h	(revision 33920)
++++ source/blender/blenkernel/BKE_cloth.h	(working copy)
+@@ -89,8 +89,8 @@
+ 	struct BVHTree		*bvhtree;			/* collision tree for this cloth object */
+ 	struct BVHTree 		*bvhselftree;			/* collision tree for this cloth object */
+ 	struct MFace 		*mfaces;
+-	struct Implicit_Data	*implicit; 		/* our implicit solver connects to this pointer */
+-	struct Implicit_Data	*implicitEM; 		/* our implicit solver connects to this pointer */
++	void *solver_data; 		/* our solvers connects to this pointer */
++	//struct Implicit_Data	*implicitEM; 		/* our implicit solver connects to this pointer */
+ 	struct EdgeHash 	*edgehash; 		/* used for selfcollisions */
+ } Cloth;
+ 
+@@ -212,8 +212,17 @@
+ // globally needed
+ void clmdSetInterruptCallBack ( int ( *f ) ( void ) );
+ ////////////////////////////////////////////////
++// solver_verlet.c
++////////////////////////////////////////////////
+ 
++// needed for cloth.c
++int verlet_init ( struct Object *ob, struct ClothModifierData *clmd );
++int verlet_free ( struct ClothModifierData *clmd );
++int verlet_solver ( struct Object *ob, float frame, struct ClothModifierData *clmd, struct ListBase *effectors );
++void verlet_set_positions ( struct ClothModifierData *clmd );
++////////////////////////////////////////////////
+ 
++
+ /////////////////////////////////////////////////
+ // cloth.c
+ ////////////////////////////////////////////////
+@@ -244,7 +253,8 @@
+ // only one available in the moment
+ typedef enum
+ {
+-	CM_IMPLICIT = 0,
++	CM_VERLET = 0,
++	CM_IMPLICIT = 1,
+ } CM_SOLVER_ID;
+ 
+ 
+@@ -257,6 +267,7 @@
+ 	int	( *init ) ( struct Object *ob, struct ClothModifierData *clmd );
+ 	int	( *solver ) ( struct Object *ob, float framenr, struct ClothModifierData *clmd, struct ListBase *effectors );
+ 	int	( *free ) ( struct ClothModifierData *clmd );
++	void ( *set_positions ) ( struct ClothModifierData *clmd );
+ }
+ CM_SOLVER_DEF;
+ 
+Index: source/blender/blenkernel/CMakeLists.txt
+===================================================================
+--- source/blender/blenkernel/CMakeLists.txt	(revision 33920)
++++ source/blender/blenkernel/CMakeLists.txt	(working copy)
+@@ -128,6 +128,7 @@
+ 	intern/sketch.c
+ 	intern/smoke.c
+ 	intern/softbody.c
++	intern/solver_verlet.c
+ 	intern/sound.c
+ 	intern/subsurf_ccg.c
+ 	intern/suggestions.c
+Index: source/blender/blenkernel/intern/cloth.c
+===================================================================
+--- source/blender/blenkernel/intern/cloth.c	(revision 33920)
++++ source/blender/blenkernel/intern/cloth.c	(working copy)
+@@ -79,7 +79,8 @@
+ // 254 = MAX!
+ static CM_SOLVER_DEF	solvers [] =
+ {
+-	{ "Implicit", CM_IMPLICIT, implicit_init, implicit_solver, implicit_free },
++	{ "Implicit", CM_IMPLICIT, implicit_init, implicit_solver, implicit_free, implicit_set_positions },
++	{ "Verlet", CM_VERLET, verlet_init, verlet_solver, verlet_free, verlet_set_positions },
+ 		// { "Implicit C++", CM_IMPLICITCPP, implicitcpp_init, implicitcpp_solver, implicitcpp_free },
+ };
+ 
+@@ -119,6 +120,7 @@
+ 	clmd->sim_parms->stepsPerFrame = 5;
+ 	clmd->sim_parms->flags = 0;
+ 	clmd->sim_parms->solver_type = 0;
++	clmd->sim_parms->old_solver_type = 0;
+ 	clmd->sim_parms->preroll = 0;
+ 	clmd->sim_parms->maxspringlen = 10;
+ 	clmd->sim_parms->vgroup_mass = 0;
+@@ -361,7 +363,7 @@
+ 
+ 	cache= clmd->point_cache;
+ 
+-	/* initialize simulation data if it didn't exist already */
++	/* initialize simulation data if it didn't exist already*/
+ 	if(clmd->clothObject == NULL) {	
+ 		if(!cloth_from_object(ob, clmd, result, framenr, 1)) {
+ 			BKE_ptcache_invalidate(cache);
+@@ -373,7 +375,7 @@
+ 			return 0;
+ 		}
+ 	
+-		implicit_set_positions(clmd);
++		solvers [clmd->sim_parms->solver_type].set_positions(clmd);
+ 	}
+ 
+ 	return 1;
+@@ -447,16 +449,38 @@
+ 		return dm;
+ 	}
+ 
++	//if(clmd->sim_parms->solver_type != clmd->sim_parms->old_solver_type)
++	//{
++	//	//solvers[clmd->sim_parms->old_solver_type].free(clmd);
++	//	//solvers[clmd->sim_parms->solver_type].init(ob, clmd);
++	//	//clmd->sim_parms->old_solver_type = clmd->sim_parms->solver_type;
++	//	clmd->sim_parms->reset = 1;
++	//}
++		
+ 	if(clmd->sim_parms->reset
++		|| (clmd->sim_parms->solver_type != clmd->sim_parms->old_solver_type)
+ 		|| (framenr == (startframe - clmd->sim_parms->preroll) && clmd->sim_parms->preroll != 0)
+ 		|| (clmd->clothObject && result->getNumVerts(result) != clmd->clothObject->numverts))
+ 	{
++		short solver_type = -1;
++		if (clmd->sim_parms->solver_type != clmd->sim_parms->old_solver_type) {
++			// If we switched the solver type, then temporarily switch it back so it can be properly freed
++			solver_type = clmd->sim_parms->solver_type;
++			clmd->sim_parms->solver_type = clmd->sim_parms->old_solver_type;
++		}
++
+ 		clmd->sim_parms->reset = 0;
+ 		cache->flag |= PTCACHE_OUTDATED;
+ 		BKE_ptcache_id_reset(scene, &pid, PTCACHE_RESET_OUTDATED);
+ 		BKE_ptcache_validate(cache, 0);
+ 		cache->last_exact= 0;
+ 		cache->flag &= ~PTCACHE_REDO_NEEDED;
++
++		if (solver_type != -1) {
++			// Now switch back to the right solver
++			clmd->sim_parms->old_solver_type = clmd->sim_parms->solver_type = solver_type;
++			do_init_cloth(ob, clmd, result, framenr);
++		}
+ 		return result;
+ 	}
+ 	
+@@ -470,7 +494,6 @@
+ 		/* do simulation */
+ 		if(!do_init_cloth(ob, clmd, dm, framenr))
+ 			return result;
+-
+ 		do_step_cloth(ob, clmd, dm, framenr);
+ 		cloth_to_object(ob, clmd, result);
+ 
+@@ -507,7 +530,7 @@
+ 	cache_result = BKE_ptcache_read(&pid, (float)framenr+scene->r.subframe, scene->r.frs_sec);
+ 
+ 	if(cache_result == PTCACHE_READ_EXACT || cache_result == PTCACHE_READ_INTERPOLATED) {
+-		implicit_set_positions(clmd);
++		solvers [clmd->sim_parms->solver_type].set_positions(clmd);
+ 		cloth_to_object (ob, clmd, result);
+ 
+ 		BKE_ptcache_validate(cache, framenr);
+@@ -518,7 +541,7 @@
+ 		return result;
+ 	}
+ 	else if(cache_result==PTCACHE_READ_OLD) {
+-		implicit_set_positions(clmd);
++		solvers [clmd->sim_parms->solver_type].set_positions(clmd);
+ 	}
+ 	else if( /*ob->id.lib ||*/ (cache->flag & PTCACHE_BAKED)) { /* 2.4x disabled lib, but this can be used in some cases, testing further - campbell */
+ 		/* if baked and nothing in cache, do nothing */
+@@ -549,6 +572,8 @@
+ /* frees all */
+ void cloth_free_modifier(ClothModifierData *clmd )
+ {
++	//int solver;
++
+ 	Cloth	*cloth = NULL;
+ 	
+ 	if ( !clmd )
+@@ -558,7 +583,8 @@
+ 
+ 	
+ 	if ( cloth )
+-	{	
++	{
++
+ 		// If our solver provides a free function, call it
+ 		if ( solvers [clmd->sim_parms->solver_type].free )
+ 		{
+@@ -918,7 +944,7 @@
+ 	}
+ 	
+ 	if(!first)
+-		implicit_set_positions(clmd);
++		solvers [clmd->sim_parms->solver_type].set_positions(clmd);
+ 
+ 	clmd->clothObject->bvhtree = bvhtree_build_from_cloth ( clmd, clmd->coll_parms->epsilon );
+ 	
+Index: source/blender/blenkernel/intern/implicit.c
+===================================================================
+--- source/blender/blenkernel/intern/implicit.c	(revision 33920)
++++ source/blender/blenkernel/intern/implicit.c	(working copy)
+@@ -747,7 +747,7 @@
+ 
+ 	// create implicit base
+ 	id = (Implicit_Data *)MEM_callocN (sizeof(Implicit_Data), "implicit vecmat");
+-	cloth->implicit = id;
++	cloth->solver_data = id;
+ 
+ 	/* process diagonal elements */		
+ 	id->A = create_bfmatrix(cloth->numverts, cloth->numsprings);
+@@ -822,7 +822,7 @@
+ 
+ 	if(cloth)
+ 	{
+-		id = cloth->implicit;
++		id = cloth->solver_data;
+ 
+ 		if(id)
+ 		{
+@@ -1751,7 +1751,7 @@
+ 	unsigned int numverts = cloth->numverts;
+ 	float dt = clmd->sim_parms->timescale / clmd->sim_parms->stepsPerFrame;
+ 	float spf = (float)clmd->sim_parms->stepsPerFrame / clmd->sim_parms->timescale;
+-	Implicit_Data *id = cloth->implicit;
++	Implicit_Data *id = cloth->solver_data;
+ 	int do_extra_solve;
+ 
+ 	if(clmd->sim_parms->flags & CLOTH_SIMSETTINGS_FLAG_GOAL) /* do goal stuff */
+@@ -1887,7 +1887,7 @@
+ 	Cloth *cloth = clmd->clothObject;
+ 	ClothVertex *verts = cloth->verts;
+ 	unsigned int numverts = cloth->numverts, i;
+-	Implicit_Data *id = cloth->implicit;
++	Implicit_Data *id = cloth->solver_data;
+ 	
+ 	for(i = 0; i < numverts; i++)
+ 	{				
+Index: source/blender/blenkernel/intern/solver_verlet.c
+===================================================================
+--- source/blender/blenkernel/intern/solver_verlet.c	(revision 0)
++++ source/blender/blenkernel/intern/solver_verlet.c	(revision 0)
+@@ -0,0 +1,468 @@
++#include "DNA_object_types.h"
++#include "DNA_cloth_types.h"
++#include "DNA_meshdata_types.h"
++#include "DNA_listBase.h"
++#include "DNA_modifier_types.h"
++
++#include "BKE_cloth.h"
++#include "BKE_effect.h"
++
++#include "BLI_math.h"
++#include "BLI_linklist.h"
++
++#include "MEM_guardedalloc.h"
++
++typedef struct Verlet_Data 
++{
++	float **x, **oldx, **v, **a;
++	char *pinned;
++} Verlet_Data;
++
++int verlet_init (Object *ob, ClothModifierData *clmd)
++{
++	unsigned int i;
++	Cloth *cloth = NULL;
++	unsigned int num_verts = 0;
++	ClothVertex *verts = NULL;
++	ClothSpring *spring = NULL;
++	Verlet_Data *data = NULL;
++
++	float gravity[3] = {0.f, 0.f, -.98f};
++
++	cloth = (Cloth *)clmd->clothObject;
++	verts = cloth->verts;
++	num_verts = cloth->numverts;
++
++	//Initialize Data set
++	data = (Verlet_Data *) MEM_callocN(sizeof(Verlet_Data), "verlet simulation data");
++
++	data->x = MEM_mallocN(sizeof(float*)*num_verts, "position data");
++	data->oldx = MEM_mallocN(sizeof(float*)*num_verts, "old position data");
++	data->v = MEM_mallocN(sizeof(float*)*num_verts, "velocity data");
++	data->a = MEM_mallocN(sizeof(float*)*num_verts, "acceleration data");
++	data->pinned = MEM_mallocN(sizeof(char)*num_verts, "pinned flag");
++	
++	for (i=0; i<num_verts; i++)
++	{
++		data->x[i] = MEM_callocN(sizeof(float)*3, "position vec");
++		data->oldx[i] = MEM_callocN(sizeof(float)*3, "old position vec");
++		data->v[i] = MEM_callocN(sizeof(float)*3, "velocity vec");
++		data->a[i] = MEM_callocN(sizeof(float)*3, "acceleration vec");
++		
++		//Initial data values
++		copy_v3_v3(data->x[i], verts[i].x);
++		copy_v3_v3(data->oldx[i], data->x[i]);
++		copy_v3_v3(data->v[i], verts[i].v);
++		if (verts[i].flags & CLOTH_VERT_FLAG_PINNED)
++		{
++			data->pinned[i] = 1;
++		}
++		else
++		{
++			data->pinned[i] = 0;
++		}
++	}
++
++	cloth->solver_data = data;
++	return 1;
++}
++
++int	verlet_free (ClothModifierData *clmd)
++{
++	Verlet_Data *data;
++	Cloth *cloth;
++	cloth = (Cloth *)clmd->clothObject;
++
++	if (cloth)
++	{
++		data = cloth->solver_data;
++
++		if (data)
++		{
++			int i;
++			for(i=0; i<cloth->numverts; i++)
++			{
++
++				MEM_freeN(data->oldx[i]);
++				MEM_freeN(data->x[i]);
++				MEM_freeN(data->a[i]);
++				MEM_freeN(data->v[i]);
++			}
++			MEM_freeN(data->oldx);
++			MEM_freeN(data->x);
++			MEM_freeN(data->a);
++			MEM_freeN(data->v);
++			MEM_freeN(data->pinned);
++
++			MEM_freeN(data);
++		}
++	}
++
++	return 1;
++}
++
++int verlet_calculate_acceleration(ClothModifierData *clmd, Verlet_Data *data, ListBase *effectors)
++{
++	unsigned int i;
++	Cloth *cloth = clmd->clothObject;
++	unsigned int num_verts = cloth->numverts;
++	float **winvec;
++
++	MFace *mfaces = cloth->mfaces;
++	EffectedPoint epoint;
++	
++	//Gravity
++	for (i=0; i<num_verts;i++)
++	{
++		copy_v3_v3(data->a[i], clmd->sim_parms->gravity);
++	}
++
++	//Effectors
++	if (effectors)
++	{
++		float mass_inv = (clmd->sim_parms->mass) ? 1.0/clmd->sim_parms->mass : 1;
++		//Initialize winvec
++		winvec = MEM_mallocN(sizeof(float*)*num_verts, "wind data");
++		for (i=0; i<num_verts; i++)
++		{
++			winvec[i] = MEM_callocN(sizeof(float)*3, "wind vector");
++		}
++		if(!winvec)
++		{
++			printf("winvec: out of memory in solver_verlet.c\n");
++		}
++		
++		//precalulate wind forces
++		for (i=0; i<num_verts; i++)
++		{
++			pd_point_from_loc(clmd->scene, data->x[i], data->v[i], i, &epoint);
++			pdDoEffectors(effectors, NULL, clmd->sim_parms->effector_weights, &epoint, winvec[i], NULL);
++		}
++		for (i=0; i<cloth->numfaces; i++)
++		{
++			float temp1[3], temp2[3];
++			float trinormal[3]={0,0,0}; // normalized triangle normal
++			float triunnormal[3]={0,0,0}; // not-normalized-triangle normal
++			float tmp[3]={0,0,0};
++			float force[3] = {0,0,0}; //Temporary force vector
++			float factor = (mfaces[i].v4) ? 0.25 : 1.0 / 3.0;
++			factor *= 1.5;
++
++			//calculate face normal
++			if(mfaces[i].v4)
++			{
++				sub_v3_v3v3(temp1, data->x[mfaces[i].v1], data->x[mfaces[i].v3]);
++				sub_v3_v3v3(temp2, data->x[mfaces[i].v2], data->x[mfaces[i].v4]);
++				cross_v3_v3v3(triunnormal, temp1, temp2);
++
++			}
++			else
++			{
++				sub_v3_v3v3(temp1, data->x[mfaces[i].v1], data->x[mfaces[i].v2]);
++				sub_v3_v3v3(temp2, data->x[mfaces[i].v2], data->x[mfaces[i].v3]);
++				cross_v3_v3v3(triunnormal, temp1, temp2);
++
++			}
++			normalize_v3_v3(trinormal, triunnormal);
++
++			//Add wind from v1
++			copy_v3_v3(tmp, trinormal);
++			mul_v3_fl(tmp, dot_v3v3(winvec[mfaces[i].v1], triunnormal));
++			VECADDS(force, force, tmp, factor);
++			mul_v3_fl(force, mass_inv);
++			add_v3_v3(data->a[mfaces[i].v1], force);
++
++			//Add wind from v2
++			copy_v3_v3(tmp, trinormal);
++			mul_v3_fl(tmp, dot_v3v3(winvec[mfaces[i].v2], triunnormal));
++			VECADDS(force, force, tmp, factor);
++			mul_v3_fl(force, mass_inv);
++			add_v3_v3(data->a[mfaces[i].v2], force);
++
++			//Add wind from v3
++			copy_v3_v3(tmp, trinormal);
++			mul_v3_fl(tmp, dot_v3v3(winvec[mfaces[i].v3], triunnormal));
++			VECADDS(force, force, tmp, factor);
++			mul_v3_fl(force, mass_inv);
++			add_v3_v3(data->a[mfaces[i].v3], force);
++
++			//Add wind from v4
++			if (mfaces[i].v4)
++			{
++				copy_v3_v3(tmp, trinormal);
++				mul_v3_fl(tmp, dot_v3v3(winvec[mfaces[i].v4], triunnormal));
++				VECADDS(force, force, tmp, factor);
++				mul_v3_fl(force, mass_inv);
++				add_v3_v3(data->a[mfaces[i].v4], force);
++			}
++		}
++		for(i=0; i < num_verts; i++)
++			MEM_freeN(winvec[i]);
++		MEM_freeN(winvec);
++	}
++	return 1;
++}
++
++int verlet_integrate(ClothModifierData *clmd, ClothVertex *verts, Verlet_Data *data, unsigned int num_verts)
++{
++	float damping;
++	float sys_damping = clmd->sim_parms->Cvi/100;
++	float edge_damping = sys_damping * 0.1f;
++
++	float safe_dist;
++	float sys_safe = .40;
++	float edge_safe = .60;
++
++	unsigned int i;
++
++	float tmp[3];
++	//float oldx_damp[3];
++	float v[3];
++	//float two_x[3];
++	float a_dt2[3];
++	float r[3];
++
++	float distance;
++	//float delta[3];
++	float diff;
++	//float dt = 1.0f/60.0f
++	float dt2 = 1.0f/3600.0f;
++
++	for (i=0; i<num_verts;i++)
++	{
++		if (verts[i].flags & CLOTH_VERT_FLAG_PINNED)
++			continue;
++		if (verts[i].spring_count < 3)
++		{
++			damping = edge_damping;
++			safe_dist = edge_safe;
++		}
++		else
++		{
++			damping = sys_damping;
++			safe_dist = sys_safe;
++		}
++
++		/*verlet formula: x = 2x - oldx + a *dt^2
++		with damping: x += (1.0-damping)*(x - oldx) + a * dt^2
++		damping is normalized*/
++		copy_v3_v3(tmp, data->x[i]);
++
++		sub_v3_v3v3(v, data->x[i], data->oldx[i]); //x - oldx
++		copy_v3_v3(data->v[i], v); //Store the velocity data for other purposes
++
++		mul_v3_fl(v, (1.0f-damping)); //v*(1-damping)
++		mul_v3_v3fl(a_dt2, data->a[i], dt2); //a * dt^2
++		if (verts[i].mass > 0.0001)
++			mul_v3_v3fl(a_dt2, a_dt2, verts[i].mass);//Account for mass
++		add_v3_v3v3(r, v, a_dt2); //v + a *dt^2
++
++		//Limit Distance
++		distance = len_v3(r);
++		if (distance > safe_dist && clmd->sim_parms->preroll)
++		{
++			diff = (distance-safe_dist/distance);
++			mul_v3_v3fl(r, r, -diff);
++			//zero_v3(r);
++		}
++
++		add_v3_v3v3(data->x[i],data->x[i], r); //x += newx
++		copy_v3_v3(data->oldx[i], tmp); // oldx = x
++		//copy_v3_v3(verts[i].v, v);
++	}
++	return 1;
++}
++
++int verlet_relax(ClothModifierData *clmd, Verlet_Data *data)
++{
++	Cloth *cloth = clmd->clothObject;
++	ClothVertex *verts = cloth->verts;
++	ClothSpring *spring;
++
++	LinkNode *search;
++
++	unsigned int i;
++	float delta[3];
++	float deltalength;
++	float offset[3];
++	float diff;
++
++	float struct_stiffness;
++	float bend_stiffness;
++
++	//if (clmd->sim_parms->structural > 1)
++	//	clmd->sim_parms->structural /= 200;
++	//if (clmd->sim_parms->bending > 1)
++	//	clmd->sim_parms->bending /= 200;
++
++	struct_stiffness = clmd->sim_parms->structural/200;
++	bend_stiffness = clmd->sim_parms->bending/200;
++
++
++	for (i=2; i<9; i*=2)
++	{
++		//Satisfy constraints
++		search = cloth->springs;
++		while(search)
++		{
++			spring = search->link;
++			if (spring->type == i)
++			{
++				sub_v3_v3v3(delta, data->x[spring->ij], data->x[spring->kl]);
++				deltalength = len_v3(delta);
++				diff = (deltalength-spring->restlen)/deltalength;
++
++				mul_v3_v3fl(offset, delta, diff);
++
++				//Shear Constraints
++				if (spring->type == CLOTH_SPRING_TYPE_SHEAR)
++				{
++					mul_v3_fl(offset, struct_stiffness);
++				}
++
++				//Bend Constraints
++				if (spring->type == CLOTH_SPRING_TYPE_BENDING)
++				{
++					mul_v3_fl(offset, bend_stiffness);
++				}
++
++				mul_v3_v3fl(offset, offset, 0.5f);
++
++				sub_v3_v3v3(data->x[spring->ij], data->x[spring->ij], offset);
++				add_v3_v3v3(data->x[spring->kl], data->x[spring->kl], offset);
++			}
++			search = search->next;
++		}
++	}
++	return 1;
++}
++
++int verlet_collision(Object *ob, ClothModifierData *clmd, Verlet_Data *data, float step, ListBase *effectors)
++{
++	unsigned int i;
++	Cloth *cloth = clmd->clothObject;
++	ClothVertex *verts = cloth->verts;
++	unsigned int num_verts = cloth->numverts;
++
++	int collision = 0;
++	float dt = clmd->sim_parms->timescale / clmd->sim_parms->stepsPerFrame;
++	float spf = (float)clmd->sim_parms->stepsPerFrame / clmd->sim_parms->timescale;
++
++	
++	// update verts to current positions
++	for(i = 0; i < num_verts; i++)
++	{
++		copy_v3_v3(verts[i].tx, data->x[i]);
++
++		sub_v3_v3v3(verts[i].tv, verts[i].tx, verts[i].txold);
++		copy_v3_v3(verts[i].v, verts[i].tv);
++	}
++
++	// call collision function
++	collision = cloth_bvh_objcollision(ob, clmd, step/clmd->sim_parms->timescale, dt/clmd->sim_parms->timescale);
++	
++	// copy corrected positions back to simulation
++	for(i = 0; i < num_verts; i++)
++	{		
++		// correct velocity again, just to be sure we had to change it due to adaptive collisions
++		sub_v3_v3v3(verts[i].tv, verts[i].tx, data->x[i]);
++
++		if(collision)
++		{
++			
++			if((clmd->sim_parms->flags & CLOTH_SIMSETTINGS_FLAG_GOAL) && (verts [i].flags & CLOTH_VERT_FLAG_PINNED))
++				continue;
++
++			copy_v3_v3(data->x[i], verts[i].tx);
++			copy_v3_v3(data->v[i], verts[i].tv);
++			mul_v3_fl(data->v[i], spf);
++		}
++	}
++
++	//if (collision)
++	//{
++	//	verlet_calculate_acceleration(clmd, data, effectors);
++	//	verlet_integrate(clmd, verts, data, num_verts);
++	//	verlet_relax(clmd, data);
++	//}
++	return 1;
++}
++
++int verlet_solver (Object *ob, float frame, ClothModifierData *clmd, ListBase *effectors)
++{
++	unsigned int i;
++	Cloth *cloth = clmd->clothObject;
++	ClothVertex *verts = cloth->verts;
++	
++	float step=0.0f, tf=clmd->sim_parms->timescale;
++	float dt = clmd->sim_parms->timescale / clmd->sim_parms->stepsPerFrame;
++	unsigned int quality = clmd->sim_parms->stepsPerFrame;
++
++	unsigned int num_verts = cloth->numverts;
++	Verlet_Data *data = cloth->solver_data;
++	
++	if(clmd->sim_parms->flags & CLOTH_SIMSETTINGS_FLAG_GOAL) /* do goal stuff */
++	{
++		for(i = 0; i < num_verts; i++)
++		{			
++			// update velocities with constrained velocities from pinned verts
++			if(verts[i].flags & CLOTH_VERT_FLAG_PINNED)
++			{			
++				sub_v3_v3v3(data->v[i], verts[i].xconst, verts[i].xold);
++			}
++		}	
++	}
++
++	//Accumulate forces
++	verlet_calculate_acceleration(clmd, data, effectors);
++
++	//Simulate particle movement
++	verlet_integrate(clmd, verts, data, num_verts);
++
++	//Relaxation step to solve constraints (springs)
++	for (; step<tf; step += dt)
++	{
++		verlet_relax(clmd, data);		
++		if(clmd->coll_parms->flags & CLOTH_COLLSETTINGS_FLAG_ENABLED && clmd->clothObject->bvhtree)
++		{
++			verlet_collision(ob, clmd, data, step, effectors);
++		}
++		for (i=0; i<num_verts; i++)
++		{	
++			// Move pinned verts to correct position
++			if(clmd->sim_parms->flags & CLOTH_SIMSETTINGS_FLAG_GOAL) 
++			{			
++				if(verts[i].flags & CLOTH_VERT_FLAG_PINNED)
++				{
++					float tvect[3] = {.0,.0,.0};
++					sub_v3_v3v3(tvect, verts[i].xconst, verts[i].xold);
++					mul_v3_v3fl(tvect, tvect, step+dt);
++					add_v3_v3v3(tvect, tvect, verts[i].xold);
++					copy_v3_v3(data->x[i], tvect);
++				}	
++			}
++			copy_v3_v3(verts[i].xold, data->oldx[i]);
++			copy_v3_v3(verts[i].x, data->x[i]);
++			copy_v3_v3(verts[i].v, data->v[i]);
++		}		
++		if(clmd->coll_parms->flags & CLOTH_COLLSETTINGS_FLAG_ENABLED && clmd->clothObject->bvhtree)
++		{
++			verlet_collision(ob, clmd, data, step, effectors);
++		}
++	}
++	return 1;
++}
++
++void verlet_set_positions(ClothModifierData *clmd)
++{
++	Cloth *cloth = clmd->clothObject;
++	ClothVertex *verts = cloth->verts;
++	unsigned int numverts = cloth->numverts, i;
++	Verlet_Data *data = (Verlet_Data*)cloth->solver_data;
++	
++	for(i = 0; i < numverts; i++)
++	{
++		copy_v3_v3(data->x[i], verts[i].x);
++		copy_v3_v3(data->v[i], verts[i].v);
++	}
++}
+Index: source/blender/makesdna/DNA_cloth_types.h
+===================================================================
+--- source/blender/makesdna/DNA_cloth_types.h	(revision 33920)
++++ source/blender/makesdna/DNA_cloth_types.h	(working copy)
+@@ -73,13 +73,14 @@
+ 	int	preroll;	/* How many frames of simulation to do before we start.	*/
+ 	int	maxspringlen; 	/* in percent!; if tearing enabled, a spring will get cut */
+ 	short	solver_type; 	/* which solver should be used?		txold	*/
++	short	old_solver_type;	/*used to detect a change in solvers*/
+ 	short	vgroup_bend;	/* vertex group for scaling bending stiffness */
+ 	short	vgroup_mass;	/* optional vertexgroup name for assigning weight.*/
+ 	short	vgroup_struct;  /* vertex group for scaling structural stiffness */
+ 	short	shapekey_rest;  /* vertex group for scaling structural stiffness */
+ 	short	presets; /* used for presets on GUI */
+ 	short 	reset;
+-	short	pad[3];
++	short	pad[2];
+ 
+ 	struct EffectorWeights *effector_weights;
+ } ClothSimSettings;
+Index: source/blender/makesrna/intern/rna_cloth.c
+===================================================================
+--- source/blender/makesrna/intern/rna_cloth.c	(revision 33920)
++++ source/blender/makesrna/intern/rna_cloth.c	(working copy)
+@@ -208,6 +208,11 @@
+ {
+ 	StructRNA *srna;
+ 	PropertyRNA *prop;
++
++	static EnumPropertyItem prop_solver_items[] = {
++		{0, "IMPLICIT", 0, "Implicit", "The regular Blender cloth solver"},
++		{1, "VERLET", 0, "Verlet", "A solver more appropriate for real-time use"},
++		{0, NULL, 0, NULL, NULL}};
+ 	
+ 	srna = RNA_def_struct(brna, "ClothSettings", NULL);
+ 	RNA_def_struct_ui_text(srna, "Cloth Settings", "Cloth simulation settings for an object");
+@@ -279,6 +284,12 @@
+ 
+ 	/* various */
+ 
++	prop= RNA_def_property(srna, "solver", PROP_ENUM, PROP_NONE);
++	RNA_def_property_enum_sdna(prop, NULL, "solver_type");
++	RNA_def_property_enum_items(prop, prop_solver_items);
++	RNA_def_property_ui_text(prop, "Cloth Solver", "");
++	RNA_def_property_update(prop, 0, "rna_cloth_update");
++
+ 	prop= RNA_def_property(srna, "air_damping", PROP_FLOAT, PROP_NONE);
+ 	RNA_def_property_float_sdna(prop, NULL, "Cvi");
+ 	RNA_def_property_range(prop, 0.0f, 10.0f);
+@@ -298,7 +309,7 @@
+ 
+ 	prop= RNA_def_property(srna, "quality", PROP_INT, PROP_NONE);
+ 	RNA_def_property_int_sdna(prop, NULL, "stepsPerFrame");
+-	RNA_def_property_range(prop, 4, 80);
++	RNA_def_property_range(prop, 1, 80);
+ 	RNA_def_property_ui_text(prop, "Quality", "Quality of the simulation in steps per frame. (higher is better quality but slower)");
+ 	RNA_def_property_update(prop, 0, "rna_cloth_update");
+ 
+@@ -317,13 +328,13 @@
+ 	
+ 	prop= RNA_def_property(srna, "structural_stiffness", PROP_FLOAT, PROP_NONE);
+ 	RNA_def_property_float_sdna(prop, NULL, "structural");
+-	RNA_def_property_range(prop, 0.0f, 10000.0f);
++	RNA_def_property_range(prop, 0.0f, 200.0f);
+ 	RNA_def_property_ui_text(prop, "Structural Stiffness", "Overall stiffness of structure");
+ 	RNA_def_property_update(prop, 0, "rna_cloth_update");
+ 
+ 	prop= RNA_def_property(srna, "structural_stiffness_max", PROP_FLOAT, PROP_NONE);
+ 	RNA_def_property_float_sdna(prop, NULL, "max_struct");
+-	RNA_def_property_range(prop, 0.0f, 10000.0f);
++	RNA_def_property_range(prop, 0.0f, 200.0f);
+ 	RNA_def_property_float_funcs(prop, NULL, "rna_ClothSettings_max_struct_set", NULL);
+ 	RNA_def_property_ui_text(prop, "Structural Stiffness Maximum", "Maximum structural stiffness value");
+ 	RNA_def_property_update(prop, 0, "rna_cloth_update");
+@@ -335,13 +346,13 @@
+ 
+ 	prop= RNA_def_property(srna, "bending_stiffness", PROP_FLOAT, PROP_NONE);
+ 	RNA_def_property_float_sdna(prop, NULL, "bending");
+-	RNA_def_property_range(prop, 0.0f, 10000.0f);
++	RNA_def_property_range(prop, 0.0f, 200.0f);
+ 	RNA_def_property_ui_text(prop, "Bending Stiffness", "Wrinkle coefficient. (higher = less smaller but more big wrinkles)");
+ 	RNA_def_property_update(prop, 0, "rna_cloth_update");
+ 
+ 	prop= RNA_def_property(srna, "bending_stiffness_max", PROP_FLOAT, PROP_NONE);
+ 	RNA_def_property_float_sdna(prop, NULL, "max_bend");
+-	RNA_def_property_range(prop, 0.0f, 10000.0f);
++	RNA_def_property_range(prop, 0.0f, 200.0f);
+ 	RNA_def_property_float_funcs(prop, NULL, "rna_ClothSettings_max_bend_set", NULL);
+ 	RNA_def_property_ui_text(prop, "Bending Stiffness Maximum", "Maximum bending stiffness value");
+ 	RNA_def_property_update(prop, 0, "rna_cloth_update");
