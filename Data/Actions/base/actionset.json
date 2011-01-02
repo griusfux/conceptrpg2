@@ -4,9 +4,14 @@
 	"action_set":
 	[
 		{
-				"name" : "base.idle",
-				"start" : 0,
-				"end" : 79
+			"name" : "base.idle",
+			"start" : 0,
+			"end" : 79
+		},
+		{
+			"name" : "base.walk",
+			"start" : 1,
+			"end" : 80
 		}
 	]
 }

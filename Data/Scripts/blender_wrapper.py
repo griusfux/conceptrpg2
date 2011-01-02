@@ -30,6 +30,9 @@ class Object:
 		self.tot_error = Vector((0.0, 0.0, 0.0));
 		self.pid = [30.0, 0.5, 0.0]
 		
+		# Stores the current animation
+		self.animation = ""
+		
 	def __eq__(self, other):
 		self.gameobj == other.gameobj
 	
@@ -136,10 +139,11 @@ class Object:
 	def get_local_vector_to(self, position, arg = 2):
 		return self.gameobj.getVectTo(position)[arg]	
 		
-	def play_animation(self, anim, start=0, end=0, layer=0, blending=0):
-		if self._armature:
-			self._armature.playAction(anim, start, end)#, layer, blending)
-#			self.gameobj.sendMessage("animation", anim, self._armature.name)
+	def play_animation(self, anim, start=0, end=0, mode=0, layer=0, blending=0):
+		if self._armature and anim != self.animation:
+			self._armature.playAction(anim, start, end, play_mode=mode)#, layer, blending)
+			self.animation = anim
+			# self.gameobj.sendMessage("animation", anim, self._armature.name)
 			
 	def end(self):
 		if not self.gameobj.invalid:

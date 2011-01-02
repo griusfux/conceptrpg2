@@ -150,6 +150,8 @@ class DefaultState(BaseState, BaseController):
 				main['input_system'].mouse.position = (0.5, 0.5)
 
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
+					act = main['default_actions']['default_walk']
+					main['player'].object.play_animation(act['name'], act['start'], act['end'], mode=1)
 					movement[1] = speed
 				if ("MoveBackward", "INPUT_ACTIVE") in inputs:
 					movement[1] = -speed
@@ -157,13 +159,15 @@ class DefaultState(BaseState, BaseController):
 					movement[0] = speed
 				if ("MoveLeft", "INPUT_ACTIVE") in inputs:
 					movement[0] = -speed
-				# if ("MoveForward", "MoveBackward", "MoveRight", "MoveLeft", "INPUT_ACTIVE") not in inputs:
-					# act = main['default_actions']['default_idle']
-					# main['player'].object.play_animation(act['name'], act['start'], act['end'])
 	
 		# Normalize the vector to the character's speed
 		if movement != [0.0, 0.0, 0.0]:
 			movement = [float(i) for i in (Vector(movement).normalize()*speed)]
+		
+		# Otherwise, idle
+		else:
+				act = main['default_actions']['default_idle']
+				main['player'].object.play_animation(act['name'], act['start'], act['end'], mode=1)
 
 		# Send the message
 		self.server.invoke("move", id, *movement)

@@ -1,3 +1,4 @@
 {
-	"default_idle" : "base.idle"
+	"default_idle" : "base.idle",
+	"default_walk" : "base.walk"
 }
