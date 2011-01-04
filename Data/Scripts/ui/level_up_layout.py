@@ -189,6 +189,7 @@ class LevelUpLayout(Layout):
 		# Accept scores
 		for ab in ("str", "con", "dex", "int", "wis", "cha"):
 			score = int(getattr(self, ab+"_score").text)
+			score += int(getattr(self, ab+"_bonus").text)
 			setattr(self.main['player'], ab+"_ab", score)
 		self.main['level_exit'] = True
 		
