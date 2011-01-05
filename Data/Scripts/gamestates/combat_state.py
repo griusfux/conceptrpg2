@@ -87,12 +87,17 @@ class CombatState(DefaultState, BaseController):
 		
 	def client_run(self, main):
 		"""Client-side run method"""
+		
+		# Update the camera
 		if self.camera != self.last_camera:
 			main['camera'].change_mode(self.camera, 15)
 			self.last_camera = self.camera
 		else:
 			main['camera'].update()
 		self.camera = 'frankie'
+		
+		# Update the effect system
+		main['effect_system'].update()
 		
 		# See if we still need to be in combat
 		if not self.monster_list:
@@ -350,6 +355,13 @@ class CombatState(DefaultState, BaseController):
 	##########
 	# Controller
 	##########
+	
+	def create_effect(self, effect_name, position, target=None, duration=0, delay=0, continuous=-1, **functions):
+		id = self.main["effect_system"].create(effect_name, position, target, duration, delay, continuous, **functions)
+		return id
+		
+	def end_effect(self, id):
+		self.main["effect_system"].remove(id)
 	
 	def play_animation(self, character, animation, lock=0):
 		"""Instruct the character to play the animation

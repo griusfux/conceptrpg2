@@ -531,3 +531,13 @@ class Save(Package):
 	
 		with open(os.path.join(self._path, 'data'), 'wb') as f:
 			pickle.dump(self.data, f)
+			
+class Effect(Package):
+	"""Effect Package"""
+	
+	_ext = 'fx'
+	_blend = 'effect.blend'
+	_config = 'effect.json'
+	_schema = 'Schemas/effect.json'
+	_new = 'Schemas/effect_new.json'
+	_dir = 'Effects'

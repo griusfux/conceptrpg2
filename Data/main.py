@@ -7,6 +7,7 @@
 
 import Scripts.blender_wrapper as BlenderWrapper
 from Scripts.ui.blender_ui_system import *
+from Scripts.effects import EffectSystem
 from Scripts.packages import *
 from Scripts.dungeon_generator import DungeonGenerator
 from Scripts.character_logic import PlayerLogic, MonsterLogic
@@ -166,6 +167,10 @@ def init(own):
 	# Create a ui system
 	if 'ui_system' not in own:
 		own['ui_system'] = BlenderUISystem()
+		
+	# Create an effect system
+	if 'effect_system' not in own:
+		own['effect_system'] = EffectSystem(own['engine'])
 		
 	# Create a socket and register with the server
 	if 'client' not in own:
