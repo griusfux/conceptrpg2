@@ -3,34 +3,35 @@
 # Description: The game server
 # Contributers: Mitchell Stokes
 
-# from socketserver import UDPServer, BaseRequestHandler
 
 from Scripts.networking import NET_ENCODING
 from Scripts.gamestate_manager import GameStateManager
 
-import socket
-import select
+import traceback
 import time
+import enet
 
-BUFFER = 4096
+class NetPlayer():
+		"""Class for handling player data"""
+		
+		def __init__(self, race, pos, ori):
+			self.race = race
+			self.position = pos
+			self.orientation = ori
 
-# class GameRequestHandler(BaseRequestHandler):
-	# """Handles incoming requests"""
-	
 class ClientHandle():
 	"""Class for handling client requests"""
 	
-	def __init__(self, server, client_id, client_addr):
+	def __init__(self, server, client_id, peer):
 		self.server = server
 		self.last_update = time.time()
 		self.id = client_id
-		self.addr = client_addr
+		self.peer = peer
 		
 		self.state_manager = GameStateManager("DungeonGeneration", self.server.main, is_server=True)
 		
-	def handle_request(self, data, client_addr):
-		self.last_update = time.time()
-		self.addr = client_addr
+	def handle_request(self, data, peer):
+		self.peer = peer
 		
 		if data:
 			# Clean up the data a little
@@ -55,13 +56,12 @@ class ClientHandle():
 	def send(self, data):
 		"""Send a message to the client"""
 		
-		self.server.socket.sendto(bytes(data, NET_ENCODING), self.addr)
+		self.peer.send(0, enet.Packet(bytes(data, NET_ENCODING)))
 
 class GameServer():
 	"""The game server"""
 	
 	def __init__(self, port, timeout):
-		#UDPServer.__init__(self, ('', port), GameRequestHandler)
 				
 		# The "main" dict for storing globals
 		self.main = {}
@@ -72,70 +72,86 @@ class GameServer():
 		# Client info
 		self.main['clients'] = {}
 		
+		# Player info
+		self.main['players'] = {}
+		
 		# The current dungeon
 		self.main['dungeon'] = []
 		
-		# Create the socket
-		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		self.socket.bind(('', port))
+		# Create the host
+		self.host = enet.Host(enet.Address(b'localhost', port), 10, 0, 0, 0)
 		
 		# How long we wait on players
 		self.timeout = timeout
 		
-		# Startup the state manager with the default state
-		# self.state_manager = GameStateManager("Default", self.main, is_server=True)
-		
 		print("Server ready")
 		
 		# Now run the server
-		while True:
-			r, w, e = select.select([self.socket], [], [], 0.01)
-			if r:
-				try:
-					data, client_addr = self.socket.recvfrom(BUFFER)
-					data = str(data, NET_ENCODING)
-				except socket.error as e:
-					print(e)
-					data = ""
+		try:
+			while True:
+				event = self.host.service(1000)
 				
-				if data:
+				if event.type == enet.EVENT_TYPE_CONNECT:
+					print('Client Connected:', event.peer.address)
+				elif event.type == enet.EVENT_TYPE_DISCONNECT:
+					self.drop_client(event.peer, "Disconnected")
+				elif event.type == enet.EVENT_TYPE_RECEIVE:
+					data = str(event.packet.data, NET_ENCODING)
 					d = data.split()
 					client_id = d[0]
 					
 					if client_id not in self.main['clients']:
-						self.register_client(client_id, client_addr)
-					elif self.main['clients'][client_id].addr != client_addr:
-						# Make the client_id unique
-						while client_id in self.main['clients']:
-							client_id = client_id + "_"
-							
-						self.register_client(client_id, client_addr)
+						self.register_client(client_id, event.peer)
 					
-					if len(d) > 1 and d[1] == "ping":
-						self.socket.sendto(b"pong", client_addr)
-						self.main['clients'][client_id].last_update = time.time()
-					else:
-						self.main['clients'][client_id].handle_request(data, client_addr)
-				
-			# Check the status of the clients
-			for cid in [i for i in self.main['clients'].keys()]:
-				if time.time() - self.main['clients'][cid].last_update > self.timeout:
-					self.broadcast("to:"+cid)
-					self.drop_client(cid, "Timed Out")
+					if d[1] == 'register': continue
+
+					self.main['clients'][client_id].handle_request(data, event.peer)
+
+		except Exception:
+			traceback.print_exc()
+		except:
+			# Grabs the KeyboardInterrupt
+			pass
+			
+		print("Server exiting...")
 					
-	def register_client(self, client_id, client_addr):
+	def register_client(self, client_id, peer):
 		"""Registers a client"""
-		
-		print(client_id, "Registered")
-		self.socket.sendto(b"cid:"+bytes(client_id, NET_ENCODING), client_addr)
-		self.main['clients'][client_id] = ClientHandle(self, client_id, client_addr)
+		# Make the id unique
+		while client_id in self.main['clients']:
+			client_id += '_'
+
+		peer.send(0, enet.Packet(b'cid:'+bytes(client_id, NET_ENCODING)))
+		self.main['clients'][client_id] = ClientHandle(self, client_id, peer)
+		print("%s Registered as %s" % (peer.address, client_id))
 					
-	def drop_client(self, client_id, reason):
+	def drop_client(self, peer, reason):
 		"""Drop a client"""
+		
+		for cid, client in self.main['clients'].items():
+			if client.peer == peer:
+				client_id = cid
+				break
+		else:
+			# The player never fully connected, ignore the drop
+			return
 		
 		if client_id in self.main['clients']:
 			print(client_id, reason)
 			del self.main['clients'][client_id]
+			
+			try:
+				del self.main['players'][client_id]
+			except KeyError:
+				print("Warning: %s not found in players list when dropping client" % client_id)
+			
+	def add_player(self, client_id, race, position, orientation):
+		"""Adds a player to the player dictionary to cache position and orientation data.
+		
+			Having this method avoids having to import the NetPlayer class into gamestates
+		"""
+		
+		self.main['players'][client_id] = NetPlayer(race, position, orientation)
 		
 	def send(self, data):
 		"""Alias to broadcast for use with RPC"""
@@ -148,5 +164,5 @@ class GameServer():
 		# print("BROADCAST:", data)
 		
 		for cid, client in self.main['clients'].items():
-			self.socket.sendto(bytes(data, NET_ENCODING), client.addr)
+			client.peer.send(0, enet.Packet(bytes(data, NET_ENCODING)))
 			

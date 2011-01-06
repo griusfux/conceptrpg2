@@ -5,11 +5,9 @@
 
 from Scripts.networking import NET_ENCODING
 
-import socket
 import time
+import enet
 
-# The buffer size to use
-BUFFER = 4096
 TIMEOUT = 5
 
 class GameClient:
@@ -17,70 +15,48 @@ class GameClient:
 	
 	def __init__(self, id, addr):
 		self.id = id
-		self.addr = addr
-		
-		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		self.socket.setblocking(0)
+		self.host = enet.Host(None, 1, 0, 0, 0)
+		self.peer = self.host.connect(enet.Address(*addr), 1)
+		self.connect_time = time.time()
 		
 		self.connected = False
 		self.server_addr = None
-		
-		self.last_update = self.last_ping = time.time()
-		self.socket.sendto(bytes(id, NET_ENCODING), addr)
 		
 	def restart(self, id, addr):
 		self.id = id
-		self.addr = addr
+
+		self.host = enet.Host(None, 1, 0, 0, 0)
+		self.peer = self.host.connect(enet.Address(*addr), 1)
+		self.connect_time = time.time()
 	
 		self.connected = False
 		self.server_addr = None
-		
-		self.last_update = time.time()
-		self.socket.sendto(bytes(self.id, NET_ENCODING), self.addr)
-		
+	
 	def run(self):
-		"""Try to get data from the server"""
-		val = None
-		
-		# If we haven't yet connected, keep poking for a server
-		if not self.connected:
-			self.socket.sendto(bytes(self.id, NET_ENCODING), self.addr)
-		elif time.time() - self.last_ping > 1.0:
-			# Let the server know we're still alive
-			self.send("ping")
-			self.last_ping = time.time()
-		
-		try:
-			data, addr = self.socket.recvfrom(BUFFER)
-			
-			if not self.server_addr:
-				print("Server found", addr)
-				self.last_update = time.time()
-				self.server_addr = addr
-				self.connected = True
-				
-				# Do a name change if necessary
-				data = str(data, NET_ENCODING)
-				
-				if data.startswith("cid:"):
-					self.id = data.split(':')[1]
-					print("ID set to", self.id)
-			elif self.server_addr == addr:
-				self.last_update = time.time()
-				data = str(data, NET_ENCODING)
-				if data != "pong": val = data
-				# data = str(data, NET_ENCODING).split()
-				# val = (data[0], data[1:])
-
-		except socket.error:
-			pass
-							
-		if time.time() - self.last_update > TIMEOUT:
-			print("Connection to the server timed out")
+		if not self.connected and time.time() - self.connect_time > TIMEOUT:
 			self.server_addr = "0.0.0.0"
 			self.connected = False
+			return
 			
-		return val
+	
+		event = self.host.service(0)
+		
+		if event.type == enet.EVENT_TYPE_CONNECT:
+			self.connected = True
+			self.server_addr = event.peer.address.host
+			self.send('register')
+		elif event.type == enet.EVENT_TYPE_DISCONNECT:
+			self.connected = False
+			self.server_addr = "0.0.0.0"
+		elif event.type == enet.EVENT_TYPE_RECEIVE:
+			data = str(event.packet.data, NET_ENCODING)
+			if data.startswith('cid:'):
+				self.id = data.split(':')[1]
+				print("ID set to", self.id)
+			else:
+				return data
+			
+		return None
 		
 	def send(self, msg):
 		"""Send a message and user name to the server"""
@@ -88,5 +64,5 @@ class GameClient:
 		if not self.connected:
 			return
 		
-		self.socket.sendto(bytes(self.id+" "+msg, NET_ENCODING), self.server_addr)
+		self.peer.send(0, enet.Packet(bytes(self.id+" "+msg, NET_ENCODING)))
 				
