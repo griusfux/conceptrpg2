@@ -6,10 +6,10 @@ from Scripts.packages import Monster
 from Scripts.character_logic import MonsterLogic
 
 import random
-from math import degrees, sqrt
+from math import degrees, sqrt, atan
 from Scripts.ai.manager import Manager as AiManager
 from Scripts.ai.state_machine import StateMachine as AiStateMachine
-from Scripts.mathutils import Vector
+from Scripts.mathutils import Vector, Matrix
 
 # Constants for grid generation
 TILE_SIZE = 1
@@ -77,12 +77,12 @@ class CombatState(DefaultState, BaseController):
 		
 		# If the player has a weapon, socket it
 		if main['player'].inventory.weapon:
-				weapon = main['player'].inventory.weapon
-				main['engine'].load_library(weapon)
-				obj = main['engine'].add_object('longsword')
-				main['player'].set_right_hand(obj)
-				self.camera = 'frankie'
-				self.last_camera = 'frankie'
+			weapon = main['player'].inventory.weapon
+			main['engine'].load_library(weapon)
+			obj = main['engine'].add_object('longsword')
+			main['player'].set_right_hand(obj)
+		self.camera = 'frankie'
+		self.last_camera = 'frankie'
 			
 		
 	def client_run(self, main):
@@ -118,8 +118,28 @@ class CombatState(DefaultState, BaseController):
 		active_power = main['player'].powers.active
 		range_type = active_power.range_type
 		range_size = active_power.range_size
-		mask = active_power.mask if hasattr(active_power, "mask") else 0
-		main['player'].targets = self.get_targets(main['player'], range_type, range_size, mask)
+		if range_type == 'RANGED':
+			# If the player already has targets, find out if they are valid
+			if main['player'].targets:
+				# Ranged can only have one target
+				if len(main['player'].targets) > 1:
+					main['player'].targets = []
+				else:
+					# The target must be in range
+					if (main['player'].targets[0].object.position-main['player'].object.position).length > range_size:
+						main['player'].targets = []
+			else:
+				target = None
+				target_dist = range_size
+				for monster in self.monster_list:
+					dist = (monster.object.position-main['player'].object.position).length
+					if dist < target_dist:
+						target = monster
+						target_dist = dist
+				main['player'].targets = [target,] if target else []
+		else:	
+			mask = active_power.mask if hasattr(active_power, "mask") else 0
+			main['player'].targets = self.get_targets(main['player'], range_type, range_size, mask)
 		# print(main['player'].targets)
 		
 		
@@ -148,6 +168,7 @@ class CombatState(DefaultState, BaseController):
 				self.monster_list.remove(monster)
 				for hero in self.hero_list:
 					hero.xp += monster.xp_reward/len(self.hero_list)
+					main['player'].targets.remove(monster)
 				monster.object.end()
 			
 		# Our id so we can talk with the server
@@ -182,6 +203,34 @@ class CombatState(DefaultState, BaseController):
 				if ("Aim", "INPUT_ACTIVE") in inputs:
 					if main['player'].powers.active.range_type == "RANGED":
 						self.camera = 'shoulder'
+						main['ui_system'].mouse.visible = True
+						
+						# Enable camera pitch on mouse look
+						dy = 0.5 - main['input_system'].mouse.position[1]
+						cam_ori = Matrix(*main['camera'].world_orientation)
+						main['camera'].world_orientation = cam_ori * Matrix.Rotation(dy, 3, 'X')
+						
+						# Build a list of possible targets
+						targets = self.monster_list
+						
+						# Gather some info for the target searching
+						distance = main['player'].powers.active.range_size * TILE_SIZE
+						cam_vec = main['camera'].pivot.getAxisVect((0,0,-1))
+						
+						final_target = None
+						final_factor = .5 #atan(1/distance) * distance
+						for target in targets:
+							target_vec = target.object.position - main['camera'].pivot.worldPosition.copy()
+							target_vec_len = target_vec.length * TILE_SIZE - 2
+							if target_vec_len < distance:
+								factor = cam_vec.angle(target_vec.normalize()) * target_vec_len
+								if factor < final_factor:
+									final_target = target
+									final_factor = factor
+									
+						main['player'].targets = [final_target] if final_target else []
+									
+						
 					else:					
 						# Show the range of the active power
 						power = main['player'].powers.active
@@ -189,6 +238,8 @@ class CombatState(DefaultState, BaseController):
 						tiles = self._find_target_range(power.range_type, power.range_size, point)
 						for tile in tiles:
 							tile.color((1, 0, 0, 0.25))
+				else:
+					main['ui_system'].mouse.visible = False
 
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
 					act = main['default_actions']['default_walk']
@@ -207,7 +258,7 @@ class CombatState(DefaultState, BaseController):
 		
 		# Otherwise, idle (This would be a good place to put grid snapping back in)
 		else:
-				act = main['default_actions']['default_idle']
+				act = main['default_actions']['1h_idle']
 				main['player'].object.play_animation(act['name'], act['start'], act['end'], mode=1)
 
 		# Send the message
