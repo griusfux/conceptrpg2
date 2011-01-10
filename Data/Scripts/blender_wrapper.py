@@ -229,7 +229,7 @@ class Vertex:
 	"""KX_VertexProxy wrapper"""
 	def __init__(self, vertex, gameobj):
 		ori = gameobj.worldOrientation
-		self.x, self.y, self.z = (Vector(vertex.getXYZ()) * Matrix(ori[0], ori[1], ori[2])) + Vector(gameobj.worldPosition)
+		self.x, self.y, self.z = (Vector(vertex.getXYZ()) * Matrix(ori)) + Vector(gameobj.worldPosition)
 
 class Camera:
 	"""Wrapper for KX_Camera"""

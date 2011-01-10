@@ -207,7 +207,7 @@ class CombatState(DefaultState, BaseController):
 						
 						# Enable camera pitch on mouse look
 						dy = 0.5 - main['input_system'].mouse.position[1]
-						cam_ori = Matrix(*main['camera'].world_orientation)
+						cam_ori = Matrix(main['camera'].world_orientation)
 						main['camera'].world_orientation = cam_ori * Matrix.Rotation(dy, 3, 'X')
 						
 						# Build a list of possible targets

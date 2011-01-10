@@ -304,7 +304,7 @@ class DungeonGenerator:
 					#from_pos = Vector(vert_pos) + Vector(tile.worldPosition)
 					ori = tile.worldOrientation
 					# The new way
-					from_pos = (Vector(vert_pos) * Matrix(ori[0], ori[1], ori[2])) + Vector(tile.worldPosition)
+					from_pos = (Vector(vert_pos) * Matrix(ori)) + Vector(tile.worldPosition)
 
 					
 					# The to position is just x units below the vert
