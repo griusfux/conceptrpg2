@@ -1,0 +1,20 @@
+{
+	"name": "Mushroom Mines",
+	"encounter_deck": "test",
+	"shop": "Kat",
+	"start_tiles":[
+			{ "obj": "start" }
+		],
+	"room_tiles": [
+			{ "obj": "chamber" }
+		],
+	"corridor_tiles": [
+			{ "obj": "corridor" }
+		],
+	"end_tiles": [
+			{ "obj": "end" }
+		],
+	"stair_tiles": [
+			{ "obj": "end" }
+		]
+}

@@ -48,7 +48,7 @@ class DungeonGenerationState(BaseState):
 		main['ui_system'].load_layout('dun_gen')
 		
 		# Load up the map file and load the scene
-		self.map = Map('ShipRuins')
+		self.map = Map('Mines')
 		main['engine'].load_library(self.map)
 		
 		# We want to time the generator
