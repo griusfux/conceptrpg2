@@ -79,7 +79,7 @@ class GameServer():
 		self.main['dungeon'] = []
 		
 		# Create the host
-		self.host = enet.Host(enet.Address(b'localhost', port), 10, 0, 0, 0)
+		self.host = enet.Host(enet.Address(b'', port), 10, 0, 0, 0)
 		
 		# How long we wait on players
 		self.timeout = timeout

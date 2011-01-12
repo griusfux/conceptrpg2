@@ -189,6 +189,7 @@ class DefaultState(BaseState, BaseController):
 	def position(self, main, client, cid, x, y, z):
 		# We could run checks here, but for now we just rebroadcast
 		self.clients.invoke('position', cid, x, y, z)
+		main['players'][cid].position = (x, y, z)
 		
 	def move(self, main, client, cid, x, y, z):
 		# We could run checks here, but for now we just rebroadcast

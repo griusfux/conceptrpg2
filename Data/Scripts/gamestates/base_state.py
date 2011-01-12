@@ -1,6 +1,8 @@
 # $Id$
 
 import pickle
+import Scripts.packages as packages
+import Scripts.character_logic as character_logic
 
 # This is used to implement RPC like functionality
 class RPC:
@@ -148,15 +150,27 @@ class BaseState:
 	def to(self, main, id):
 		pass		
 		
-	# At this level, we just ignore time disconnects
+	# At this level, we just ignore disconnects
 	def dis(self, main, id):
 		pass
+		
+	def add_player(self, main, id, race, pos, ori):
+		if id in main['net_players']:
+			# This player is already in the list, so just ignore this call
+			return
+	
+		race = packages.Race(race)
+		main['engine'].load_library(race)
+		
+		obj = main['engine'].add_object(race.root_object, pos, ori)
+		main['net_players'][id] = character_logic.PlayerLogic(obj)
 	
 	# Register the functions
 	client_functions = {
 			cid: (str,),
 			to: (str,),
-			dis: (str,)
+			dis: (str,),
+			add_player: (str, str, "pickle", "pickle"),
 			}
 	
 	def client_init(self, main):
@@ -180,12 +194,20 @@ class BaseState:
 		client.server.broadcast("dis:"+cid)
 		client.server.drop_client(cid, "Disconnected")
 		
+	def add_player(self, main, client, race, pos, ori):
+		client.server.add_player(client.id, race, pos, ori)
+		self.clients.invoke('add_player', client.id, race, pos, ori)
+		
+		for k, v in main['players'].items():
+			self.client.invoke('add_player', k, v.race, v.position, v.orientation)
+		
 	def switch_state(self, main, client, state):
 		self._next_state = state
 		
 	# Register the functions
 	server_functions = {
 			dis: (str,),
+			add_player: (str, "pickle", "pickle"),
 			switch_state: (str,),
 			}
 		

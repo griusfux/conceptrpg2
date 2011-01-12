@@ -125,6 +125,12 @@ class DungeonGenerationState(BaseState):
 				main['shop_keepers'] = {}
 				print("Could not find a shop empty!")
 			
+			# Add the player to the server state
+			pobj = main['player'].object
+			pos = pobj.position[:]
+			ori = [[a, b, c] for a, b, c in pobj.get_orientation()]
+			self.server.invoke('add_player', main['player'].race.package_name, pos, ori)
+			
 			# Switch to the default state now
 			self.server.invoke('switch_state', "Default")
 			return ("Default", "SWITCH")
