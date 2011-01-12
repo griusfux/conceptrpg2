@@ -6,3 +6,5 @@ if sys.platform == 'win32':
 		from .enet_win64 import *
 	else:
 		from .enet_win32 import *
+else:
+	raise ImportError("Unsupported platform:", sys.platform)

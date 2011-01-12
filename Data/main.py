@@ -23,6 +23,9 @@ import subprocess
 import pickle
 import os
 import json
+import sys
+import struct
+import time
 
 # Create a shorthand for gl
 import bge
@@ -33,10 +36,6 @@ user = 'Kupoman'
 port = 9999
 ip = 'localhost'
 addr = (ip, port)
-
-# Camera globals
-scale_max = 2
-scale_min = 0.25
 
 # Error handling global
 gl.error = False
@@ -56,65 +55,6 @@ def animation(cont):
 			cont.activate(mess.bodies[0])
 		else:
 			print("WARNING: No actuator found for animation: %s" % mess.bodies[0])
-		
-def camera(cont):
-	cam = cont.owner
-	scaler = cont.sensors['scale'].owner
-	ray = cont.sensors['ray']
-	cempty = cont.sensors['CamEmpty'].owner
-	
-	if not ray.hitObject:
-		scale = scale_max
-	else:
-		scale = scaler.getDistanceTo(ray.hitPosition)
-
-		if scale > scale_max:
-			scale = scale_max
-		elif scale < scale_min:
-			scale = scale_min
-			
-	scaler.scaling = [scale, scale, scale]
-
-	cont.activate(cont.actuators['ray_track'])
-	cont.activate(cont.actuators['cam_track'])
-	
-	# Handle mouselook
-	mouse = gl.mouse
-	
-	# Calculate the change in x
-	dx = 0.5 - mouse.position[0]
-	
-	# Rotate the camera
-	cempty.applyRotation((0, 0, dx*5))
-	
-	# Calculate the change in y
-	dy = 0.5 - mouse.position[1]
-	
-	is_upright = cempty.localOrientation[2][2] >= 0.0
-	is_facing_up = cempty.localOrientation[2][1] >= 0.0
-	apply_rot = False
-	
-	# if not (bool(is_upright) ^ bool(not(bool(dy >= 0) ^ bool(is_facing_up)))):
-		# apply_rot = True
-	# if is_upright:
-		# apply_rot = True
-	# elif dy >= 0.0 and is_facing_up:
-		# apply_rot = True
-	# elif dy < 0.0 and not is_facing_up:
-		# apply_rot = True
-		
-	# if apply_rot:
-		# cempty.applyRotation((-dy*5, 0, 0))
-	
-	# if cempty.localOrientation[2][1] >= 0.0:
-		# if dy > 0:
-			# cempty.applyRotation((-dy*5, 0, 0))
-	#else
-	# Rotate the camera
-	# cempty.applyRotation((-dy*5, 0, 0))
-	
-	# Reset the mouse
-	mouse.position = (0.5, 0.5)
 
 def exit_game(main):
 	print("Exiting...")
@@ -176,17 +116,6 @@ def init(own):
 	if 'client' not in own:
 		own['client'] = GameClient(user, addr)
 		
-		# Fallback to offline mode
-		# if not own['client'].connected:
-			# print("Could not connect to the server, starting game in offline mode.")
-			# own['is_offline'] = True
-			# own['is_host'] = True
-		# else:
-			# own['is_host'] = own['client'].is_host
-			# print("Username: %s\tIs host? %s" % (own['client'].user, 'True' if own['client'].is_host else 'False'))
-			# own['is_offline'] = False
-			# own['net_players'] = {}
-		own['is_host'] = own['is_offline'] = True
 		return
 	elif not own['client'].connected:
 		own['client'].run()

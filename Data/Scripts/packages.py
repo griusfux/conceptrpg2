@@ -126,13 +126,13 @@ class Package:
 			
 			return cls(package_name)
 		except Exception as e:
-			print(e)
+			traceback.print_exc()
 			print("Unable to create package in "+path)
 		
 		return None
 		
 	@classmethod
-	def get_package_list(cls):
+	def get_package_list(cls, show_traceback=False):
 		packages = []
 		
 		for f in os.listdir(cls._dir):
@@ -142,7 +142,10 @@ class Package:
 				try:
 					packages.append(cls(f.replace("."+cls._ext, "")))
 				except Exception as e:
-					print(f, e)
+					if show_traceback:
+						traceback.print_exc()
+					else:
+						print(f, e)
 				
 		return packages
 	
