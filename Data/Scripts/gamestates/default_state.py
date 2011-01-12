@@ -7,11 +7,6 @@ from .base_state import BaseState, BaseController
 
 class DefaultState(BaseState, BaseController):
 	"""The default state for the game"""
-	
-	def __init__(self, main, is_server=False):
-		"""DefaultState Constructor"""
-		
-		BaseState.__init__(self, main, is_server)
 			
 	##########
 	# Client
@@ -19,6 +14,7 @@ class DefaultState(BaseState, BaseController):
 				
 	# Client functions
 	def position(self, main, cid, x, y, z):
+		if cid not in main['net_players']: return
 		server_pos = [x, y, z]
 		client_pos = main['net_players'][cid].object.position
 		
@@ -29,12 +25,15 @@ class DefaultState(BaseState, BaseController):
 		main['net_players'][cid].object.position = client_pos
 		
 	def move(self, main, cid, x, y, z):
+		if cid not in main['net_players']: return
 		main['net_players'][cid].object.move([x, y, z], min=[-50, -50, 0], max=[50, 50, 0])
 		
 	def rotate(self, main, cid, x, y, z):
+		if cid not in main['net_players']: return
 		main['net_players'][cid].object.rotate((x, y, z))
 			
 	def anim(self, main, cid, action, start, end, layer, blending):
+		if cid not in main['net_players']: return
 		print("Playing", action)
 		main['net_players'][cid].object.play_animation(action, start, end, layer, blending)
 		

@@ -102,8 +102,8 @@ class DungeonGenerationState(BaseState):
 					self.server.invoke('update_dungeon', i)
 				self.server.invoke('finish_dungeon')
 				self.building = False
-			else:
-				raise SystemError("Built a dungeon, but the server didn't request one nor was a dungeon received from the server.")
+			# else:
+				# raise SystemError("Built a dungeon, but the server didn't request one nor was a dungeon received from the server.")
 		else:
 			# Dungeon is done
 			print("\nDungeon generation complete with %d rooms\n in %.4f seconds" % (main['dgen'].room_count, time.time() - self.start_time))
