@@ -160,6 +160,9 @@ class BaseState:
 	def rotate(self, main, cid, x, y, z):
 		pass
 		
+	def position(self, main, cid, x, y, z):
+		pass
+		
 	def add_player(self, main, id, race, pos, ori):
 		if id in main['net_players']:
 			# This player is already in the list, so just ignore this call
@@ -178,6 +181,7 @@ class BaseState:
 			dis: (str,),
 			move: (str, float, float, float),
 			rotate: (str, float, float, float),
+			position: (str, float, float, float),
 			add_player: (str, str, "pickle", "pickle"),
 			}
 	
