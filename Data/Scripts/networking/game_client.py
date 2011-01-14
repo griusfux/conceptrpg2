@@ -20,7 +20,12 @@ class GameClient:
 		self.connect_time = time.time()
 		
 		self.connected = False
+		self.registered = False
 		self.server_addr = None
+		
+	def disconnect(self):
+		self.send('dis:')
+		self.host.flush()
 		
 	def restart(self, id, addr):
 		self.id = id
@@ -53,6 +58,7 @@ class GameClient:
 			if data.startswith('cid:'):
 				self.id = data.split(':')[1]
 				print("ID set to", self.id)
+				self.registered = True
 			else:
 				return data
 			

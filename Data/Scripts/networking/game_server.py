@@ -94,16 +94,20 @@ class GameServer():
 				if event.type == enet.EVENT_TYPE_CONNECT:
 					print('Client Connected:', event.peer.address)
 				elif event.type == enet.EVENT_TYPE_DISCONNECT:
+					# print('Client Disconnected:', event.peer.address)
 					self.drop_client(event.peer, "Disconnected")
 				elif event.type == enet.EVENT_TYPE_RECEIVE:
 					data = str(event.packet.data, NET_ENCODING)
 					d = data.split()
 					client_id = d[0]
 					
-					if client_id not in self.main['clients']:
+					if d[1].strip() == 'register':
 						self.register_client(client_id, event.peer)
+						continue
 					
-					if d[1] == 'register': continue
+					if client_id not in self.main['clients']:
+						print("Warning:%s is not registered" % client_id)
+						continue
 
 					self.main['clients'][client_id].handle_request(data, event.peer)
 
@@ -117,10 +121,14 @@ class GameServer():
 					
 	def register_client(self, client_id, peer):
 		"""Registers a client"""
+		
 		# Make the id unique
 		while client_id in self.main['clients']:
+			if self.main['clients'][client_id].peer == peer:
+				# Not "new" so ignore
+				return
 			client_id += '_'
-
+			
 		peer.send(0, enet.Packet(b'cid:'+bytes(client_id, NET_ENCODING)))
 		self.main['clients'][client_id] = ClientHandle(self, client_id, peer)
 		print("%s Registered as %s" % (peer.address, client_id))
@@ -139,11 +147,9 @@ class GameServer():
 		if client_id in self.main['clients']:
 			print(client_id, reason)
 			del self.main['clients'][client_id]
-			
-			try:
+
+			if client_id in self.main['players']:
 				del self.main['players'][client_id]
-			except KeyError:
-				print("Warning: %s not found in players list when dropping client" % client_id)
 			
 	def add_player(self, client_id, race, position, orientation):
 		"""Adds a player to the player dictionary to cache position and orientation data.

@@ -62,8 +62,8 @@ def exit_game(main):
 	# We use try/except so that we always reach gl.endGame()
 	try:
 		if 'client' in main:
-			main['client'].send("dis:"+main['client'].id)
-			
+			main['client'].disconnect()
+
 		if hasattr(gl, "server"):
 			gl.server.terminate()
 			del gl.server
@@ -139,7 +139,11 @@ def init(own):
 			si.wShowWindow = 7 #SW_SHOWMINNOACTIVE
 			gl.server = subprocess.Popen(s, startupinfo=si, creationflags=subprocess.CREATE_NEW_CONSOLE)
 		
-		return		
+		return
+	elif not own['client'].registered:
+		# Don't continue until we are properly registered with the server
+		own['client'].run()
+		return
 	
 	# Setup an input system
 	own['input_system'] = BlenderInputSystem('keys.conf', 'mouse.conf')

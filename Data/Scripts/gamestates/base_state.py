@@ -202,9 +202,9 @@ class BaseState:
 	##########
 	
 	# Server functions
-	def dis(self, main, client, cid):
-		client.server.broadcast("dis:"+cid)
-		client.server.drop_client(cid, "Disconnected")
+	def dis(self, main, client):
+		client.server.broadcast("dis:"+client.id)
+		client.server.drop_client(client.peer, "Disconnected")
 		
 	def add_player(self, main, client, race, pos, ori):
 		client.server.add_player(client.id, race, pos, ori)
@@ -218,7 +218,7 @@ class BaseState:
 		
 	# Register the functions
 	server_functions = {
-			dis: (str,),
+			dis: (),
 			add_player: (str, "pickle", "pickle"),
 			switch_state: (str,),
 			}
