@@ -74,6 +74,7 @@ class CombatState(DefaultState, BaseController):
 		player_tile = self.grid.tile_from_point(main["player"].object.position)
 		main["player"].tile = player_tile
 		player_tile.fill(main["player"])
+		main["player"].lock = 0
 		
 		# If the player has a weapon, socket it
 		if main['player'].inventory.weapon:
@@ -257,7 +258,7 @@ class CombatState(DefaultState, BaseController):
 			movement = [float(i) for i in (Vector(movement).normalize()*speed)]
 		
 		# Otherwise, idle (This would be a good place to put grid snapping back in)
-		else:
+		elif not main['player'].lock:
 				act = main['default_actions']['1h_idle']
 				main['player'].object.play_animation(act['name'], act['start'], act['end'], mode=1)
 
