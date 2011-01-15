@@ -1,0 +1,8 @@
+{
+	"name": "Power",
+	"range_type": "MELEE",
+	"range_size": 1,
+	"damage_types": [],
+	"effect_types": [],
+	"flags": []
+}

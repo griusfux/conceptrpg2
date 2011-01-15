@@ -1,0 +1,8 @@
+{
+	"name": "Monster",
+	"role" : "brute",
+	
+	"xp_reward" : 0,
+	"ai_start_state": "",
+	"ai_keywords": []
+}
