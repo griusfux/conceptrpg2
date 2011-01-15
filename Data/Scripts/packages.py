@@ -101,6 +101,9 @@ class Package:
 		# Store the package
 		self._package = package
 		
+		# Default values for the package (updated in _validate())
+		self._defaults = {}
+		
 		# Validate the file
 		self._validate()
 		
@@ -170,6 +173,11 @@ class Package:
 		# Then load the schema (this overwrites old keys)
 		with open(self._schema) as f:
 			schema.update(json.loads(f.read()))
+			
+		new_file = self._schema.split('.')
+		new_file[0] += '_new'
+		with open('.'.join(new_file)) as f:
+			self._defaults.update(json.loads(f.read()))
 		
 		for key, value in schema.items():
 			if not self._validate_dict(self._dict, key, value):
@@ -178,7 +186,14 @@ class Package:
 	def _validate_dict(self, d, key, value, setting=True):
 		if key not in d:
 			print("\"{0}\" is missing from {1}".format(key, self._path.replace('/', ':')))
-			return False
+			if key in self._defaults:
+				# Add the key to the dict
+				self._dict[key] = self._defaults[key]
+				if setting:
+					setattr(self, key, self._dict[key])
+				return True
+			else:
+				return False
 		elif isinstance(value, dict):
 			if not setting:
 				# This stucture is too nested, break out
