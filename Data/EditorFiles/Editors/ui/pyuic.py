@@ -2,5 +2,7 @@ import subprocess
 import sys
 
 if __name__ == "__main__":
+	file = sys.argv[1].split('\\')[-1]
+
 	subprocess.call(r"python C:\Python31\Lib\site-packages\PyQt4\uic\pyuic.py -o "\
-					+ sys.argv[1][:-3]+"_ui.py " +sys.argv[1])
+					+ file[:-3]+"_ui.py " +file)

@@ -13,6 +13,7 @@ class EditorWindow(QMainWindow):
 
 	EDITORS = {
 		'Armors': ArmorEditor,
+		'Classes': ClassEditor,
 		'Items': ItemEditor,
 		'Maps': MapEditor,
 		'Monsters': MonsterEditor,
