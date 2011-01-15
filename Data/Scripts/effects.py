@@ -31,6 +31,7 @@ class Effect:
 		
 		# XXX Direct object property access
 		gameobj = self._object.gameobj
+		gameobj["target"] = self._target
 		gameobj["functions"] = self._functions
 		
 		if self._continuous > 0:
@@ -49,7 +50,6 @@ class EffectSystem:
 	def create(self, effect_name, position, target=None, duration=0, delay=0, continuous=-1, **functions):
 		effect = Effect(self._next_id, effect_name, position, target, duration, delay, continuous, **functions)
 		self._effects.append(effect)
-		print("Effect %s created" % effect_name)
 		self._next_id += 1
 		return effect.id
 		

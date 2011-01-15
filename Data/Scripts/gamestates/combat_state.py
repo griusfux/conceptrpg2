@@ -414,7 +414,7 @@ class CombatState(DefaultState, BaseController):
 	def end_effect(self, id):
 		self.main["effect_system"].remove(id)
 	
-	def play_animation(self, character, animation, lock=0):
+	def play_animation(self, character, animation, lock=0, mode=0):
 		"""Instruct the character to play the animation
 		
 		character -- the charcter who will play the animation
@@ -424,7 +424,9 @@ class CombatState(DefaultState, BaseController):
 		"""
 		
 		character.add_lock(lock)
-		self.server.invoke("anim", animation, 1, 20, 0, 0) # XXX should be done based on the supplied character
+		character.object.play_animation(animation['name'], animation['start'], animation['end'], mode=mode)
+		
+		# self.server.invoke("anim", animation, 1, 20, 0, 0) # XXX should be done based on the supplied character
 		
 	def get_targets(self, character, type, range, mask=0):
 		"""Get targets in a range

@@ -1,0 +1,8 @@
+{
+	"name": "Magic Missle",
+	"range_type": "RANGED",
+	"range_size": 20,
+	"damage_types": [],
+	"effect_types": [],
+	"flags": []
+}

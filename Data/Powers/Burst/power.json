@@ -1,6 +1,6 @@
 {
 	"name": "Burst",
-	"range_type": "RANGED",
+	"range_type": "BURST",
 	"range_size": 3,
 	"damage_types": [],
 	"effect_types": [],
