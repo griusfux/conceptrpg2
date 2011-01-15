@@ -55,10 +55,10 @@ class DefaultState(BaseState, BaseController):
 	
 	# Register the functions
 	client_functions = {
-				position: (str, float, float, float),
-				move: (str, float, float, float),
-				rotate: (str, float, float, float),
-				anim: (str, str, int, int, int, int)
+				"position": (position, (str, float, float, float)),
+				"move": (move, (str, float, float, float)),
+				"rotate": (rotate, (str, float, float, float)),
+				"anim": (anim, (str, str, int, int, int, int))
 			}
 	
 	def client_init(self, main):
@@ -162,7 +162,7 @@ class DefaultState(BaseState, BaseController):
 		# Normalize the vector to the character's speed
 		if movement != [0.0, 0.0, 0.0]:
 			movement = [float(i) for i in (Vector(movement).normalize()*speed)]
-			# self.server.invoke("position", id, *main['player'].object.position)
+			self.server.invoke("position", id, *main['player'].object.position)
 		
 		# Otherwise, idle
 		else:
@@ -193,6 +193,7 @@ class DefaultState(BaseState, BaseController):
 		
 	def move(self, main, client, cid, x, y, z):
 		# We could run checks here, but for now we just rebroadcast
+		# print(cid)
 		self.clients.invoke('move', cid, x, y, z)
 		
 	def rotate(self, main, client, cid, x, y, z):
@@ -204,10 +205,10 @@ class DefaultState(BaseState, BaseController):
 
 	# Register the functions
 	server_functions = {
-				position: (str, float, float, float),
-				move: (str, float, float, float),
-				rotate: (str, float, float, float),
-				anim: (str, int, int, int, int)
+				"position": (position, (str, float, float, float)),
+				"move": (move, (str, float, float, float)),
+				"rotate": (rotate, (str, float, float, float)),
+				"anim": (anim, (str, int, int, int, int))
 			}
 	def server_init(self, main):
 		"""Initialize the server state"""

@@ -34,9 +34,9 @@ class DungeonGenerationState(BaseState):
 		
 	# Register the RPC functions
 	client_functions = {
-				load_dungeon: (int, int, "pickle"),
-				finish_dungeon: (),
-				build_dungeon: (),
+				"load_dungeon": (load_dungeon, (int, int, "pickle")),
+				"finish_dungeon": (finish_dungeon, ()),
+				"build_dungeon": (build_dungeon, ()),
 			}
 	
 	def client_init(self, main):
@@ -173,11 +173,11 @@ class DungeonGenerationState(BaseState):
 		
 	# Register the RPC functions
 	server_functions = {
-			request_dungeon: (),
-			request_dungeon_pieces: ("pickle",),
-			save_dungeon: (),
-			update_dungeon: ("pickle",),
-			finish_dungeon: (),
+			"request_dungeon": (request_dungeon, ()),
+			"request_dungeon_pieces": (request_dungeon_pieces, ("pickle",)),
+			"save_dungeon": (save_dungeon, ()),
+			"update_dungeon": (update_dungeon, ("pickle",)),
+			"finish_dungeon": (finish_dungeon, ()),
 		}
 		
 	def server_init(self, main):

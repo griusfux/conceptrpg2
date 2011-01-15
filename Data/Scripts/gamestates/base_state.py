@@ -11,12 +11,8 @@ class RPC:
 		self.state = state
 		self.client = client
 	
-		self.funcs = {}
-	
-		# Re-arrange the dict
-		for func, args in rdict.items():
-			self.funcs[func.__name__] = (func, args)
-		
+		self.funcs = rdict
+
 	def invoke(self, f, *args):
 		if f not in self.funcs:
 			raise ValueError(f+" is not a registered function.\nAvailable functions: "+
@@ -101,10 +97,14 @@ class BaseState:
 		
 		# Merge function dicts
 		if hasattr(self, "client_functions") and type(self) is not BaseState:
-			self.client_functions.update(BaseState.client_functions)
+			d = self.client_functions
+			self.client_functions = BaseState.client_functions.copy()
+			self.client_functions.update(d)
 		if hasattr(self, "server_functions") and type(self) is not BaseState:
-			self.server_functions.update(BaseState.server_functions)
-		
+			d = self.server_functions
+			self.server_functions = BaseState.server_functions.copy()
+			self.server_functions.update(d)
+
 		# Setup the Remote Procedure Calls
 		c = main['server'] if is_server else main['client']
 		self.clients = RPC(self, c, self.client_functions)
@@ -176,13 +176,13 @@ class BaseState:
 	
 	# Register the functions
 	client_functions = {
-			cid: (str,),
-			to: (str,),
-			dis: (str,),
-			move: (str, float, float, float),
-			rotate: (str, float, float, float),
-			position: (str, float, float, float),
-			add_player: (str, str, "pickle", "pickle"),
+			"cid": (cid, (str,)),
+			"to": (to, (str,)),
+			"dis": (dis, (str,)),
+			"move": (move, (str, float, float, float)),
+			"rotate": (rotate, (str, float, float, float)),
+			"position": (position, (str, float, float, float)),
+			"add_player": (add_player, (str, str, "pickle", "pickle")),
 			}
 	
 	def client_init(self, main):
@@ -218,9 +218,9 @@ class BaseState:
 		
 	# Register the functions
 	server_functions = {
-			dis: (),
-			add_player: (str, "pickle", "pickle"),
-			switch_state: (str,),
+			"dis": (dis, ()),
+			"add_player": (add_player, (str, "pickle", "pickle")),
+			"switch_state": (switch_state, (str,)),
 			}
 		
 	def server_init(self, main):
