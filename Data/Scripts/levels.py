@@ -5,6 +5,10 @@ INT_INFO = "Intelligence describes how well your character learns and reasons."
 WIS_INFO = "Wisdom measures your common sense, perception, self-discipline, and empathy. You use your wisdom score to notice details, sense danger, and get a read on other people."
 CHA_INFO = "Charisma measures your force of personality"
 
+AT_WILL = 0
+ENCOUNTER = 1
+DAILY = 2
+
 class UnspentLevel:
 	def __init__(self, level, player_class):
 	
@@ -33,22 +37,27 @@ class UnspentLevel:
 		########
 		# Powers
 		
+		# available_powers = [power for power in player_class['powers'] if power['level'] <= level]
+		
 		# At wills
+		# self.at_will_powers = [power for power in available_powers if power.usage == AT_WILL]
 		if level == 1:
-			self.at_wills = 2
+			self.at_will_count = 2
 		else:
-			self.at_wills = 0
+			self.at_will_count = 0
 			
 		# Encounters
+		# self.at_will_powers = [power for power in available_powers if power.usage == ENCOUNTER]
 		if level in (1, 3, 7):
-			self.encounters = 1
+			self.encounter_count = 1
 		else:
-			self.encounters = 0
+			self.encounter_count = 0
 			
 		# Dailies
+		# self.at_will_powers = [power for power in available_powers if power.usage == DAILY]
 		if level in (1, 5, 9):
-			self.dailies = 1
+			self.daily_count = 1
 		else:
-			self.dailies = 0
+			self.daily_count = 0
 		
 		
