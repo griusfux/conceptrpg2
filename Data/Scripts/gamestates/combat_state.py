@@ -81,7 +81,7 @@ class CombatState(DefaultState, BaseController):
 			main['engine'].load_library(weapon)
 			obj = main['engine'].add_object('longsword')
 			main['player'].set_right_hand(obj)
-		self.camera = 'frankie'
+		self.camera = 'combat'
 		self.last_camera = 'frankie'
 			
 		
@@ -94,7 +94,7 @@ class CombatState(DefaultState, BaseController):
 			self.last_camera = self.camera
 		else:
 			main['camera'].update()
-		self.camera = 'frankie'
+		self.camera = 'combat'
 		
 		# Update the effect system
 		main['effect_system'].update()

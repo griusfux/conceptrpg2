@@ -335,7 +335,7 @@ class Camera:
 		# Some defaults
 		self.camera.perspective = 1
 		self.camera.parent.timeOffset = 0
-		self.camera.lens = 35
+		self.camera.lens = 25
 		self.camera.ortho_scale = 35
 		
 		self.pivot.setParent(self.target.gameobj)
@@ -410,6 +410,13 @@ class Camera:
 		self.camera.scaling = [1/scale, 1/scale, 1/scale]
 		
 		return
+		
+	def init_combat(self):
+		self.init_frankie()
+		self._target_orientation = Matrix.Rotation(radians(60), 3, 'X')
+		
+	def update_combat(self):
+		self.update_frankie()
 		
 	def init_shoulder(self):
 		self._target_distance = 0
