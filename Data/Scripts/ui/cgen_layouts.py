@@ -113,7 +113,7 @@ class CgenName(CgenLayout):
 		# Get the Player's name
 		self.name_img = bgui.Image(self.grid, "name_input_img", "Textures/ui/text_input_hover.png",
 								pos=[.33, .5], size=[.33, .05])
-		self.name_input = bgui.TextInput(self.name_img, "name_input",pos=[.05, 0.3],
+		self.name_input = bgui.TextInput(self.name_img, "name_input",pos=[0.05, 0.05],
 									size = [1,.9], text='Hero',
 									options = bgui.BGUI_DEFAULT)
 		# self.name_input.frame.colors = [(1, 1, 1, .5)]*4
