@@ -17,6 +17,7 @@ class EditorWindow(QMainWindow):
 		'Items': ItemEditor,
 		'Maps': MapEditor,
 		'Monsters': MonsterEditor,
+		'Powers': PowerEditor,
 		'Weapons': WeaponEditor,
 		}
 

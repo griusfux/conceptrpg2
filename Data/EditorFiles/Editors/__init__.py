@@ -3,6 +3,7 @@ from .ClassEditor import ClassEditor
 from .ItemEditor import ItemEditor
 from .MapEditor import MapEditor
 from .MonsterEditor import MonsterEditor
+from .PowerEditor import PowerEditor
 from .WeaponEditor import WeaponEditor
 
 # import EditorFiles.Editors.ArmorEditor as ArmorEditor

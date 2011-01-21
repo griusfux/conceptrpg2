@@ -1,6 +1,6 @@
 {
 	"name": "str",
-	"range_type": "str",
+	"range_type": "{'RANGED', 'BURST', 'MELEE'}",
 	"range_size": "int",
 	"damage_types": "list",
 	"effect_types": "list",
