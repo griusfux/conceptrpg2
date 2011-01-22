@@ -61,9 +61,15 @@ def exit_game(main):
 	
 	# We use try/except so that we always reach gl.endGame()
 	try:
+		# Attempt to save the player
+		if 'player' in main:
+			main['player'].save()
+			
+		# Disconnect from the server
 		if 'client' in main:
 			main['client'].disconnect()
 
+		# Close the server if we launched it
 		if hasattr(gl, "server"):
 			gl.server.terminate()
 			del gl.server
