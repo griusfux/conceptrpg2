@@ -115,10 +115,7 @@ class DefaultStateLayout(Layout):
 		self.lock_msg.text = "LOCKED: %s" % (main['player'].lock - time()) if main['player'].lock else ""
 		
 		if not self.mtext.text:
-			import bge #XXX This needs to go :P
-			
-			key = main['input_system'].keyboard.dict["LevelUp"]
-			key = bge.events.EventToString(key)
+			key = main['input_system'].event_to_string("LevelUp")
 			key = key[:-3].title()
 			self.mtext.text = "Press %s to level up!" % key
 		if main['player'].unspent_levels:

@@ -150,3 +150,13 @@ class BlenderInputSystem():
 			input.extend(self.joystick.check_input())
 
 		return input
+		
+	# Get the key value for a supplied input
+	def event_to_string(self, event):
+		e = self.keyboard.dict.get(event)
+		if not e:
+			e = self.mouse.dict.get(event)
+		if not e:
+			return ""
+			
+		return bge.events.EventToString(e)
