@@ -112,7 +112,7 @@ class DungeonGenerator:
 				
 				if type == "Rooms":
 					self.room_count += 1
-					self.rooms[str(room_id)] = tile_obj
+					self.rooms[str(room_id)] = BlenderWrapper.Object(tile_obj)
 					tile_obj['room_id'] = room_id
 					tile_obj['encounter'] = True
 				elif type == "Stairs":
@@ -271,7 +271,7 @@ class DungeonGenerator:
 			# See if anything needs to be done based on the type of tile placed
 			if type == 'Rooms':
 				self.room_count += 1
-				self.rooms[str(self.room_count)] = tile_obj
+				self.rooms[str(self.room_count)] = BlenderWrapper.Object(tile_obj)
 				tile_obj['room_id'] = self.room_count
 				tile_obj['encounter'] = True
 			elif type == 'Stairs':

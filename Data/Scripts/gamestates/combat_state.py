@@ -274,6 +274,8 @@ class CombatState(DefaultState, BaseController):
 		"""Cleanup the client state"""
 		del main['player'].tile
 		
+		main['room'] = None
+		
 		# Put away the player's weapon
 		main['player'].clear_right_hand()
 		self.grid.end()

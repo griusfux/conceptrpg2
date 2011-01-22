@@ -78,6 +78,9 @@ class GameServer():
 		# The current dungeon
 		self.main['dungeon'] = []
 		
+		# Which rooms still have encounters
+		self.main['encounters'] = {}
+		
 		# Create the host
 		self.host = enet.Host(enet.Address(b'', port), 10, 0, 0, 0)
 		

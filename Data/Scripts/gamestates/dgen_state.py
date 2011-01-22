@@ -165,6 +165,10 @@ class DungeonGenerationState(BaseState):
 		else:
 			main['dungeon'].append(tile)
 			
+			# Add an encounter if we have a room
+			if tile[0] == "Rooms":
+				main['encounters'][str(tile[2])] = True
+			
 	def finish_dungeon(self, main, client):
 		# This releases the lock on the dungeon
 		if client.id == main.get("dungeon_lock"):

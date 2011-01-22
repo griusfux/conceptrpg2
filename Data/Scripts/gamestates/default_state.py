@@ -37,6 +37,10 @@ class DefaultState(BaseState, BaseController):
 		print("Playing", action)
 		main['net_players'][cid].object.play_animation(action, start, end, layer, blending)
 		
+	def init_combat(self, main, room_id):
+		main['room'] = main['dgen'].rooms[room_id]
+		
+		
 	# Override BaseState's to
 	def to(self, main, id):
 		if id not in main['net_players']: return
@@ -58,7 +62,10 @@ class DefaultState(BaseState, BaseController):
 				"position": (position, (str, float, float, float)),
 				"move": (move, (str, float, float, float)),
 				"rotate": (rotate, (str, float, float, float)),
-				"anim": (anim, (str, str, int, int, int, int))
+				"anim": (anim, (str, str, int, int, int, int)),
+				"init_combat": (init_combat, (str,)),
+				"to": (to, (str,)),
+				"dis": (dis, (str,)),
 			}
 	
 	def client_init(self, main):
@@ -176,11 +183,15 @@ class DefaultState(BaseState, BaseController):
 		# XXX This needs cleanup, we shouldn't be accessing KX_GameObject attributes
 		if main.sensors['encounter_mess'].positive:
 			import Scripts.blender_wrapper as Blender
-			room = main['dgen'].rooms[main.sensors['encounter_mess'].bodies[0]]
-			del room['encounter']
-			main['room'] = Blender.Object(room)
-			return ('Combat', 'SWITCH')
+			room_id = main.sensors['encounter_mess'].bodies[0]
+			self.server.invoke("init_combat", room_id)
+			room = main['dgen'].rooms[room_id]
+			del room.gameobj['encounter']
 			
+			
+		if main['room']:
+			return ('Combat', 'SWITCH')
+
 	##########
 	# Server
 	##########
@@ -202,13 +213,19 @@ class DefaultState(BaseState, BaseController):
 		
 	def anim(self, main, client, action, start, end, layer, blending):
 		self.clients.invoke("anim", client.id, action, start, end, layer, blending)
-
+		
+	def init_combat(self, main, client, room_id):
+		if main['encounters'].get(room_id):
+			main['encounters'][room_id] = False
+			self.clients.invoke("init_combat", room_id)
+			
 	# Register the functions
 	server_functions = {
 				"position": (position, (str, float, float, float)),
 				"move": (move, (str, float, float, float)),
 				"rotate": (rotate, (str, float, float, float)),
-				"anim": (anim, (str, int, int, int, int))
+				"anim": (anim, (str, int, int, int, int)),
+				"init_combat": (init_combat, (str,))
 			}
 	def server_init(self, main):
 		"""Initialize the server state"""
