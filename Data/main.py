@@ -175,8 +175,9 @@ def init(own):
 				print("\nERROR: A default action with the name %s already exists!\n" % action)
 				continue
 			own['default_actions'][action] = own['actions'][actions[action]]	
-	
-	# Setup the passive combat system
+
+	# Current room to use for the combat state
+	own['room'] = None
 	own['state_manager'] = GameStateManager("CharacterCreation", own)
 	own['init'] = True
 	
