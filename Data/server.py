@@ -3,9 +3,11 @@
 # Description: A program that runs the game server
 # Contributers: Mitchell Stokes
 
-from Scripts.networking.game_server import GameServer
 import time
 import sys
+
+sys.path.append("extern")
+from Scripts.networking.game_server import GameServer
 
 class Log:
 	def __init__(self, stream, log):
