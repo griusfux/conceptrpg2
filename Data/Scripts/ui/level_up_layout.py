@@ -1,5 +1,6 @@
 import bgui
 from .layouts import Layout
+from Scripts.packages import Power
 
 import Scripts.levels as levels
 class LevelUpLayout(Layout):
@@ -108,6 +109,14 @@ class LevelUpLayout(Layout):
 		available_lbl = bgui.Label(available_header, "lvl_available_lbl", pos=[0,0], pt_size=20,text="Available Powers",
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
 
+		inst = bgui.TextBlock(available_frame, "lvl_avail_inst", pos=[0, 0.75], size=[0.9, .125], 
+									pt_size=14, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+		inst.text = "Select a power and click \"Learn\" to learn the power"
+
+		self.available_list = bgui.ListBox(available_frame, "lvl_avail_list", size=[.9,.65], pos=[.05, .125], sub_theme='Box')
+		
+		self.learn_btn = bgui.FrameButton(available_frame, "learn_btn", text="Learn", pt_size=16,
+										size=[.175, .075], pos=[.778, .025]).on_click = self.learn_on_click
 
 		####################
 		# Known Powers Panel
@@ -115,6 +124,15 @@ class LevelUpLayout(Layout):
 		known_header = bgui.Frame(known_frame, "lvl_known_head", size=[1, .11], pos=[0,.89], sub_theme="Lvl_Header")
 		known_lbl = bgui.Label(known_header, "lvl_known_lbl", pos=[0,0], pt_size=20,text="Known Powers",
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+
+		inst = bgui.TextBlock(known_frame, "lvl_avail_inst", pos=[0, 0.75], size=[0.9, .125], 
+									pt_size=14, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+		inst.text = "Select a power and click \"Unlearn\" to unlearn the power"
+
+		self.known_list = bgui.ListBox(known_frame, "lvl_known_list", size=[.9,.65], pos=[.05, .125], sub_theme='Box')
+		
+		self.unlearn_btn = bgui.FrameButton(known_frame, "unlearn_btn", text="Unlearn", pt_size=16,
+										size=[.175, .075], pos=[.05, .025]).on_click = self.unlearn_on_click
 								
 	def ab_lbl_on_click(self, widget):
 		ab = widget.name[4:7]
@@ -191,7 +209,47 @@ class LevelUpLayout(Layout):
 			score = int(getattr(self, ab+"_score").text)
 			score += int(getattr(self, ab+"_bonus").text)
 			setattr(self.main['player'], ab+"_ab", score)
+			
+		for power in self.learned[0]:
+			self.main['player'].powers.add(Power(power))
 		self.main['level_exit'] = True
+		
+	def learn_on_click(self, widget):
+		if self.selected_a_power and not len(self.learned[0]) >= self.unspent_level.at_will_count:
+			power = Power(self.selected_a_power.name)
+			self.learned[0].append(power.name)
+			
+			list = self.available_list.list
+			list.remove(self.selected_a_power)
+			self.available_list.list = list
+			
+			self.known_list.list += [self.selected_a_power]
+			
+			self.selected_a_power.on_click = self.select_k_power
+			
+			self.selected_a_power = None
+			
+		
+	def unlearn_on_click(self, widget):
+		if self.selected_k_power:
+			power = Power(self.selected_k_power.name)
+			self.learned[0].remove(power.name)
+			
+			list = self.known_list.list
+			list.remove(self.selected_k_power)
+			self.known_list.list = list
+			
+			self.available_list.list += [self.selected_k_power]
+			
+			self.selected_k_power.on_click = self.select_a_power
+			
+			self.selected_k_power = None
+		
+	def select_a_power(self, widget):
+		self.selected_a_power = widget
+		
+	def select_k_power(self, widget):
+		self.selected_k_power = widget
 		
 	def update(self, main):
 		if not self.init:
@@ -218,8 +276,27 @@ class LevelUpLayout(Layout):
 				self.unspent_points = self.unspent_level.ability_points
 				self.point_mode = self.unspent_level.ability_spend
 				
-			# Build available powers list box
-			# Build known powers list box
+			# Create lists for known, available, and learned powers
+			known_list_strings = [power.name for power in main['player'].powers.all]
+			available_lists = self.unspent_level.at_will_powers, []
+			self.learned = [[], [], []]
+			# Remove any known powers from the available powers TODO: remove try/except
+			for list in available_lists:
+				for power in known_list_strings:
+					try:
+						list.remove(power)
+					except ValueError:
+						pass #Not found
+			self.available_list.list = [bgui.Label(self, power, pt_size=16, text=power) for power in available_lists[0]]
+			for label in self.available_list.list:
+				label.on_click=self.select_a_power
+			
+			self.known_list.list = [bgui.Label(self, power, pt_size=16, text=power) for power in known_list_strings]
+			self.known_list.list += [bgui.Label(self, 'pow_sep', pt_size=16, text='--------------------')]
+			
+			self.selected_a_power = None
+			self.selected_k_power = None
+			
 			self.init = True
 			
 		# Update final scores
@@ -229,7 +306,8 @@ class LevelUpLayout(Layout):
 			getattr(self, ab+"_final").text = str(bonus+score)
 		
 		# Make accept button inactive if there are unspent level perks
-		if self.unspent_points != 0:
+		# print(self.unspent_points != 0 and len(self.learned[0]) < self.unspent_level.at_will_count)
+		if self.unspent_points != 0 or len(self.learned[0]) < self.unspent_level.at_will_count :
 			self.lvl_btn.color = [0.4, 0.4, 0.4, 1.0]
 			self.lvl_btn.frozen = True
 		else:

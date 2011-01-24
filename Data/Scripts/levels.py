@@ -1,3 +1,5 @@
+import Scripts.packages as packages
+
 STR_INFO = "Strength measures your character's physical power. It's important for most characters who fight hand-to-hand."
 CON_INFO = "Constitution represents your character's health, stamina, and vital force. All characters benefit from a high constitution score."
 DEX_INFO = "Dexterity measures hand-eye coordination, agility, reflexes, and balance."
@@ -37,10 +39,10 @@ class UnspentLevel:
 		########
 		# Powers
 		
-		# available_powers = [power for power in player_class['powers'] if power['level'] <= level]
+		available_powers = [power for power in player_class.powers]
 		
 		# At wills
-		# self.at_will_powers = [power for power in available_powers if power.usage == AT_WILL]
+		self.at_will_powers = [power for power in available_powers]
 		if level == 1:
 			self.at_will_count = 2
 		else:
@@ -59,5 +61,7 @@ class UnspentLevel:
 			self.daily_count = 1
 		else:
 			self.daily_count = 0
+			
+		self.level = level
 		
 		

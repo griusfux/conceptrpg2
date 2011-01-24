@@ -87,7 +87,6 @@ class CharacterCreationState(BaseState):
 				
 				# Give the player an attack power
 				player.powers.add(Power('Attack'))
-				player.powers.add(Power('Burst'))
 				
 				# Give the player racial traits
 				# This needs to be done after giving the player xp to ensure there

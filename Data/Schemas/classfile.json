@@ -1,3 +1,4 @@
 {
-	"name": "str"
+	"name": "str",
+	"powers" : "list"
 }
