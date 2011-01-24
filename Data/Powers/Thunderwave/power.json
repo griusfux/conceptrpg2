@@ -1,0 +1,8 @@
+{
+	"name": "Thunderwave",
+	"range_type": "BURST",
+	"range_size": 3,
+	"damage_types": ["THUNDER"],
+	"effect_types": [],
+	"flags": []
+}
