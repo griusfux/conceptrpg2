@@ -1,8 +1,9 @@
 {
 	"name": "Magic Missle",
+	"level" : 1,
+	"usage" : "AT_WILL",
 	"range_type": "RANGED",
 	"range_size": 20,
 	"damage_types": [],
-	"effect_types": [],
 	"flags": []
 }

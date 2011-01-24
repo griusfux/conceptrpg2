@@ -1,8 +1,9 @@
 {
 	"name": "Power",
+	"level" : 1,
+	"usage" : "AT_WILL",
 	"range_type": "MELEE",
 	"range_size": 1,
 	"damage_types": [],
-	"effect_types": [],
 	"flags": []
 }

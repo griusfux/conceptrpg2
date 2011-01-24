@@ -1,8 +1,9 @@
 {
 	"name": "Burst",
+	"level" : 1,
+	"usage" : "AT_WILL",
 	"range_type": "BURST",
 	"range_size": 3,
 	"damage_types": [],
-	"effect_types": [],
 	"flags": []
 }
