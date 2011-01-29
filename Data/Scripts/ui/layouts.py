@@ -36,6 +36,36 @@ class InventoryOverlay(Layout):
 
 			self.items = bgui.TextBlock(self.frame, "inv_items", text=item_str, size=[0.96, 0.96], pos=[0.04, 0])
 			
+class TitleLayout(Layout):
+	def __init__(self, sys):
+		Layout.__init__(self, sys, "title_layout", use_mouse=True)
+		
+		# Background image
+		self.splash = bgui.Image(self, "title_splash", "Textures/TitleSplash.png", size=[1, 1], pos=[0, 0])
+		
+		# Menu entries
+		self.menu = [
+				bgui.Label(self.splash, "title_start", text="Start Game", pos=[0.05, 0.170]),
+				bgui.Label(self.splash, "title_join", text="Join Game", pos=[0.05, 0.130]),
+				bgui.Label(self.splash, "title_options", text="Options", pos=[0.05, 0.090]),
+				bgui.Label(self.splash, "title_exit", text="Exit", pos=[0.05, 0.050])
+			]
+			
+		for i in self.menu:
+			i.on_hover = self.menu_hover
+			i.on_click = self.menu_click
+		
+		
+	def update(self, main):
+		self.main = main
+		for i in self.menu: i.pt_size=26
+		
+	def menu_hover(self, widget):
+		widget.pt_size = 32
+		
+	def menu_click(self, widget):
+		self.main['action'] = widget.name.split('_')[-1]
+
 class DunGenLayout(Layout):
 	
 	def __init__(self, sys):

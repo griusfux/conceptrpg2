@@ -88,7 +88,7 @@ def in_game(cont):
 		own = cont.owner
 		
 		# Check for and handle exits
-		if cont.sensors['exit'].positive:
+		if cont.sensors['exit'].positive or 'exit' in own:
 			exit_game(own)
 		else:
 			# Update the ui
@@ -184,6 +184,6 @@ def init(own):
 
 	# Current room to use for the combat state
 	own['room'] = None
-	own['state_manager'] = GameStateManager("CharacterCreation", own)
+	own['state_manager'] = GameStateManager("Title", own)
 	own['init'] = True
 	

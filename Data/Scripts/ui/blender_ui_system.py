@@ -12,6 +12,7 @@ layouts = {
 	"cgen_race": CgenRace,
 	"cgen_class": CgenClass,
 	
+	"title": TitleLayout,
 	"dun_gen": DunGenLayout,
 	"default_state": DefaultStateLayout,
 	"combat": CombatLayout,
