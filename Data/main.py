@@ -88,7 +88,8 @@ def in_game(cont):
 		own = cont.owner
 		
 		# Check for and handle exits
-		if cont.sensors['exit'].positive or 'exit' in own:
+		#if cont.sensors['exit'].positive or 'exit' in own:
+		if 'exit' in own:
 			exit_game(own)
 		else:
 			# Update the ui

@@ -32,6 +32,3 @@ class TitleState(BaseState):
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
 		del main['action']
-		
-		# Reset the mouse position
-		main['input_system'].mouse.position = (0.5, 0.5)

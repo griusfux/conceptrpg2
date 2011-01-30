@@ -66,6 +66,31 @@ class TitleLayout(Layout):
 	def menu_click(self, widget):
 		self.main['action'] = widget.name.split('_')[-1]
 
+class InGameMenuLayout(Layout):
+	def __init__(self, sys):
+		Layout.__init__(self, sys, "ingame_menu", use_mouse=True)
+		
+		# Background frame
+		self.frame = bgui.Frame(self, "igm_frame", size=[.25, .50], sub_theme='HUD',
+				options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+				
+		# Menu entries
+		self.menu = [
+				bgui.FrameButton(self.frame, "img_game", text="Return to Game", size=[0.8, 0.125], pos=[0, 0.775], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX),
+				bgui.FrameButton(self.frame, "img_options", text="Options", size=[0.8, 0.125], pos=[0, 0.550], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX),
+				bgui.FrameButton(self.frame, "img_title", text="Return to Title", size=[0.8, 0.125], pos=[0, 0.325], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX),
+				bgui.FrameButton(self.frame, "igm_exit", text="Exit Game", size=[0.8, 0.125], pos=[0, 0.1], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+		]
+		
+		for i in self.menu:
+			i.on_click = self.menu_click
+			
+	def update(self, main):
+		self.main = main
+		
+	def menu_click(self, widget):
+		self.main['action'] = widget.name.split('_')[-1]
+		
 class DunGenLayout(Layout):
 	
 	def __init__(self, sys):

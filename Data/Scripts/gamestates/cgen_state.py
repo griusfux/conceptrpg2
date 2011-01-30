@@ -30,6 +30,9 @@ class CharacterCreationState(BaseState):
 		
 		inputs = main['input_system'].run()
 		
+		if ("InGameMenu", "INPUT_CLICK") in inputs:
+			return("InGameMenu", "PUSH")
+		
 		# Check for cgen start
 		if main['next_layout'] == 'start' and main['cgen_input']['character'].package_name == "&new":
 			main['next_layout'] = 'cgen_name'

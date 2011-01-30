@@ -6,6 +6,7 @@ from .gamestates import *
 STATES = {
 		"Default": DefaultState,
 		"Title": TitleState,
+		"InGameMenu": InGameMenuState,
 		"CharacterCreation": CharacterCreationState,
 		"DungeonGeneration": DungeonGenerationState,
 		"Combat": CombatState,

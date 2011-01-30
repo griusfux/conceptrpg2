@@ -179,7 +179,10 @@ class CombatState(DefaultState, BaseController):
 		movement = [0.0, 0.0, 0.0]
 		speed = main['player'].speed
 		
-		if inputs:				
+		if inputs:
+			if ("InGameMenu", "INPUT_CLICK") in inputs:
+				return("InGameMenu", "PUSH")
+
 			if ("Stats", "INPUT_CLICK") in inputs:
 				main['ui_system'].toogle_overlay("stats")				
 				

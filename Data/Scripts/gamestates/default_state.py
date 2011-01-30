@@ -103,6 +103,9 @@ class DefaultState(BaseState, BaseController):
 		speed = main['player'].speed
 		
 		if inputs:
+			if ("InGameMenu", "INPUT_CLICK") in inputs:
+				return("InGameMenu", "PUSH")
+
 			if ("SwitchCamera", "INPUT_CLICK") in inputs:
 				# main['engine'].set_active_camera(main['top_down_camera'])
 				if main['camera'].mode == "frankie":

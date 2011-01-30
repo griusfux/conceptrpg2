@@ -13,6 +13,7 @@ layouts = {
 	"cgen_class": CgenClass,
 	
 	"title": TitleLayout,
+	"ingame_menu": InGameMenuLayout,
 	"dun_gen": DunGenLayout,
 	"default_state": DefaultStateLayout,
 	"combat": CombatLayout,
@@ -33,7 +34,9 @@ class BlenderUISystem(bgui.System):
 		self.mouse = bge.logic.mouse
 		
 		# All layouts will be a widget subclass, so we can just keep track of one widget
-		self.layout = Layout(self, "none_layout")
+		self.current_layout = "none_layout"
+		self._change_layout = False
+		self.layout = Layout(self, self.current_layout)
 		
 		# We can also add 'overlay' layouts
 		self.overlays = {}
@@ -42,8 +45,9 @@ class BlenderUISystem(bgui.System):
 		self.keymap = {getattr(bge.events, val): getattr(bgui, val) for val in dir(bge.events) if val.endswith('KEY') or val.startswith('PAD')}
 		
 	def load_layout(self, layout):
-		self._remove_widget(self.layout)
-		self.layout = layouts[layout](self) if layout else Layout(self, "none_layout")
+		# Use a delayed loading of layouts, see run() for more info
+		self.current_layout = layout if layout else "none_layout"
+		self._change_layout = True
 		
 	def toggle_overlay(self, layout):
 		if layout in self.overlays:
@@ -71,6 +75,14 @@ class BlenderUISystem(bgui.System):
 		
 	def run(self, main):
 		"""A high-level method to be run every frame"""
+		
+		# We use a delay loading of layouts so that the new layout's first update is called
+		# immediately and in the same frame as creation. This gets rid of possible ui flickering
+		# as layouts adjust themselves.
+		if self._change_layout:
+			self._remove_widget(self.layout)
+			self.layout = layouts[self.current_layout](self)
+			self._change_layout = False
 		
 		# Update the layout and overlays
 		self.layout.update(main)
