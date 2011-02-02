@@ -1,6 +1,7 @@
-from .base_state import BaseState
+from .default_state import DefaultState
 
-class ShopState(BaseState):
+# We subclass DefaultState so we still have RPCs for networking
+class ShopState(DefaultState):
 	"""A state to handle shopping from a shopkeeper"""
 	
 	##########
