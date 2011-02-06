@@ -216,7 +216,7 @@ class LevelUpLayout(Layout):
 		
 	def learn_on_click(self, widget):
 		if self.selected_a_power and not len(self.learned[0]) >= self.unspent_level.at_will_count:
-			power = Power(self.selected_a_power.name)
+			power = Power(self.selected_a_power.name.strip())
 			self.learned[0].append(power.name)
 			
 			list = self.available_list.list
@@ -278,7 +278,7 @@ class LevelUpLayout(Layout):
 				
 			# Create lists for known, available, and learned powers
 			known_list_strings = [power.name for power in main['player'].powers.all]
-			available_lists = self.unspent_level.at_will_powers, []
+			available_lists = self.unspent_level.at_will_powers, self.unspent_level.encounter_powers, self.unspent_level.daily_powers
 			self.learned = [[], [], []]
 			# Remove any known powers from the available powers TODO: remove try/except
 			for list in available_lists:
@@ -287,7 +287,11 @@ class LevelUpLayout(Layout):
 						list.remove(power)
 					except ValueError:
 						pass #Not found
-			self.available_list.list = [bgui.Label(self, power, pt_size=16, text=power) for power in available_lists[0]]
+			
+			display_list = ['At Will'] + ['    '+power for power in available_lists[0]]
+			display_list += ['Encounter'] + ['    '+power for power in available_lists[1]]
+			display_list += ['Daily'] + ['    '+power for power in available_lists[2]]
+			self.available_list.list = [bgui.Label(self, item, pt_size=16, text=item) for item in display_list]
 			for label in self.available_list.list:
 				label.on_click=self.select_a_power
 			
