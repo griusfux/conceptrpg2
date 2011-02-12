@@ -9,7 +9,9 @@
 			{ "obj": "chamber" }
 		],
 	"corridor_tiles": [
-			{ "obj": "corridor" }
+			{ "obj": "corridor_8" },
+			{ "obj": "corridor_T" },
+			{ "obj": "corridor_+" }
 		],
 	"end_tiles": [
 			{ "obj": "end" }
