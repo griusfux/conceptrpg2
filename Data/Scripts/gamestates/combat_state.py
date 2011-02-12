@@ -66,8 +66,8 @@ class CombatState(DefaultState, BaseController):
 			# Add the monster to the monster list
 			self.monster_list.append(logic)
 			
-			# Initialize an ai manager
-			self.ai_manager = AiManager(self)
+		# Initialize an ai manager
+		self.ai_manager = AiManager(self)
 		
 		# Set up the players
 		self.hero_list = [main['player']]
@@ -227,7 +227,7 @@ class CombatState(DefaultState, BaseController):
 							target_vec = target.object.position - main['camera'].pivot.worldPosition.copy()
 							target_vec_len = target_vec.length * TILE_SIZE - 2
 							if target_vec_len < distance:
-								factor = cam_vec.angle(target_vec.normalize()) * target_vec_len
+								factor = cam_vec.angle(target_vec.normalized()) * target_vec_len
 								if factor < final_factor:
 									final_target = target
 									final_factor = factor
@@ -258,7 +258,7 @@ class CombatState(DefaultState, BaseController):
 	
 		# Normalize the vector to the character's speed
 		if movement != [0.0, 0.0, 0.0]:
-			movement = [float(i) for i in (Vector(movement).normalize()*speed)]
+			movement = [float(i) for i in (Vector(movement).normalized()*speed)]
 		
 		# Otherwise, idle (This would be a good place to put grid snapping back in)
 		elif not main['player'].lock:
@@ -417,6 +417,10 @@ class CombatState(DefaultState, BaseController):
 		id = self.main["effect_system"].create(effect_name, position, target, duration, delay, continuous, **functions)
 		return id
 		
+	def add_effect(self, effect):
+		id = self.main["effect_system"].add(effect)
+		return id
+		
 	def end_effect(self, id):
 		self.main["effect_system"].remove(id)
 	
@@ -474,40 +478,40 @@ class CombatState(DefaultState, BaseController):
 	def move(self, id, character, linear = (0,0,0) , angular = (0,0,0) , local = False):
 		"""Handles linear and angular movement of a character"""
 		
-		# Movement blocking mostly works, but there are still some small issues.
-		# Blocking feels weak around the zero range
-		# Rotation may allow the user to leave the area, this could also be because of the above problem
+		# Positions are not quite accurate in the movement blocking, also adapting
+		# Rotate to the new method causes some problems.
 		
-		linear = Vector(linear)
-		if linear.length > 0:
-			# Convert to a world vector if local is true
-			if local:
-				angle = Vector((0,1,0)).angle(character.object.forward_vector)
-				linear.rotate(Vector((0,0,1)), angle)
-			
-			# Ensure we are using a normalized vector
-			linear.normalize()
-			
-			# Find the new position relative to the grid origin
-			position = character.object.position - Vector(self.grid.origin) + linear
-		
-			# Convert to grid coordinates
-			position = [int(i/TILE_SIZE) for i in position]
-			position[1] *= -1
-			
-			# Get the tile that corresponds with the character's position
-			tile = self.grid(position[0], position[1])
-			
-			if tile != None and tile.valid:
-				# Convert to local space
-				angle = character.object.forward_vector.angle(Vector((0,1,0)))
-				linear.rotate(Vector((0,0,1)), -angle)
+		if 0:
+			linear = Vector(linear)
+			if linear.length > 0:
+				# Convert to a world vector if local is true
+				if local:
+					angle = Vector((0,1,0)).angle(character.object.forward_vector)
+					# linear.rotate(Euler((0, 0, angle)))
 				
-				# Apply the characters speed
-				linear *= character.speed
-			else:
-				# The character can't move that way, so eliminate any movement in linear
-				linear *= 0
+				# Ensure we are using a normalized vector
+				linear.normalized()
+				
+				# Find the new position relative to the grid origin
+				position = character.object.position - Vector(self.grid.origin) + linear
+			
+				# Convert to grid coordinates
+				position = [int(i/TILE_SIZE) for i in position]
+				position[1] *= -1
+				
+				# Get the tile that corresponds with the character's position
+				tile = self.grid(position[0], position[1])
+				
+				if tile != None and tile.valid:
+					# Convert to local space
+					angle = character.object.forward_vector.angle(Vector((0,1,0)))
+					# linear.rotate(Euler((0, 0, -angle)))
+					
+					# Apply the characters speed
+					linear *= character.speed
+				else:
+					# The character can't move that way, so eliminate any movement in linear
+					linear *= 0
 		
 		self.server.invoke("rotate", id, *angular)
 		self.server.invoke("move", id, *linear)
