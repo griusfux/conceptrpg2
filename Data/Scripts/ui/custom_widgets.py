@@ -98,3 +98,180 @@ class PackageSelector(Widget):
 			img.on_click = self.package_image
 			self.pkg_imgs.append(img)
 			
+
+class ScrollBar(Widget):
+	
+	def __init__(self, parent, name, size=[0,1], pos=[0,0], width=20, step=.1,
+					layout='VERTICAL', sub_theme='', options=BGUI_DEFAULT):
+		
+		Widget.__init__(self, parent, name, None, size, pos, sub_theme, options)
+		
+		# Options
+		# width = How wide the ScrollBar is, overrides size if size is 0
+		# layout = The orientation of the ScrollBar, options include 'HORIZONTAL' and 'VERTICAL'
+		# step = how far to increment the ScrollBar on a scroll event
+		
+		self._layout = layout
+		
+		# Allow for an on scroll callback
+		self.on_scroll = None
+		
+		# The ScrollBar starts at the beginning
+		self._amount = 0
+		
+		# Save the step
+		self.step = step
+		
+		# Scale the width setting for the system
+		width *= self.system.size[1]/1000
+		
+		# Adjust the appropriate size if it is 0
+		if layout=='VERTICAL':
+			if self.size[0] == 0:
+				self.size[0] = width
+				self.position[0] -= width
+		else: # HORIZONTAL
+			if self.size[1] == 0:
+				self.size[1] = width
+		
+		# Set up a frame to build this widget on
+		main_frame = Frame(self, 'scroll_main_frame', size=[1,1], pos=[0,0])
+		# self.on_click = self.scroll_up
+		main_frame.colors = [[0, 0, 0, 0],] * 4
+		
+		# Find the size of the arrows (They are 1:1), and their locations
+		arrow_size = []
+		a1_pos = []
+		a2_pos = []
+		if layout=='VERTICAL':
+			arrow_size = [1, self.size[0]/self.size[1]]
+			a1_pos = [0, 1-arrow_size[1]]
+			a2_pos = [0, 0]
+		else: # HORIZONTAL
+			arrow_size = [self.size[1]/self.size[0], 1]
+			a1_pos = [0,0]
+			a2_pos = [1-arrow_size[0], 0]
+			
+
+		# Create the scroll arrow frames (need to pass in copies because they get altered
+		up_arrow = Frame(main_frame, 'scroll_up', border=1, size=arrow_size[:], pos=a1_pos)
+		up_arrow.on_click = self.scroll_up
+		down_arrow = Frame(main_frame, 'scroll_down', border=1, size=arrow_size[:], pos=a2_pos)
+		down_arrow.on_click = self.scroll_down
+		
+		# Create the scroll bar
+		bar_size = [1, 1-2*arrow_size[1]] if layout=='VERTICAL' else [1-2*arrow_size[0], 1]
+		bar_pos = [0, arrow_size[1]] if layout=='VERTICAL' else [arrow_size[0], 0]
+		self._scroll_bar = Frame(main_frame, 'scroll_bar', size=bar_size, pos=bar_pos)
+		self._scroll_bar.colors = [[0,0,0,0],]*4
+		
+		# Create the indicator
+		bar_size = [1, self._scroll_bar.size[0]/self._scroll_bar.size[1]] if layout=='VERTICAL' else [self._scroll_bar.size[1]/self._scroll_bar.size[0], 1]
+		mark_pos = [0, 1-bar_size[1]] if layout=='VERTICAL' else [0,0]
+		self._marker = Frame(self._scroll_bar, 'scroll_marker', border=1, size=bar_size, pos=mark_pos)
+		
+	def scroll_up(self, widget):
+		self.amount -= self.step
+	
+	def scroll_down(self, widget):
+		self.amount += self.step
+		
+	@property
+	def amount(self):
+		return self._amount
+		
+	@amount.setter
+	def amount(self, value):
+		
+		# Ensure 0 <= amount < 1=
+		if value < 0:
+			value = 0
+		elif value > 1:
+			value = 1
+		
+		# Take care of the call back if it is setup
+		if self.on_scroll:
+			self.on_scroll(self, value-self._amount)
+			
+		self._amount = value
+			
+		# Update the marker
+		if self._layout == 'VERTICAL':
+			pos = (self._scroll_bar.size[1] - self._marker.size[1]) / self._scroll_bar.size[1]
+			self._marker.position = [0, (1-self._amount)*pos]
+		else: # HORIZONTAL
+			pos = (self._scroll_bar.size[0] - self._marker.size[0]) / self._scroll_bar.size[0]
+			self._marker.position = [(self._amount)*pos, 0]
+
+class ListBox(Frame):
+
+	def __init__(self, parent, name, list=[], border=1, aspect=None, size=[1, 1],
+				pos=[0,0], spacing=15, padding=15, sub_theme='', options=BGUI_DEFAULT):
+				
+		Frame.__init__(self, parent, 'main_frame', border, aspect, size, pos, sub_theme, options)
+		self.colors = [[0,0,0,0],] * 4
+		
+		self._list_frame = Frame(self, 'list_frame', border=None, size=[1,1], pos=[0,0])
+		self._list_frame.colors = [[0,0,0,0],] * 4
+		
+		self._scroll_bar = ScrollBar(self._list_frame, 'scroll_bar', size=[0.05,1], pos=[.95,0])
+		self._scroll_bar.on_scroll = self._scroll
+		self._scroll_bar.visible = False
+		
+		self.spacing = spacing * (self.system.size[1]/1000)
+		self.padding = padding * (self.system.size[1]/1000)
+		
+		self.list = list
+		
+	@property
+	def list(self):
+		return self._list
+		
+	@list.setter
+	def list(self, value):
+		self._list = []
+		previous_size = 0
+		
+		if not value:
+			self._list_size = 0
+			self._scroll_bar.step = 0
+			return
+			
+		for item in value:
+			if not isinstance(item, Widget):
+				print("WARNING: ListBox items must be widgets")
+				continue
+				
+			self._list.append(item)
+			previous_size = sum([item.size[1]+self.spacing for item in self._list])
+			x = self._list_frame.position[0]
+			y = self._list_frame.position[1]+self._list_frame.size[1] - previous_size
+			x += self.padding
+			x /= self.system.size[0]
+			y /= self.system.size[1]
+			item.position = [x, y]
+			
+		self._list_size = previous_size
+			
+		step = 1 / ((self._list_size+self.padding-self._list_frame.size[1])/self._list_frame.size[1]*len(self._list))
+		self._scroll_bar.step = step
+		
+		
+	def _scroll(self, widget, amount):
+		amount = amount * ((self._list_size+self.padding-self._list_frame.size[1])/self.system.size[1])
+		for item in self._list:
+			item.position = [item.position[0]/self.system.size[0], item.position[1]/self.system.size[1] + amount]
+		
+	def _draw(self):
+		Frame._draw(self)
+	
+		if self._list_size > self._list_frame.size[1]:
+			self._scroll_bar.visible = True
+			self._scroll_bar._draw()
+		
+		for item in self._list:
+			if item.position[1] < self._list_frame.position[1] or item.position[1]+item.size[1] > self._list_frame.position[1]+self._list_frame.size[1]:
+				item.visible = False
+			else:
+				item.visible = True
+		

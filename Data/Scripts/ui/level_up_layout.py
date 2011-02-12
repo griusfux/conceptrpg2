@@ -1,5 +1,6 @@
 import bgui
 from .layouts import Layout
+import Scripts.ui.custom_widgets as cWidgets
 from Scripts.packages import Power
 
 import Scripts.levels as levels
@@ -113,7 +114,7 @@ class LevelUpLayout(Layout):
 									pt_size=14, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		inst.text = "Select a power and click \"Learn\" to learn the power"
 
-		self.available_list = bgui.ListBox(available_frame, "lvl_avail_list", size=[.9,.65], pos=[.05, .125], sub_theme='Box')
+		self.available_list = cWidgets.ListBox(available_frame, "lvl_avail_list", size=[.9,.65], pos=[.05, .125], sub_theme='Box')
 		
 		self.learn_btn = bgui.FrameButton(available_frame, "learn_btn", text="Learn", pt_size=16,
 										size=[.175, .075], pos=[.778, .025]).on_click = self.learn_on_click
@@ -129,7 +130,7 @@ class LevelUpLayout(Layout):
 									pt_size=14, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		inst.text = "Select a power and click \"Unlearn\" to unlearn the power"
 
-		self.known_list = bgui.ListBox(known_frame, "lvl_known_list", size=[.9,.65], pos=[.05, .125], sub_theme='Box')
+		self.known_list = cWidgets.ListBox(known_frame, "lvl_known_list", size=[.9,.65], pos=[.05, .125], sub_theme='Box')
 		
 		self.unlearn_btn = bgui.FrameButton(known_frame, "unlearn_btn", text="Unlearn", pt_size=16,
 										size=[.175, .075], pos=[.05, .025]).on_click = self.unlearn_on_click
