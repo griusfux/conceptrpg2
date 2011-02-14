@@ -1,4 +1,6 @@
 {
+	"1h_walk" : "walk_1h",
 	"1h_idle" : "base.1h_idle",
-	"1h_attack" : "1h_swing"
+	"1h_attack" : "1h_swing_2",
+	"cleave" : "1h_swing"
 }

@@ -246,7 +246,7 @@ class CombatState(DefaultState, BaseController):
 					main['ui_system'].mouse.visible = False
 
 				if ("MoveForward", "INPUT_ACTIVE") in inputs:
-					act = main['default_actions']['default_walk']
+					act = main['default_actions']['1h_walk']
 					main['player'].object.play_animation(act['name'], act['start'], act['end'], mode=1)
 					movement[1] = speed
 				if ("MoveBackward", "INPUT_ACTIVE") in inputs:
