@@ -9,7 +9,7 @@ class Inventory:
 		self.items = []
 		self.armor = None
 		self.weapon = None
-		self.gold = 0
+		self.credits = 0
 		
 	def add(self, item):
 		"""Add an item to the inventory

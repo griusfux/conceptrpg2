@@ -103,7 +103,7 @@ class CharacterLogic:
 		self._armor	= self.Dummy()
 		self._shield = self.Dummy()
 		self._weapon = self.Dummy()
-		self.gold	= 0
+		self.credits	= 0
 		self.inventory_weight = 0
 		
 		# the character's game object
@@ -249,6 +249,7 @@ class PlayerLogic(CharacterLogic):
 		"""Fills in stats from a SaveData object"""
 		
 		save_data = save.data
+		print(type(save_data))
 		
 		self.name		= save_data["name"]
 		self.level		= save_data["level"]
@@ -273,7 +274,7 @@ class PlayerLogic(CharacterLogic):
 		self.speed_base = save_data["speed_base"]
 		
 		self.inventory = save_data["inventory"]
-		self.gold 		= save_data["gold"]
+		self.credits 		= save_data["credits"]
 		
 		self.powers		= PowerManager(self, save_data["powers"])
 		
@@ -309,7 +310,7 @@ class PlayerLogic(CharacterLogic):
 				"speed_base" : self.speed_base,
 				
 				"inventory"	: self.inventory,
-				"gold"		: self.gold,
+				"credits"		: self.credits,
 				
 				"powers"	: [power.package_name for power in self.powers.all]
 			}

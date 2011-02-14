@@ -97,14 +97,14 @@ class ShopLayout(Layout):
 		self.confirm_yes.on_click = self.purchase
 		self.confirm_no.on_click = self.cancel
 		
-		# Not enough gold dialouge
-		self.neg = bgui.Frame(self, "not_enough_gold", size=[.25, .15], sub_theme="HUD",
+		# Not enough credits dialouge
+		self.neg = bgui.Frame(self, "not_enough_credits", size=[.25, .15], sub_theme="HUD",
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
 		self.neg_mess = bgui.TextBlock(self.neg, "neg_mess", pt_size=25, size=[.8, .55],
 								pos=[0, .25], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		self.neg_cancel = bgui.FrameButton(self.neg, "neg_cancel", pt_size=25, text="Cancel",
 								size=[.3, .2], pos=[0, .1], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
-		self.neg_mess.text = "You do not have enough gold for that."
+		self.neg_mess.text = "You do not have enough credits for that."
 		self.neg.visible = False
 		
 		self.neg_cancel.on_click = self.cancel
@@ -133,13 +133,13 @@ class ShopLayout(Layout):
 		self.main_frame.frozen = True
 		
 		# Check to see if the player can't afford the item
-		if self.main['player'].inventory.gold < item.cost:
+		if self.main['player'].inventory.credits < item.cost:
 			self.neg.visible = True
 			return
 		
 		# Display confirmation
 		self.confirm_item.text = item.name
-		self.confirm_cost.text = "For " + str(item.cost) + "g ?"
+		self.confirm_cost.text = "For " + str(item.cost) + " credits?"
 		self.confirm.visible = True
 
 		
@@ -156,7 +156,7 @@ class ShopLayout(Layout):
 		"""On click event for purchasing an item"""
 		
 		item = self.items[self.selected]
-		self.main['player'].inventory.gold -= item.cost
+		self.main['player'].inventory.credits -= item.cost
 		self.main['player'].inventory.add(item)
 		
 		self.confirm.visible = False
@@ -235,6 +235,6 @@ class ShopLayout(Layout):
 			
 			# Fill in the stats for the item
 			self.item_name.text = item.name if item else ""
-			self.item_cost.text = str(item.cost) + "g" if item else ""
+			self.item_cost.text = str(item.cost) + " credits" if item else ""
 			self.item_description.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean sed orci neque. Cras eget neque lacinia leo sodales suscipit sed." if item else ""
 			
