@@ -45,9 +45,10 @@ class TitleLayout(Layout):
 		
 		# Menu entries
 		self.menu = [
-				bgui.Label(self.splash, "title_start", text="Start Game", pos=[0.05, 0.170]),
-				bgui.Label(self.splash, "title_join", text="Join Game", pos=[0.05, 0.130]),
-				bgui.Label(self.splash, "title_options", text="Options", pos=[0.05, 0.090]),
+				bgui.Label(self.splash, "title_start", text="Start Game", pos=[0.05, 0.210]),
+				bgui.Label(self.splash, "title_join", text="Join Game", pos=[0.05, 0.170]),
+				bgui.Label(self.splash, "title_options", text="Options", pos=[0.05, 0.130]),
+				bgui.Label(self.splash, "title_credits", text="Credits", pos=[0.05, 0.090]),
 				bgui.Label(self.splash, "title_exit", text="Exit", pos=[0.05, 0.050])
 			]
 			
@@ -64,6 +65,7 @@ class TitleLayout(Layout):
 		widget.pt_size = 32
 		
 	def menu_click(self, widget):
+		widget.pt_size = 32
 		self.main['action'] = widget.name.split('_')[-1]
 
 class InGameMenuLayout(Layout):

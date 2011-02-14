@@ -77,7 +77,10 @@ def exit_game(main):
 		print(e)
 	
 	gl.error = True
-	gl.endGame()
+	if main['exit'] == "RESTART":
+		gl.restartGame()
+	else:
+		gl.endGame()
 					
 def in_game(cont):
 	# Wrap this whole thing in a try/except to prevent console spam

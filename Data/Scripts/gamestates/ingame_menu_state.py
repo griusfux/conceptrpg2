@@ -26,9 +26,9 @@ class InGameMenuState(DefaultState):
 			elif action == 'options':
 				print("Options not implemented yet")
 			elif action == 'title':
-				print("Return to Title not implemented yet")
+				main['exit'] = "RESTART"
 			elif action == 'exit':
-				main['exit'] = True
+				main['exit'] = "END"
 			else:
 				# Sanity check, should never happen
 				print("Unsupported action:", action)

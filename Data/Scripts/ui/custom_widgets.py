@@ -89,7 +89,7 @@ class PackageSelector(Widget):
 			img = Image(self, "pkg_img"+str(i), img_name, aspect=0.75,
 						size=[1, .9], pos=[.18+(.25*(i-self.idx)), 0], options=BGUI_DEFAULT|BGUI_CENTERY)
 			pkg_lbl = Label(img, "pkg_lbl"+str(i), text=self.packages[i].name,
-							pt_size=24, options=BGUI_DEFAULT)
+							pt_size=30, options=BGUI_DEFAULT)
 			# Center the label manual, since BGUI_CENTERX makes the text box on the previous page stop working
 			pkg_lbl._update_position(pkg_lbl._base_size, [(img.size[0]-pkg_lbl.size[0])/(2*img.size[0]), 0])
 			
