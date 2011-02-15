@@ -21,6 +21,8 @@ class TitleState(BaseState):
 				return ("CharacterCreation", "SWITCH")
 			elif action == 'options':
 				print("Options menu isn't implemented yet")
+			elif action == 'credits':
+				print("Credits menu isn't implemented yet")
 			elif action == 'exit':
 				main['exit'] = True
 			else:

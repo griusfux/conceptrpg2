@@ -75,6 +75,8 @@ class DefaultState(BaseState, BaseController):
 		main['engine'].set_active_camera(main['camera'])
 		self.camera_mode = "frankie"
 		
+		main['player'].save()
+		
 		self.in_shop = False
 		
 	def client_run(self, main):
