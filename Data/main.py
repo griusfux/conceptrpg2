@@ -39,13 +39,6 @@ addr = (ip, port)
 
 # Error handling global
 gl.error = False
-
-# Server script/runtime (in order of precedence)
-servers = [
-	"python server.py",
-	"python server.pyc",
-	"server.exe"
-]
 	
 def animation(cont):
 	mess = cont.sensors['mess']
@@ -70,9 +63,9 @@ def exit_game(main):
 			main['client'].disconnect()
 
 		# Close the server if we launched it
-		if hasattr(gl, "server"):
-			gl.server.terminate()
-			del gl.server
+		if "server" in main:
+			main['server'].terminate()
+			del main['server']
 	except Exception as e:
 		print(e)
 	
@@ -122,39 +115,10 @@ def init(own):
 	if 'effect_system' not in own:
 		own['effect_system'] = EffectSystem(own['engine'])
 		
-	# Create a socket and register with the server
-	if 'client' not in own:
-		own['client'] = GameClient(user, addr)
-		
-		return
-	elif not own['client'].connected:
-		own['client'].run()
-		if own['client'].server_addr == "0.0.0.0":
-			# We failed to reach the server
-			print("Failed to reach the server...")
-			print("Starting local server")
-			own['client'].restart(user, ('localhost', port))
-			if hasattr(gl, 'server'):
-				gl.server.terminate()
-				
-			# Find something to run
-			server = ""
-			for s in servers:
-				if os.path.exists(s.split()[-1]):
-					server = s
-					break
+	# Just copy network variables until we have a working ui
+	own['user'] = user
+	own['addr'] = addr
 
-			si = subprocess.STARTUPINFO()
-			si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-			si.wShowWindow = 7 #SW_SHOWMINNOACTIVE
-			gl.server = subprocess.Popen(s, startupinfo=si, creationflags=subprocess.CREATE_NEW_CONSOLE)
-		
-		return
-	elif not own['client'].registered:
-		# Don't continue until we are properly registered with the server
-		own['client'].run()
-		return
-	
 	# Setup an input system
 	own['input_system'] = BlenderInputSystem('keys.conf', 'mouse.conf')
 

@@ -106,7 +106,7 @@ class BaseState:
 			self.server_functions.update(d)
 
 		# Setup the Remote Procedure Calls
-		c = main['server'] if is_server else main['client']
+		c = main['server'] if is_server else main.get('client')
 		self.clients = RPC(self, c, self.client_functions)
 		self.server = RPC(self, c, self.server_functions)
 		
@@ -131,7 +131,7 @@ class BaseState:
 			self.server.parse_command(main, client.data, client)
 			return self.server_run(main, client)
 		else:
-			val = main['client'].run()
+			val = main['client'].run() if "client" in main else None
 			while val:
 				self.clients.parse_command(main, val)
 				val = main['client'].run()

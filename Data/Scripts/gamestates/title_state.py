@@ -15,10 +15,11 @@ class TitleState(BaseState):
 			action = main['action']
 			
 			if action == 'start':
-				return ("CharacterCreation", "SWITCH")
+				main['is_host'] = True
+				return ("NetworkSetup", "SWITCH")
 			elif action == 'join':
-				# Do the same as start for now
-				return ("CharacterCreation", "SWITCH")
+				main['is_host'] = False
+				return ("NetworkSetup", "SWITCH")
 			elif action == 'options':
 				print("Options menu isn't implemented yet")
 			elif action == 'credits':
