@@ -1,1 +1,9 @@
-Martins Upitis -- Outline 2D filter
+Team Members:
+ * Daniel Stokes (Artist/Programmer)
+ * Mitchell Stokes (Programmer)
+ * Andrew Smith (Artist)
+ * Jonathan Cote (Artist)
+
+Special Thanks To:
+ * Martins Upitis (Outline 2D filter)
+ * Stephen Doonan (Harrowprint font)

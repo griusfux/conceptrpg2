@@ -23,6 +23,7 @@ layouts = {
 	"inventory_overlay": InventoryOverlay,
 	"stats": StatsOverlay,
 	"start_game_overlay": StartGameOverlay,
+	"credits_overlay": CreditsOverlay
 	}
 
 class BlenderUISystem(bgui.System):

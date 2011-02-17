@@ -73,17 +73,17 @@ class StartGameOverlay(Layout):
 		Layout.__init__(self, sys, "start_game_overlay", use_mouse=True)
 		
 		# Background frame
-		self.frame = bgui.Frame(self, "sgo_frame", size=[.66, .66], pos=[0.30, 0.05],
+		self.frame = bgui.Frame(self, "sgo_frame", size=[.33, .66], pos=[0.30, 0.05],
 			sub_theme='HUD')
 			
 		self.user = bgui.TextInput(self.frame, "sgo_user", prefix="Username: ",
-				size=[0.5, 0.07], pos=[0.05, 0.5], text="User")
+				size=[0.5, 0.07], pos=[0.05, 0.8], text="User")
 				
 		self.ip = bgui.TextInput(self.frame, "sgo_ip", prefix="Server IP: ",
-				size=[0.5, 0.07], pos=[0.05, 0.4], text="localhost")
+				size=[0.5, 0.07], pos=[0.05, 0.7], text="localhost")
 				
 		self.port = bgui.TextInput(self.frame, "sgo_port", prefix="Server Port: ",
-				size=[0.5, 0.07], pos=[0.05, 0.3], text="9999")
+				size=[0.5, 0.07], pos=[0.05, 0.6], text="9999")
 
 		# "Go" button
 		self.go_button = bgui.FrameButton(self.frame, "sgo_go", text="",
@@ -101,6 +101,30 @@ class StartGameOverlay(Layout):
 		self.main['user'] = self.user.text
 		self.main['addr'] = (self.ip.text, int(self.port.text))
 		self.main['start_game'] = True
+
+class CreditsOverlay(Layout):
+	def __init__(self, sys):
+		Layout.__init__(self, sys, "credits_overlay", use_mouse=True)
+		
+		# Background frame
+		self.frame = bgui.Frame(self, "co_frame", size=[0.33, 0.66], pos=[0.30, 0.05],
+			sub_theme='HUD')
+			
+		# Credits text pulled from a file
+		with open('../credits.txt') as f:
+			self.block = bgui.TextBlock(self.frame, "co_block", text=f.read().replace("\t", "    "),
+				size=[0.95, 0.65], pos=[0.05, 0.3])
+		
+		# "Go" button
+		self.go_button = bgui.FrameButton(self.frame, "sgo_go", text="Done",
+			size=[0.2, 0.075], pos=[0.75, 0.05])
+		self.go_button.on_click = self.button_click
+		
+	def update(self, main):	
+		self.main = main
+		
+	def button_click(self, widget):
+		self.main['overlay_done'] = True
 
 class InGameMenuLayout(Layout):
 	def __init__(self, sys):

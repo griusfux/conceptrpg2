@@ -10,6 +10,7 @@ class TitleState(BaseState):
 		
 		self.current_overlay = ""
 		main['start_game'] = False
+		main['overlay_done'] = False
 	
 	def client_run(self, main):
 		"""Client-side run method"""
@@ -19,6 +20,7 @@ class TitleState(BaseState):
 			
 			if self.current_overlay:
 				main['ui_system'].remove_overlay(self.current_overlay)
+				self.current_overlay = ""
 			
 			if action == 'start':
 				main['is_host'] = True
@@ -29,7 +31,7 @@ class TitleState(BaseState):
 			elif action == 'options':
 				print("Options menu isn't implemented yet")
 			elif action == 'credits':
-				print("Credits menu isn't implemented yet")
+				self.current_overlay="credits_overlay"
 			elif action == 'exit':
 				main['exit'] = True
 			else:
@@ -44,9 +46,17 @@ class TitleState(BaseState):
 		if main['start_game']:
 			if self.current_overlay:
 				main['ui_system'].remove_overlay(self.current_overlay)
+				self.current_overlay = ""
 			return ("NetworkSetup", "SWITCH")
+			
+		if main['overlay_done']:
+			main['ui_system'].remove_overlay(self.current_overlay)
+			self.current_overlay = ""
+			main['overlay_done'] = False
+
 		
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
 		del main['action']
 		del main['start_game']
+		del main['overlay_done']
