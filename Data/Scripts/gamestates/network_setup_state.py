@@ -25,7 +25,9 @@ class NetworkSetupState(BaseState):
 				if os.path.exists(s.split()[-1]):
 					server = s
 					break
-					
+				
+			server += " "+str(main['addr'][1])
+			
 			si = subprocess.STARTUPINFO()
 			si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 			si.wShowWindow = 7 #SW_SHOWMINNOACTIVE

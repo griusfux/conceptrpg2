@@ -19,12 +19,6 @@ import json
 import bge
 gl = bge.logic
 
-# Globals for networking
-user = 'Kupoman'
-port = 9999
-ip = 'localhost'
-addr = (ip, port)
-
 # Error handling global
 gl.error = False
 	
@@ -102,10 +96,6 @@ def init(own):
 	# Create an effect system
 	if 'effect_system' not in own:
 		own['effect_system'] = EffectSystem(own['engine'])
-		
-	# Just copy network variables until we have a working ui
-	own['user'] = user
-	own['addr'] = addr
 
 	# Setup an input system
 	own['input_system'] = BlenderInputSystem('keys.conf', 'mouse.conf')

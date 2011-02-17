@@ -20,9 +20,14 @@ class Log:
 		self.log.flush()
 	
 def main():
+	if len(sys.argv) > 1:
+		port = int(sys.argv[1])
+	else:
+		port = 9999
+
 	log = open('server_log.txt', 'w')
 	sys.stdout = Log(sys.stdout, log)
-	server = GameServer(9999, 10)
+	server = GameServer(port, 10)
 	log.close()
 	
 if __name__ == "__main__":

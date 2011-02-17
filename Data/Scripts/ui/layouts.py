@@ -67,6 +67,40 @@ class TitleLayout(Layout):
 	def menu_click(self, widget):
 		widget.pt_size = 32
 		self.main['action'] = widget.name.split('_')[-1]
+		
+class StartGameOverlay(Layout):
+	def __init__(self, sys):
+		Layout.__init__(self, sys, "start_game_overlay", use_mouse=True)
+		
+		# Background frame
+		self.frame = bgui.Frame(self, "sgo_frame", size=[.66, .66], pos=[0.30, 0.05],
+			sub_theme='HUD')
+			
+		self.user = bgui.TextInput(self.frame, "sgo_user", prefix="Username: ",
+				size=[0.5, 0.07], pos=[0.05, 0.5], text="User")
+				
+		self.ip = bgui.TextInput(self.frame, "sgo_ip", prefix="Server IP: ",
+				size=[0.5, 0.07], pos=[0.05, 0.4], text="localhost")
+				
+		self.port = bgui.TextInput(self.frame, "sgo_port", prefix="Server Port: ",
+				size=[0.5, 0.07], pos=[0.05, 0.3], text="9999")
+
+		# "Go" button
+		self.go_button = bgui.FrameButton(self.frame, "sgo_go", text="",
+			size=[0.2, 0.075], pos=[0.75, 0.05])
+		self.go_button.on_click = self.button_click
+			
+	def update(self, main):
+		self.main = main
+		if not self.go_button.text:
+			self.go_button.text = "Start" if main['is_host'] else "Join"
+		if main['is_host'] and self.ip.visible:
+			self.ip.visible = False
+			
+	def button_click(self, widget):
+		self.main['user'] = self.user.text
+		self.main['addr'] = (self.ip.text, int(self.port.text))
+		self.main['start_game'] = True
 
 class InGameMenuLayout(Layout):
 	def __init__(self, sys):
