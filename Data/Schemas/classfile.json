@@ -1,4 +1,12 @@
 {
 	"name": "str",
+	"key_abilities" : "list",
+	
+	"armor_profs" : "list",
+	"weapon_profs" : "list",
+	
+	"hp_first_level" : "int",
+	"hp_per_level" : "int",
+	
 	"powers" : "list"
 }

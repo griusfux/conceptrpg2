@@ -1,3 +1,11 @@
 {
-	"name": "Class"
+	"name": "Class",
+	"key_abilities" : [],
+	
+	"armor_profs" : [],
+	"weapon_profs" : [],
+	
+	"hp_first_level" : 1,
+	"hp_per_level" : 0,
+	"powers" : []
 }

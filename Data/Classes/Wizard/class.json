@@ -1,0 +1,16 @@
+{
+	"name": "Wizard",
+	"key_abilities" : ["Intelligence", "Wisdom", "Dexterity"],
+	
+	"armor_profs" : ["CLOTH"],
+	"weapon_profs" : ["DAGGER", "QUARTERSTAFF"],
+	
+	"hp_first_level" : 10,
+	"hp_per_level" : 4,
+	
+	"powers" : [
+			"Burst",
+			"Magic Missle",
+			"Thunderwave"
+			]
+}
