@@ -59,7 +59,7 @@ class CombatState(DefaultState, BaseController):
 		if monster in main['player'].targets:
 			main['player'].targets.remove(monster)
 			
-		effect = effects.FadeEffect(monster.object, 90)
+		effect = effects.FadeEffect(monster.object, 25)
 		def f_end(object, engine):
 			object.end()
 		effect.f_end = f_end
@@ -129,6 +129,7 @@ class CombatState(DefaultState, BaseController):
 			main['engine'].load_library(weapon)
 			obj = main['engine'].add_object('longsword')
 			main['player'].set_right_hand(obj)
+			
 		self.camera = 'combat'
 		self.last_camera = 'frankie'
 		
@@ -140,7 +141,7 @@ class CombatState(DefaultState, BaseController):
 			color[3] = 0
 			obj.color = color
 		
-			effect = effects.FadeEffect(obj, duration=600, amount=1)
+			effect = effects.FadeEffect(obj, duration=90, amount=1)
 			self.add_effect(effect)
 			
 		
@@ -206,10 +207,11 @@ class CombatState(DefaultState, BaseController):
 		# Maintain monsters
 		for id, monster in self.monster_list.items():
 			# Highlight any targets
+			alpha = monster.object.color[3]
 			if monster in main['player'].targets:
-				monster.object.color = [0.75, 0.15, 0.15, 1]
+				monster.object.color = [0.75, 0.15, 0.15, alpha]
 			else:
-				monster.object.color = [1, 1, 1, 1]
+				monster.object.color = [1, 1, 1, alpha]
 			# Get rid of any dead guys
 			if main['owns_combat'] and monster.hp <= 0:
 				self.server.invoke("kill_monster", id)
