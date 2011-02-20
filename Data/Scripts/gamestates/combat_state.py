@@ -46,12 +46,12 @@ class CombatState(DefaultState, BaseController):
 		logic.ai = AiStateMachine(logic, (["idle", ["seek"], [], [], [("hp_lt_zero", "death"),]], ["death", ["die"], [], [], []]))
 		
 		# Add the monster to the monster list
-		self.monster_list.append(logic)
+		id = str(len(self.monster_list))
+		self.monster_list[id] = logic
 		
 	def kill_monster(self, main, cid, id):
 		if cid != main['combat_id']: return
 		if id not in self.monster_list: return
-
 		monster = self.monster_list[id]
 		main['player'].xp += monster.xp_reward/len(self.hero_list)
 		
@@ -81,9 +81,10 @@ class CombatState(DefaultState, BaseController):
 		# Get room info
 		self.room = CombatRoom(main['room'])
 		
+		self.monster_list = {}
+		
 		# Place the monsters
 		if main['owns_combat']:
-			self.monster_list = {}
 			for monster in [Monster(i) for i in self._generate_encounter(main['dgen'].deck)]:
 				# Load the monster
 				main['engine'].load_library(monster)
@@ -106,6 +107,9 @@ class CombatState(DefaultState, BaseController):
 				
 				# Update the server
 				self.server.invoke("add_monster", monster.name, id, x, y, GRID_Z)
+		else:
+			# Request monsters from the server
+			self.server.invoke("request_monsters")
 		
 		# Initialize an ai manager
 		# self.ai_manager = AiManager(self)
@@ -290,11 +294,27 @@ class CombatState(DefaultState, BaseController):
 			del main['combats'][client.combat_id]
 			self._next_state = "Default"
 			
+	def s_modify_health(self, main, client, id, amount):
+		combat = main['combats'][client.combat_id]
+		
+		monster = self.monster_list[id]
+		monster.hp += amount
+		
+		if monster.hp <= 0:
+			self.s_kill_monster(self, main, client, id)
+			
+	def request_monsters(self, main, client):
+		combat = main['combats'][client.combat_id]
+		
+		for i, v in combat.monster_list.items():
+			self.clients.invoke("add_monster", client.combat_id, v[0].name, i, *v[1])
+			
 			
 	server_functions  = dict(DefaultState.server_functions,
 			**{
 				"add_monster": (s_add_monster, (str, str, float, float, float)),
-				"kill_monster": (s_kill_monster, (str,))
+				"kill_monster": (s_kill_monster, (str,)),
+				"request_monsters": (request_monsters, ())
 			})
 		
 	def server_init(self, main):
@@ -343,6 +363,13 @@ class CombatState(DefaultState, BaseController):
 	##########
 	# Controller
 	##########
+	
+	def modify_health(self, character, amount):
+		BaseController.modify_health(self, character, amount)
+		
+		for i, v in self.monsters_list.items():
+			if character == v:
+				server.invoke("modify_health", i, amount)
 	
 	def create_effect(self, effect_name, position, target=None, duration=0, delay=0, continuous=-1, **functions):
 		id = self.main["effect_system"].create(effect_name, position, target, duration, delay, continuous, **functions)
