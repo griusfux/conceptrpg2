@@ -338,7 +338,9 @@ class LevelUpLayout(Layout):
 		
 		# Make accept button inactive if there are unspent level perks
 		if self.unspent_points != 0 or len(self.learned[0]) < self.unspent_level.at_will_count\
-			or len(self.learned[1]) < self.unspent_level.encounter_count:
+			or len(self.learned[1]) < self.unspent_level.encounter_count\
+			or len(self.learned[2]) < self.unspent_level.daily_count:
+			
 			self.lvl_btn.color = [0.4, 0.4, 0.4, 1.0]
 			self.lvl_btn.frozen = True
 		else:
