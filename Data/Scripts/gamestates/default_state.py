@@ -101,23 +101,13 @@ class DefaultState(BaseState, BaseController):
 		# Our id so we can talk with the server
 		id = main['client'].id
 		
-		# Our movement vector and player speed
-		movement = [0.0, 0.0, 0.0]
-		speed = main['player'].speed
-		
 		if inputs:
-			if ("InGameMenu", "INPUT_CLICK") in inputs:
-				return("InGameMenu", "PUSH")
-
 			if ("SwitchCamera", "INPUT_CLICK") in inputs:
 				# main['engine'].set_active_camera(main['top_down_camera'])
 				if main['camera'].mode == "frankie":
 					self.camera_mode = "topdown"
 				else:
 					self.camera_mode = "frankie"
-				
-			if ("Stats", "INPUT_CLICK") in inputs:
-				main['ui_system'].toogle_overlay("stats")
 				
 			if main['player'].unspent_levels and ("LevelUp", "INPUT_CLICK") in inputs:
 				return("LevelUp", "PUSH")
@@ -153,37 +143,10 @@ class DefaultState(BaseState, BaseController):
 			if ("cam6", "INPUT_CLICK") in inputs:
 					self.camera_mode = "shoulder"
 					
-			# Only let the player do stuff while they are not "locked"
-			if not main['player'].lock:
-				# Update rotations (mouse look)
-				dx = 0.5 - main['input_system'].mouse.position[0]
-				if abs(dx) > 0:
-					self.server.invoke("rotate", id, 0, 0, dx)
-				main['input_system'].mouse.position = (0.5, 0.5)
-
-				if ("MoveForward", "INPUT_ACTIVE") in inputs:
-					act = main['default_actions']['default_walk']
-					main['player'].object.play_animation(act['name'], act['start'], act['end'], mode=1)
-					movement[1] = speed
-				if ("MoveBackward", "INPUT_ACTIVE") in inputs:
-					movement[1] = -speed
-				if ("MoveRight", "INPUT_ACTIVE") in inputs:
-					movement[0] = speed
-				if ("MoveLeft", "INPUT_ACTIVE") in inputs:
-					movement[0] = -speed
-	
-		# Normalize the vector to the character's speed
-		if movement != [0.0, 0.0, 0.0]:
-			movement = [float(i) for i in (Vector(movement).normalized()*speed)]
-			self.server.invoke("position", id, *main['player'].object.position)
-		
-		# Otherwise, idle
-		else:
-				act = main['default_actions']['default_idle']
-				main['player'].object.play_animation(act['name'], act['start'], act['end'], mode=1)
-
-		# Send the message
-		self.server.invoke("move", id, *movement)
+			
+			result = self._handle_generic_input(main, inputs)
+			if result:
+				return result
 		
 		# Check to see if we need to move to the combat state
 		# XXX This needs cleanup, we shouldn't be accessing KX_GameObject attributes
@@ -197,6 +160,59 @@ class DefaultState(BaseState, BaseController):
 			
 		if main['room']:
 			return ('Combat', 'SWITCH')
+			
+	def _get_idle_animation(self, main):
+		return main['default_actions']['default_idle']
+		
+	def _get_forward_animation(self, main):
+		return main['default_actions']['default_walk']
+			
+	def _handle_generic_input(self, main, inputs):
+		# Our id so we can talk with the server
+		id = main['client'].id
+		
+		# Our movement vector and player speed
+		movement = [0.0, 0.0, 0.0]
+		speed = main['player'].speed
+		
+		if ("InGameMenu", "INPUT_CLICK") in inputs:
+			return("InGameMenu", "PUSH")
+			
+		if ("Stats", "INPUT_CLICK") in inputs:
+			main['ui_system'].toogle_overlay("stats")
+
+		# Only let the player do stuff while they are not "locked"
+		if not main['player'].lock:
+			# Update rotations (mouse look)
+			dx = 0.5 - main['input_system'].mouse.position[0]
+			if abs(dx) > 0:
+				self.server.invoke("rotate", id, 0, 0, dx)
+			main['input_system'].mouse.position = (0.5, 0.5)
+
+			if ("MoveForward", "INPUT_ACTIVE") in inputs:
+				act = self._get_forward_animation(main)
+				main['player'].object.play_animation(act['name'], act['start'], act['end'], mode=1)
+				movement[1] = speed
+			if ("MoveBackward", "INPUT_ACTIVE") in inputs:
+				movement[1] = -speed
+			if ("MoveRight", "INPUT_ACTIVE") in inputs:
+				movement[0] = speed
+			if ("MoveLeft", "INPUT_ACTIVE") in inputs:
+				movement[0] = -speed
+				
+		
+		# Normalize the vector to the character's speed
+		if movement != [0.0, 0.0, 0.0]:
+			movement = [float(i) for i in (Vector(movement).normalized()*speed)]
+			self.server.invoke("position", id, *main['player'].object.position)
+
+		# Otherwise, idle
+		elif not main['player'].lock:
+			act = self._get_idle_animation(main)
+			main['player'].object.play_animation(act['name'], act['start'], act['end'], mode=1)
+
+		# Send the message
+		self.server.invoke("move", id, *movement)
 
 	##########
 	# Server

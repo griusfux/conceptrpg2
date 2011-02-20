@@ -13,10 +13,8 @@ from Scripts.mathutils import Vector, Matrix
 
 # Constants for grid generation
 TILE_SIZE = 1
+HALF_TILE_SIZE = TILE_SIZE/2.0
 GRID_Z = 0.01
-
-# We don't need to bother subclassing DefaultState since we are going to mostly override
-# everything anyways, and Python doesn't have abstract classes or interfaces.
 
 class CombatState(DefaultState, BaseController):		
 	##########
@@ -25,16 +23,11 @@ class CombatState(DefaultState, BaseController):
 	
 	def client_init(self, main):
 		"""Intialize the client state"""
-		print("Init combat...")
 		
 		main['ui_system'].load_layout("combat")
-		
-		# Generate the grid
-		self.grid = CombatGrid(main, main['engine'], main['room'])
 
-		# "Place" the player
-		# player_tile = self.grid.tile_from_point(main['player'].object.position)
-		# main['player'].object.position = player_tile.position
+		# Get room info
+		self.room = CombatRoom(main['room'])
 		
 		# Place the monsters
 		self.monster_list = []
@@ -43,38 +36,26 @@ class CombatState(DefaultState, BaseController):
 			main['engine'].load_library(monster)
 		
 			# Find a place to put the monster
-			x = y = None
-			while not x or not y:
-				x = random.randrange(0, self.grid.x_steps)
-				y = random.randrange(0, self.grid.y_steps)
-				
-				if not self.grid(x, y).valid:
-					x = y = None
+			x = random.uniform(self.room.start_x+TILE_SIZE, self.room.end_x-TILE_SIZE)
+			y = random.uniform(self.room.start_y+TILE_SIZE, self.room.end_y-TILE_SIZE)
+			print(x, y)
 					
 			# Place the monster
-			tile = self.grid(x, y)
-			obj = main['engine'].add_object(monster.name, tile.position)
+			obj = main['engine'].add_object(monster.name, (x, y, GRID_Z))
 			
 			# Setup logic/ai
 			logic = MonsterLogic(obj, monster)
 			#([name, [actions], [entry_actions], [exit_actions], [(transition, target_state)]], [second_name, [actions], [entry_actions], [exit_actions], [(tran1, target1), (tran2, target2)]]
 			logic.ai = AiStateMachine(logic, (["idle", ["seek"], [], [], [("hp_lt_zero", "death"),]], ["death", ["die"], [], [], []]))
 			
-			tile.fill(logic)
-			logic.tile = tile
-			
 			# Add the monster to the monster list
 			self.monster_list.append(logic)
-			
+		
 		# Initialize an ai manager
-		self.ai_manager = AiManager(self)
+		# self.ai_manager = AiManager(self)
 		
 		# Set up the players
 		self.hero_list = [main['player']]
-		player_tile = self.grid.tile_from_point(main["player"].object.position)
-		main["player"].tile = player_tile
-		player_tile.fill(main["player"])
-		main["player"].lock = 0
 		
 		# If the player has a weapon, socket it
 		if main['player'].inventory.weapon:
@@ -103,11 +84,6 @@ class CombatState(DefaultState, BaseController):
 		# See if we still need to be in combat
 		if not self.monster_list:
 			return ("Default", "SWITCH")
-
-		# Reset the combat tiles
-		for row in self.grid.map:
-			for tile in row:
-				tile.color((0, 0, 0, 0))
 
 		# Update the player's lock
 		main['player'].update_lock()
@@ -139,19 +115,17 @@ class CombatState(DefaultState, BaseController):
 						target_dist = dist
 				main['player'].targets = [target,] if target else []
 		else:	
-			mask = active_power.mask if hasattr(active_power, "mask") else 0
-			main['player'].targets = self.get_targets(main['player'], range_type, range_size, mask)
-		# print(main['player'].targets)
-		
+			mask = getattr(active_power, "mask", {'ENEMIES'})
+			main['player'].targets = self.get_targets(main['player'], range_type, range_size, mask)		
 		
 			
 		####	
 		# ai
 		
 		#Dicision making
-		for monster in self.monster_list:
-			monster.target = [main['player']]
-			monster.actions = monster.ai.run()
+		# for monster in self.monster_list:
+			# monster.target = [main['player']]
+			# monster.actions = monster.ai.run()
 			
 		# Run the ai manager
 		#self.ai_manager.run()
@@ -165,37 +139,22 @@ class CombatState(DefaultState, BaseController):
 				monster.object.color = [1, 1, 1, 1]
 			# Get rid of any dead guys
 			if monster.hp <= 0:
-				monster.tile.fill(None)
 				self.monster_list.remove(monster)
+				xp_reward = monster.xp_reward/len(self.hero_list)
 				for hero in self.hero_list:
-					hero.xp += monster.xp_reward/len(self.hero_list)
+					hero.xp += xp_reward
 					main['player'].targets.remove(monster)
 				monster.object.end()
 			
 		# Our id so we can talk with the server
 		id = main['client'].id
 		
-		# Our movement vector and player speed
-		movement = [0.0, 0.0, 0.0]
-		speed = main['player'].speed
-		
 		if inputs:
-			if ("InGameMenu", "INPUT_CLICK") in inputs:
-				return("InGameMenu", "PUSH")
-
-			if ("Stats", "INPUT_CLICK") in inputs:
-				main['ui_system'].toogle_overlay("stats")				
-				
 			if ("Inventory", "INPUT_CLICK") in inputs:
 				main['ui_system'].toogle_overlay("inventory_overlay")
 		
 			# Only let the player do stuff while they are not "locked"
 			if not main['player'].lock:
-				# Update rotations (mouse look)
-				dx = 0.5 - main['input_system'].mouse.position[0]
-				if abs(dx) > 0:
-					self.server.invoke("rotate", id, 0, 0, dx)
-				main['input_system'].mouse.position = (0.5, 0.5)
 				
 				if ("UsePower", "INPUT_ACTIVE") in inputs:
 					target = main['player']
@@ -239,49 +198,23 @@ class CombatState(DefaultState, BaseController):
 						# Show the range of the active power
 						power = main['player'].powers.active
 						point = main['player'].object.position
-						tiles = self._find_target_range(power.range_type, power.range_size, point)
-						for tile in tiles:
-							tile.color((1, 0, 0, 0.25))
+						# tiles = self._find_target_range(power.range_type, power.range_size, point)
+						# for tile in tiles:
+							# tile.color((1, 0, 0, 0.25))
 				else:
 					main['ui_system'].mouse.visible = False
 
-				if ("MoveForward", "INPUT_ACTIVE") in inputs:
-					act = main['default_actions']['1h_walk']
-					main['player'].object.play_animation(act['name'], act['start'], act['end'], mode=1)
-					movement[1] = speed
-				if ("MoveBackward", "INPUT_ACTIVE") in inputs:
-					movement[1] = -speed
-				if ("MoveRight", "INPUT_ACTIVE") in inputs:
-					movement[0] = speed
-				if ("MoveLeft", "INPUT_ACTIVE") in inputs:
-					movement[0] = -speed
-	
-		# Normalize the vector to the character's speed
-		if movement != [0.0, 0.0, 0.0]:
-			movement = [float(i) for i in (Vector(movement).normalized()*speed)]
-		
-		# Otherwise, idle (This would be a good place to put grid snapping back in)
-		elif not main['player'].lock:
-				act = main['default_actions']['1h_idle']
-				main['player'].object.play_animation(act['name'], act['start'], act['end'], mode=1)
-
-		# Send the message
-		# self.server.invoke("move", id, *movement)
-		
-		self.move(id, main['player'], movement, local=True)
-		
-		# DEBUG: Uncomment to see the player's tile
-		# main['player'].tile.color((1, 0, 0, 1))
+					
+			result = self._handle_generic_input(main, inputs)
+			if result: return result
 
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
-		del main['player'].tile
 		
 		main['room'] = None
 		
 		# Put away the player's weapon
 		main['player'].clear_right_hand()
-		self.grid.end()
 
 	##########
 	# Server
@@ -289,24 +222,12 @@ class CombatState(DefaultState, BaseController):
 		
 	def server_init(self, main):
 		"""Initialize the server state"""
-		
-		print("\n\n\nCombat!\n\n\n")
-		
-		self.run = self.server_run
+		pass
 		
 	def server_run(self, main, client):
 		"""Server-side run method"""
 
-		# Here we just need to broadcast the data to the other clients
-		client.server.broadcast(client.id + " " + client.data)
-		
-		
-		for input in client.data.split():
-			if input.startswith("dis"):
-				client.server.drop_client(client.id, "Disconnected")
-			elif input.startswith("state"):
-				input = input.replace('state', '')
-				return (input, 'SWITCH')
+		pass
 				
 	##########
 	# Other
@@ -318,96 +239,25 @@ class CombatState(DefaultState, BaseController):
 		
 		no_brutes_soldiers = True
 		monsters = []
-
-		
-		self.xp_reward = 0
 		
 		while no_brutes_soldiers:
-			self.xp_reward = 0		
 			remaining = num_players
 			while remaining > 0:
 				draw = random.choice(deck.cards)
 				
 				if draw['role'] in ('soldier', 'brute'):
 					monsters.extend([draw['monster'] for i in range(2)])
-					self.xp_reward += 200 / num_players
 					no_brutes_soldiers = False
 				elif draw['role'] == 'minion':
 					monsters.extend([draw['monster'] for i in range(4)])
-					self.xp_reward += 100 / num_players
 				elif draw['role']:
 					monsters.append(draw[0])
-					self.xp_reward += 100 / num_players
 				else:
 					continue
 					
 				remaining -= 1
 
 		return monsters
-				
-		
-	def _find_target_range(self, type, _range, point):		
-		from mathutils import Vector # XXX Calling Blender stuff = bad
-		
-		# If the point passed in was a 2tuple, then add a z of GRID_SIZE to the end)
-		if len(point) == 2:
-			point += (GRID_SIZE,)
-		
-		# Find the direction
-		vec = Vector(self.main['player'].object.forward_vector)
-		angle = degrees(vec.angle(Vector((0, 1, 0))))
-		
-		if 0 < angle < 45:
-			direction = "+y"
-		elif 135 < angle < 180:
-			direction = "-y"
-		else:
-			if vec[0] > 0:
-				direction = "+x"
-			else:
-				direction = "-x"
-				
-		tiles = []
-		
-		if type == 'MELEE':
-			for i in range(_range):
-				if direction == "+x":
-					tiles.append(self.grid.tile_from_point((point[0]+TILE_SIZE*(i+1), point[1])))
-				elif direction == "-x":
-					tiles.append(self.grid.tile_from_point((point[0]-TILE_SIZE*(i+1), point[1])))
-				elif direction == "+y":
-					tiles.append(self.grid.tile_from_point((point[0], point[1]+TILE_SIZE*(i+1))))
-				elif direction == "-y":
-					tiles.append(self.grid.tile_from_point((point[0], point[1]-TILE_SIZE*(i+1))))
-		elif type == 'RANGED':
-			if _range == 'WEAPON':
-				pass
-			elif _range == 'SIGHT':
-				pass
-			else: # It's a number
-				pass
-		elif type == 'BLAST':
-				pass
-		elif type == 'BURST':
-			radius = int(_range)+1
-			y_vals = [sqrt((radius**2) - ((i+0.5)**2)) for i in range(radius)]
-			for x in range(int(_range)+1):
-				for y in range(int(round(y_vals[x]))):
-					tiles.append(self.grid.tile_from_point((point[0]+x*TILE_SIZE, point[1] + y*TILE_SIZE)))
-			point = self.grid.tile_from_point(point)
-			next_quarter = [self.grid(curr.x - (curr.x-point.x)*2, curr.y) for curr in tiles if curr]
-			tiles += next_quarter
-			next_half = [self.grid(curr.x, curr.y - (curr.y-point.y)*2) for curr in tiles if curr]
-			tiles += next_half
-		elif type == 'wall':
-				pass
-		else:
-			print("Invalid range type: %s" % type)
-
-		# Remove invalid tiles
-		while None in tiles:
-			tiles.remove(None)
-		return tiles
 	
 	##########
 	# Controller
@@ -438,39 +288,49 @@ class CombatState(DefaultState, BaseController):
 		
 		# self.server.invoke("anim", animation, 1, 20, 0, 0) # XXX should be done based on the supplied character
 		
-	def get_targets(self, character, type, range, mask=0):
+	def get_targets(self, character, type, _range, target_types={'ENEMIES'}):
 		"""Get targets in a range
 		
 		character -- character using the power
 		type -- the type of area (line, burst, etc)
 		range -- the range to grab (integer)
-		mask -- a bit field indicating target types to exclude
-		
-		1	- self
-		2	- allies
-		4	- enemies
+		target_types -- which type of targets to grab (SELF, ALLIES, ENEMIES, etc)
 		
 		"""
 		
+		# Bump the range a bit to compensate for the first half "tile"
+		# that the player occupies
+		_range += HALF_TILE_SIZE
+		
 		targets = []
 		
-		tiles = self._find_target_range(type, range, self.main['player'].object.position)
+		if not target_types:
+			return targets
+			
+		tlist = []
+		if 'SELF' in target_types:
+			tlist.append(self.main['player'])
+		if 'ALLIES' in target_types:
+			tlist.extend(self.hero_list if character in self.hero_list else self.monster_list)
+		if 'ENEMIES' in target_types:
+			tlist.extend(self.monster_list if character in self.hero_list else self.hero_list)
 		
-		for tile in tiles:
-			if tile.object:
-				if mask & 1 and tile.object == self.main['player']:
-					continue
-				if mask & 2:
-					if character in self.monster_list and tile.object in self.monster_list:
-						continue
-					elif character in self.hero_list and tile.object in self.hero_list:
-						continue
-				if mask & 4:
-					if character in self.monster_list and tile.object in self.hero_list:
-						continue
-					elif character in self.hero_list and tile.object in self.monster_list:
-						continue
-				targets.append(tile.object)
+		if type == 'MELEE':
+			ori_ivnt = character.object.get_orientation().inverted()
+			for target in tlist:
+				# Convert to local space
+				v = target.object.position - character.object.position
+				v *= ori_ivnt
+				
+				# Now do a simple bounds check
+				if v[1] < _range and abs(v[0]) < HALF_TILE_SIZE:
+					targets.append(target)
+		elif type == 'BURST':
+			for target in tlist:
+				
+				# Do a simple distance check
+				if (target.object.position - character.object.position).length < _range:
+					targets.append(target)
 				
 		return targets		
 	
@@ -524,13 +384,18 @@ class CombatState(DefaultState, BaseController):
 			character.tile.fill(None)
 			new_tile.fill(character)
 			character.tile = new_tile
-
-# The following classes are for handling the combat grid
-class CombatGrid:
-	"""This object handles the grid aspect of combat, and is made up of CombatTile objects"""
+			
+	def _get_idle_animation(self, main):
+		return main['default_actions']['1h_idle']
+		
+	def _get_forward_animation(self, main):
+		return main['default_actions']['1h_walk']
+			
+class CombatRoom:
+	"""This class keeps track of room information"""
 	
-	def __init__(self, main, Engine, room):
-		vert_list = [i for i in room.get_vertex_list() if i.z <=0]
+	def __init__(self, room):
+		vert_list = [i for i in room.get_vertex_list() if i.z <= 0]
 		
 		# Find the smallest and largest x and y
 		sx = lx = vert_list[0].x
@@ -548,110 +413,16 @@ class CombatGrid:
 				ly = vert.y
 		
 		# Record the size of the room
-		x = lx - sx
-		y = ly - sy
-		self.origin = (sx, ly, GRID_Z)
+		self.width = lx - sx
+		self.height = ly - sy
+		
+		self.start_x = sx
+		self.start_y = sy
+		
+		self.end_x = lx
+		self.end_y = ly
 		
 		# Find out how many tiles we need
-		self.x_steps = int(round(x / TILE_SIZE))
-		self.y_steps = int(round(y / TILE_SIZE))
-		
-		# Create an empty 2D list/array to hold the grid
-		self.map = [[None for i in range(self.y_steps)] for i in range(self.x_steps)]
-		
-		# Now fill the 2D list/array
-		for x in range(self.x_steps):
-			for y in range(self.y_steps):
-				self.map[x][y] = CombatTile(main, Engine, x, y, (self.origin[0] + x, self.origin[1] - y, GRID_Z), room, self.x_steps, self.y_steps)
-	
-	def __call__(self, x, y):
-		if x < 0 or y < 0:
-			return None
-			
-		try:
-			return self.map[x][y]
-		except IndexError:
-			return None
-			
-	def tile_from_point(self, point):
-		"""Finds the tile that contains the point"""
-		
-		# Calculate the offset based on the distance from the origin
-		x_off = abs(point[0] - self.origin[0])
-		y_off = abs(point[1] - self.origin[1])
-		
-		# Convert the offset to tiles
-		x = int(x_off/TILE_SIZE)
-		y = int(y_off/TILE_SIZE)
-		
-		# Clamp the x, y to be in the grid
-		if x > self.x_steps - 1:
-			x = self.x_steps - 1
-		elif x < 0:
-			x = 0
-			
-		if y > self.y_steps - 1:
-			y = self.y_steps - 1
-		elif y < 0:
-			y = 0
-			
-		# Return the tile
-		return self(x, y)
-
-	def end(self):
-		for x in self.map:
-			for y in x:
-				y.end()
-				
-class CombatTile:
-	"""The individual squares of the CombatGrid object"""
-	
-	def __init__(self, main, Engine, x, y, position, room, x_steps, y_steps):
-		self.x = x
-		self.y = y
-		self.position = (position[0] + TILE_SIZE / 2, position[1] - TILE_SIZE / 2, position[2])
-		self.valid = True
-		self.object = None
-		
-		self.grid_color = Engine.add_object('GridColor', position)
-		self.grid_color.color = [0, 0, 0, 0]
-		
-		# Check if the tile is in the room
-		for vert in self.grid_color.get_vertex_list():
-			hit_ob, hit_pos, hit_norm = Engine.ray_cast((vert.x, vert.y, vert.z + 1), (vert.x, vert.y, vert.z-1), self.grid_color)
-			if not hit_ob or hit_ob != room:
-				self.valid = False
-				break
-				
-		# Check if anything is in the tile
-		v1 = self.grid_color.get_vertex_list()[0]
-		v2 = self.grid_color.get_vertex_list()[2]
-		hit_ob, hit_pos, hit_norm = Engine.ray_cast((v1.x, v1.y, v1.z), (v2.x, v2.y, v2.z), self.grid_color)
-		if hit_ob:
-			self.valid = False
-			
-		# Uncomment to add lines to valid tiles
-		# self.grid_lines = Engine.add_object('GridTile', position) if self.valid else None
-			
-	def color(self, color):
-		self.grid_color.color = color
-			
-	def fill(self, object):
-		"""'Fill the tile with the given object, or empty it if object is none"""
-		
-		self.object = object
-		
-		if self.object:
-			self.valid = False
-		else:
-			self.valid = True
-		
-	def end(self):
-		"""A method to cleanup the tile when we are done"""
-		# If grid lines are uncommented remove them
-		if hasattr(self, "grid_lines"):
-			# Ensure the Tile has lines before attempting to remove it
-			if self.grid_lines:
-				self.grid_lines.end()
-		self.grid_color.end()
+		self.x_steps = int(round(self.width / TILE_SIZE))
+		self.y_steps = int(round(self.height / TILE_SIZE))
 	
