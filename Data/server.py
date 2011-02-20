@@ -17,7 +17,9 @@ class Log:
 	def write(self, msg):
 		self.stream.write(msg)
 		self.log.write(msg)
-		self.log.flush()
+		
+	def flush(self):
+		self.stream.flush()
 	
 def main():
 	if len(sys.argv) > 1:

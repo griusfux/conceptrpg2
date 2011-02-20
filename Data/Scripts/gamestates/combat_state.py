@@ -2,7 +2,7 @@
 
 from .base_state import BaseState, BaseController
 from .default_state import DefaultState
-from Scripts.packages import Monster
+from Scripts.packages import *
 from Scripts.character_logic import MonsterLogic
 
 import random
@@ -16,10 +16,62 @@ TILE_SIZE = 1
 HALF_TILE_SIZE = TILE_SIZE/2.0
 GRID_Z = 0.01
 
+class Combat:
+	"""Combat utility class"""
+	
+	def __init__(self):
+		self.hero_list = []
+		self.monster_list = {}
+
 class CombatState(DefaultState, BaseController):		
 	##########
 	# Client
 	##########
+	
+	def add_monster(self, main, cid, monster, id, x, y, z):
+		if cid != main['combat_id']: return
+		if id in self.monster_list: return
+	
+		monster = Monster(monster)
+	
+		# Load the library
+		main['engine'].load_library(monster)
+		
+		# Place the monster
+		obj = main['engine'].add_object(monster.name, (x, y, z))
+		
+		# Setup logic/ai
+		logic = MonsterLogic(obj, monster)
+		#([name, [actions], [entry_actions], [exit_actions], [(transition, target_state)]], [second_name, [actions], [entry_actions], [exit_actions], [(tran1, target1), (tran2, target2)]]
+		logic.ai = AiStateMachine(logic, (["idle", ["seek"], [], [], [("hp_lt_zero", "death"),]], ["death", ["die"], [], [], []]))
+		
+		# Add the monster to the monster list
+		self.monster_list.append(logic)
+		
+	def kill_monster(self, main, cid, id):
+		if cid != main['combat_id']: return
+		if id not in self.monster_list: return
+
+		monster = self.monster_list[id]
+		main['player'].xp += monster.xp_reward/len(self.hero_list)
+		
+		if monster in main['player'].targets:
+			main['player'].targets.remove(monster)
+			
+		monster.object.end()
+		del self.monster_list[id]
+	
+	def end_combat(self, main, cid):
+		if cid != main['combat_id']: return
+		self._next_state = "Default"
+	
+	
+	client_functions  = dict(DefaultState.client_functions,
+			**{
+				"add_monster": (add_monster, (str, str, str, float, float, float)),
+				"kill_monster": (kill_monster, (str, str)),
+				"end_combat": (end_combat, (str,))
+			})
 	
 	def client_init(self, main):
 		"""Intialize the client state"""
@@ -30,25 +82,30 @@ class CombatState(DefaultState, BaseController):
 		self.room = CombatRoom(main['room'])
 		
 		# Place the monsters
-		self.monster_list = []
-		for monster in [Monster(i) for i in self._generate_encounter(main['dgen'].deck)]:
-			# Load the monster
-			main['engine'].load_library(monster)
-		
-			# Find a place to put the monster
-			x = random.uniform(self.room.start_x+TILE_SIZE, self.room.end_x-TILE_SIZE)
-			y = random.uniform(self.room.start_y+TILE_SIZE, self.room.end_y-TILE_SIZE)
-					
-			# Place the monster
-			obj = main['engine'].add_object(monster.name, (x, y, GRID_Z))
+		if main['owns_combat']:
+			self.monster_list = {}
+			for monster in [Monster(i) for i in self._generate_encounter(main['dgen'].deck)]:
+				# Load the monster
+				main['engine'].load_library(monster)
 			
-			# Setup logic/ai
-			logic = MonsterLogic(obj, monster)
-			#([name, [actions], [entry_actions], [exit_actions], [(transition, target_state)]], [second_name, [actions], [entry_actions], [exit_actions], [(tran1, target1), (tran2, target2)]]
-			logic.ai = AiStateMachine(logic, (["idle", ["seek"], [], [], [("hp_lt_zero", "death"),]], ["death", ["die"], [], [], []]))
-			
-			# Add the monster to the monster list
-			self.monster_list.append(logic)
+				# Find a place to put the monster
+				x = random.uniform(self.room.start_x+TILE_SIZE, self.room.end_x-TILE_SIZE)
+				y = random.uniform(self.room.start_y+TILE_SIZE, self.room.end_y-TILE_SIZE)
+						
+				# Place the monster
+				obj = main['engine'].add_object(monster.name, (x, y, GRID_Z))
+				
+				# Setup logic/ai
+				logic = MonsterLogic(obj, monster)
+				#([name, [actions], [entry_actions], [exit_actions], [(transition, target_state)]], [second_name, [actions], [entry_actions], [exit_actions], [(tran1, target1), (tran2, target2)]]
+				logic.ai = AiStateMachine(logic, (["idle", ["seek"], [], [], [("hp_lt_zero", "death"),]], ["death", ["die"], [], [], []]))
+				
+				# Add the monster to the monster list
+				id = str(len(self.monster_list))
+				self.monster_list[id] = logic
+				
+				# Update the server
+				self.server.invoke("add_monster", monster.name, id, x, y, GRID_Z)
 		
 		# Initialize an ai manager
 		# self.ai_manager = AiManager(self)
@@ -79,10 +136,6 @@ class CombatState(DefaultState, BaseController):
 		
 		# Update the effect system
 		main['effect_system'].update()
-		
-		# See if we still need to be in combat
-		if not self.monster_list:
-			return ("Default", "SWITCH")
 
 		# Update the player's lock
 		main['player'].update_lock()
@@ -107,7 +160,7 @@ class CombatState(DefaultState, BaseController):
 			else:
 				target = None
 				target_dist = range_size
-				for monster in self.monster_list:
+				for monster in self.monster_list.values():
 					dist = (monster.object.position-main['player'].object.position).length
 					if dist < target_dist:
 						target = monster
@@ -130,20 +183,15 @@ class CombatState(DefaultState, BaseController):
 		#self.ai_manager.run()
 		
 		# Maintain monsters
-		for monster in self.monster_list:
+		for id, monster in self.monster_list.items():
 			# Highlight any targets
 			if monster in main['player'].targets:
 				monster.object.color = [0.75, 0.15, 0.15, 1]
 			else:
 				monster.object.color = [1, 1, 1, 1]
 			# Get rid of any dead guys
-			if monster.hp <= 0:
-				self.monster_list.remove(monster)
-				xp_reward = monster.xp_reward/len(self.hero_list)
-				for hero in self.hero_list:
-					hero.xp += xp_reward
-					main['player'].targets.remove(monster)
-				monster.object.end()
+			if main['owns_combat'] and monster.hp <= 0:
+				self.server.invoke("kill_monster", id)
 			
 		# Our id so we can talk with the server
 		id = main['client'].id
@@ -173,7 +221,7 @@ class CombatState(DefaultState, BaseController):
 						main['camera'].world_orientation = cam_ori * Matrix.Rotation(dy, 3, 'X')
 						
 						# Build a list of possible targets
-						targets = self.monster_list
+						targets = self.monster_list.values()
 						
 						# Gather some info for the target searching
 						distance = main['player'].powers.active.range_size * TILE_SIZE
@@ -218,15 +266,49 @@ class CombatState(DefaultState, BaseController):
 	##########
 	# Server
 	##########
+	
+	def s_add_monster(self, main, client, monster, id, x, y, z):
+		combat = main['combats'][client.combat_id]
+		if id not in combat.monster_list:
+			combat.monster_list[id] = [Monster(monster), [x, y, z]]
+			self.clients.invoke("add_monster", client.combat_id, monster, id, x, y, z)
+		# else:
+			# print("WARNING (add_monster): Monster id, '%s', has already been added, ignoring" % id)
+		
+	def s_kill_monster(self, main, client, id):
+		combat = main['combats'][client.combat_id]
+		
+		if id in combat.monster_list:
+			del combat.monster_list[id]
+			self.clients.invoke("kill_monster", client.combat_id, id)
+		else:
+			# print("WARNING (kill_monster): Monster id, '%s', not in list, ignoring" % id)
+			return
+			
+		if len(combat.monster_list) < 1:
+			self.clients.invoke("end_combat", client.combat_id)	
+			del main['combats'][client.combat_id]
+			self._next_state = "Default"
+			
+			
+	server_functions  = dict(DefaultState.server_functions,
+			**{
+				"add_monster": (s_add_monster, (str, str, float, float, float)),
+				"kill_monster": (s_kill_monster, (str,))
+			})
 		
 	def server_init(self, main):
 		"""Initialize the server state"""
+		
 		pass
 		
 	def server_run(self, main, client):
 		"""Server-side run method"""
 
-		pass
+		if main['combats'].get(client.combat_id) == -1:
+			main['combats'][client.combat_id] = Combat()
+			
+			
 				
 	##########
 	# Other
@@ -315,7 +397,7 @@ class CombatState(DefaultState, BaseController):
 		if 'ALLIES' in target_types:
 			tlist.extend(self.hero_list if character in self.hero_list else self.monster_list)
 		if 'ENEMIES' in target_types:
-			tlist.extend(self.monster_list if character in self.hero_list else self.hero_list)
+			tlist.extend(self.monster_list.values() if character in self.hero_list else self.hero_list)
 		
 		if type == 'MELEE':
 			ori_ivnt = character.object.get_orientation().inverted()

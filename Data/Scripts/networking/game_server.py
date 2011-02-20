@@ -28,6 +28,8 @@ class ClientHandle():
 		self.id = client_id
 		self.peer = peer
 		
+		self.combat_id = -1
+		
 		self.state_manager = GameStateManager("DungeonGeneration", self.server.main, is_server=True)
 		
 	def handle_request(self, data, peer):
@@ -80,6 +82,9 @@ class GameServer():
 		
 		# Which rooms still have encounters
 		self.main['encounters'] = {}
+		
+		# Current "combats"
+		self.main['combats'] = {}
 		
 		# Create the host
 		self.host = enet.Host(enet.Address(b'', port), 10, 0, 0, 0)

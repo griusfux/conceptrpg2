@@ -37,8 +37,11 @@ class DefaultState(BaseState, BaseController):
 		print("Playing", action)
 		main['net_players'][cid].object.play_animation(action, start, end, layer, blending)
 		
-	def init_combat(self, main, room_id):
+	def init_combat(self, main, room_id, owns):
 		main['room'] = main['dgen'].rooms[room_id]
+		
+		main['combat_id'] = room_id
+		main['owns_combat'] = owns != 0
 		
 		
 	# Override BaseState's to
@@ -63,7 +66,7 @@ class DefaultState(BaseState, BaseController):
 				"move": (move, (str, float, float, float)),
 				"rotate": (rotate, (str, float, float, float)),
 				"anim": (anim, (str, str, int, int, int, int)),
-				"init_combat": (init_combat, (str,)),
+				"init_combat": (init_combat, (str, int)),
 				"to": (to, (str,)),
 				"dis": (dis, (str,)),
 			}
@@ -239,7 +242,14 @@ class DefaultState(BaseState, BaseController):
 	def init_combat(self, main, client, room_id):
 		if main['encounters'].get(room_id):
 			main['encounters'][room_id] = False
-			self.clients.invoke("init_combat", room_id)
+			main['combats'][room_id] = -1
+			self._next_state = "Combat"
+			client.combat_id = room_id
+			self.client.invoke("init_combat", room_id, 1)
+		elif main['combats'].get(room_id):
+			self._next_state = "Combat"
+			client.combat_id = room_id
+			self.client.invoke("init_combat", room_id, 0)
 			
 	# Register the functions
 	server_functions = {
