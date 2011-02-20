@@ -7,7 +7,7 @@
 
 import Scripts.blender_wrapper as BlenderWrapper
 from Scripts.ui.blender_ui_system import *
-from Scripts.effects import EffectSystem
+from Scripts.effect_manager import EffectManager
 from Scripts.packages import *
 from Scripts.gamestate_manager import GameStateManager
 
@@ -95,7 +95,7 @@ def init(own):
 		
 	# Create an effect system
 	if 'effect_system' not in own:
-		own['effect_system'] = EffectSystem(own['engine'])
+		own['effect_system'] = EffectManager(own['engine'])
 
 	# Setup an input system
 	own['input_system'] = BlenderInputSystem('keys.conf', 'mouse.conf')

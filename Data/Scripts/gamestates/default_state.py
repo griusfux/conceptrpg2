@@ -81,6 +81,7 @@ class DefaultState(BaseState, BaseController):
 		
 	def client_run(self, main):
 		"""Client-side run method"""
+		main['effect_system'].update()
 		
 		# Make sure the camera is in the right mode
 		if main['camera'].mode != self.camera_mode:
