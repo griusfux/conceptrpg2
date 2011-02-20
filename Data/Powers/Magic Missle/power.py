@@ -17,7 +17,7 @@ def power(self, controller, user):
 	damage += user.int_mod
 		
 	def f_collision(effect, position):
-		target.hp -= damage
+		controller.modify_health(target, -damage)
 		
 	target = user.targets[0]
 	
