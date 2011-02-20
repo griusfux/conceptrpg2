@@ -19,8 +19,8 @@ class ProjectileEffect(StaticEffect):
 		
 		if isinstance(self.target, mathutils.Vector):
 			self.target_position = selft.target
-		else:	# XXX Gameobject code
-			if self.target.object.gameobj.invalid:
+		else:
+			if not self.target.object.valid:
 				self.time = 0
 				return
 			self.target_position = self.target.object.position

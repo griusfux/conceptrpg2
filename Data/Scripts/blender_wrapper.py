@@ -182,6 +182,10 @@ class Object:
 	def color(self, color):
 		self.gameobj.color = color
 		
+	@property
+	def valid(self):
+		return not self.gameobj.invalid
+		
 	def initialize_sockets(self):
 		if not self._armature:
 			print("WARNING: %s has no armature to contain sockets" % (self.gameobj.name))
