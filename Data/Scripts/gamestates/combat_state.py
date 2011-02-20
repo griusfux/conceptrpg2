@@ -314,6 +314,7 @@ class CombatState(DefaultState, BaseController):
 			**{
 				"add_monster": (s_add_monster, (str, str, float, float, float)),
 				"kill_monster": (s_kill_monster, (str,)),
+				"modify_health": (s_modify_health, (str, float)),
 				"request_monsters": (request_monsters, ())
 			})
 		
