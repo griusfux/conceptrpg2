@@ -10,6 +10,7 @@ from math import degrees, sqrt, atan
 from Scripts.ai.manager import Manager as AiManager
 from Scripts.ai.state_machine import StateMachine as AiStateMachine
 from Scripts.mathutils import Vector, Matrix
+import Scripts.effect_manager as effects
 
 # Constants for grid generation
 TILE_SIZE = 1
@@ -58,7 +59,12 @@ class CombatState(DefaultState, BaseController):
 		if monster in main['player'].targets:
 			main['player'].targets.remove(monster)
 			
-		monster.object.end()
+		effect = effects.FadeEffect(monster.object, 90)
+		def f_end(object, engine):
+			object.end()
+		effect.f_end = f_end
+		self.add_effect(effect)
+		
 		del self.monster_list[id]
 	
 	def end_combat(self, main, cid):
@@ -125,6 +131,17 @@ class CombatState(DefaultState, BaseController):
 			main['player'].set_right_hand(obj)
 		self.camera = 'combat'
 		self.last_camera = 'frankie'
+		
+		# Fade in monsters
+		for key, value in self.monster_list.items():
+			obj = value.object
+			
+			color = obj.color
+			color[3] = 0
+			obj.color = color
+		
+			effect = effects.FadeEffect(obj, duration=600, amount=1)
+			self.add_effect(effect)
 			
 		
 	def client_run(self, main):
