@@ -369,7 +369,7 @@ class CombatState(DefaultState, BaseController):
 		
 		for i, v in self.monster_list.items():
 			if character == v:
-				server.invoke("modify_health", i, amount)
+				self.server.invoke("modify_health", i, amount)
 	
 	def create_effect(self, effect_name, position, target=None, duration=0, delay=0, continuous=-1, **functions):
 		id = self.main["effect_system"].create(effect_name, position, target, duration, delay, continuous, **functions)
