@@ -34,7 +34,7 @@ class CharacterLogic:
 			
 	def __init__(self, obj):
 		# Set up weapon sockets
-		if obj.armature:
+		if obj and obj.armature:
 			self.armature = obj.armature
 			
 		#Player information

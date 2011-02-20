@@ -274,7 +274,7 @@ class CombatState(DefaultState, BaseController):
 	def s_add_monster(self, main, client, monster, id, x, y, z):
 		combat = main['combats'][client.combat_id]
 		if id not in combat.monster_list:
-			combat.monster_list[id] = [Monster(monster), [x, y, z]]
+			combat.monster_list[id] = [MonsterLogic(None, Monster(monster)), [x, y, z]]
 			self.clients.invoke("add_monster", client.combat_id, monster, id, x, y, z)
 		# else:
 			# print("WARNING (add_monster): Monster id, '%s', has already been added, ignoring" % id)
@@ -296,16 +296,19 @@ class CombatState(DefaultState, BaseController):
 			
 	def s_modify_health(self, main, client, id, amount):
 		combat = main['combats'][client.combat_id]
+		if id not in combat.monster_list: return
+		print("Modify health", amount)
 		
-		monster = self.monster_list[id]
+		monster = combat.monster_list[id][0]
 		monster.hp += amount
 		
 		if monster.hp <= 0:
-			self.s_kill_monster(self, main, client, id)
+			self.s_kill_monster(main, client, id)
 			
 	def request_monsters(self, main, client):
 		combat = main['combats'][client.combat_id]
-		
+		if id not in combat.monster_list: return
+		print(combat.monster_list)
 		for i, v in combat.monster_list.items():
 			self.clients.invoke("add_monster", client.combat_id, v[0].name, i, *v[1])
 			
