@@ -7,7 +7,7 @@ class ProjectileEffect(StaticEffect):
 		StaticEffect.__init__(self, visual, position, duration, delay, continuous)
 		
 		self.target = target
-		self.target_position = mahutils.Vector((0, 0, 0))
+		self.target_position = mathutils.Vector((0, 0, 0))
 		self.speed = speed
 		
 		self.obj = None
