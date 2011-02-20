@@ -38,7 +38,6 @@ class CombatState(DefaultState, BaseController):
 			# Find a place to put the monster
 			x = random.uniform(self.room.start_x+TILE_SIZE, self.room.end_x-TILE_SIZE)
 			y = random.uniform(self.room.start_y+TILE_SIZE, self.room.end_y-TILE_SIZE)
-			print(x, y)
 					
 			# Place the monster
 			obj = main['engine'].add_object(monster.name, (x, y, GRID_Z))
@@ -116,7 +115,7 @@ class CombatState(DefaultState, BaseController):
 				main['player'].targets = [target,] if target else []
 		else:	
 			mask = getattr(active_power, "mask", {'ENEMIES'})
-			main['player'].targets = self.get_targets(main['player'], range_type, range_size, mask)		
+			main['player'].targets = self.get_targets(main['player'], range_type, range_size, target_types=mask)		
 		
 			
 		####	
@@ -288,7 +287,7 @@ class CombatState(DefaultState, BaseController):
 		
 		# self.server.invoke("anim", animation, 1, 20, 0, 0) # XXX should be done based on the supplied character
 		
-	def get_targets(self, character, type, _range, target_types={'ENEMIES'}):
+	def get_targets(self, character, type, _range, target_types={'ENEMIES'}, source=None):
 		"""Get targets in a range
 		
 		character -- character using the power
@@ -302,6 +301,9 @@ class CombatState(DefaultState, BaseController):
 		# that the player occupies
 		_range += HALF_TILE_SIZE
 		
+		if not source:
+			source = character.object.position
+
 		targets = []
 		
 		if not target_types:
@@ -319,7 +321,7 @@ class CombatState(DefaultState, BaseController):
 			ori_ivnt = character.object.get_orientation().inverted()
 			for target in tlist:
 				# Convert to local space
-				v = target.object.position - character.object.position
+				v = target.object.position - source
 				v *= ori_ivnt
 				
 				# Now do a simple bounds check
@@ -329,7 +331,7 @@ class CombatState(DefaultState, BaseController):
 			for target in tlist:
 				
 				# Do a simple distance check
-				if (target.object.position - character.object.position).length < _range:
+				if (target.object.position - source).length < _range:
 					targets.append(target)
 				
 		return targets		

@@ -3,6 +3,5 @@ def power(self, controller, user):
 	action = controller.main['default_actions']['1h_attack']
 	controller.play_animation(user, action, 4/3)
 
-	targets = controller.get_targets(user, self.range_type, self.range_size)
-	for target in targets:
+	for target in user.targets:
 		controller.modify_health(target, -10)
