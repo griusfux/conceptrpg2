@@ -45,19 +45,19 @@ class DefaultState(BaseState, BaseController):
 		
 		
 	# Override BaseState's to
-	def to(self, main, id):
+	def to(self, main, cid):
 		if id not in main['net_players']: return
 		
-		main['net_players'][id].object.end()
-		del main['net_players'][id]
+		main['net_players'][cid].object.end()
+		del main['net_players'][cid]
 		print(cid, "timed out.")
 		
 	# Override BaseState's dis
-	def dis(self, main, id):
+	def dis(self, main, cid):
 		if id not in main['net_players']: return
 		
-		main['net_players'][id].object.end()
-		del main['net_players'][id]
+		main['net_players'][cid].object.end()
+		del main['net_players'][cid]
 		print(cid, "diconnected.")
 	
 	# Register the functions
