@@ -1,0 +1,9 @@
+{
+	"name": "Force Orb",
+	"level" : 1,
+	"usage" : "ENCOUNTER",
+	"range_type": "RANGED",
+	"range_size": 20,
+	"damage_types": ["FORCE"],
+	"flags": []
+}
