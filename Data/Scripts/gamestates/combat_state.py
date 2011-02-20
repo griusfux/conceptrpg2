@@ -367,7 +367,7 @@ class CombatState(DefaultState, BaseController):
 	def modify_health(self, character, amount):
 		BaseController.modify_health(self, character, amount)
 		
-		for i, v in self.monsters_list.items():
+		for i, v in self.monster_list.items():
 			if character == v:
 				server.invoke("modify_health", i, amount)
 	
