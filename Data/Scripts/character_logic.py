@@ -249,7 +249,6 @@ class PlayerLogic(CharacterLogic):
 		"""Fills in stats from a SaveData object"""
 		
 		save_data = save.data
-		print(type(save_data))
 		
 		self.name		= save_data["name"]
 		self.level		= save_data["level"]
