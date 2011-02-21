@@ -86,6 +86,14 @@ class Object:
 	def position(self, value):
 		self.gameobj.worldPosition = value[:]
 		
+	@property
+	def scaling(self):
+		return self.gameobj.localScale.copy()
+		
+	@scaling.setter
+	def scaling(self, value):
+		self.gameobj.localScale = value
+		
 	def get_orientation(self):
 		return self.gameobj.worldOrientation
 		
@@ -183,8 +191,24 @@ class Object:
 		self.gameobj.color = color
 		
 	@property
+	def visible(self):
+		return self.gameobj.visible
+		
+	@visible.setter
+	def visible(self, value):
+		self.gameobj.visible = value
+		
+	@property
+	def name(self):
+		return self.gameobj.name
+		
+	@property
 	def valid(self):
 		return not self.gameobj.invalid
+		
+	@property
+	def children(self):
+		return [Object(child) for child in self.gameobj.children]
 		
 	def initialize_sockets(self):
 		if not self._armature:
