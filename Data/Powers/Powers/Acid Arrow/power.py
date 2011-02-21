@@ -13,12 +13,14 @@ def power(self, controller, user):
 	def f_collision(effect, position):
 		damage = random.randint(*ROLL) + random.randint(*ROLL) + user.int_mod		
 		controller.modify_health(target, -damage)
+		controller.add_status(target, "Acid", -5, "SAVE")
 		
 		second_targets = controller.get_targets(user, "BURST", 1, source=position)
 		for second_target in second_targets:
 			if second_target == target:
 				continue
 			controller.modify_health(second_target, -(random.randint(*ROLL) + user.int_mod))
+			controller.add_status(second_target, "Acid", -5, "SAVE")
 		
 	target = user.targets[0]
 	

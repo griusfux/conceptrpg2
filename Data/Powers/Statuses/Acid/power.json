@@ -1,0 +1,5 @@
+{
+	"name": "Acid",
+	"damage_types": ["ACID"],
+	"flags": ["PASSIVE"]
+}

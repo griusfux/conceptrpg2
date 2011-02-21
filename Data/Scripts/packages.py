@@ -413,6 +413,10 @@ class Status(Power):
 	_dir = 'Powers/Statuses'
 	_schema = 'Schemas/statusfile.json'
 	
+	def __init__(self, package_name):
+		Power.__init__(self, package_name)
+		self.amount = 0
+	
 		
 class Item(Package):
 	"""Item Package"""

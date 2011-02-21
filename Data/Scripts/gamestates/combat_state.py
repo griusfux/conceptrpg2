@@ -17,6 +17,9 @@ TILE_SIZE = 1
 HALF_TILE_SIZE = TILE_SIZE/2.0
 GRID_Z = 0.01
 
+# A constant for how many frames are in a "turn"
+TURN = 540
+
 class Combat:
 	"""Combat utility class"""
 	
@@ -79,6 +82,11 @@ class CombatState(DefaultState, BaseController):
 		effect.f_end = f_end
 		self.add_effect(effect)
 		
+		# Clear any of the monster's statuses out of the status list
+		for status in self.status_list:
+			if status['user'] == monster:
+				self.status_list.remove(status)
+				
 		del self.monster_list[id]
 		
 	@rpc(client_functions, "add_hero", str, str)
@@ -159,6 +167,8 @@ class CombatState(DefaultState, BaseController):
 			
 		self.camera = 'combat'
 		self.last_camera = 'frankie'
+		
+		self.status_list = []
 			
 		
 	def client_run(self, main):
@@ -184,6 +194,13 @@ class CombatState(DefaultState, BaseController):
 		# Reset the target shapes
 		for key, shape in main['target_shapes'].items():
 			shape.visible = False
+			
+		# Handle status effects
+		for status in self.status_list:
+			status['time'] += 1
+			if status['time'] == TURN:
+				status['time'] = 0
+				status['power'].use(self, status['user'])
 		
 		# Targeting
 		active_power = main['player'].powers.active
@@ -437,6 +454,7 @@ class CombatState(DefaultState, BaseController):
 	
 	def modify_health(self, character, amount):
 		BaseController.modify_health(self, character, amount)
+		print(character, amount)
 		
 		for i, v in self.monster_list.items():
 			if character == v:
@@ -448,6 +466,20 @@ class CombatState(DefaultState, BaseController):
 		
 	def end_effect(self, id):
 		self.main["effect_system"].remove(id)
+		
+	def add_status(self, character, status, amount, duration):
+		status = Status(status)
+		status.amount = amount
+		
+		character.powers.add(status)
+		
+		status_entry = {}
+		status_entry['power'] = status
+		status_entry['user'] = character
+		status_entry['time'] = 0
+		self.status_list.append(status_entry)
+		
+		
 	
 	def play_animation(self, character, animation, lock=0, mode=0):
 		"""Instruct the character to play the animation
