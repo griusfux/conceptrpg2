@@ -6,7 +6,7 @@ from Scripts.packages import *
 from Scripts.character_logic import MonsterLogic
 
 import random
-from math import degrees, sqrt, atan
+from math import *
 from Scripts.ai.manager import Manager as AiManager
 from Scripts.ai.state_machine import StateMachine as AiStateMachine
 from Scripts.mathutils import Vector, Matrix
@@ -459,6 +459,21 @@ class CombatState(DefaultState, BaseController):
 				# Do a simple distance check
 				if (target.object.position - source).length < _range:
 					targets.append(target)
+		elif type == 'BLAST':
+			pi_fourths = math.pi / 4
+			for target in tlist:
+			
+				# Start with a simple distance check
+				if (target.object.position - source).length < _range:
+					
+					# Now do an angle check
+					v1 = character.object.forward_vector
+					v2 = character.object.get_local_vector_to(target.object.position)
+					
+					angle = v1.angle(v2)
+					
+					if angle < pi_fourths:
+						targets.append(target)
 				
 		return targets		
 	
