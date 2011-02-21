@@ -389,12 +389,12 @@ class Camera:
 		return
 		
 	def init_frankie(self):		
-		self._target_distance = 8
-		self._target_position = Vector((0, 0, 1))
+		self._target_distance = 4
+		self._target_position = Vector((0, 0, 1.5))
 		self._target_orientation = Matrix.Rotation(radians(80), 3, 'X')
 
 		self.camera.parent.timeOffset = 35
-		self.camera.lens = 25
+		# self.camera.lens = 25
 		return
 		
 	def update_frankie(self):
@@ -417,15 +417,15 @@ class Camera:
 		
 	def init_combat(self):
 		self.init_frankie()
-		self._target_orientation = Matrix.Rotation(radians(60), 3, 'X')
+		# self._target_orientation = Matrix.Rotation(radians(60), 3, 'X')
 		
 	def update_combat(self):
 		self.update_frankie()
 		
 	def init_shoulder(self):
 		self._target_distance = 0
-		self._target_position = Vector((0.3, -1, 1.5))
-		self._target_rotation = Matrix.Rotation(radians(90), 3, 'X')
+		self._target_position = Vector((.5, -1.0, 1.5))
+		self._target_rotation = Matrix.Rotation(radians(-90), 3, 'X')
 		
 	def update_shoulder(self):
 		return
