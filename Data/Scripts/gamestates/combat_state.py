@@ -26,8 +26,8 @@ class Combat:
 
 class CombatState(DefaultState, BaseController):
 	
-	client_functions = DefaultState.client_functions
-	server_functions = DefaultState.server_functions
+	client_functions = DefaultState.client_functions.copy()
+	server_functions = DefaultState.server_functions.copy()
 	
 	##########
 	# Client
@@ -49,7 +49,7 @@ class CombatState(DefaultState, BaseController):
 		# Setup logic/ai
 		logic = MonsterLogic(obj, monster)
 		#([name, [actions], [entry_actions], [exit_actions], [(transition, target_state)]], [second_name, [actions], [entry_actions], [exit_actions], [(tran1, target1), (tran2, target2)]]
-		logic.ai = AiStateMachine(logic, (["idle", ["seek"], [], [], [("hp_lt_zero", "death"),]], ["death", ["die"], [], [], []]))
+		# logic.ai = AiStateMachine(logic, (["idle", ["seek"], [], [], [("hp_lt_zero", "death"),]], ["death", ["die"], [], [], []]))
 		
 		# Add the monster to the monster list
 		id = str(len(self.monster_list))
@@ -60,7 +60,9 @@ class CombatState(DefaultState, BaseController):
 		if cid != main['combat_id']: return
 		if id not in self.monster_list: return
 		monster = self.monster_list[id]
-		main['player'].xp += monster.xp_reward/len(self.hero_list)
+		main['player'].xp += monster.xp_reward//len(self.hero_list)
+		main['player'].credits += monster.credit_reward//len(self.hero_list)
+		print("Current credits:", main['player'].credits)
 		
 		if monster in main['player'].targets:
 			main['player'].targets.remove(monster)
@@ -72,6 +74,13 @@ class CombatState(DefaultState, BaseController):
 		self.add_effect(effect)
 		
 		del self.monster_list[id]
+		
+	@rpc(client_functions, "add_hero", str, str)
+	def add_hero(self, main, cid, hid):
+		if cid != main['combat_id']: return
+		if hid in self.hero_list: return
+		
+		self.hero_list[hid] = main['net_players'][hid]
 	
 	@rpc(client_functions, "end_combat", str)
 	def end_combat(self, main, cid):
@@ -87,10 +96,12 @@ class CombatState(DefaultState, BaseController):
 		self.room = CombatRoom(main['room'])
 		
 		self.monster_list = {}
+		self.hero_list = {main['client'].id:main['player']}
 		
 		# Place the monsters
 		if main['owns_combat']:
-			for monster in [Monster(i) for i in self._generate_encounter(main['dgen'].deck)]:
+			print(len(main['net_players']))
+			for monster in [Monster(i) for i in self._generate_encounter(main['dgen'].deck, len(main['net_players']))]:
 				# Load the monster
 				main['engine'].load_library(monster)
 			
@@ -115,12 +126,12 @@ class CombatState(DefaultState, BaseController):
 		else:
 			# Request monsters from the server
 			self.server.invoke("request_monsters")
+			
+			# Let others know we're here
+			self.server.invoke("add_hero")
 		
 		# Initialize an ai manager
 		# self.ai_manager = AiManager(self)
-		
-		# Set up the players
-		self.hero_list = [main['player']]
 		
 		# If the player has a weapon, socket it
 		if main['player'].inventory.weapon:
@@ -298,7 +309,9 @@ class CombatState(DefaultState, BaseController):
 	
 	@rpc(server_functions, "add_monster", str, str, float, float, float)
 	def s_add_monster(self, main, client, monster, id, x, y, z):
-		combat = main['combats'][client.combat_id]
+		combat = main['combats'].get(client.combat_id, None)
+		if combat is None: return
+		
 		if id not in combat.monster_list:
 			combat.monster_list[id] = [MonsterLogic(None, Monster(monster)), [x, y, z]]
 			self.clients.invoke("add_monster", client.combat_id, monster, id, x, y, z)
@@ -307,7 +320,8 @@ class CombatState(DefaultState, BaseController):
 		
 	@rpc(server_functions, "kill_monster", str)
 	def s_kill_monster(self, main, client, id):
-		combat = main['combats'][client.combat_id]
+		combat = main['combats'].get(client.combat_id, None)
+		if combat is None: return
 		
 		if id in combat.monster_list:
 			del combat.monster_list[id]
@@ -323,9 +337,9 @@ class CombatState(DefaultState, BaseController):
 		
 	@rpc(server_functions, "modify_health", str, float)
 	def s_modify_health(self, main, client, id, amount):
-		combat = main['combats'][client.combat_id]
+		combat = main['combats'].get(client.combat_id, None)
+		if combat is None: return
 		if id not in combat.monster_list: return
-		print("Modify health", amount)
 		
 		monster = combat.monster_list[id][0]
 		monster.hp += amount
@@ -335,12 +349,28 @@ class CombatState(DefaultState, BaseController):
 			
 	@rpc(server_functions, "request_monsters")
 	def request_monsters(self, main, client):
-		combat = main['combats'][client.combat_id]
+		combat = main['combats'].get(client.combat_id, None)
+		if combat is None: return
 		if id not in combat.monster_list: return
 		print(combat.monster_list)
 		for i, v in combat.monster_list.items():
 			self.clients.invoke("add_monster", client.combat_id, v[0].name, i, *v[1])
 
+	@rpc(server_functions, "add_hero")
+	def s_add_hero(self, main, client):
+		combat = main['combats'].get(client.combat_id, None)
+		if combat is None: return
+		
+		id = client.id
+		if id in combat.hero_list:
+			# Already added, ignore
+			return
+			
+		self.clients.invoke('add_hero', client.combat_id, client.id)
+		
+		for hero in combat.hero_list:
+			self.client.invoke('add_hero', client.combat_id, hero)
+			
 	def server_init(self, main):
 		"""Initialize the server state"""
 		
@@ -446,9 +476,9 @@ class CombatState(DefaultState, BaseController):
 		if 'SELF' in target_types:
 			tlist.append(self.main['player'])
 		if 'ALLIES' in target_types:
-			tlist.extend(self.hero_list if character in self.hero_list else self.monster_list)
+			tlist.extend(self.hero_list.values() if character in self.hero_list.values() else self.monster_list.values())
 		if 'ENEMIES' in target_types:
-			tlist.extend(self.monster_list.values() if character in self.hero_list else self.hero_list)
+			tlist.extend(self.monster_list.values() if character in self.hero_list.values() else self.hero_list.values())
 		
 		if type == 'MELEE':
 			ori_ivnt = character.object.get_orientation().inverted()
@@ -477,7 +507,7 @@ class CombatState(DefaultState, BaseController):
 					v1 = character.object.forward_vector
 					v2 = character.object.get_local_vector_to(target.object.position)
 					
-					angle = v1.angle(v2)
+					angle = v1.angle(v2, 0)
 					
 					if angle < pi_fourths:
 						targets.append(target)

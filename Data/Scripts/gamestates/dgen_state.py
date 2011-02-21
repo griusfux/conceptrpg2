@@ -8,8 +8,8 @@ import time
 class DungeonGenerationState(BaseState):
 	"""A state used to build dungeons"""
 	
-	client_functions = BaseState.client_functions
-	server_functions = BaseState.server_functions
+	client_functions = BaseState.client_functions.copy()
+	server_functions = BaseState.server_functions.copy()
 			
 	##########
 	# Client

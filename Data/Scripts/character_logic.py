@@ -331,6 +331,7 @@ class MonsterLogic(CharacterLogic):
 		# self.id = monsterdata.id
 		
 		self.xp_reward = monsterdata.xp_reward
+		self.credit_reward = monsterdata.credit_reward
 		self.role = monsterdata.role
 		self.leader = False
 		self.elite	= False
@@ -349,8 +350,8 @@ class MonsterLogic(CharacterLogic):
 		# self.wis_ab = monsterdata.wis_ab
 		# self.cha_ab = monsterdata.cha_ab
 		
-		self.ai_keywords = monsterdata.ai_keywords
-		self.ai_start_state = monsterdata.ai_start_state
+		# self.ai_keywords = monsterdata.ai_keywords
+		# self.ai_start_state = monsterdata.ai_start_state
 
 		# self.recalc_stats()
 		

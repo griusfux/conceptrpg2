@@ -12,8 +12,8 @@ class DefaultState(BaseState, BaseController):
 	# Client
 	##########
 	
-	client_functions = BaseState.client_functions
-	server_functions = BaseState.server_functions
+	client_functions = BaseState.client_functions.copy()
+	server_functions = BaseState.server_functions.copy()
 				
 	# Client functions
 	@rpc(client_functions, "position", str, float, float, float)

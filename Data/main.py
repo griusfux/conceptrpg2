@@ -133,3 +133,5 @@ def init(own):
 	own['state_manager'] = GameStateManager("Title", own)
 	own['init'] = True
 	
+	own['net_players'] = {}
+	

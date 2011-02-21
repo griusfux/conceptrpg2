@@ -163,7 +163,7 @@ class CharacterCreationState(BaseState):
 			# Setup the armature
 			gameobj.armature = root_ob
 			
-			main['net_players'] = {main['client'].id: player}
+			main['net_players'][main['client'].id] = player
 			main['player'] = player
 			
 			# Fill the player's hit points
