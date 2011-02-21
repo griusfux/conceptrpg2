@@ -208,7 +208,7 @@ class CombatState(DefaultState, BaseController):
 			# Highlight any targets
 			alpha = monster.object.color[3]
 			if monster in main['player'].targets:
-				monster.object.color = [0.75, 0.15, 0.15, alpha]
+				monster.object.color = [1, 0.6, 0.6, alpha]
 			else:
 				monster.object.color = [1, 1, 1, alpha]
 			# Get rid of any dead guys
