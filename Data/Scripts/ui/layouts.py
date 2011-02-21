@@ -249,6 +249,10 @@ class CombatLayout(DefaultStateLayout):
 		self.power_frame.colors = [(0, 0, 0, 0)]*4
 		
 	def update_powerbar(self, main):
+		hex = 	{"AT_WILL" : "Textures/ui/hex_tile_blue.png",
+				 "ENCOUNTER" : "Textures/ui/hex_tile_green.png",
+				 "DAILY" : "Textures/ui/hex_tile_red.png"}
+	
 		psys = main['player'].powers
 		powers = psys.all
 	
@@ -260,7 +264,8 @@ class CombatLayout(DefaultStateLayout):
 		# Create new images
 		for i in range(min(8, len(powers))):
 			# Background
-			img = bgui.Image(self.power_frame, "sbg"+str(i), "Textures/ui/hex_tile.png",
+			bg = "Textures/ui/hex_tile_gray.png" if powers[i].spent else hex[powers[i].usage]
+			img = bgui.Image(self.power_frame, "sbg"+str(i), bg,
 							 size=[1/8, 1], pos=[(1/8)*i, 0.5 if i == psys.active_index else 0])
 							 
 			# Label

@@ -26,6 +26,7 @@ class ProjectileEffect(StaticEffect):
 			self.target_position = self.target.object.position
 			
 		self.target_position = self.target if isinstance(self.target, mathutils.Vector) else self.target.object.position
+		self.target_position[2] += 1
 		distance = self.target_position - self.obj.position
 		
 		if distance.length < 0.25:
@@ -37,18 +38,21 @@ class ProjectileEffect(StaticEffect):
 			velocity = distance.copy()
 			velocity.normalize()
 			
-			# up = mathutils.Vector((0,0,1))
-			# cross = velocity.cross(up)
-			# cross.normalize()
-			# up = velocity.cross(cross)
-			# up.normalize
+			up = mathutils.Vector((0,0,1))
+			cross = velocity.cross(up)
+			cross.normalize()
+			up = velocity.cross(cross)
+			up.normalize()
 			
-			# matrix = mathutils.Matrix((cross, velocity, up))
+			matrix = mathutils.Matrix((cross, velocity, up))
 			
 			velocity *= self.speed
 			self.obj.position += velocity
 			
-			# self.obj.set_orientation(matrix*(self.speed/2))
+			orientation = matrix - self.obj.get_orientation().copy()
+			orientation *= self.speed/2
+			self.obj.set_orientation(self.obj.get_orientation()+orientation)
+			# self.obj.set_orientation(matrix)#*(self.speed/2))
 			
 		
 	def _fire(self, engine):

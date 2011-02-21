@@ -1,0 +1,6 @@
+{
+	"name": "str",
+	"level" : "int",
+	"damage_types": "list",
+	"flags": "list"
+}

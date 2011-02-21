@@ -373,6 +373,9 @@ class Power(Package):
 		self._push = None
 		self._pop = None
 		
+		# Set up a boolean property to determine if the power is used or not
+		self.spent = False
+		
 		if "PASSIVE" in self.flags:
 			self._push = p.push
 			self._pop = p.pop
@@ -404,9 +407,11 @@ class Power(Package):
 		
 class Feat(Power):
 	_dir = 'Powers/Feats'
+	_schema = 'Schemas/featfile.json'
 	
 class Status(Power):
 	_dir = 'Powers/Statuses'
+	_schema = 'Schemas/statusfile.json'
 	
 		
 class Item(Package):

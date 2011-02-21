@@ -1,0 +1,5 @@
+{
+	"name": "str",
+	"level" : "int",
+	"flags": "list"
+}

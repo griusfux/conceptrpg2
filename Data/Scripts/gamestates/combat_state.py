@@ -55,6 +55,13 @@ class CombatState(DefaultState, BaseController):
 		id = str(len(self.monster_list))
 		self.monster_list[id] = logic
 		
+		color = obj.color
+		color[3] = 0
+		obj.color = color
+	
+		effect = effects.FadeEffect(obj, duration=90, amount=1)
+		self.add_effect(effect)
+		
 	@rpc(client_functions, "kill_monster", str, str)
 	def kill_monster(self, main, cid, id):
 		if cid != main['combat_id']: return
@@ -121,6 +128,18 @@ class CombatState(DefaultState, BaseController):
 				
 				# Update the server
 				self.server.invoke("add_monster", monster.name, id, x, y, GRID_Z)
+				
+		
+				# Fade in monsters
+				for key, value in self.monster_list.items():
+					obj = value.object
+					
+					color = obj.color
+					color[3] = 0
+					obj.color = color
+				
+					effect = effects.FadeEffect(obj, duration=90, amount=1)
+					self.add_effect(effect)
 		else:
 			# Request monsters from the server
 			self.server.invoke("request_monsters")
@@ -140,17 +159,6 @@ class CombatState(DefaultState, BaseController):
 			
 		self.camera = 'combat'
 		self.last_camera = 'frankie'
-		
-		# Fade in monsters
-		for key, value in self.monster_list.items():
-			obj = value.object
-			
-			color = obj.color
-			color[3] = 0
-			obj.color = color
-		
-			effect = effects.FadeEffect(obj, duration=90, amount=1)
-			self.add_effect(effect)
 			
 		
 	def client_run(self, main):
@@ -239,8 +247,14 @@ class CombatState(DefaultState, BaseController):
 			if not main['player'].lock:
 				
 				if ("UsePower", "INPUT_ACTIVE") in inputs:
-					target = main['player']
-					main['player'].powers.active.use(self, main['player'])
+					power = main['player'].powers.active
+					if not power.spent:
+						target = main['player']
+						power.use(self, main['player'])
+						if power.usage != "AT_WILL":
+							power.spent = True
+							main['player'].powers.make_next_active()
+						
 				if ("NextPower", "INPUT_CLICK") in inputs:
 					main['player'].powers.make_next_active()
 				if ("PrevPower", "INPUT_CLICK") in inputs:
@@ -300,6 +314,11 @@ class CombatState(DefaultState, BaseController):
 		
 		# Put away the player's weapon
 		main['player'].clear_right_hand()
+		
+		# Restore encounter powers
+		for power in main['player'].powers.all:
+			if power.usage == "ENCOUNTER":
+				power.spent = False
 
 	##########
 	# Server
