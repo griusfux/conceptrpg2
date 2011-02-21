@@ -349,7 +349,7 @@ class Power(Package):
 	_blend = ''
 	_config = 'power.json'
 	_schema = 'Schemas/powerfile.json'
-	_dir = 'Powers'
+	_dir = 'Powers/Powers'
 	_img = 'power.png'
 	
 	def __init__(self, package_name):
@@ -404,6 +404,9 @@ class Power(Package):
 		
 class Feat(Power):
 	_dir = 'Powers/Feats'
+	
+class Status(Power):
+	_dir = 'Powers/Statuses'
 	
 		
 class Item(Package):
