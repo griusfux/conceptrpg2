@@ -46,6 +46,9 @@ class BlenderUISystem(bgui.System):
 		# Now we generate a dict to map BGE keys to bgui keys
 		self.keymap = {getattr(bge.events, val): getattr(bgui, val) for val in dir(bge.events) if val.endswith('KEY') or val.startswith('PAD')}
 		
+		# Now setup the scene callback so we can draw
+		bge.logic.getCurrentScene().post_draw.append(self.render)
+		
 	def load_layout(self, layout):
 		# Use a delayed loading of layouts, see run() for more info
 		self.current_layout = layout if layout else "none_layout"
@@ -121,6 +124,3 @@ class BlenderUISystem(bgui.System):
 		for key, state in keyboard.events.items():
 			if state == bge.logic.KX_INPUT_JUST_ACTIVATED:
 				self.update_keyboard(self.keymap[key], is_shifted)
-		
-		# Now setup the scene callback so we can draw
-		bge.logic.getCurrentScene().post_draw = [self.render]

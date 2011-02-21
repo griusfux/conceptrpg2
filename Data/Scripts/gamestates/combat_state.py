@@ -459,6 +459,10 @@ class CombatState(DefaultState, BaseController):
 		for i, v in self.monster_list.items():
 			if character == v:
 				self.server.invoke("modify_health", i, amount)
+				
+				pos = character.object.position[:2]+(character.object.position[2]+2,)
+				effect = effects.TextEffect(amount, pos, 90)
+				self.add_effect(effect)
 		
 	def add_effect(self, effect):
 		id = self.main["effect_system"].add(effect)
