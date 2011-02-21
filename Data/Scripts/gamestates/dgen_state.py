@@ -1,24 +1,29 @@
 # $Id$
 
 from Scripts.packages import Map, Shop
-from .base_state import BaseState
+from .base_state import *
 
 import time
 
 class DungeonGenerationState(BaseState):
 	"""A state used to build dungeons"""
+	
+	client_functions = BaseState.client_functions
+	server_functions = BaseState.server_functions
 			
 	##########
 	# Client
 	##########
 	
 	# Client RPC functions
+	@rpc(client_functions, "load_dungeon", int, int, "pickle")
 	def load_dungeon(self, main, idx, max, dungeon_tile):
 		self.dungeon_list.append(dungeon_tile)
 		self.tiles_recv.add(idx)
 		if max > self.max_tiles:
 			self.max_tiles = max
 		
+	@rpc(client_functions, "finish_dungeon")
 	def finish_dungeon(self, main):
 		if len(self.tiles_recv) < self.max_tiles:
 			# We missed some, try to grab them
@@ -29,15 +34,9 @@ class DungeonGenerationState(BaseState):
 			print("Dungoen downloaded from the server")
 			self.building = False
 		
+	@rpc(client_functions, "build_dungeon")
 	def build_dungeon(self, main):
 		self.send_dungeon = True
-		
-	# Register the RPC functions
-	client_functions = {
-				"load_dungeon": (load_dungeon, (int, int, "pickle")),
-				"finish_dungeon": (finish_dungeon, ()),
-				"build_dungeon": (build_dungeon, ()),
-			}
 	
 	def client_init(self, main):
 		"""Intialize the client state"""
@@ -140,16 +139,19 @@ class DungeonGenerationState(BaseState):
 	##########
 			
 	# Server RPC functions
+	@rpc(server_functions, "request_dungeon")
 	def request_dungeon(self, main, client):
 		if main['dungeon']:
 			self.send_dungeon(main, client)
 		else:
 			self.client.invoke('build_dungeon')
 			
+	@rpc(server_functions, "request_dungeon_pieces", "pickle")
 	def request_dungeon_pieces(self, main, client, missing):
 		if main['dungeon']:
 			self.send_dungeon(main, client, missing)
-			
+		
+	@rpc(server_functions, "save_dungeon")	
 	def save_dungeon(self, main, client):
 		# This creates a "lock" on editing the dungeon
 		if not main['dungeon']:
@@ -157,7 +159,8 @@ class DungeonGenerationState(BaseState):
 		else:
 			print("Recieved a save dungeon request from %s, but a dungeon was already built" % client.id)
 			self.send_dungeon(main, client)
-			
+		
+	@rpc(server_functions, "update_dungeon", "pickle")
 	def update_dungeon(self, main, client, tile):
 		if client.id != main.get("dungeon_lock"):
 			print("Recieved an update dungeon request from %s, but the client didn't lock the dungeon" % client.id)
@@ -168,21 +171,13 @@ class DungeonGenerationState(BaseState):
 			# Add an encounter if we have a room
 			if tile[0] == "Rooms":
 				main['encounters'][str(tile[2])] = True
-			
+	
+	@rpc(server_functions, "finish_dungeon")		
 	def finish_dungeon(self, main, client):
 		# This releases the lock on the dungeon
 		if client.id == main.get("dungeon_lock"):
 			del main['dungeon_lock']
 			print("Dungeon uploaded by", client.id)
-		
-	# Register the RPC functions
-	server_functions = {
-			"request_dungeon": (request_dungeon, ()),
-			"request_dungeon_pieces": (request_dungeon_pieces, ("pickle",)),
-			"save_dungeon": (save_dungeon, ()),
-			"update_dungeon": (update_dungeon, ("pickle",)),
-			"finish_dungeon": (finish_dungeon, ()),
-		}
 		
 	def server_init(self, main):
 		"""Initialize the server state"""

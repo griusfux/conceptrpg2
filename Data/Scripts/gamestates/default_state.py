@@ -3,7 +3,7 @@
 from Scripts.packages import *
 from Scripts.mathutils import Vector
 from Scripts.character_logic import PlayerLogic, MonsterLogic
-from .base_state import BaseState, BaseController
+from .base_state import *
 
 class DefaultState(BaseState, BaseController):
 	"""The default state for the game"""
@@ -11,8 +11,12 @@ class DefaultState(BaseState, BaseController):
 	##########
 	# Client
 	##########
+	
+	client_functions = BaseState.client_functions
+	server_functions = BaseState.server_functions
 				
 	# Client functions
+	@rpc(client_functions, "position", str, float, float, float)
 	def position(self, main, cid, x, y, z):
 		if cid not in main['net_players']: return
 		server_pos = [x, y, z]
@@ -24,19 +28,23 @@ class DefaultState(BaseState, BaseController):
 			
 		main['net_players'][cid].object.position = client_pos
 		
+	@rpc(client_functions, "move", str, float, float, float)
 	def move(self, main, cid, x, y, z):
 		if cid not in main['net_players']: return
 		main['net_players'][cid].object.move([x, y, z], min=[-50, -50, 0], max=[50, 50, 0])
 		
+	@rpc(client_functions, "rotate", str, float, float, float)
 	def rotate(self, main, cid, x, y, z):
 		if cid not in main['net_players']: return
 		main['net_players'][cid].object.rotate((x, y, z))
-			
+		
+	@rpc(client_functions, "anim", str, str, int, int, int, int)	
 	def anim(self, main, cid, action, start, end, layer, blending):
 		if cid not in main['net_players']: return
 		print("Playing", action)
 		main['net_players'][cid].object.play_animation(action, start, end, layer, blending)
 		
+	@rpc(client_functions, "init_combat", str, int)
 	def init_combat(self, main, room_id, owns):
 		main['room'] = main['dgen'].rooms[room_id]
 		
@@ -45,6 +53,7 @@ class DefaultState(BaseState, BaseController):
 		
 		
 	# Override BaseState's to
+	@rpc(client_functions, "to", str)
 	def to(self, main, cid):
 		if id not in main['net_players']: return
 		
@@ -53,23 +62,13 @@ class DefaultState(BaseState, BaseController):
 		print(cid, "timed out.")
 		
 	# Override BaseState's dis
+	@rpc(client_functions, "dis", str)
 	def dis(self, main, cid):
 		if id not in main['net_players']: return
 		
 		main['net_players'][cid].object.end()
 		del main['net_players'][cid]
 		print(cid, "diconnected.")
-	
-	# Register the functions
-	client_functions = {
-				"position": (position, (str, float, float, float)),
-				"move": (move, (str, float, float, float)),
-				"rotate": (rotate, (str, float, float, float)),
-				"anim": (anim, (str, str, int, int, int, int)),
-				"init_combat": (init_combat, (str, int)),
-				"to": (to, (str,)),
-				"dis": (dis, (str,)),
-			}
 	
 	def client_init(self, main):
 		"""Intialize the client state"""
@@ -222,23 +221,28 @@ class DefaultState(BaseState, BaseController):
 	##########
 		
 	# Server functions
+	@rpc(server_functions, "position", str, float, float, float)
 	def position(self, main, client, cid, x, y, z):
 		# We could run checks here, but for now we just rebroadcast
 		self.clients.invoke('position', cid, x, y, z)
 		main['players'][cid].position = (x, y, z)
 		
+	@rpc(server_functions, "move", str, float, float, float)
 	def move(self, main, client, cid, x, y, z):
 		# We could run checks here, but for now we just rebroadcast
 		# print(cid)
 		self.clients.invoke('move', cid, x, y, z)
 		
+	@rpc(server_functions, "rotate", str, float, float, float)
 	def rotate(self, main, client, cid, x, y, z):
 		# We could run checks here, but for now we just rebroadcast
 		self.clients.invoke('rotate', cid, x, y, z)
 		
+	@rpc(server_functions, "anim", str, int, int, int, int)
 	def anim(self, main, client, action, start, end, layer, blending):
 		self.clients.invoke("anim", client.id, action, start, end, layer, blending)
 		
+	@rpc(server_functions, "init_combat", str)
 	def init_combat(self, main, client, room_id):
 		if main['encounters'].get(room_id):
 			main['encounters'][room_id] = False
@@ -250,15 +254,7 @@ class DefaultState(BaseState, BaseController):
 			self._next_state = "Combat"
 			client.combat_id = room_id
 			self.client.invoke("init_combat", room_id, 0)
-			
-	# Register the functions
-	server_functions = {
-				"position": (position, (str, float, float, float)),
-				"move": (move, (str, float, float, float)),
-				"rotate": (rotate, (str, float, float, float)),
-				"anim": (anim, (str, int, int, int, int)),
-				"init_combat": (init_combat, (str,))
-			}
+
 	def server_init(self, main):
 		"""Initialize the server state"""
 		pass

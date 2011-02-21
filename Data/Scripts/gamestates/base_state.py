@@ -5,6 +5,12 @@ import Scripts.packages as packages
 import Scripts.character_logic as character_logic
 
 # This is used to implement RPC like functionality
+def rpc(d, name, *args):
+	def decorator(f):
+		d[name] = (f, args)
+		return f
+	return decorator
+
 class RPC:
 	def __init__(self, state, client, rdict):
 		# Stash the client and state
@@ -86,6 +92,9 @@ class RPC:
 class BaseState:
 	"""Base gamestate"""
 	
+	client_functions = {}
+	server_functions = {}
+	
 	def __init__(self, main, is_server=False):
 		"""BaseState Constructor"""
 		
@@ -94,16 +103,6 @@ class BaseState:
 		
 		# This variable allows for switching states without a return (used for RPC functions)
 		self._next_state = ""
-		
-		# Merge function dicts
-		if hasattr(self, "client_functions") and type(self) is not BaseState:
-			d = self.client_functions
-			self.client_functions = BaseState.client_functions.copy()
-			self.client_functions.update(d)
-		if hasattr(self, "server_functions") and type(self) is not BaseState:
-			d = self.server_functions
-			self.server_functions = BaseState.server_functions.copy()
-			self.server_functions.update(d)
 
 		# Setup the Remote Procedure Calls
 		c = main['server'] if is_server else main.get('client')
@@ -142,27 +141,34 @@ class BaseState:
 	##########
 	
 	# Client functions
+	@rpc(client_functions, "cid", str)
 	def cid(self, main, id):
 		print("Setting id to", id)
 		main['client'].id = id
 		
 	# At this level, we just ignore time outs
+	@rpc(client_functions, "to", str)
 	def to(self, main, id):
 		pass		
 		
 	# At this level, we just ignore disconnects
+	@rpc(client_functions, "dis", str)
 	def dis(self, main, id):
 		pass
 		
+	@rpc(client_functions, "move", str, float, float, float)
 	def move(self, main, cid, x, y, z):
 		pass
 		
+	@rpc(client_functions, "rotate", str, float, float, float)
 	def rotate(self, main, cid, x, y, z):
 		pass
 		
+	@rpc(client_functions, "position", str, float, float, float)
 	def position(self, main, cid, x, y, z):
 		pass
-		
+
+	@rpc(client_functions, "add_player", str, str, "pickle", "pickle")
 	def add_player(self, main, id, race, pos, ori):
 		if id in main['net_players']:
 			# This player is already in the list, so just ignore this call
@@ -173,17 +179,6 @@ class BaseState:
 		
 		obj = main['engine'].add_object(race.root_object, pos, ori)
 		main['net_players'][id] = character_logic.PlayerLogic(obj)
-	
-	# Register the functions
-	client_functions = {
-			"cid": (cid, (str,)),
-			"to": (to, (str,)),
-			"dis": (dis, (str,)),
-			"move": (move, (str, float, float, float)),
-			"rotate": (rotate, (str, float, float, float)),
-			"position": (position, (str, float, float, float)),
-			"add_player": (add_player, (str, str, "pickle", "pickle")),
-			}
 	
 	def client_init(self, main):
 		"""Intialize the client state"""
@@ -202,10 +197,12 @@ class BaseState:
 	##########
 	
 	# Server functions
+	@rpc(server_functions, "dis")
 	def dis(self, main, client):
 		client.server.broadcast("dis:"+client.id)
 		client.server.drop_client(client.peer, "Disconnected")
 		
+	@rpc(server_functions, "add_player", str, "pickle", "pickle")
 	def add_player(self, main, client, race, pos, ori):
 		client.server.add_player(client.id, race, pos, ori)
 		self.clients.invoke('add_player', client.id, race, pos, ori)
@@ -213,15 +210,9 @@ class BaseState:
 		for k, v in main['players'].items():
 			self.client.invoke('add_player', k, v.race, v.position, v.orientation)
 		
+	@rpc(server_functions, "switch_state", str)
 	def switch_state(self, main, client, state):
 		self._next_state = state
-		
-	# Register the functions
-	server_functions = {
-			"dis": (dis, ()),
-			"add_player": (add_player, (str, "pickle", "pickle")),
-			"switch_state": (switch_state, (str,)),
-			}
 		
 	def server_init(self, main):
 		"""Initialize the server state"""

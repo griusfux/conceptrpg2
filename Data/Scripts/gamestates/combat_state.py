@@ -1,6 +1,6 @@
 # $Id$
 
-from .base_state import BaseState, BaseController
+from .base_state import *
 from .default_state import DefaultState
 from Scripts.packages import *
 from Scripts.character_logic import MonsterLogic
@@ -24,11 +24,16 @@ class Combat:
 		self.hero_list = []
 		self.monster_list = {}
 
-class CombatState(DefaultState, BaseController):		
+class CombatState(DefaultState, BaseController):
+	
+	client_functions = DefaultState.client_functions
+	server_functions = DefaultState.server_functions
+	
 	##########
 	# Client
 	##########
 	
+	@rpc(client_functions, "add_monster", str, str, str, float, float, float)
 	def add_monster(self, main, cid, monster, id, x, y, z):
 		if cid != main['combat_id']: return
 		if id in self.monster_list: return
@@ -50,6 +55,7 @@ class CombatState(DefaultState, BaseController):
 		id = str(len(self.monster_list))
 		self.monster_list[id] = logic
 		
+	@rpc(client_functions, "kill_monster", str, str)
 	def kill_monster(self, main, cid, id):
 		if cid != main['combat_id']: return
 		if id not in self.monster_list: return
@@ -67,17 +73,10 @@ class CombatState(DefaultState, BaseController):
 		
 		del self.monster_list[id]
 	
+	@rpc(client_functions, "end_combat", str)
 	def end_combat(self, main, cid):
 		if cid != main['combat_id']: return
 		self._next_state = "Default"
-	
-	
-	client_functions  = dict(DefaultState.client_functions,
-			**{
-				"add_monster": (add_monster, (str, str, str, float, float, float)),
-				"kill_monster": (kill_monster, (str, str)),
-				"end_combat": (end_combat, (str,))
-			})
 	
 	def client_init(self, main):
 		"""Intialize the client state"""
@@ -290,6 +289,7 @@ class CombatState(DefaultState, BaseController):
 	# Server
 	##########
 	
+	@rpc(server_functions, "add_monster", str, str, float, float, float)
 	def s_add_monster(self, main, client, monster, id, x, y, z):
 		combat = main['combats'][client.combat_id]
 		if id not in combat.monster_list:
@@ -298,6 +298,7 @@ class CombatState(DefaultState, BaseController):
 		# else:
 			# print("WARNING (add_monster): Monster id, '%s', has already been added, ignoring" % id)
 		
+	@rpc(server_functions, "kill_monster", str)
 	def s_kill_monster(self, main, client, id):
 		combat = main['combats'][client.combat_id]
 		
@@ -312,7 +313,8 @@ class CombatState(DefaultState, BaseController):
 			self.clients.invoke("end_combat", client.combat_id)	
 			del main['combats'][client.combat_id]
 			self._next_state = "Default"
-			
+		
+	@rpc(server_functions, "modify_health", str, float)
 	def s_modify_health(self, main, client, id, amount):
 		combat = main['combats'][client.combat_id]
 		if id not in combat.monster_list: return
@@ -324,22 +326,14 @@ class CombatState(DefaultState, BaseController):
 		if monster.hp <= 0:
 			self.s_kill_monster(main, client, id)
 			
+	@rpc(server_functions, "request_monsters")
 	def request_monsters(self, main, client):
 		combat = main['combats'][client.combat_id]
 		if id not in combat.monster_list: return
 		print(combat.monster_list)
 		for i, v in combat.monster_list.items():
 			self.clients.invoke("add_monster", client.combat_id, v[0].name, i, *v[1])
-			
-			
-	server_functions  = dict(DefaultState.server_functions,
-			**{
-				"add_monster": (s_add_monster, (str, str, float, float, float)),
-				"kill_monster": (s_kill_monster, (str,)),
-				"modify_health": (s_modify_health, (str, float)),
-				"request_monsters": (request_monsters, ())
-			})
-		
+
 	def server_init(self, main):
 		"""Initialize the server state"""
 		
