@@ -1,6 +1,6 @@
 {
 	"name": "Mushroom Mines",
-	"encounter_deck": "test",
+	"encounter_deck": "Mining Golems",
 	"shop": "Kat",
 	"start_tiles":[
 			{ "obj": "start" }

@@ -1,0 +1,8 @@
+{
+	"name": "Clay Golem",
+	"role" : "brute",
+	
+	"xp_reward" : 100,
+	"ai_start_state": "spawn",
+	"ai_keywords": [ "movement.happy" ]
+}

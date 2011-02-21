@@ -1,0 +1,6 @@
+{
+	"name": "Test Deck",
+	"cards": [
+		{ "monster": "Clay Golem", "role": "brute", "count": 50 }
+	]
+}
