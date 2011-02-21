@@ -2,7 +2,7 @@
 	"name": "str",
 	"level" : "int",
 	"usage" : "{'AT_WILL', 'ENCOUNTER', 'DAILY', 'FEAT'}",
-	"range_type": "{'RANGED', 'BURST', 'MELEE'}",
+	"range_type": "{'RANGED', 'BURST', 'MELEE', 'BLAST'}",
 	"range_size": "int",
 	"damage_types": "list",
 	"flags": "list"

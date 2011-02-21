@@ -2,7 +2,7 @@
 	"name": "Thunderwave",
 	"level" : 1,
 	"usage" : "AT_WILL",
-	"range_type": "BURST",
+	"range_type": "BLAST",
 	"range_size": 3,
 	"damage_types": ["THUNDER"],
 	"flags": []
