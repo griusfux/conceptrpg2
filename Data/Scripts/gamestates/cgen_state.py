@@ -41,6 +41,14 @@ class CharacterCreationState(BaseState):
 		elif main['next_layout'] in ('end_cgen', 'start'):	
 			# Add the player empty
 			gameobj = main['engine'].add_object("CharacterEmpty")
+	
+			# Load the target shapes
+			main['target_shapes'] = {}
+			for child in gameobj.children:
+				if child.name == "blast":
+					main['target_shapes']['BLAST'] = child
+				elif child.name == "burst":
+					main['target_shapes']['BURST'] = child
 			
 			# Setup the player logic
 			player = PlayerLogic(gameobj)

@@ -164,6 +164,10 @@ class CombatState(DefaultState, BaseController):
 		# Handles input
 		inputs = main['input_system'].run()
 		
+		# Reset the target shapes
+		for key, shape in main['target_shapes'].items():
+			shape.visible = False
+		
 		# Targeting
 		active_power = main['player'].powers.active
 		range_type = active_power.range_type
@@ -266,10 +270,13 @@ class CombatState(DefaultState, BaseController):
 					else:					
 						# Show the range of the active power
 						power = main['player'].powers.active
-						point = main['player'].object.position
-						# tiles = self._find_target_range(power.range_type, power.range_size, point)
-						# for tile in tiles:
-							# tile.color((1, 0, 0, 0.25))
+						type = power.range_type
+						size = power.range_size
+						
+						if type in main['target_shapes']:
+							main['target_shapes'][type].color = [1, 0, 0, 0.25]
+							main['target_shapes'][type].scaling = Vector([size+HALF_TILE_SIZE]*2 + [1])
+							main['target_shapes'][type].visible = True
 				else:
 					main['ui_system'].mouse.visible = False
 
@@ -460,7 +467,7 @@ class CombatState(DefaultState, BaseController):
 				if (target.object.position - source).length < _range:
 					targets.append(target)
 		elif type == 'BLAST':
-			pi_fourths = math.pi / 4
+			pi_fourths = pi / 4
 			for target in tlist:
 			
 				# Start with a simple distance check
