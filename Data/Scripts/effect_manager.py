@@ -8,12 +8,6 @@ class EffectManager:
 		self._effects = []
 		self._next_id = 0
 		
-	def create(self, effect_name, position, target=None, duration=0, delay=0, continuous=-1, **functions):
-		effect = Effect(self._next_id, effect_name, position, target, duration, delay, continuous, **functions)
-		self._effects.append(effect)
-		self._next_id += 1
-		return effect.id
-		
 	def add(self, effect):
 		self._effects.append(effect)
 		effect._load(self._next_id, self._engine)
