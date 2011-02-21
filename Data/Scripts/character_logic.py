@@ -15,12 +15,12 @@ XP_TABLE =	[0,
 			1000,
 			2250,
 			3750,
-			5500,
-			7500,
-			10000,
-			13000,
-			16500,
-			20500,]
+			5500,]
+			# 7500,
+			# 10000,
+			# 13000,
+			# 16500,
+			# 20500,]
 
 class CharacterLogic:
 	"""A logic object that stores all the information and methods of the player"""
