@@ -62,7 +62,6 @@ class CombatState(DefaultState, BaseController):
 		monster = self.monster_list[id]
 		main['player'].xp += monster.xp_reward//len(self.hero_list)
 		main['player'].credits += monster.credit_reward//len(self.hero_list)
-		print("Current credits:", main['player'].credits)
 		
 		if monster in main['player'].targets:
 			main['player'].targets.remove(monster)
@@ -100,7 +99,6 @@ class CombatState(DefaultState, BaseController):
 		
 		# Place the monsters
 		if main['owns_combat']:
-			print(len(main['net_players']))
 			for monster in [Monster(i) for i in self._generate_encounter(main['dgen'].deck, len(main['net_players']))]:
 				# Load the monster
 				main['engine'].load_library(monster)
