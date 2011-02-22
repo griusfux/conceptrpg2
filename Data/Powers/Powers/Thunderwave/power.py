@@ -1,5 +1,5 @@
 import random
-ROLL = [1, 6]
+import Scripts.effects as effects
 
 def power(self, controller, user):
 	
@@ -10,16 +10,16 @@ def power(self, controller, user):
 	controller.play_animation(user, action, 0.5)
 	
 	
-	damage = random.randint(*ROLL)
+	damage = random.randint(1, 6)
 	if user.level >= 21:
-		damage += random.randint(*ROLL)
+		damage += random.randint(1, 6)
 	damage += user.int_mod
 		
-	def f_collision(effect):
-		effect.endObject()
-		target.hp -= damage
+	def f_collision(effect_obj, position):
+		controller.modify_health(effect_obj.target, -damage)
 	
 	for target in user.targets:
-		controller.create_effect("magic_missle", user.object._sockets['right_hand'].worldPosition.copy(), target=target.object.gameobj, collision = f_collision)
-	
+		effect = effects.ProjectileEffect("magic_missle", user.object.position, target)
+		effect.f_collision = f_collision
+		controller.add_effect(effect)
 	

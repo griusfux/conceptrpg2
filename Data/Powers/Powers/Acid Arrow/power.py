@@ -11,7 +11,7 @@ def power(self, controller, user):
 	controller.play_animation(user, action, 0.5)
 		
 	def f_collision(effect, position):
-		damage = random.randint(*ROLL) + random.randint(*ROLL) + user.int_mod		
+		damage = random.randint(1, 8) + random.randint(1, 8) + user.int_mod		
 		controller.modify_health(target, -damage)
 		controller.add_status(target, "Acid", -5, "SAVE")
 		
@@ -19,7 +19,7 @@ def power(self, controller, user):
 		for second_target in second_targets:
 			if second_target == target:
 				continue
-			controller.modify_health(second_target, -(random.randint(*ROLL) + user.int_mod))
+			controller.modify_health(second_target, -(random.randint(1, 8) + user.int_mod))
 			controller.add_status(second_target, "Acid", -5, "SAVE")
 		
 	target = user.targets[0]

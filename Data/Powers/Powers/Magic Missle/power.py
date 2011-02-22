@@ -1,6 +1,5 @@
 import Scripts.effects as effects
 import random
-ROLL = [1, 4]
 
 def power(self, controller, user):
 	
@@ -11,9 +10,9 @@ def power(self, controller, user):
 	controller.play_animation(user, action, 0.5)
 	
 	
-	damage = random.randint(*ROLL) + random.randint(*ROLL)
+	damage = random.randint(1, 4) + random.randint(1, 4)
 	if user.level >= 21:
-		damage += random.randint(*ROLL) + random.randint(*ROLL)
+		damage += random.randint(1, 4) + random.randint(1, 4)
 	damage += user.int_mod
 		
 	def f_collision(effect, position):

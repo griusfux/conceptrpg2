@@ -31,7 +31,7 @@ class ProjectileEffect(StaticEffect):
 		
 		if distance.length < 0.25:
 			if self.f_collision:
-				self.f_collision(self.obj, self.target_position)
+				self.f_collision(self, self.target_position)
 			self.time = 0
 			
 		else:
