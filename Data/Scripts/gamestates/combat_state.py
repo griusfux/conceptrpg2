@@ -553,7 +553,7 @@ class CombatState(DefaultState, BaseController):
 					
 					# Now do an angle check
 					v1 = character.object.forward_vector
-					v2 = character.object.get_local_vector_to(target.object.position)
+					v2 = target.object.position - character.object.position
 					
 					angle = v1.angle(v2, 0)
 					
