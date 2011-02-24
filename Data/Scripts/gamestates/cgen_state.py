@@ -130,6 +130,7 @@ class CharacterCreationState(BaseState):
 			
 			main['net_players'] = {main['client'].id: player}
 			main['player'] = player
+			player.id = main['client'].id
 			
 			# Fill the player's hit points
 			player.hp = player.max_hp
