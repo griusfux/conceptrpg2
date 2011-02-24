@@ -53,25 +53,6 @@ class DefaultState(BaseState, BaseController):
 		
 		main['combat_id'] = room_id
 		main['owns_combat'] = owns != 0
-		
-		
-	# Override BaseState's to
-	@rpc(client_functions, "to", str)
-	def to(self, main, cid):
-		if id not in main['net_players']: return
-		
-		main['net_players'][cid].object.end()
-		del main['net_players'][cid]
-		print(cid, "timed out.")
-		
-	# Override BaseState's dis
-	@rpc(client_functions, "dis", str)
-	def dis(self, main, cid):
-		if id not in main['net_players']: return
-		
-		main['net_players'][cid].object.end()
-		del main['net_players'][cid]
-		print(cid, "diconnected.")
 	
 	def client_init(self, main):
 		"""Intialize the client state"""

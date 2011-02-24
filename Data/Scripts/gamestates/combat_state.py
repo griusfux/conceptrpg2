@@ -40,22 +40,27 @@ class CombatState(DefaultState, BaseController):
 	def add_monster(self, main, cid, monster, id, x, y, z):
 		if cid != main['combat_id']: return
 		if id in self.monster_list: return
+		
+		if id not in main['net_players']:
+			print("Warning, couldn't find MonsterLogic for id:", id)
+			return
 	
-		monster = Monster(monster)
+		# monster = Monster(monster)
 	
 		# Load the library
-		main['engine'].load_library(monster)
+		# main['engine'].load_library(monster)
 		
 		# Place the monster
-		obj = main['engine'].add_object(monster.name, (x, y, z))
+		# obj = main['engine'].add_object(monster.name, (x, y, z))
 		
 		# Setup logic/ai
-		logic = MonsterLogic(obj, monster)
+		# logic = MonsterLogic(obj, monster)
 		#([name, [actions], [entry_actions], [exit_actions], [(transition, target_state)]], [second_name, [actions], [entry_actions], [exit_actions], [(tran1, target1), (tran2, target2)]]
 		# logic.ai = AiStateMachine(logic, (["idle", ["seek"], [], [], [("hp_lt_zero", "death"),]], ["death", ["die"], [], [], []]))
 		
 		# Add the monster to the monster list
-		logic.id = id
+		logic = main['net_players'][id]
+		obj = logic.object
 		self.monster_list[id] = logic
 		
 		color = obj.color
@@ -88,6 +93,7 @@ class CombatState(DefaultState, BaseController):
 				self.status_list.remove(status)
 				
 		del self.monster_list[id]
+		del main['net_players'][id]
 		
 	@rpc(client_functions, "move_monster", str, float, float, float)
 	def move_monster(self, main, cid, x, y, z):
@@ -335,6 +341,7 @@ class CombatState(DefaultState, BaseController):
 		
 		if cid not in combat.monster_list:
 			combat.monster_list[cid] = [MonsterLogic(None, Monster(monster)), [x, y, z]]
+			self.clients.invoke("add_player", cid, monster, 1, [x, y, z], None)
 			self.clients.invoke("add_monster", client.combat_id, monster, cid, x, y, z)
 		# else:
 			# print("WARNING (add_monster): Monster id, '%s', has already been added, ignoring" % id)
@@ -564,14 +571,8 @@ class CombatState(DefaultState, BaseController):
 		character.object.move(linear, min=[-50, -50, 0], max=[50, 50, 0], local=local)
 		
 		# Now handle rpcs
-		is_monster = character in self.monster_list.values()
-		
-		if is_monster:
-			self.server.invoke("rotate_monster", character.id, *angular)
-			self.server.invoke("position_monster", character.id, *character.object.position)
-		else:
-			self.server.invoke("rotate", character.id, *angular)
-			self.server.invoke("position", character.id, *character.object.position)
+		self.server.invoke("rotate", character.id, *angular)
+		self.server.invoke("position", character.id, *character.object.position)
 
 	def _get_idle_animation(self, main):
 		return main['default_actions']['1h_idle']

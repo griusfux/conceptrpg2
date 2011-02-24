@@ -146,15 +146,23 @@ class BaseState:
 		print("Setting id to", id)
 		main['client'].id = id
 		
-	# At this level, we just ignore time outs
 	@rpc(client_functions, "to", str)
-	def to(self, main, id):
-		pass		
+	def to(self, main, cid):
+		if 'net_players' not in main: return
+		if id not in main['net_players']: return
 		
-	# At this level, we just ignore disconnects
+		main['net_players'][cid].object.end()
+		del main['net_players'][cid]
+		print(cid, "timed out.")
+		
 	@rpc(client_functions, "dis", str)
-	def dis(self, main, id):
-		pass
+	def dis(self, main, cid):
+		if 'net_players' not in main: return
+		if id not in main['net_players']: return
+		
+		main['net_players'][cid].object.end()
+		del main['net_players'][cid]
+		print(cid, "diconnected.")
 		
 	@rpc(client_functions, "move", str, float, float, float)
 	def move(self, main, cid, x, y, z):
@@ -168,18 +176,33 @@ class BaseState:
 	def position(self, main, cid, x, y, z):
 		pass
 
-	@rpc(client_functions, "add_player", str, str, "pickle", "pickle")
-	def add_player(self, main, id, race, pos, ori):
-		if id in main['net_players']:
+	@rpc(client_functions, "add_player", str, str, int, "pickle", "pickle")
+	def add_player(self, main, cid, race, is_monster, pos, ori):
+		if cid in main['net_players']:
 			# This player is already in the list, so just ignore this call
 			return
 	
-		race = packages.Race(race)
+		if is_monster != 0:
+			race = packages.Monster(race)
+		else:
+			race = packages.Race(race)
 		main['engine'].load_library(race)
 		
-		obj = main['engine'].add_object(race.root_object, pos, ori)
-		main['net_players'][id] = character_logic.PlayerLogic(obj)
-		main['net_players'][id].id = id
+		if is_monster != 0:
+			obj = main['engine'].add_object(race.name, pos, ori)
+			main['net_players'][cid] = character_logic.MonsterLogic(obj, race)
+		else:
+			obj = main['engine'].add_object(race.root_object, pos, ori)
+			main['net_players'][cid] = character_logic.PlayerLogic(obj)
+		main['net_players'][cid].id = cid
+	
+	# @rpc(client_functions, "remove_player", str)
+	# def remove_player(self, main, cid):
+		# """Silently removes the player"""
+		
+		# if cid not in main['net_players']: return
+		# main['net_players'][cid].end_object()
+		# del main['net_players'][cid]
 	
 	def client_init(self, main):
 		"""Intialize the client state"""
@@ -206,10 +229,10 @@ class BaseState:
 	@rpc(server_functions, "add_player", str, "pickle", "pickle")
 	def add_player(self, main, client, race, pos, ori):
 		client.server.add_player(client.id, race, pos, ori)
-		self.clients.invoke('add_player', client.id, race, pos, ori)
+		self.clients.invoke('add_player', client.id, race, 0, pos, ori)
 		
 		for k, v in main['players'].items():
-			self.client.invoke('add_player', k, v.race, v.position, v.orientation)
+			self.client.invoke('add_player', k, v.race, 0, v.position, v.orientation)
 		
 	@rpc(server_functions, "switch_state", str)
 	def switch_state(self, main, client, state):
