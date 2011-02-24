@@ -13,9 +13,6 @@ class MonsterEditor(QFrame):
 		
 		# Setup the values
 		self.ui.name.setText(data.name)
-		self.ui.ai_start_state.setText(data.ai_start_state)
-		self.ui.ai_keywords.insertItems(0, data.ai_keywords)
 		
 	def save(self):
 		self.data.name = self.ui.name.text()
-		self.data.ai_start_state = self.ui.ai_start_state.text()
