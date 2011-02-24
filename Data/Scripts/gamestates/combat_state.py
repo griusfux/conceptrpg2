@@ -187,6 +187,10 @@ class CombatState(DefaultState, BaseController):
 			if status['time'] == TURN:
 				status['time'] = 0
 				status['power'].use(self, status['user'])
+				if status['save']:
+					if self.check_save(status['user'], 0, 'STATIC', status['power'].damage_types[0]):
+						status['user'].powers.remove(status['power'])
+						self.status_list.remove(status)
 		
 		# Targeting
 		active_power = main['player'].powers.active
@@ -471,6 +475,7 @@ class CombatState(DefaultState, BaseController):
 		status_entry['power'] = status
 		status_entry['user'] = character
 		status_entry['time'] = 0
+		status_entry['save'] = duration.strip().lower() == 'save'
 		self.status_list.append(status_entry)
 
 	def get_targets(self, character, type, _range, target_types={'ENEMIES'}, source=None):
@@ -547,6 +552,27 @@ class CombatState(DefaultState, BaseController):
 		# Now handle rpcs
 		self.server.invoke("rotate", character.id, *angular)
 		self.server.invoke("position", character.id, *character.object.position)
+		
+	def check_save(self, defender, def_stat, offender, off_stat):
+		def_value = 0
+		off_value = 0
+		
+		if offender == 'STATIC':
+			off_value = 10
+			if off_stat in defender.saving_throw_mods:
+				off_value += defender.saving_throw_mods['off_stat']
+				
+			return random.randint(1, 20) >= off_value
+			
+		if off_stat.strip().lower()[:3] in ('str', 'con', 'dex', 'int', 'wis', 'cha'):
+			off_value = offender.level//2 + getattr(offender, off_stat.strip().lower()[:3]+"_mod")
+			off_value += random.randint(1, 20)
+			
+		if def_stat.strip().lower() in ('ac', 'fortitude', 'reflex', 'will'):
+			def_value = getattr(defender, def_stat.strip().lower())
+			
+		
+		return def_value >= off_value
 
 	def _get_idle_animation(self, main):
 		return main['default_actions']['1h_idle']

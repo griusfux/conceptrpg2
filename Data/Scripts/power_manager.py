@@ -44,9 +44,10 @@ class PowerManager:
 		"""
 		
 		if "PASSIVE" in power.flags:
-			self._passivs.remove(power)
+			self._passives.remove(power)
 			power.pop(self.owner)
-		self._powers.remove(power)
+		else:
+			self._powers.remove(power)
 		
 	def make_next_active(self):
 		"""Make the power after the current power active"""

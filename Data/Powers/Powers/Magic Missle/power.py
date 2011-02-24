@@ -16,7 +16,10 @@ def power(self, controller, user):
 	damage += user.int_mod
 		
 	def f_collision(effect, position):
-		controller.modify_health(target, -damage)
+		if not controller.check_save(target, 'Reflex', user, 'Intelligence'):
+			controller.modify_health(target, -damage)
+		else:
+			conroller.modify_health(target, 0)
 		
 	target = user.targets[0]
 	

@@ -10,6 +10,10 @@ def power(self, controller, user):
 	controller.play_animation(user, action, 0.5)
 	
 	for target in user.targets:
+		if controller.check_save(target, "Fortitude", user, "Intelligence"):
+			controller.modify_health(target, 0)
+			continue
+			
 		damage = random.randint(1, 8)
 		damage += user.int_mod
 		

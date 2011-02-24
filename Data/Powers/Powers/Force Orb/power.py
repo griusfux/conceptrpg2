@@ -1,7 +1,5 @@
 import Scripts.effects as effects
 import random
-ROLL = [1, 8]
-ROLL2 = [1, 10]
 
 def power(self, controller, user):
 	
@@ -16,6 +14,10 @@ def power(self, controller, user):
 	damage += user.int_mod
 		
 	def f_collision(effect, position):
+		if controller.check_save(target, "Reflex", user, "Intelligence"):
+			controller.modify_helath(target, 0)
+			return
+			
 		controller.modify_health(target, -damage)
 		second_targets = controller.get_targets(user, "BURST", 1, source=position)
 		for second_target in second_targets:
