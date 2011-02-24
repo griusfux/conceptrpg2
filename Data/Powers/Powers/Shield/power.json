@@ -1,0 +1,9 @@
+{
+	"name": "Shield",
+	"level" : 2,
+	"usage" : "ENCOUNTER",
+	"range_type": "BURST",
+	"range_size": 0,
+	"damage_types": [],
+	"flags": ["UTILITY"]
+}

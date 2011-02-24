@@ -42,25 +42,32 @@ class UnspentLevel:
 		
 		
 		# At wills
-		self.at_will_powers = [power.name for power in available_powers if power.usage == 'AT_WILL']
+		self.at_will_powers = [power.name for power in available_powers if power.usage == 'AT_WILL' and 'UTILITY' not in power.flags]
 		if level == 1:
 			self.at_will_count = 2
 		else:
 			self.at_will_count = 0
 			
 		# Encounters
-		self.encounter_powers = [power.name for power in available_powers if power.usage == 'ENCOUNTER']
+		self.encounter_powers = [power.name for power in available_powers if power.usage == 'ENCOUNTER' and 'UTILITY' not in power.flags]
 		if level in (1, 3, 7):
 			self.encounter_count = 1
 		else:
 			self.encounter_count = 0
 			
 		# Dailies
-		self.daily_powers = [power.name for power in available_powers if power.usage == 'DAILY']
+		self.daily_powers = [power.name for power in available_powers if power.usage == 'DAILY' and 'UTILITY' not in power.flags]
 		if level in (1, 5, 9):
 			self.daily_count = 1
 		else:
 			self.daily_count = 0
+			
+		# Utilities
+		self.utility_powers = [power.name for power in available_powers if 'UTILITY' in power.flags]
+		if level in (2, 6, 10):
+			self.utility_count = 1
+		else:
+			self.utility_count = 0
 			
 		self.level = level
 		

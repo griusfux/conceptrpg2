@@ -211,7 +211,7 @@ class LevelUpLayout(Layout):
 			score += int(getattr(self, ab+"_bonus").text)
 			setattr(self.main['player'], ab+"_ab", score)
 		
-		for i in range(3):
+		for i in range(4):
 			for power in self.learned[i]:
 				self.main['player'].powers.add(Power(power))
 		self.main['level_exit'] = True
@@ -221,7 +221,11 @@ class LevelUpLayout(Layout):
 			power = Power(self.selected_a_power.name.strip())
 			
 			i = 0
-			if power.usage == "AT_WILL":
+			if 'UTILITY' in power.flags:
+				if len(self.learned[3]) >= self.unspent_level.utility_count:
+					return
+				i = 3
+			elif power.usage == "AT_WILL":
 				if len(self.learned[0]) >= self.unspent_level.at_will_count:
 					return
 				i = 0
@@ -253,7 +257,9 @@ class LevelUpLayout(Layout):
 			
 			i = 0
 			
-			if power.usage == "AT_WILL":
+			if 'UTILITY' in power.flags:
+				i = 3
+			elif power.usage == "AT_WILL":
 				i = 0
 			elif power.usage == "ENCOUNTER":
 				i = 1
@@ -304,8 +310,8 @@ class LevelUpLayout(Layout):
 				
 			# Create lists for known, available, and learned powers
 			known_list_strings = [power.name for power in main['player'].powers.all]
-			available_lists = self.unspent_level.at_will_powers, self.unspent_level.encounter_powers, self.unspent_level.daily_powers
-			self.learned = [[], [], []]
+			available_lists = self.unspent_level.at_will_powers, self.unspent_level.encounter_powers, self.unspent_level.daily_powers, self.unspent_level.utility_powers
+			self.learned = [[], [], [], []]
 			# Remove any known powers from the available powers TODO: remove try/except
 			for list in available_lists:
 				for power in known_list_strings:
@@ -317,6 +323,7 @@ class LevelUpLayout(Layout):
 			display_list = ['At Will'] + ['    '+power for power in available_lists[0]]
 			display_list += ['Encounter'] + ['    '+power for power in available_lists[1]]
 			display_list += ['Daily'] + ['    '+power for power in available_lists[2]]
+			display_list += ['Utility'] + ['  '+power for power in available_lists[3]]
 			display_list += ['Unlearned']
 			self.available_list.list = [bgui.Label(self, item, pt_size=16, text=item) for item in display_list]
 			for label in self.available_list.list:
@@ -339,7 +346,8 @@ class LevelUpLayout(Layout):
 		# Make accept button inactive if there are unspent level perks
 		if self.unspent_points != 0 or len(self.learned[0]) < self.unspent_level.at_will_count\
 			or len(self.learned[1]) < self.unspent_level.encounter_count\
-			or len(self.learned[2]) < self.unspent_level.daily_count:
+			or len(self.learned[2]) < self.unspent_level.daily_count\
+			or len(self.learned[3]) < self.unspent_level.utility_count:
 			
 			self.lvl_btn.color = [0.4, 0.4, 0.4, 1.0]
 			self.lvl_btn.frozen = True
