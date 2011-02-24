@@ -80,20 +80,13 @@ class CombatState(DefaultState, BaseController):
 		
 		if monster in main['player'].targets:
 			main['player'].targets.remove(monster)
-			
-		effect = effects.FadeEffect(monster.object, 25)
-		def f_end(object, engine):
-			object.end()
-		effect.f_end = f_end
-		self.add_effect(effect)
-		
+
 		# Clear any of the monster's statuses out of the status list
 		for status in self.status_list:
 			if status['user'] == monster:
 				self.status_list.remove(status)
-				
+
 		del self.monster_list[id]
-		del main['net_players'][id]
 		
 	@rpc(client_functions, "move_monster", str, float, float, float)
 	def move_monster(self, main, cid, x, y, z):
@@ -354,6 +347,7 @@ class CombatState(DefaultState, BaseController):
 		if id in combat.monster_list:
 			del combat.monster_list[id]
 			self.clients.invoke("kill_monster", client.combat_id, id)
+			self.clients.invoke("remove_player", id)
 		else:
 			# print("WARNING (kill_monster): Monster id, '%s', not in list, ignoring" % id)
 			return
@@ -463,10 +457,6 @@ class CombatState(DefaultState, BaseController):
 				pos = character.object.position[:2]+(character.object.position[2]+2,)
 				effect = effects.TextEffect(amount, pos, 90)
 				self.add_effect(effect)
-		
-	def add_effect(self, effect):
-		id = self.main["effect_system"].add(effect)
-		return id
 		
 	def end_effect(self, id):
 		self.main["effect_system"].remove(id)

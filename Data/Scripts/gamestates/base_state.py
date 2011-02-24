@@ -3,6 +3,7 @@
 import pickle
 import Scripts.packages as packages
 import Scripts.character_logic as character_logic
+import Scripts.effect_manager as effects
 
 # This is used to implement RPC like functionality
 def rpc(d, name, *args):
@@ -140,6 +141,16 @@ class BaseState:
 	# Client
 	##########
 	
+	def _delete_player(self, main, cid):
+		obj = main['net_players'][cid].object
+		effect = effects.FadeEffect(obj, 25)
+		def f_end(object, engine):
+			object.end()
+		effect.f_end = f_end
+		self.add_effect(effect)
+		
+		del main['net_players'][cid]
+	
 	# Client functions
 	@rpc(client_functions, "cid", str)
 	def cid(self, main, id):
@@ -151,8 +162,7 @@ class BaseState:
 		if 'net_players' not in main: return
 		if id not in main['net_players']: return
 		
-		main['net_players'][cid].object.end()
-		del main['net_players'][cid]
+		self._delete_player(self, main, cid)
 		print(cid, "timed out.")
 		
 	@rpc(client_functions, "dis", str)
@@ -160,9 +170,16 @@ class BaseState:
 		if 'net_players' not in main: return
 		if id not in main['net_players']: return
 		
-		main['net_players'][cid].object.end()
-		del main['net_players'][cid]
+		self._delete_player(self, main, cid)
 		print(cid, "diconnected.")
+		
+	@rpc(client_functions, "remove_player", str)
+	def remove_player(self, main, cid):
+		"""Remove a player without printing a message"""
+		if 'net_players' not in main: return
+		if cid not in main['net_players']: return
+
+		self._delete_player(main, cid)
 		
 	@rpc(client_functions, "move", str, float, float, float)
 	def move(self, main, cid, x, y, z):
@@ -253,9 +270,11 @@ class BaseState:
 	##########
 	# Other
 	##########
-	
-	# Empty ---
-	
+		
+	def add_effect(self, effect):
+		id = self.main["effect_system"].add(effect)
+		return id
+
 # All states should have a controller interface by which things like the AI system may make use
 # of the state. Subclass this controller and override methods as you need them.
 class BaseController:
