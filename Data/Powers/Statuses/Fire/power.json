@@ -1,0 +1,5 @@
+{
+	"name": "Fire",
+	"damage_types": ["FIRE"],
+	"flags": ["PASSIVE"]
+}
