@@ -521,6 +521,9 @@ class Engine:
 		
 		# So we can keep track of already loaded libraries
 		self.library_list = []
+		
+	def __del__(self):
+		self.free_libraries()
 	
 	def load_library(self, package):
 		"""Load scene data from a package file"""
@@ -530,6 +533,15 @@ class Engine:
 			
 		gl.LibLoad(package.name, 'Scene', package.blend)
 		self.library_list.append(package.name)
+		
+	def free_libraries(self):
+		"""Free all the cached libraries"""
+		
+		for lib in self.library_list:
+			print("Freeing:", lib)
+			gl.LibFree(lib)
+			
+		self.library_list = []
 		
 	def angle_between(self, vec1, vec2):
 		vec1 = Vector(vec1)
