@@ -179,6 +179,7 @@ class BaseState:
 		
 		obj = main['engine'].add_object(race.root_object, pos, ori)
 		main['net_players'][id] = character_logic.PlayerLogic(obj)
+		main['net_players'][id].id = id
 	
 	def client_init(self, main):
 		"""Intialize the client state"""

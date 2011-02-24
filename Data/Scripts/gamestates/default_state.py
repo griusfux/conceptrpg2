@@ -19,13 +19,16 @@ class DefaultState(BaseState, BaseController):
 	@rpc(client_functions, "position", str, float, float, float)
 	def position(self, main, cid, x, y, z):
 		if cid not in main['net_players']: return
-		server_pos = [x, y, z]
-		client_pos = main['net_players'][cid].object.position
 		
-		for i in range(3):
-			if abs(server_pos[i]-client_pos[i]) > 1.0:
-				client_pos[i] = server_pos[i]
+		client_pos = main['net_players'][cid].object.position
+		if main['player'].id == cid:
+			# Check to make sure we are still where the server says we are
+			server_pos = [x, y, z]
 			
+			for i in range(3):
+				if abs(server_pos[i]-client_pos[i]) > 1.0:
+					client_pos[i] = server_pos[i]
+				
 		main['net_players'][cid].object.position = client_pos
 		
 	@rpc(client_functions, "move", str, float, float, float)
@@ -214,7 +217,8 @@ class DefaultState(BaseState, BaseController):
 			main['player'].object.play_animation(act['name'], act['start'], act['end'], mode=1)
 
 		# Send the message
-		self.server.invoke("move", id, *movement)
+		# self.server.invoke("move", id, *movement)
+		main['player'].object.move(movement, min=[-50, -50, 0], max=[50, 50, 0])
 
 	##########
 	# Server

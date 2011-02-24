@@ -37,6 +37,8 @@ class CharacterLogic:
 		if obj and obj.armature:
 			self.armature = obj.armature
 			
+		self.id = -1
+			
 		#Player information
 		self.name		= ""
 		self.level		= 0

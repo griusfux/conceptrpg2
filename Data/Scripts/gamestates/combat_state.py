@@ -55,7 +55,7 @@ class CombatState(DefaultState, BaseController):
 		# logic.ai = AiStateMachine(logic, (["idle", ["seek"], [], [], [("hp_lt_zero", "death"),]], ["death", ["die"], [], [], []]))
 		
 		# Add the monster to the monster list
-		id = str(len(self.monster_list))
+		logic.id = id
 		self.monster_list[id] = logic
 		
 		color = obj.color
@@ -89,6 +89,16 @@ class CombatState(DefaultState, BaseController):
 				
 		del self.monster_list[id]
 		
+	@rpc(client_functions, "move_monster", str, float, float, float)
+	def move_monster(self, main, cid, x, y, z):
+		if cid not in self.monster_list: return
+		self.monster_list[cid].object.position = (x, y, z)
+		
+	@rpc(client_functions, "rotate_monster", str, float, float, float)
+	def rotate_monster(self, main, cid, x, y, z):
+		if cid not in self.monster_list: return
+		self.monster_list[cid].object.rotate((x, y, z))
+
 	@rpc(client_functions, "add_hero", str, str)
 	def add_hero(self, main, cid, hid):
 		if cid != main['combat_id']: return
@@ -114,40 +124,17 @@ class CombatState(DefaultState, BaseController):
 		
 		# Place the monsters
 		if main['owns_combat']:
+			i = 0
 			for monster in [Monster(i) for i in self._generate_encounter(main['dgen'].deck, len(main['net_players']))]:
-				# Load the monster
-				main['engine'].load_library(monster)
-			
+
 				# Find a place to put the monster
 				x = random.uniform(self.room.start_x+TILE_SIZE, self.room.end_x-TILE_SIZE)
 				y = random.uniform(self.room.start_y+TILE_SIZE, self.room.end_y-TILE_SIZE)
-						
-				# Place the monster
-				obj = main['engine'].add_object(monster.name, (x, y, GRID_Z))
-				
-				# Setup logic/ai
-				logic = MonsterLogic(obj, monster)
-				#([name, [actions], [entry_actions], [exit_actions], [(transition, target_state)]], [second_name, [actions], [entry_actions], [exit_actions], [(tran1, target1), (tran2, target2)]]
-				logic.ai = AiStateMachine(logic, (["idle", ["seek"], [], [], [("hp_lt_zero", "death"),]], ["death", ["die"], [], [], []]))
-				
-				# Add the monster to the monster list
-				id = str(len(self.monster_list))
-				self.monster_list[id] = logic
+				i += 1
 				
 				# Update the server
-				self.server.invoke("add_monster", monster.name, id, x, y, GRID_Z)
-				
-		
-				# Fade in monsters
-				for key, value in self.monster_list.items():
-					obj = value.object
+				self.server.invoke("add_monster", monster.name, str(i), x, y, GRID_Z)
 					
-					color = obj.color
-					color[3] = 0
-					obj.color = color
-				
-					effect = effects.FadeEffect(obj, duration=90, amount=1)
-					self.add_effect(effect)
 		else:
 			# Request monsters from the server
 			self.server.invoke("request_monsters")
@@ -342,13 +329,13 @@ class CombatState(DefaultState, BaseController):
 	##########
 	
 	@rpc(server_functions, "add_monster", str, str, float, float, float)
-	def s_add_monster(self, main, client, monster, id, x, y, z):
+	def s_add_monster(self, main, client, monster, cid, x, y, z):
 		combat = main['combats'].get(client.combat_id, None)
 		if combat is None: return
 		
-		if id not in combat.monster_list:
-			combat.monster_list[id] = [MonsterLogic(None, Monster(monster)), [x, y, z]]
-			self.clients.invoke("add_monster", client.combat_id, monster, id, x, y, z)
+		if cid not in combat.monster_list:
+			combat.monster_list[cid] = [MonsterLogic(None, Monster(monster)), [x, y, z]]
+			self.clients.invoke("add_monster", client.combat_id, monster, cid, x, y, z)
 		# else:
 			# print("WARNING (add_monster): Monster id, '%s', has already been added, ignoring" % id)
 		
@@ -385,8 +372,8 @@ class CombatState(DefaultState, BaseController):
 	def request_monsters(self, main, client):
 		combat = main['combats'].get(client.combat_id, None)
 		if combat is None: return
-		if id not in combat.monster_list: return
-		print(combat.monster_list)
+		if client.combat_id not in combat.monster_list: return
+		
 		for i, v in combat.monster_list.items():
 			self.clients.invoke("add_monster", client.combat_id, v[0].name, i, *v[1])
 
@@ -395,8 +382,7 @@ class CombatState(DefaultState, BaseController):
 		combat = main['combats'].get(client.combat_id, None)
 		if combat is None: return
 		
-		id = client.id
-		if id in combat.hero_list:
+		if client.id in combat.hero_list:
 			# Already added, ignore
 			return
 			
@@ -404,7 +390,15 @@ class CombatState(DefaultState, BaseController):
 		
 		for hero in combat.hero_list:
 			self.client.invoke('add_hero', client.combat_id, hero)
-			
+	
+	@rpc(server_functions, "rotate_monster", str, float, float, float)
+	def s_rotate_monster(self, main, client, cid, x, y, z):
+		self.clients.invoke("rotate_monster", cid, x, y, z)
+		
+	@rpc(server_functions, "position_monster", str, float, float, float)
+	def s_position_monster(self, main, client, cid, x, y, z):
+		self.clients.invoke("position_monster", cid, x, y, z)
+	
 	def server_init(self, main):
 		"""Initialize the server state"""
 		
@@ -563,56 +557,22 @@ class CombatState(DefaultState, BaseController):
 		return targets		
 	
 	
-	def move(self, id, character, linear = (0,0,0) , angular = (0,0,0) , local = False):
+	def move(self, character, linear = (0,0,0) , angular = (0,0,0) , local = False):
 		"""Handles linear and angular movement of a character"""
 		
-		# Positions are not quite accurate in the movement blocking, also adapting
-		# Rotate to the new method causes some problems.
+		# Move the character
+		character.object.move(linear, min=[-50, -50, 0], max=[50, 50, 0], local=local)
 		
-		if 0:
-			linear = Vector(linear)
-			if linear.length > 0:
-				# Convert to a world vector if local is true
-				if local:
-					angle = Vector((0,1,0)).angle(character.object.forward_vector)
-					# linear.rotate(Euler((0, 0, angle)))
-				
-				# Ensure we are using a normalized vector
-				linear.normalized()
-				
-				# Find the new position relative to the grid origin
-				position = character.object.position - Vector(self.grid.origin) + linear
-			
-				# Convert to grid coordinates
-				position = [int(i/TILE_SIZE) for i in position]
-				position[1] *= -1
-				
-				# Get the tile that corresponds with the character's position
-				tile = self.grid(position[0], position[1])
-				
-				if tile != None and tile.valid:
-					# Convert to local space
-					angle = character.object.forward_vector.angle(Vector((0,1,0)))
-					# linear.rotate(Euler((0, 0, -angle)))
-					
-					# Apply the characters speed
-					linear *= character.speed
-				else:
-					# The character can't move that way, so eliminate any movement in linear
-					linear *= 0
+		# Now handle rpcs
+		is_monster = character in self.monster_list.values()
 		
-		self.server.invoke("rotate", id, *angular)
-		self.server.invoke("move", id, *linear)
-			# print(position)
-		
+		if is_monster:
+			self.server.invoke("rotate_monster", charcter.id, *angular)
+			self.server.invoke("moster_position", character.id, *character.object.position)
+		else:
+			self.server.invoke("rotate", character.id, *angular)
+			self.server.invoke("position", character.id, *character.object.position)
 
-		# If the character has changed tiles, the tiles need to be updated to reflect this
-		new_tile = self.grid.tile_from_point(character.object.position)
-		if new_tile != character.tile:
-			character.tile.fill(None)
-			new_tile.fill(character)
-			character.tile = new_tile
-			
 	def _get_idle_animation(self, main):
 		return main['default_actions']['1h_idle']
 		
