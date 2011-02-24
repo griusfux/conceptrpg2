@@ -217,6 +217,7 @@ class BaseState:
 			main['net_players'][cid] = character_logic.MonsterLogic(obj, race)
 		else:
 			obj = main['engine'].add_object(race.root_object, pos, ori)
+			obj.armature = obj
 			main['net_players'][cid] = character_logic.PlayerLogic(obj)
 		main['net_players'][cid].id = cid
 	
