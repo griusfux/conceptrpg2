@@ -192,6 +192,13 @@ class BaseState:
 	@rpc(client_functions, "position", str, float, float, float)
 	def position(self, main, cid, x, y, z):
 		pass
+		
+	@rpc(client_functions, "animate", str, str, int, int, int)
+	def animate(self, main, cid, action, start, end, mode):
+		if 'net_players' not in main: return
+		if cid not in main['net_players']: return
+		
+		main['net_players'][cid].object.play_animation(action, start, end, mode=mode)
 
 	@rpc(client_functions, "add_player", str, str, int, "pickle", "pickle")
 	def add_player(self, main, cid, race, is_monster, pos, ori):
@@ -251,6 +258,10 @@ class BaseState:
 		for k, v in main['players'].items():
 			self.client.invoke('add_player', k, v.race, 0, v.position, v.orientation)
 		
+	@rpc(server_functions, "animate", str, str, int, int, int)
+	def s_animate(self, main, client, cid, action, start, end, mode):
+		self.clients.invoke('animate', cid, action, start, end, mode) 
+		
 	@rpc(server_functions, "switch_state", str)
 	def switch_state(self, main, client, state):
 		self._next_state = state
@@ -280,7 +291,7 @@ class BaseState:
 class BaseController:
 	"""Base controller interface"""
 	
-	def play_animation(self, character, animation, lock=0):
+	def play_animation(self, character, animation, lock=0, mode=0):
 		"""Instruct the character to play the animation
 		
 		character -- the charcter who will play the animation
@@ -289,7 +300,9 @@ class BaseController:
 		
 		"""
 		
-		pass
+		if lock:
+			character.add_lock(lock)
+		self.server.invoke("animate", character.id, animation['name'], animation['start'], animation['end'], mode)
 		
 	def get_targets(self, type, range):
 		"""Get targets in a range

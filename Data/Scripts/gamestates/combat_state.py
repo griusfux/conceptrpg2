@@ -472,23 +472,7 @@ class CombatState(DefaultState, BaseController):
 		status_entry['user'] = character
 		status_entry['time'] = 0
 		self.status_list.append(status_entry)
-		
-		
-	
-	def play_animation(self, character, animation, lock=0, mode=0):
-		"""Instruct the character to play the animation
-		
-		character -- the charcter who will play the animation
-		animation -- the animation to play
-		lock -- how long to lock for the animation
-		
-		"""
-		
-		character.add_lock(lock)
-		character.object.play_animation(animation['name'], animation['start'], animation['end'], mode=mode)
-		
-		# self.server.invoke("anim", animation, 1, 20, 0, 0) # XXX should be done based on the supplied character
-		
+
 	def get_targets(self, character, type, _range, target_types={'ENEMIES'}, source=None):
 		"""Get targets in a range
 		

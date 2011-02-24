@@ -177,7 +177,7 @@ class DefaultState(BaseState, BaseController):
 
 			if ("MoveForward", "INPUT_ACTIVE") in inputs:
 				act = self._get_forward_animation(main)
-				main['player'].object.play_animation(act['name'], act['start'], act['end'], mode=1)
+				self.play_animation(main['player'], act, mode=1)
 				movement[1] = speed
 			if ("MoveBackward", "INPUT_ACTIVE") in inputs:
 				movement[1] = -speed
@@ -195,7 +195,7 @@ class DefaultState(BaseState, BaseController):
 		# Otherwise, idle
 		elif not main['player'].lock:
 			act = self._get_idle_animation(main)
-			main['player'].object.play_animation(act['name'], act['start'], act['end'], mode=1)
+			self.play_animation(main['player'], act, mode=1)
 
 		# Send the message
 		# self.server.invoke("move", id, *movement)
@@ -258,25 +258,4 @@ class DefaultState(BaseState, BaseController):
 	# Controller
 	##########
 	
-	def play_animation(self, character, animation, lock=0):
-		"""Instruct the character to play the animation
-		
-		character -- the character who will play the animation
-		animation -- the animation to play
-		lock -- how long to lock for the animation
-		
-		"""
-		
-		character.add_lock(lock)
-		self.server.invoke("anim", animation, 1, 20, 0, 0)
-#		self.main['client'].send('anim:'+animation) # XXX should be done based on the supplied character
-		
-	def get_targets(self, type, range):
-		"""Get targets in a range
-		
-		type -- the type of area (line, burst, etc)
-		range -- the range to grab (integer)
-		
-		"""
-		
-		return []
+	# Empty ---
