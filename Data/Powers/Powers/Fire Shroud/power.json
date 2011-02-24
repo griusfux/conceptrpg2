@@ -1,0 +1,9 @@
+{
+	"name": "Fire Shroud",
+	"level" : 3,
+	"usage" : "ENCOUNTER",
+	"range_type": "BURST",
+	"range_size": 3,
+	"damage_types": ["FIRE"],
+	"flags": []
+}
