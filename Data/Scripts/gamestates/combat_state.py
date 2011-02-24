@@ -13,12 +13,12 @@ from Scripts.mathutils import Vector, Matrix
 import Scripts.effect_manager as effects
 
 # Constants for grid generation
-TILE_SIZE = 1
-HALF_TILE_SIZE = TILE_SIZE/2.0
-GRID_Z = 0.01
+UNIT_SIZE = 1
+HALF_UNIT_SIZE = UNIT_SIZE/2.0
+SAFE_Z = 0.01
 
 # A constant for how many frames are in a "turn"
-TURN = 540
+TURN = 90
 
 class Combat:
 	"""Combat utility class"""
@@ -128,12 +128,12 @@ class CombatState(DefaultState, BaseController):
 			for monster in [Monster(i) for i in self._generate_encounter(main['dgen'].deck, len(main['net_players']))]:
 
 				# Find a place to put the monster
-				x = random.uniform(self.room.start_x+TILE_SIZE, self.room.end_x-TILE_SIZE)
-				y = random.uniform(self.room.start_y+TILE_SIZE, self.room.end_y-TILE_SIZE)
+				x = random.uniform(self.room.start_x+UNIT_SIZE, self.room.end_x-UNIT_SIZE)
+				y = random.uniform(self.room.start_y+UNIT_SIZE, self.room.end_y-UNIT_SIZE)
 				i += 1
 				
 				# Update the server
-				self.server.invoke("add_monster", monster.name, str(i), x, y, GRID_Z)
+				self.server.invoke("add_monster", monster.name, str(i), x, y, SAFE_Z)
 					
 		else:
 			# Request monsters from the server
@@ -277,14 +277,14 @@ class CombatState(DefaultState, BaseController):
 						targets = self.monster_list.values()
 						
 						# Gather some info for the target searching
-						distance = main['player'].powers.active.range_size * TILE_SIZE
+						distance = main['player'].powers.active.range_size * UNIT_SIZE
 						cam_vec = main['camera'].pivot.getAxisVect((0,0,-1))
 						
 						final_target = None
 						final_factor = .5 #atan(1/distance) * distance
 						for target in targets:
 							target_vec = target.object.position - main['camera'].pivot.worldPosition.copy()
-							target_vec_len = target_vec.length * TILE_SIZE - 2
+							target_vec_len = target_vec.length * UNIT_SIZE - 2
 							if target_vec_len < distance:
 								factor = cam_vec.angle(target_vec.normalized()) * target_vec_len
 								if factor < final_factor:
@@ -302,7 +302,7 @@ class CombatState(DefaultState, BaseController):
 						
 						if type in main['target_shapes']:
 							main['target_shapes'][type].color = [1, 0, 0, 0.25]
-							main['target_shapes'][type].scaling = Vector([size+HALF_TILE_SIZE]*2 + [1])
+							main['target_shapes'][type].scaling = Vector([size+HALF_UNIT_SIZE]*2 + [1])
 							main['target_shapes'][type].visible = True
 				else:
 					main['ui_system'].mouse.visible = False
@@ -504,7 +504,7 @@ class CombatState(DefaultState, BaseController):
 		
 		# Bump the range a bit to compensate for the first half "tile"
 		# that the player occupies
-		_range += HALF_TILE_SIZE
+		_range += HALF_UNIT_SIZE
 		
 		if not source:
 			source = character.object.position
@@ -530,7 +530,7 @@ class CombatState(DefaultState, BaseController):
 				v *= ori_ivnt
 				
 				# Now do a simple bounds check
-				if v[1] < _range and abs(v[0]) < HALF_TILE_SIZE:
+				if v[1] < _range and abs(v[0]) < HALF_UNIT_SIZE:
 					targets.append(target)
 		elif type == 'BURST':
 			for target in tlist:
@@ -567,8 +567,8 @@ class CombatState(DefaultState, BaseController):
 		is_monster = character in self.monster_list.values()
 		
 		if is_monster:
-			self.server.invoke("rotate_monster", charcter.id, *angular)
-			self.server.invoke("moster_position", character.id, *character.object.position)
+			self.server.invoke("rotate_monster", character.id, *angular)
+			self.server.invoke("position_monster", character.id, *character.object.position)
 		else:
 			self.server.invoke("rotate", character.id, *angular)
 			self.server.invoke("position", character.id, *character.object.position)
@@ -611,6 +611,6 @@ class CombatRoom:
 		self.end_y = ly
 		
 		# Find out how many tiles we need
-		self.x_steps = int(round(self.width / TILE_SIZE))
-		self.y_steps = int(round(self.height / TILE_SIZE))
+		self.x_steps = int(round(self.width / UNIT_SIZE))
+		self.y_steps = int(round(self.height / UNIT_SIZE))
 	
