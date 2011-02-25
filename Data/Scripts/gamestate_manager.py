@@ -13,6 +13,7 @@ STATES = {
 		"Combat": CombatState,
 		"Shop": ShopState,
 		"LevelUp": LevelUpState,
+		"Inventory": InventoryState,
 		}
 		
 

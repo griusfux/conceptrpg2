@@ -14,13 +14,13 @@ layouts = {
 	
 	"title": TitleLayout,
 	"ingame_menu": InGameMenuLayout,
+	"inventory": InventoryLayout,
 	"dun_gen": DunGenLayout,
 	"default_state": DefaultStateLayout,
 	"combat": CombatLayout,
 	"shop" : ShopLayout,
 	"level_up" : LevelUpLayout,
 	
-	"inventory_overlay": InventoryOverlay,
 	"stats": StatsOverlay,
 	"start_game_overlay": StartGameOverlay,
 	"credits_overlay": CreditsOverlay

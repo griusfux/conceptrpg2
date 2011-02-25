@@ -20,21 +20,84 @@ class StatsOverlay(Layout):
 	def update(self, main):
 		self.fps.text = "%.2f fps" % main['engine'].fps
 		
-class InventoryOverlay(Layout):
+class InventoryLayout(Layout):
 	def __init__(self, parent):
 		Layout.__init__(self, parent, "inventory_overlay")
 		
-		self.frame = bgui.Frame(self, "inv_frame", size=[0.25, 0.25], pos=[0.6, 0.4], sub_theme="HUD")
+		self.frame = bgui.Frame(self, "inv_frame", size=[0.6, 0.8], pos=[0.1, 0.1], sub_theme="HUD")
+		
+		# Player stats
+		self.stats_frame = bgui.Frame(self.frame, "st_frame", size=[0.33, 0.5], pos=[0, 0.5], sub_theme="Transp")
+		self.pname = bgui.Label(self.stats_frame, "pname", text="Name:", pos=[0.05, 0.9])
+		self.prace = bgui.Label(self.stats_frame, "prace", text="Race:", pos=[0.05, 0.8])
+		self.pclass = bgui.Label(self.stats_frame, "pclass", text="Class:", pos=[0.05, 0.7])
+		self.plvl = bgui.Label(self.stats_frame, "plvl", text="Level:", pos=[0.05, 0.6])
+		self.pxp = bgui.Label(self.stats_frame, "pxp", text="Exp:", pos=[0.05, 0.5])
+		self.xpnl = bgui.Label(self.stats_frame, "xpnl", text="Exp to Next Level:", pos=[0.05, 0.4])
+		
+		# Player abilities
+		self.ab_frame = bgui.Frame(self.frame, "ab_frame", size=[0.34, 0.5], pos=[0.33, 0.5], sub_theme="Transp")
+		self.str = bgui.Label(self.ab_frame, "str", text="Str:", pos=[0.05, 0.9])
+		self.con = bgui.Label(self.ab_frame, "con", text="Con:", pos=[0.05, 0.8])
+		self.dex = bgui.Label(self.ab_frame, "dex", text="Dex:", pos=[0.05, 0.7])
+		self.int = bgui.Label(self.ab_frame, "int", text="Int:", pos=[0.05, 0.6])
+		self.wis = bgui.Label(self.ab_frame, "wis", text="Wis:", pos=[0.05, 0.5])
+		self.cha = bgui.Label(self.ab_frame, "cha", text="Cha:", pos=[0.05, 0.4])
+		
+		# Player defenses
+		self.def_frame = bgui.Frame(self.frame, "def_frame", size=[0.33, 0.5], pos=[0.67, 0.5], sub_theme="Transp")
+		self.ac = bgui.Label(self.def_frame, "ac", text="AC:", pos=[0.05, 0.9])
+		self.fortitude = bgui.Label(self.def_frame, "Fortitude:", pos=[0.05, 0.8])
+		self.reflex = bgui.Label(self.def_frame, "Reflex:", pos=[0.05, 0.7])
+		self.will = bgui.Label(self.def_frame, "Will:", pos=[0.05, 0.6])
+		
+		# Player inventory
+		self.inv_frame = bgui.Frame(self.frame, "inv_frame", size=[0.5, 0.5], pos=[0, 0], sub_theme="Transp")
+		bgui.Label(self.inv_frame, "inv_header", text="Inventory", pt_size=42, pos=[0.05, 0.85])
+		
+		# Player equipment
+		self.eq_frame = bgui.Frame(self.frame, "eq_frame", size=[0.5, 0.5], pos=[0.5, 0], sub_theme="Transp")
+		self.weapon = bgui.Label(self.eq_frame, "weapon", text="Weapon:", pos=[0.05, 0.9])
+		self.armor = bgui.Label(self.eq_frame, "armor", text="Armor:", pos=[0.05, 0.8])
+		self.shield = bgui.Label(self.eq_frame, "shield", text="Shield:", pos=[0.05, 0.7])
 		
 		self.items = None
 		
 	def update(self, main):
+		player = main['player']
 		
-		# Generate the item list
+		# Player stats
+		self.pname.text = "Name: "+player.name
+		self.prace.text = "Race: "+player.race.name
+		self.pclass.text = "Class: "+player.player_class.name
+		self.plvl.text = "Level: "+str(player.level)
+		self.pxp.text = "Exp: "+str(player.xp)
+		self.xpnl.text = "Exp to Next Level: "+str(player.next_level)
+		
+		# Player abilities
+		self.str.text = "Str:\t"+str(player.str_ab)
+		self.con.text = "Con:\t"+str(player.con_ab)
+		self.dex.text = "Dex:\t"+str(player.dex_ab)
+		self.int.text = "Int:\t"+str(player.int_ab)
+		self.wis.text = "Wis:\t"+str(player.wis_ab)
+		self.cha.text = "Cha:\t"+str(player.cha_ab)
+		
+		# Player defenses
+		self.ac.text = "AC: "+str(player.ac)
+		self.fortitude.text = "Fortitude: "+str(player.fortitude)
+		self.reflex.text = "Reflex: "+str(player.reflex)
+		self.will.text = "Will: "+str(player.will)
+		
+		# Player inventory
 		if not self.items:
 			item_str = "\n".join([item.name for item in main['player'].inventory.items])
 
-			self.items = bgui.TextBlock(self.frame, "inv_items", text=item_str, size=[0.96, 0.96], pos=[0.04, 0])
+			self.items = bgui.TextBlock(self.inv_frame, "inv_items", text=item_str, size=[0.96, 0.80], pos=[0.1, 0])
+			
+		# Player equipment
+		self.weapon.text = "Weapon: "+player.weapon.name
+		self.armor.text = "Armor: "+player.armor.name
+		self.shield.text = "Shield: "+player.shield.name
 			
 class TitleLayout(Layout):
 	def __init__(self, sys):

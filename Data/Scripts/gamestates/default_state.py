@@ -99,7 +99,7 @@ class DefaultState(BaseState, BaseController):
 				return("LevelUp", "PUSH")
 
 			if ("Inventory", "INPUT_CLICK") in inputs:
-				main['ui_system'].toggle_overlay("inventory_overlay")
+				return("Inventory", "PUSH")
 				
 			if ("Action", "INPUT_CLICK") in inputs and not self.in_shop:
 				for shop, obj in main['shop_keepers'].items():
