@@ -109,21 +109,20 @@ class CharacterCreationState(BaseState, BaseController):
 					print("Unable to open up the file %s for %s's racial traits" % (traits, player.race.name))
 				
 				# Setup player inventory
-				player.inventory = Inventory()
 				
 				w = Weapon('Longsword')
-				player.inventory.add(w)
-				player.inventory.weapon = w
+				player.inventory.append(w)
+				player.weapon = w
 				
 				
 				a = Armor('Mighty Robes')
-				player.inventory.add(a)
-				player.inventory.armor = a
-					
-				player.inventory.add(Item('Bonsai'))
+				player.inventory.append(a)
+				player.armor = a
+
+				player.inventory.append(Item('Bonsai'))
 				
 				# Give the player some starting credits
-				player.inventory.credits = 100
+				player.credits = 100
 				
 				# Save the new player
 				player.save()
@@ -134,7 +133,6 @@ class CharacterCreationState(BaseState, BaseController):
 			
 			# Fill the player's hit points
 			player.hp = player.max_hp
-			
 			
 			# Set up the camera
 			from Scripts.blender_wrapper import Camera

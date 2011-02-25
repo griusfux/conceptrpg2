@@ -90,7 +90,7 @@ class InventoryLayout(Layout):
 		
 		# Player inventory
 		if not self.items:
-			item_str = "\n".join([item.name for item in main['player'].inventory.items])
+			item_str = "\n".join([item.name for item in main['player'].inventory])
 
 			self.items = bgui.TextBlock(self.inv_frame, "inv_items", text=item_str, size=[0.96, 0.80], pos=[0.1, 0])
 			

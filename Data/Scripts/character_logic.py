@@ -32,6 +32,9 @@ class CharacterLogic:
 			self.type = "none"
 			self.weight = self.ac = self.bonus = self.speed = 0
 			
+		def __bool__(self):
+			return False
+			
 	def __init__(self, obj):
 		# Set up weapon sockets
 		if obj and obj.armature:
@@ -158,7 +161,7 @@ class CharacterLogic:
 		self.surge_value= self.max_hp // 4
 		
 		#speed
-		self.speed = self.speed_base + self.armor.speed
+		self.speed = self.speed_base
 		
 		for stat, value in self.stat_mods.items():
 			setattr(self, stat, getattr(self, stat) + value)
@@ -194,25 +197,30 @@ class CharacterLogic:
 		return self._armor
 	@armor.setter
 	def armor(self, value):
-		self.ac -= self._armor.ac
-		self.speed -= self._armor.speed
-		self._armor = self.Dummy() if value == None else value
-		self.ac += self._armor.ac
-		self.speed += self._armor.speed
+		print("Equipping", value)
+		if self._armor:
+			self.ac -= self._armor.ac
+		if value:
+			self._armor = value
+			self.ac += self._armor.ac
+		else:
+			self._armor = self.Dummy()
 	
 	@property
 	def shield(self):
 		return self._shield	
 	@shield.setter
 	def shield(self, value):
-		self.ac -= self._shield.bonus
-		self._shield = self.Dummy() if value == None else value
-		self.ac += self._shield.bonus
+		if self._shield:
+			self.ac -= self._shield.bonus
+		if value:
+			self._shield = value
+			self.ac += self._shield.bonus
+		else:
+			self._shield = self.Dummy()
 	
 	@property
 	def weapon(self):
-		if self._weapon.type == "none":
-			self._weapon.type == "unarmed"
 		return self._weapon
 	@weapon.setter
 	def weapon(self, value):
@@ -274,6 +282,9 @@ class PlayerLogic(CharacterLogic):
 		self.speed_base = save_data["speed_base"]
 		
 		self.inventory = save_data["inventory"]
+		self.armor = save_data["armor"]
+		self.weapon = save_data["weapon"]
+		self.shield = save_data["shield"]
 		self.credits 		= save_data["credits"]
 		
 		self.powers		= PowerManager(self, save_data["powers"])
@@ -310,6 +321,9 @@ class PlayerLogic(CharacterLogic):
 				"speed_base" : self.speed_base,
 				
 				"inventory"	: self.inventory,
+				"armor"		: self.armor if self.armor else None,
+				"weapon"	: self.weapon if self.weapon else None,
+				"shield"	: self.shield if self.shield else None,
 				"credits"		: self.credits,
 				
 				"powers"	: [power.package_name for power in self.powers.all]

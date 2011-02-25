@@ -145,8 +145,8 @@ class CombatState(DefaultState, BaseController):
 		# self.ai_manager = AiManager(self)
 		
 		# If the player has a weapon, socket it
-		if main['player'].inventory.weapon:
-			weapon = main['player'].inventory.weapon
+		if main['player'].weapon:
+			weapon = main['player'].weapon
 			main['engine'].load_library(weapon)
 			obj = main['engine'].add_object('longsword')
 			main['player'].set_right_hand(obj)
