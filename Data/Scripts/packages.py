@@ -366,7 +366,11 @@ class Power(Package):
 		# We don't need the temp file anymore, so clean up
 		pyfile.close()
 		os.remove(pyfile.name)
-		os.remove(pyfile.name.replace('.py', '.pyc'))
+		try:
+			os.remove(pyfile.name.replace('.py', '.pyc'))
+		except WindowsError:
+			# Probably not the best thing as there could be still useful files in this folder...
+			shutil.rmtree(os.path.join(tempfile.gettempdir(), '__pycache__'))
 
 		# Grab the method from the module
 		self._use = p.power
