@@ -324,4 +324,10 @@ class BaseController:
 		"""
 		
 		character.hp += amount
+				
+	def modify_stat(self, character, stat, amount):
+		if stat not in character.stat_mods:
+			character.stat_mods[stat] = 0
+		character.stat_mods[stat] += amount
+		character.recalc_stats()
 		

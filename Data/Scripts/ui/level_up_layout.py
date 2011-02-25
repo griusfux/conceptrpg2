@@ -211,9 +211,10 @@ class LevelUpLayout(Layout):
 			score += int(getattr(self, ab+"_bonus").text)
 			setattr(self.main['player'], ab+"_ab", score)
 		
-		for i in range(4):
-			for power in self.learned[i]:
-				self.main['player'].powers.add(Power(power))
+		# for i in range(4):
+			# for power in self.learned[i]:
+				# self.main['player'].powers.add(Power(power))
+		self.main['new_powers'] = [i for j in self.learned for i in j]
 		self.main['level_exit'] = True
 		
 	def learn_on_click(self, widget):

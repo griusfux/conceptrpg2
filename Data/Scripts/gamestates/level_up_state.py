@@ -1,6 +1,7 @@
-from .base_state import BaseState
+from .base_state import BaseState, BaseController
+from Scripts.packages import *
 
-class LevelUpState(BaseState):
+class LevelUpState(BaseState, BaseController):
 	"""A state to spend new level perks"""
 	
 	def client_init(self, main):
@@ -15,6 +16,8 @@ class LevelUpState(BaseState):
 		
 		# Done leveling
 		if main['level_exit']:
+			for power in main['new_powers']:
+				main['player'].powers.add(Power(power), self)
 			main['player'].recalc_stats()
 			return ("", "POP")
 		
@@ -22,6 +25,7 @@ class LevelUpState(BaseState):
 		"""Cleanup the client state"""
 		main['ui_system'].load_layout("default_state")
 		del main['level_exit']
+		del main['new_powers']
 		
 		# Reset the mouse position
 		main['input_system'].mouse.position = (0.5, 0.5)

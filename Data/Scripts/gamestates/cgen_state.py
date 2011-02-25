@@ -4,10 +4,10 @@ from Scripts.packages import *
 from Scripts.character_logic import PlayerLogic
 from Scripts.power_manager import *
 from Scripts.inventory import *
-from .base_state import BaseState
+from .base_state import BaseState, BaseController
 
 
-class CharacterCreationState(BaseState):
+class CharacterCreationState(BaseState, BaseController):
 	"""A state that handles creating a new character"""
 	
 	##########
@@ -97,14 +97,14 @@ class CharacterCreationState(BaseState):
 				player.recalc_stats()
 				
 				# Give the player an attack power
-				player.powers.add(Power('Attack'))
+				player.powers.add(Power('Attack'), self)
 				
 				# Give the player racial traits
 				# This needs to be done after giving the player xp to ensure there
 				# is already an unspent level for level 1
 				traits = player.race.traits
 				try:
-					player.powers.add(Feat(traits))
+					player.powers.add(Feat(traits), self)
 				except PackageError:
 					print("Unable to open up the file %s for %s's racial traits" % (traits, player.race.name))
 				

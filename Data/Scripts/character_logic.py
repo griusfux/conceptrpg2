@@ -72,15 +72,11 @@ class CharacterLogic:
 		
 		#defenses
 		self.ac			= 0
-		self.ac_bonus	= 0
+		self.armor_bonus= 0
 		self.shield_bonus= 0
-		self.ac_buff	= 0
 		self.fortitude	= 0
-		self.fort_buff	= 0
 		self.reflex		= 0
-		self.reflex_buff= 0
 		self.will		= 0
-		self.will_buff	= 0
 		
 		#hit points
 		self.max_hp		= 0
@@ -97,8 +93,6 @@ class CharacterLogic:
 		self.speed		= 5
 		self.speed_base = 0
 		self.speed_armor_penalty = 0
-		self.speed_item_mod	= 0
-		self.speed_misc_mod	= 0
 		
 		#inventory and equipment
 		self.inventory = []
@@ -117,6 +111,8 @@ class CharacterLogic:
 		self.powers = PowerManager(self, [])
 		
 		self.targets = []
+		
+		self.stat_mods = {}
 		
 	def __del__(self):
 		if self.object:
@@ -140,14 +136,14 @@ class CharacterLogic:
 		self.cha_mod = -5 + self.cha_ab // 2
 		
 		#defenses
-		self.ac	= 10 + self.level//2 + self.armor.ac + self.shield.bonus + self.ac_buff
+		self.ac	= 10 + self.level//2 + self.armor.ac + self.shield.bonus
 		if self.armor.type in ("light", "none"):
 			self.ac	= self.ac + self.dex_mod if(self.dex_ab > self.int_ab) else self.int_mod
-		self.fortitude = 10 + self.level//2 + self.fort_buff
+		self.fortitude = 10 + self.level//2
 		self.fortitude += self.str_mod if(self.str_ab > self.con_ab) else self.con_mod
-		self.reflex	= 10 + self.level//2 + self.reflex_buff + self.shield_bonus
+		self.reflex	= 10 + self.level//2 + self.shield_bonus
 		self.reflex	+= self.dex_mod if(self.dex_ab > self.int_ab) else self.int_mod
-		self.will	= 10 + self.level//2 + self.will_buff
+		self.will	= 10 + self.level//2
 		self.will	+= self.wis_mod if(self.wis_ab > self.cha_ab) else self.cha_mod
 		
 		#hit points
@@ -162,7 +158,12 @@ class CharacterLogic:
 		self.surge_value= self.max_hp // 4
 		
 		#speed
-		self.speed = self.speed_base + self.armor.speed + self.speed_item_mod + self.speed_misc_mod
+		self.speed = self.speed_base + self.armor.speed
+		
+		for stat, value in self.stat_mods.items():
+			setattr(self, stat, getattr(self, stat) + value)
+			
+		print(self.ac)
 	
 	# Managed access to xp
 	@property

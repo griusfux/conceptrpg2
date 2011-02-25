@@ -23,7 +23,7 @@ class PowerManager:
 		
 		self._current_power = 0
 		
-	def add(self, power):
+	def add(self, power, controller):
 		"""Add a power to the manager
 		
 		power -- the power to add
@@ -32,11 +32,11 @@ class PowerManager:
 		
 		if "PASSIVE" in power.flags:
 			self._passives.append(power)
-			power.push(self.owner)
+			power.push(controller, self.owner)
 		else:
 			self._powers.append(power)
 		
-	def remove(self, power):
+	def remove(self, power, controller):
 		"""Remove a power from the manager
 		
 		power -- the power to remove
@@ -45,7 +45,7 @@ class PowerManager:
 		
 		if "PASSIVE" in power.flags:
 			self._passives.remove(power)
-			power.pop(self.owner)
+			power.pop(controller, self.owner)
 		else:
 			self._powers.remove(power)
 		

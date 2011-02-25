@@ -387,15 +387,15 @@ class Power(Package):
 	def use(self, controller, user):
 		self._use(self, controller, user)
 		
-	def push(self, user):
+	def push(self, controller, user):
 		if self._push:
-			self._push(self, user)
+			self._push(self, controller, user)
 		else:
 			pass
 			
-	def pop(self, user):
+	def pop(self, controller, user):
 		if self._pop:
-			self._pop(self, user)
+			self._pop(self, controller, user)
 		else:
 			pass		
 		

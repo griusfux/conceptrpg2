@@ -326,7 +326,11 @@ class CombatState(DefaultState, BaseController):
 		for power in main['player'].powers.all:
 			if power.usage == "ENCOUNTER":
 				power.spent = False
-
+				
+		# Clear combat statuses
+		for status in self.status_list:
+			status['user'].powers.remove(status['power'], self)
+						
 	##########
 	# Server
 	##########
@@ -469,7 +473,7 @@ class CombatState(DefaultState, BaseController):
 		status = Status(status)
 		status.amount = amount
 		
-		character.powers.add(status)
+		character.powers.add(status, self)
 		
 		status_entry = {}
 		status_entry['power'] = status
