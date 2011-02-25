@@ -162,8 +162,6 @@ class CharacterLogic:
 		
 		for stat, value in self.stat_mods.items():
 			setattr(self, stat, getattr(self, stat) + value)
-			
-		print(self.ac)
 	
 	# Managed access to xp
 	@property
