@@ -28,7 +28,7 @@ class CharacterLogic:
 	class Dummy:
 		"""A dummy item to represent a null for an equipment slot"""
 		def __init__(self):
-			self.name = "null"
+			self.name = "None"
 			self.type = "none"
 			self.weight = self.ac = self.bonus = self.speed = 0
 			
@@ -224,7 +224,11 @@ class CharacterLogic:
 		return self._weapon
 	@weapon.setter
 	def weapon(self, value):
-		self._weapon = self.Dummy() if value == None else value
+		if value:
+			self._weapon = value
+		else:
+			self._weapon = self.Dummy()
+			self._weapon.name = "Unarmed"
 	
 	#######################
 	# Hand socket functions
