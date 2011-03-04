@@ -295,7 +295,7 @@ class PlayerLogic(CharacterLogic):
 		
 		if self.level == 0:
 			self.xp += 0
-		self.next_level = XP_TABLE[self.level]
+		self.next_level = XP_TABLE[self.level] if self.level < len(XP_TABLE) else XP_TABLE[-1]
 		self.last_level = XP_TABLE[self.level-1]
 
 		self.recalc_stats()
