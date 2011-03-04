@@ -28,9 +28,11 @@ class NetworkSetupState(BaseState):
 				
 			server += " "+str(main['addr'][1])
 			
-			si = subprocess.STARTUPINFO()
-			si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-			si.wShowWindow = 7 #SW_SHOWMINNOACTIVE
+			si = None
+			if os.name == 'nt':
+				si = subprocess.STARTUPINFO()
+				si.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW
+				si.wShowWindow = 7 #SW_SHOWMINNOACTIVE
 			main['server'] = subprocess.Popen(s, startupinfo=si, creationflags=subprocess.CREATE_NEW_CONSOLE)
 		
 		
