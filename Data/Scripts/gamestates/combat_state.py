@@ -189,7 +189,7 @@ class CombatState(DefaultState, BaseController):
 				status['power'].use(self, status['user'])
 				if status['save']:
 					if self.check_save(status['user'], 0, 'STATIC', status['power'].damage_types[0]):
-						status['user'].powers.remove(status['power'])
+						status['user'].powers.remove(status['power'], self)
 						self.status_list.remove(status)
 		
 		# Targeting
@@ -253,7 +253,7 @@ class CombatState(DefaultState, BaseController):
 			# Only let the player do stuff while they are not "locked"
 			if not main['player'].lock:
 				
-				if ("UsePower", "INPUT_ACTIVE") in inputs:
+				if ("UsePower", "INPUT_CLICK") in inputs:
 					power = main['player'].powers.active
 					if not power.spent:
 						target = main['player']

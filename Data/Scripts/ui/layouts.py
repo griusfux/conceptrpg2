@@ -278,7 +278,7 @@ class DefaultStateLayout(Layout):
 		
 		
 		# Locked message
-		self.lock_msg = bgui.Label(self, "lock_msg", pt_size=42, pos=[0.35, 0.90])
+		# self.lock_msg = bgui.Label(self, "lock_msg", pt_size=42, pos=[0.35, 0.90])
 		
 	def update(self, main):
 		player = main['player']
@@ -290,7 +290,7 @@ class DefaultStateLayout(Layout):
 		self.exp_text.text = "EXP (%d/%d)" % (player.xp, player.next_level)#player.xp+100-(player.xp%100))
 		self.exp_bar.percent = (player.xp-player.last_level)/(player.next_level-player.last_level+1)
 		
-		self.lock_msg.text = "LOCKED: %s" % (main['player'].lock - time()) if main['player'].lock else ""
+		# self.lock_msg.text = "LOCKED: %s" % (main['player'].lock - time()) if main['player'].lock else ""
 		
 		if not self.mtext.text:
 			key = main['input_system'].event_to_string("LevelUp")

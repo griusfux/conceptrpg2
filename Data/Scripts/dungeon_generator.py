@@ -36,6 +36,7 @@ class DungeonGenerator:
 	min_rooms = 8
 	max_tries = 5
 	ray_length = 5
+	dead_end_thresh = 0.5
 	generation = GEN_RANDOM
 	
 	def __init__(self, map):	
@@ -82,6 +83,9 @@ class DungeonGenerator:
 		
 		# This dictionary is used to keep track of what rooms still have encounters in them
 		self.rooms = {}
+		
+		# Keep track of dead-ends so we can potenially clean some up
+		self._dead_ends = []
 		
 		# This is used so we can clear the dungeon if we need to
 		self._tiles = []
@@ -240,6 +244,12 @@ class DungeonGenerator:
 				#print('Maximum tries reached, force an end')
 				# The limit has been reached, force a dead end
 				self.tries = 0
+				
+				# But, first check if there is another dead end close enough
+				if (self.clean_dead_ends(node.object)):
+					self.tries = 0
+					self.exit_nodes.remove(node)
+					return
 				self.place_tile(node, 'Ends', check_collision=False)
 		else:
 			# Success! Store some data and cleanup
@@ -276,6 +286,8 @@ class DungeonGenerator:
 				tile_obj['encounter'] = True
 			elif type == 'Stairs':
 				self.has_stairs = True
+			elif type == 'Ends':
+				self._dead_ends.append(tile_node)
 			
 			# Mathutils.Vector and Mathutils.Matrix can not be pickled, so convert them
 			pos = [i for i in tile_node.worldPosition]
@@ -285,6 +297,21 @@ class DungeonGenerator:
 			self.result.append((type, index, self.room_count, pos, ori))
 			self._tiles.append(BlenderWrapper.Object(tile_node))
 				
+	def clean_dead_ends(self, node_object):
+		a = node_object.worldPosition
+	
+		for ob in self._dead_ends:
+			b = ob.worldPosition
+			
+			if abs(a[0]-b[0]) < self.dead_end_thresh and \
+				abs(a[1]-b[1]) < self.dead_end_thresh and \
+				abs(a[2]-b[2]) < self.dead_end_thresh:
+				self._dead_ends.remove(ob)
+				ob.endObject()
+				return True
+				
+		return False
+			
 	def check_collision(self, tile, meshes):
 		# Iterate the verts
 		for mesh in meshes:
