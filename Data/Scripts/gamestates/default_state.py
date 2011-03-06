@@ -209,6 +209,8 @@ class DefaultState(BaseState, BaseController):
 	@rpc(server_functions, "position", str, float, float, float)
 	def position(self, main, client, cid, x, y, z):
 		# We could run checks here, but for now we just rebroadcast
+		if cid not in main['players']: return
+		
 		self.clients.invoke('position', cid, x, y, z)
 		main['players'][cid].position = (x, y, z)
 		

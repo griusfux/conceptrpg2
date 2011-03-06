@@ -1,23 +1,28 @@
 from Scripts.ai.base_state import BaseState
+import json
 
 class StateMachine:
-	def __init__(self, agent, state_list, initial_state = None):
+	def __init__(self, agent, definition, initial_state = None):
 		self.states = {}
 		first = None
 		
-		for state in state_list:
-			state_name = state[0]
-			actions = state[1]
-			entry_actions = state[2]
-			exit_actions = state[3]
-			transitions = state[4]
+		definition = json.load(open(definition, 'r'))
+		
+		for state in definition['states']:
+			transitions = definition['global_transitions'] + state['transitions']
+			state_name = state['name']
+			
+			actions = state['actions']
+			entry_actions = state['entry_actions']
+			exit_actions = state['exit_actions']
+			
 			new_state = BaseState(agent, actions, entry_actions, exit_actions, transitions)
 			self.states[state_name] = new_state
 			
 			if first == None:
 				first = new_state
 		
-		self.current_state = initial_state if initial_state else first
+		self.current_state = self.states[initial_state] if initial_state else first
 	
 	def run(self):
 		triggered_transition = None

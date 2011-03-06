@@ -44,22 +44,13 @@ class CombatState(DefaultState, BaseController):
 		if id not in main['net_players']:
 			print("Warning, couldn't find MonsterLogic for id:", id)
 			return
-	
-		# monster = Monster(monster)
-	
-		# Load the library
-		# main['engine'].load_library(monster)
-		
-		# Place the monster
-		# obj = main['engine'].add_object(monster.name, (x, y, z))
-		
-		# Setup logic/ai
-		# logic = MonsterLogic(obj, monster)
-		#([name, [actions], [entry_actions], [exit_actions], [(transition, target_state)]], [second_name, [actions], [entry_actions], [exit_actions], [(tran1, target1), (tran2, target2)]]
-		# logic.ai = AiStateMachine(logic, (["idle", ["seek"], [], [], [("hp_lt_zero", "death"),]], ["death", ["die"], [], [], []]))
-		
+			
 		# Add the monster to the monster list
 		logic = main['net_players'][id]
+		
+		if main['owns_combat']:
+			logic.ai = AiStateMachine(logic, "Scripts/ai/definitions/test.json", "seek")
+			self.ai_manager.add_agent(logic)
 		obj = logic.object
 		self.monster_list[id] = logic
 		
@@ -133,6 +124,9 @@ class CombatState(DefaultState, BaseController):
 				
 				# Update the server
 				self.server.invoke("add_monster", monster.name, str(i), x, y, SAFE_Z)
+			
+			# Initialize an ai manager
+			self.ai_manager = AiManager(self, [])
 					
 		else:
 			# Request monsters from the server
@@ -140,9 +134,6 @@ class CombatState(DefaultState, BaseController):
 			
 			# Let others know we're here
 			self.server.invoke("add_hero")
-		
-		# Initialize an ai manager
-		# self.ai_manager = AiManager(self)
 		
 		# If the player has a weapon, socket it
 		if main['player'].weapon:
@@ -222,14 +213,14 @@ class CombatState(DefaultState, BaseController):
 			
 		####	
 		# ai
-		
-		#Dicision making
-		# for monster in self.monster_list:
-			# monster.target = [main['player']]
-			# monster.actions = monster.ai.run()
-			
-		# Run the ai manager
-		#self.ai_manager.run()
+		if main['owns_combat']:
+			#Dicision making
+			for id, monster in self.monster_list.items():
+				monster.target = main['player']
+				monster.actions = monster.ai.run()
+				
+			# Run the ai manager
+			self.ai_manager.run()
 		
 		# Maintain monsters
 		for id, monster in self.monster_list.items():
