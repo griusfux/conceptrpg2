@@ -6,7 +6,10 @@
 			{ "obj": "start" }
 		],
 	"room_tiles": [
-			{ "obj": "chamber" }
+            { "obj": "chamb_med_1" },
+            { "obj": "chamb_med_2" },
+            { "obj": "chamb_med_3" },
+            { "obj": "chamb_med_4" }
 		],
 	"corridor_tiles": [
 			{ "obj": "corridor_8" },
