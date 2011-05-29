@@ -14,6 +14,7 @@ from Scripts.gamestate_manager import GameStateManager
 from Scripts.blender_input_system import BlenderInputSystem
 
 import json
+import os
 
 # Create a shorthand for gl
 import bge
