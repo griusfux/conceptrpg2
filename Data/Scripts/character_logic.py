@@ -51,51 +51,14 @@ class CharacterLogic:
 		self.last_level = 0
 		self.next_level = 0
 		self.unspent_levels = []
-		self.size		= ""
-		
-		#ability scores
-		self.str_ab		= 0
-		self.str_mod	= 0
-		self.str_bonus	= 0
-		self.con_ab		= 0
-		self.con_mod	= 0
-		self.con_bonus	= 0
-		self.dex_ab		= 0
-		self.dex_mod	= 0
-		self.dex_bonus	= 0
-		self.int_ab		= 0
-		self.int_mod	= 0
-		self.int_bonus	= 0
-		self.wis_ab		= 0
-		self.wis_mod	= 0
-		self.wis_bonus	= 0
-		self.cha_ab		= 0
-		self.cha_mod	= 0
-		self.cha_bonus	= 0
-		
-		#defenses
-		self.ac			= 0
-		self.armor_bonus= 0
-		self.shield_bonus= 0
-		self.fortitude	= 0
-		self.reflex		= 0
-		self.will		= 0
 		
 		#hit points
 		self.max_hp		= 0
-		self.bloodied	= 0
-		self.surge_value= 0
-		self.surges_day	= 0
 		self.hp			= 0
 		self.surges		= 0
-		self.second_wind= False
-		self.resistances= {}
-		self.saving_throw_mods = {}
 		
 		#speed
 		self.speed		= 5
-		self.speed_base = 0
-		self.speed_armor_penalty = 0
 		
 		#inventory and equipment
 		self.inventory = []
@@ -130,41 +93,10 @@ class CharacterLogic:
 
 	def recalc_stats(self):
 		"""Recalculates the player's stats that are calculated based on other stats"""
-		#ability modifiers
-		self.str_mod = -5 + self.str_ab // 2
-		self.con_mod = -5 + self.con_ab // 2
-		self.dex_mod = -5 + self.dex_ab // 2
-		self.int_mod = -5 + self.int_ab // 2
-		self.wis_mod = -5 + self.wis_ab // 2
-		self.cha_mod = -5 + self.cha_ab // 2
-		
-		#defenses
-		self.ac	= 10 + self.level//2 + self.armor.ac + self.shield.bonus
-		if self.armor.type in ("light", "none"):
-			self.ac	= self.ac + self.dex_mod if(self.dex_ab > self.int_ab) else self.int_mod
-		self.fortitude = 10 + self.level//2
-		self.fortitude += self.str_mod if(self.str_ab > self.con_ab) else self.con_mod
-		self.reflex	= 10 + self.level//2 + self.shield_bonus
-		self.reflex	+= self.dex_mod if(self.dex_ab > self.int_ab) else self.int_mod
-		self.will	= 10 + self.level//2
-		self.will	+= self.wis_mod if(self.wis_ab > self.cha_ab) else self.cha_mod
 		
 		#hit points
 		hp_percent = (self.hp / self.max_hp) if self.max_hp else 1
-		if self.player_class and hasattr(self.player_class, "hp_per_level"):
-			self.max_hp = int(self.player_class.hp_first_level) + (self.level - 1) * int(self.player_class.hp_per_level)
-		else:
-			self.max_hp = 6 + (self.level-1) * 3
-		self.max_hp += self.con_ab
 		self.hp = self.max_hp * hp_percent
-		self.bloodied	= self.max_hp // 2
-		self.surge_value= self.max_hp // 4
-		
-		#speed
-		self.speed = self.speed_base
-		
-		for stat, value in self.stat_mods.items():
-			setattr(self, stat, getattr(self, stat) + value)
 	
 	# Managed access to xp
 	@property
@@ -197,12 +129,8 @@ class CharacterLogic:
 		return self._armor
 	@armor.setter
 	def armor(self, value):
-		print("Equipping", value)
-		if self._armor:
-			self.ac -= self._armor.ac
 		if value:
 			self._armor = value
-			self.ac += self._armor.ac
 		else:
 			self._armor = self.Dummy()
 	
@@ -211,11 +139,8 @@ class CharacterLogic:
 		return self._shield	
 	@shield.setter
 	def shield(self, value):
-		if self._shield:
-			self.ac -= self._shield.bonus
 		if value:
 			self._shield = value
-			self.ac += self._shield.bonus
 		else:
 			self._shield = self.Dummy()
 	
@@ -270,20 +195,7 @@ class PlayerLogic(CharacterLogic):
 		self._xp			= save_data["xp"]
 		self.unspent_levels = save_data["unspent_levels"]
 		
-		self.str_ab		= save_data["str_ab"]
-		self.str_bonus	= save_data["str_bonus"]
-		self.con_ab		= save_data["con_ab"]
-		self.con_bonus	= save_data["con_bonus"]
-		self.dex_ab		= save_data["dex_ab"]
-		self.dex_bonus	= save_data["dex_bonus"]
-		self.int_ab		= save_data["int_ab"]
-		self.int_bonus	= save_data["int_bonus"]
-		self.wis_ab		= save_data["wis_ab"]
-		self.wis_bonus	= save_data["wis_bonus"]
-		self.cha_ab		= save_data["cha_ab"]
-		self.cha_bonus	= save_data["cha_bonus"]
-		
-		self.speed_base = save_data["speed_base"]
+		self.speed = save_data["speed"]
 		
 		self.inventory = save_data["inventory"]
 		self.armor = save_data["armor"]
@@ -309,20 +221,7 @@ class PlayerLogic(CharacterLogic):
 				"xp"		: self.xp,
 				"unspent_levels" : self.unspent_levels,
 				
-				"str_ab"	: self.str_ab,
-				"str_bonus"	: self.str_bonus,
-				"con_ab"	: self.con_ab,
-				"con_bonus"	: self.con_bonus,
-				"dex_ab"	: self.dex_ab,
-				"dex_bonus"	: self.dex_bonus,
-				"int_ab"	: self.int_ab,
-				"int_bonus" : self.int_bonus,
-				"wis_ab"	: self.wis_ab,
-				"wis_bonus" : self.wis_bonus,
-				"cha_ab"	: self.cha_ab,
-				"cha_bonus"	: self.cha_bonus,
-				
-				"speed_base" : self.speed_base,
+				"speed" : self.speed,
 				
 				"inventory"	: self.inventory,
 				"armor"		: self.armor if self.armor else None,
@@ -363,11 +262,6 @@ class MonsterLogic(CharacterLogic):
 		# self.role = monsterdata.role
 		# self.leader = monsterdata.leader
 		# self.elite = monsterdata.elite
-		# self.str_ab = monsterdata.str_ab
-		# self.con_ab = monsterdata.con_ab
-		# self.int_ab = monsterdata.int_ab
-		# self.wis_ab = monsterdata.wis_ab
-		# self.cha_ab = monsterdata.cha_ab
 		
 		# self.ai_keywords = monsterdata.ai_keywords
 		# self.ai_start_state = monsterdata.ai_start_state

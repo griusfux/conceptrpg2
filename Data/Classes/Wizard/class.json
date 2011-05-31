@@ -1,12 +1,12 @@
 {
 	"name": "Wizard",
-	"key_abilities" : ["Intelligence", "Wisdom", "Dexterity"],
 	
-	"armor_profs" : ["CLOTH"],
-	"weapon_profs" : ["DAGGER", "QUARTERSTAFF"],
-	
-	"hp_first_level" : 10,
-	"hp_per_level" : 4,
+	"storm_subclass": "str",
+	"death_subclass": "str",
+	"fire_subclass": "str",
+	"earth_subclass": "str",
+	"water_subclass": "str",
+	"holy_subclass": "str",
 	
 	"powers" : [
 			"Burst",
