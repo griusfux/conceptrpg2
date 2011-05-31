@@ -1,0 +1,10 @@
+{
+	"name": "Warrior",
+	
+	"storm_subclass": "Berserker",
+	"death_subclass": "Slayer",
+	"fire_subclass": "Barbarian",
+	"earth_subclass": "Guardian",
+	"water_subclass": "Guerrilla",
+	"holy_subclass": "Paladin"
+}

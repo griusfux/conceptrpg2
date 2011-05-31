@@ -1,11 +1,10 @@
 {
 	"name": "Class",
-	"key_abilities" : [],
 	
-	"armor_profs" : [],
-	"weapon_profs" : [],
-	
-	"hp_first_level" : 1,
-	"hp_per_level" : 0,
-	"powers" : []
+	"storm_subclass": "",
+	"death_subclass": "",
+	"fire_subclass": "",
+	"earth_subclass": "",
+	"water_subclass": "",
+	"holy_subclass": ""
 }

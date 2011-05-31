@@ -35,7 +35,7 @@ class UnspentLevel:
 		########
 		# Powers
 		
-		available_powers = [packages.Power(power) for power in player_class.powers]
+		available_powers = []#[packages.Power(power) for power in player_class.powers]
 		
 		# Limit to current level and below
 		available_powers = [power for power in available_powers if power.level <= level]

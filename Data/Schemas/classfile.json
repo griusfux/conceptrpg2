@@ -6,7 +6,5 @@
 	"fire_subclass": "str",
 	"earth_subclass": "str",
 	"water_subclass": "str",
-	"holy_subclass": "str",
-	
-	"powers": "list"
+	"holy_subclass": "str"
 }
