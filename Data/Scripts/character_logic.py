@@ -47,11 +47,23 @@ class CharacterLogic:
 		self.level		= 0
 		self.race		= ""
 		self.player_class= ""
+		self.element    = "NEUTRAL"
 		self._xp			= 0
 		self.last_level = 0
 		self.next_level = 0
 		self.unspent_levels = []
 		
+		#affinities
+		self.affinities = { "death" : 0,
+							"storm" : 0,
+							"fire" : 0,
+							"holy" : 0,
+							"earth" : 0,
+							"water" : 0,
+							"weapon" : 0,
+							"spell" : 0
+							}
+							
 		#hit points
 		self.max_hp		= 0
 		self.hp			= 0
