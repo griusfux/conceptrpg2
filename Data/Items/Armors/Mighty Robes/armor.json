@@ -1,8 +1,9 @@
 {
-	"name": "Mighty Robes",
-	"type": "armor",
-	"cost": 1337,
+	"name" : "Mighty Robes",
+	"cost" : 1337,
 	
-	"subtype": "heavy",
-	"ac": 9999
+	"type" : "CLOTH",
+	"arcane_defense" : 9999,
+	"physical_defense" : 9999,
+	"reflex" : 9999
 }

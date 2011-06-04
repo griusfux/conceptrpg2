@@ -1,4 +1,9 @@
 {
-	"subtype": "{'light', 'medium', 'heavy'}",
-	"ac": "int"
+	"name" : "str",
+	"cost" : "int",
+	
+	"type" : "{'CLOTH', 'LEATHER', 'METAL'}",
+	"arcane_defense" : "int",
+	"physical_defense" : "int",
+	"reflex" : "int"
 }

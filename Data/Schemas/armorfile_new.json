@@ -1,8 +1,9 @@
 {
-	"name": "Armor",
-	"type": "armor",
-	"cost": 0,
-
-	"subtype": "light",
-	"ac": 0
+	"name" : "Armor",
+	"cost" : 0,
+	
+	"type" : "CLOTH",
+	"arcane_defense" : 0,
+	"physical_defense" : 0,
+	"reflex" : 0
 }
