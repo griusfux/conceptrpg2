@@ -116,7 +116,7 @@ class CharacterCreationState(BaseState, BaseController):
 				player.inventory.append(Item('Bonsai'))
 				
 				# Give the player some starting credits
-				player.credits = 100
+				# player.credits = 100
 				
 				# Save the new player
 				player.save()

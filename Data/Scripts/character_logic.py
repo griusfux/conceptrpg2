@@ -13,14 +13,9 @@ from Scripts.levels import UnspentLevel
 
 XP_TABLE =	[0,
 			1000,
-			2250,
-			3750,
-			5500,]
-			# 7500,
-			# 10000,
-			# 13000,
-			# 16500,
-			# 20500,]
+			2000,
+			3000,
+			4000,]
 
 class CharacterLogic:
 	"""A logic object that stores all the information and methods of the player"""
@@ -47,11 +42,20 @@ class CharacterLogic:
 		self.level		= 0
 		self.race		= ""
 		self.player_class= ""
-		self.element    = "NEUTRAL"
+		self.element    = ""
 		self._xp			= 0
 		self.last_level = 0
 		self.next_level = 0
 		self.unspent_levels = []
+		
+		#attributes
+		self.endurance		= 5
+		self.arcane_damage	= 5
+		self.arcane_defense = 5
+		self.physical_damage= 5
+		self.physical_defense=5
+		self.accuracy		= 5
+		self.reflex			= 5
 		
 		#affinities
 		self.affinities = { "death" : 0,
@@ -67,7 +71,6 @@ class CharacterLogic:
 		#hit points
 		self.max_hp		= 0
 		self.hp			= 0
-		self.surges		= 0
 		
 		#speed
 		self.speed		= 5
@@ -77,8 +80,7 @@ class CharacterLogic:
 		self._armor	= self.Dummy()
 		self._shield = self.Dummy()
 		self._weapon = self.Dummy()
-		self.credits	= 0
-		self.inventory_weight = 0
+		self.credits	= 100
 		
 		# the character's game object
 		self.object = obj
@@ -107,6 +109,7 @@ class CharacterLogic:
 		"""Recalculates the player's stats that are calculated based on other stats"""
 		
 		#hit points
+		self.max_hp = self.endurance * 5
 		hp_percent = (self.hp / self.max_hp) if self.max_hp else 1
 		self.hp = self.max_hp * hp_percent
 	
@@ -207,6 +210,16 @@ class PlayerLogic(CharacterLogic):
 		self._xp			= save_data["xp"]
 		self.unspent_levels = save_data["unspent_levels"]
 		
+		self.endurance		= save_data["endurance"]
+		self.arcane_damage	= save_data["arcane_damage"]
+		self.arcane_defense = save_data["arcane_defense"]
+		self.physical_damage = save_data["physical_damage"]
+		self.physical_defense = save_data["physical_defense"]
+		self.accuracy = save_data["accuracy"]
+		self.reflex = save_data["reflex"]
+
+		self.affinities = save_data["affinities"]
+		
 		self.speed = save_data["speed"]
 		
 		self.inventory = save_data["inventory"]
@@ -232,6 +245,16 @@ class PlayerLogic(CharacterLogic):
 				"player_class" : self.player_class.package_name,
 				"xp"		: self.xp,
 				"unspent_levels" : self.unspent_levels,
+				
+				"endurance" : self.endurance,
+				"arcane_damage" : self.arcane_damage,
+				"arcane_defense" : self.arcane_defense,
+				"physical_damage" : self.physical_damage,
+				"physical_defense" : self.physical_defense,
+				"reflex" : self.reflex,
+				"accuracy" : self.accuracy,
+				
+				"affinities" : self.affinities,
 				
 				"speed" : self.speed,
 				
