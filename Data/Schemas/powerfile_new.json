@@ -1,9 +1,10 @@
 {
-	"name": "Power",
-	"level" : 1,
-	"usage" : "AT_WILL",
-	"range_type": "MELEE",
-	"range_size": 1,
-	"damage_types": [],
+	"name" : "Power",
+	"element" : "NEUTRAL",
+	"description" : "A powerfully powerful power.",
+	"tier" : 1,
+	"delivery" : "SPELL",
+	"cool_down" : 1,
+	"range": 0,
 	"flags": []
 }

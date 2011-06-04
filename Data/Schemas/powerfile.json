@@ -1,9 +1,10 @@
 {
-	"name": "str",
-	"level" : "int",
-	"usage" : "{'AT_WILL', 'ENCOUNTER', 'DAILY', 'FEAT'}",
-	"range_type": "{'RANGED', 'BURST', 'MELEE', 'BLAST'}",
-	"range_size": "int",
-	"damage_types": "list",
+	"name" : "str",
+	"element" : "{'DEATH', 'STORM', 'FIRE', 'HOLY', 'EARTH', 'WATER', 'NEUTRAL'}",
+	"description" : "str",
+	"tier" : "int",
+	"delivery" : "{'WEAPON', 'SPELL'}",
+	"cool_down" : "int",
+	"range": "str",
 	"flags": "list"
 }

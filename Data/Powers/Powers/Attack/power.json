@@ -1,9 +1,10 @@
 {
-	"name": "Attack",
-	"level" : 1,
-	"usage" : "AT_WILL",
-	"range_type": "MELEE",
-	"range_size": 1,
-	"damage_types": [],
-	"flags": []
+	"name" : "Attack",
+	"element" : "NEUTRAL",
+	"description" : "A standard attack",
+	"tier" : 0,
+	"delivery" : "WEAPON",
+	"cool_down" : 0,
+	"range": "0",
+	"flags": ["WEAPON_SPEED", "WEAPON_RANGE"]
 }
