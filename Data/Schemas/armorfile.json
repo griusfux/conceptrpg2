@@ -1,7 +1,4 @@
-{
-	"name" : "str",
-	"cost" : "int",
-	
+{	
 	"type" : "{'CLOTH', 'LEATHER', 'METAL'}",
 	"arcane_defense" : "int",
 	"physical_defense" : "int",

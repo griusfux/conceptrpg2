@@ -1,5 +1,7 @@
 {
-	"subtype": "{'ranged', 'melee'}",
-	"damage": "str",
-	"bonus": "int"
+	"type" : "{'SWORD', 'AXE', 'POLEARM', 'BLUNT', 'BOW', 'GUN', 'THROWN'}",
+	"weight" : "int",
+	"range" : "int",
+	"accuracy" : "int",
+	"hands" : "int"
 }

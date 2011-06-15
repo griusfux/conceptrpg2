@@ -1,7 +1,7 @@
 {
 	"name": "str",
-	"role" : "str",
+	"role" : "{'MEAT_SHIELD', 'PEON', 'SPEEDSTER', 'BRAWLER', 'SUPPORT', 'BLASTER'}",
+	"level_adjustment" : "str",
 	
-	"xp_reward" : "int",
-	"credit_reward" : "int"
+	"element" : "{'DEATH', 'STORM', 'FIRE', 'HOLY', 'EARTH', 'WATER'}"
 }

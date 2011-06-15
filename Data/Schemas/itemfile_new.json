@@ -1,5 +1,5 @@
 {
 	"name": "Item",
-	"type": "other",
+	"class": "other",
 	"cost": 0
 }

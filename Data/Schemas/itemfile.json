@@ -1,5 +1,5 @@
 {
 	"name": "str",
-	"type": "{'armor', 'weapon', 'helmet', 'shield', 'other'}",
+	"class": "{'armor', 'weapon', 'helmet', 'shield', 'other'}",
 	"cost": "int"
 }
