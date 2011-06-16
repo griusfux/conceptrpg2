@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'PowerEditor.ui'
 #
-# Created: Wed Jun 15 22:07:17 2011
+# Created: Wed Jun 15 22:24:58 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -48,12 +48,14 @@ class Ui_PowerEditor(object):
         self.horizontalLayout_4 = QtGui.QHBoxLayout()
         self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
         self.shape_modifier = QtGui.QSpinBox(PowerEditor)
+        self.shape_modifier.setMaximum(360)
         self.shape_modifier.setObjectName(_fromUtf8("shape_modifier"))
         self.horizontalLayout_4.addWidget(self.shape_modifier)
         self.gridLayout.addLayout(self.horizontalLayout_4, 3, 6, 1, 1)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.cool_down = QtGui.QSpinBox(PowerEditor)
+        self.cool_down.setMinimum(1)
         self.cool_down.setObjectName(_fromUtf8("cool_down"))
         self.horizontalLayout.addWidget(self.cool_down)
         self.gridLayout.addLayout(self.horizontalLayout, 5, 6, 1, 1)
@@ -64,6 +66,8 @@ class Ui_PowerEditor(object):
         self.effect_shape.setObjectName(_fromUtf8("effect_shape"))
         self.gridLayout.addWidget(self.effect_shape, 3, 1, 1, 1)
         self.tier = QtGui.QSpinBox(PowerEditor)
+        self.tier.setMinimum(1)
+        self.tier.setMaximum(5)
         self.tier.setObjectName(_fromUtf8("tier"))
         self.gridLayout.addWidget(self.tier, 5, 1, 1, 1)
         self.label_2 = QtGui.QLabel(PowerEditor)
