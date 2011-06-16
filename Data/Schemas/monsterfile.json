@@ -1,7 +1,7 @@
 {
 	"name": "str",
 	"role" : "{'MEAT_SHIELD', 'PEON', 'SPEEDSTER', 'BRAWLER', 'SUPPORT', 'BLASTER'}",
-	"level_adjustment" : "str",
+	"level_adjustment" : "int",
 	
-	"element" : "{'DEATH', 'STORM', 'FIRE', 'HOLY', 'EARTH', 'WATER'}"
+	"element" : "{'DEATH', 'STORM', 'FIRE', 'HOLY', 'EARTH', 'WATER', 'NEUTRAL'}"
 }

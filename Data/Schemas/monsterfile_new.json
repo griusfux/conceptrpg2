@@ -1,7 +1,7 @@
 {
-	"name": "Monster",
-	"role" : "brute",
+	"name": "monster",
+	"role" : "MEAT_SHIELD",
+	"level_adjustment" : 0,
 	
-	"xp_reward" : 0,
-	"credit_reward" : 0
+	"element" : "NEUTRAL"
 }

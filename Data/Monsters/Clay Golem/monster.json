@@ -1,7 +1,6 @@
 {
 	"name": "Clay Golem",
-	"role" : "brute",
-	
-	"xp_reward" : 100,
-	"credit_reward" : 100
+	"role" : "BRAWLER",
+	"level_adjustment" : 0,
+	"element" : "NEUTRAL"
 }
