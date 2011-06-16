@@ -1,10 +1,23 @@
 {
 	"name": "str",
 	
-	"storm_subclass": "str",
-	"death_subclass": "str",
-	"fire_subclass": "str",
-	"earth_subclass": "str",
-	"water_subclass": "str",
-	"holy_subclass": "str"
+	"subclass" : {
+				"death" : "str",
+				"storm" : "str",
+				"fire" : "str",
+				"holy" : "str",
+				"earth" : "str",
+				"water" : "str"
+				}
+				
+	"affinities" : {
+				"death" : "int",
+				"storm" : "int",
+				"fire" : "int",
+				"holy" : "int",
+				"earth" : "int",
+				"water" : "int",
+				"weapon" : "int",
+				"spell" : "int"
+				}
 }
