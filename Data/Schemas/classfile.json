@@ -8,7 +8,7 @@
 				"holy" : "str",
 				"earth" : "str",
 				"water" : "str"
-				}
+				},
 				
 	"affinities" : {
 				"death" : "int",
