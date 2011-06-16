@@ -179,11 +179,68 @@ class Package:
 		with open('.'.join(new_file)) as f:
 			self._defaults.update(json.loads(f.read()))
 		
-		for key, value in schema.items():
-			if not self._validate_dict(self._dict, key, value):
-				del self._dict[key]
+#		for key, value in schema.items():
+#			if not self._validate_dict(self._dict, key, value):
+#				del self._dict[key]
+#		print(schema)
+		self._validate_dict(self._dict, schema, self._defaults)
+		
+		for k, v in self._dict.items():
+			setattr(self, k, v)
+	
+	def _validate_dict(self, d, schema, defaults):
+		def print_warning(msg):
+			name = self._path.replace('/', ':')
+			print('WARNING {0}: {1}'.format(name, msg))
+		
+		# First get rid of any extra items
+		invalid = []
+		for k, v in d.items():
+			if k not in schema:
+				print_warning('"{0}" is not a valid key, ignoring'.format(k))
+				invalid.append(k)
 				
-	def _validate_dict(self, d, key, value, setting=True):
+		for k in invalid:
+			del d[k]
+		
+		# Now make sure everything in the schema is accounted for
+		for sk, sv in schema.items():
+			
+			# Check if the key exists
+			if sk not in d:
+				print_warning('"{0}" not found, setting to default'.format(sk))
+				d[sk] =  defaults[sk]
+					
+			# Handle sub dictionaries
+			elif isinstance(sv, dict):
+				if not isinstance(d[sk], dict):
+					print_warning('Expected a sub dictionary for {0}, got a {1} instead'.format(sk, type(d[sk])))
+					d[sk] = defaults[sk]
+				else:
+					self._validate_dict(d[sk], sv, defaults[sk])
+					
+			# Handle lists
+			elif isinstance(sv, list):
+				if not isinstance(d[sk], list):
+					print_warning('Expected a list for {0}, got a {1} instead'.format(sk, type(d[sk])))
+					d[sk] = defaults[sk]
+				else:
+					for i in d[sk]:
+						self._validate_dict(i, sv[0], defaults[sk][0])
+				
+			# Handle sets
+			elif isinstance(eval(sv), set):
+				items = eval(sv)
+				if d[sk] not in items:
+					print_warning('Expected item in {0} for {1}, got "{2}" instead'.format(items, sk, d[sk]))
+					d[sk] = defaults[sk]
+			
+			# Handle everything else
+			elif not isinstance(d[sk], eval(sv)):
+				print_warning('Expected a {0} for {1}, got {2} instead'.format(type(eval(sv)), sk, type(d[sk])))
+				d[sk] = defaults[sk]
+				
+	def __validate_dict(self, d, key, value, setting=True):
 		if key not in d:
 			print("\"{0}\" is missing from {1}".format(key, self._path.replace('/', ':')))
 			if key in self._defaults:

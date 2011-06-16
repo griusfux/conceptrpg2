@@ -2,9 +2,9 @@
 	"name": "str",
 	"encounter_deck": "str",
 	"shop": "str",
-	"start_tiles": { "obj": "str" },
-	"room_tiles": { "obj": "str" },
-	"corridor_tiles": { "obj": "str" },
-	"end_tiles": { "obj": "str" },
-	"stair_tiles": { "obj": "str" }
+	"start_tiles": [{ "obj": "str" }],
+	"room_tiles": [{ "obj": "str" }],
+	"corridor_tiles": [{ "obj": "str" }],
+	"end_tiles": [{ "obj": "str" }],
+	"stair_tiles": [{ "obj": "str" }]
 }
