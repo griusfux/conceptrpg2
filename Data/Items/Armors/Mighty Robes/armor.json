@@ -1,6 +1,7 @@
 {
 	"name" : "Mighty Robes",
 	"cost" : 1337,
+	"class" : "armor",
 	
 	"type" : "CLOTH",
 	"arcane_defense" : 9999,

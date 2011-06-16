@@ -1,6 +1,6 @@
 {
 	"name": "Weapon",
-	"type": "weapon",
+	"class": "weapon",
 	"cost": 0,
 
 	"type" : "SWORD",

@@ -1,9 +1,11 @@
 {
 	"name": "Longsword",
-	"type": "weapon",
+	"class": "weapon",
 	"cost": 5,
 	
-	"subtype": "melee",
-	"damage": "1d6",
-	"bonus": 0
+	"type": "SWORD",
+	"weight": 0,
+	"range" : 0,
+	"accuracy" : 0,
+	"hands" : 1
 }
