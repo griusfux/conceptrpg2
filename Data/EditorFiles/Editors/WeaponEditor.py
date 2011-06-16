@@ -15,24 +15,37 @@ class WeaponEditor(QFrame):
 		
 		# Load up the schema file so we can get acceptable subtypes
 		with open(data._schema) as f:
-			subtypes = eval(json.loads(f.read())['subtype'])
+			types = eval(json.loads(f.read())['type'])
 		
-		self.ui.subtype.addItems([i for i in subtypes])
+		self.ui.type.addItems([i.title() for i in types])
+		self.ui.hands.addItems(["One", "Two"])
 		
 		# Set the text fields
 		self.ui.name.setText(data.name)
 		self.ui.cost.setValue(data.cost)
-		self.ui.type.setText(data.type)
 		
-		self.ui.subtype.setCurrentIndex(self.ui.subtype.findText(data.subtype))
-		self.ui.damage0.setValue(data.damage[0])
-		self.ui.damage1.setValue(data.damage[1])
-		self.ui.bonus.setValue(data.bonus)
+		self.ui.type.setCurrentIndex(self.ui.type.findText(data.type.title()))
+		self.ui.weight.setValue(data.weight)
+		self.ui.range.setValue(data.range)
+		self.ui.accuracy.setValue(data.accuracy)
+		self.ui.hands.setCurrentIndex(data.hands-1)
+#		self.ui.damage0.setValue(data.damage[0])
+#		self.ui.damage1.setValue(data.damage[1])
+#		self.ui.bonus.setValue(data.bonus)
 		
 	def save(self):
-		self.data.name = self.ui.name.text()
-		self.data.cost = self.ui.cost.value()
-		self.data.subtype = self.ui.subtype.itemText(self.ui.subtype.currentIndex())
-		self.data.damage = self.ui.damage0.value(), self.ui.damage1.value()
-		self.data.bonus = self.ui.bonus.value()
+		data = self.data
+		ui = self.ui
+		
+		data.name = ui.name.text()
+		data.cost = ui.cost.value()
+		
+		data.type = ui.type.itemText(self.ui.type.currentIndex()).upper()
+		data.weight = ui.weight.value()
+		data.range = ui.range.value()
+		data.accuracy = ui.accuracy.value()
+		data.hands = ui.hands.currentIndex()+1
+#		self.data.subtype = self.ui.subtype.itemText(self.ui.subtype.currentIndex())
+#		self.data.damage = self.ui.damage0.value(), self.ui.damage1.value()
+#		self.data.bonus = self.ui.bonus.value()
 		

@@ -155,28 +155,6 @@ class Weapon(Item):
     _dir = 'Items/Weapons'
     _img = 'weapon.png'
     
-    def __init__(self, package_name):
-        Item.__init__(self, package_name)
-        
-        # Store the original damage string for possible error printing
-        _damage = self.damage
-        
-        # Split the damage into two parts, separated by a 'd'
-        self.damage = [int(i) for i in self.damage.split('d')]
-        
-        if len(self.damage) != 2:
-            raise PackageError("Malformed damage for Weapon. Expected xdy, got {0} instead".format(_damage))
-            
-    def write(self):
-        # Store the original value so we can restore it
-        _damage = self.damage
-        
-        self.damage = 'd'.join([str(self.damage[0]), str(self.damage[1])])
-        
-        Item.write(self)
-        
-        self.damage = _damage
-    
 class Armor(Item):
     """Armor Package"""
     

@@ -33,99 +33,6 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Type:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="2">
-      <widget class="QLineEdit" name="type">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Subtype:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <spacer name="verticalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>Damage:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="2">
-      <widget class="QComboBox" name="subtype">
-       <property name="editable">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="2">
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QSpinBox" name="damage0">
-         <property name="maximum">
-          <number>99</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>d</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSpinBox" name="damage1">
-         <property name="maximum">
-          <number>999</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </item>
-     <item row="7" column="0">
-      <widget class="QLabel" name="label_7">
-       <property name="text">
-        <string>Bonus:</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="2">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
@@ -150,13 +57,153 @@
        </item>
       </layout>
      </item>
-     <item row="7" column="2">
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Type:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Weight: </string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Range: </string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QSpinBox" name="weight">
+         <property name="minimum">
+          <number>-5</number>
+         </property>
+         <property name="maximum">
+          <number>5</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="type">
+       <property name="editable">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
-        <widget class="QSpinBox" name="bonus"/>
+        <widget class="QSpinBox" name="range">
+         <property name="minimum">
+          <number>-5</number>
+         </property>
+         <property name="maximum">
+          <number>5</number>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Accuracy: </string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QSpinBox" name="accuracy">
+         <property name="minimum">
+          <number>-5</number>
+         </property>
+         <property name="maximum">
+          <number>5</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>Hands: </string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QComboBox" name="hands"/>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_5">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -190,11 +237,7 @@
  <tabstops>
   <tabstop>name</tabstop>
   <tabstop>cost</tabstop>
-  <tabstop>type</tabstop>
-  <tabstop>subtype</tabstop>
-  <tabstop>damage0</tabstop>
-  <tabstop>damage1</tabstop>
-  <tabstop>bonus</tabstop>
+  <tabstop>weight</tabstop>
  </tabstops>
  <resources/>
  <connections/>
