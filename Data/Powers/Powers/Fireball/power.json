@@ -1,9 +1,0 @@
-{
-	"name": "Fireball",
-	"level" : 5,
-	"usage" : "DAILY",
-	"range_type": "RANGED",
-	"range_size": 20,
-	"damage_types": ["FIRE"],
-	"flags": []
-}

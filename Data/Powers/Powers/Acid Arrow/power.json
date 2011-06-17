@@ -1,9 +1,0 @@
-{
-	"name": "Acid Arrow",
-	"level" : 1,
-	"usage" : "DAILY",
-	"range_type": "RANGED",
-	"range_size": 20,
-	"damage_types": ["ACID"],
-	"flags": []
-}
