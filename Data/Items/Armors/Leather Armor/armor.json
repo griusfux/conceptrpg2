@@ -1,0 +1,9 @@
+{
+	"name" : "Leather Armor",
+	"cost" : 0,
+	
+	"type" : "LEATHER",
+	"arcane_defense" : 1,
+	"physical_defense" : 1,
+	"reflex" : 4
+}

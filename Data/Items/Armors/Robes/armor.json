@@ -1,0 +1,9 @@
+{
+	"name" : "Robes",
+	"cost" : 0,
+	
+	"type" : "CLOTH",
+	"arcane_defense" : 4,
+	"physical_defense" : 1,
+	"reflex" : 1
+}
