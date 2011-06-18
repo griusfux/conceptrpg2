@@ -29,6 +29,7 @@ class NewDialog(QDialog):
 		package_type = self.ui.package_type.itemText(self.ui.package_type.currentIndex())
 		package_name = self.ui.package_name.text()
 		package = getattr(p, package_type).create(package_name)
+		package.name = package_name
 		
 		if package:
 			# Unlike the package system, the editor uses the plural forms of the 
