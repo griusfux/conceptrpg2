@@ -128,7 +128,7 @@ class CharacterLogic:
 		
 		while self.level < len(XP_TABLE) and self._xp >= self.next_level:
 			self.level += 1
-			self.unspent_levels.append(UnspentLevel(self.level, self.player_class))
+			self.unspent_levels.append(UnspentLevel(self.level))
 			self.last_level = self.next_level
 			if self.level < len(XP_TABLE):
 				self.next_level = XP_TABLE[self.level]
