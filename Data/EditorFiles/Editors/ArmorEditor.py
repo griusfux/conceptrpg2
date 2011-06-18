@@ -10,25 +10,31 @@ class ArmorEditor(QFrame):
 		self.data = data
 		
 		# Create the ui
-		self.ui = Ui_ArmorEditor()
-		self.ui.setupUi(self)
+		self.ui = ui = Ui_ArmorEditor()
+		ui.setupUi(self)
 
-		# Load up the schema file so we can get acceptable subtypes
+		# Load up the schema file so we can get acceptable types
 		with open(data._schema) as f:
-			subtypes = eval(json.loads(f.read())['subtype'])
+			types = eval(json.loads(f.read())['type'])
 		
-		self.ui.subtype.addItems([i for i in subtypes])
+		ui.type.addItems([i for i in types])
 		
 		# Set the text fields
-		self.ui.name.setText(data.name)
-		self.ui.cost.setValue(data.cost)
-		self.ui.type.setText(data.type)
+		ui.name.setText(data.name)
+		ui.cost.setValue(data.cost)
 		
-		self.ui.subtype.setCurrentIndex(self.ui.subtype.findText(data.subtype))
-		self.ui.ac.setValue(data.ac)
+		ui.type.setCurrentIndex(ui.type.findText(data.type))
+		ui.arcane_defense.setValue(data.arcane_defense)
+		ui.physical_defense.setValue(data.physical_defense)
+		ui.reflex.setValue(data.reflex)
 		
 	def save(self):
-		self.data.name = self.ui.name.text()
-		self.data.cost = self.ui.cost.value()
-		self.data.subtype = self.ui.subtype.itemText(self.ui.subtype.currentIndex())
-		self.data.ac = self.ui.ac.value()
+		ui = self.ui
+		data = self.data
+		
+		data.name = ui.name.text()
+		data.cost = ui.cost.value()
+		data.type = ui.type.itemText(ui.type.currentIndex())
+		data.arcane_defense = ui.arcane_defense.value()
+		data.physical_defense = ui.physical_defense.value()
+		data.reflex = ui.reflex.value()
