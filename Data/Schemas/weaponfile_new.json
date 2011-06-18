@@ -1,6 +1,5 @@
 {
 	"name": "Weapon",
-	"class": "weapon",
 	"cost": 0,
 
 	"type" : "SWORD",
