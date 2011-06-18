@@ -1,0 +1,9 @@
+{
+    "accuracy": 1, 
+    "cost": 0, 
+    "hands": 2, 
+    "name": "Longbow", 
+    "range": 1, 
+    "type": "BOW", 
+    "weight": 1
+}

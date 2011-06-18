@@ -1,0 +1,9 @@
+{
+    "accuracy": 1, 
+    "cost": 0, 
+    "hands": 1, 
+    "name": "Saber", 
+    "range": 0, 
+    "type": "SWORD", 
+    "weight": -1
+}

@@ -1,0 +1,9 @@
+{
+    "accuracy": 0, 
+    "cost": 0, 
+    "hands": 2, 
+    "name": "Rifle", 
+    "range": 1, 
+    "type": "GUN", 
+    "weight": 1
+}

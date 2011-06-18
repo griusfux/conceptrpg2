@@ -1,0 +1,9 @@
+{
+    "accuracy": 1, 
+    "cost": 0, 
+    "hands": 1, 
+    "name": "Throwing Star", 
+    "range": 0, 
+    "type": "THROWN", 
+    "weight": -1
+}

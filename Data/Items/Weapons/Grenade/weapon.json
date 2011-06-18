@@ -1,0 +1,9 @@
+{
+    "accuracy": 0, 
+    "cost": 0, 
+    "hands": 1, 
+    "name": "Grenade", 
+    "range": -1, 
+    "type": "THROWN", 
+    "weight": 0
+}
