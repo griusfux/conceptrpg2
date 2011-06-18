@@ -12,8 +12,8 @@ class Map(Package):
 class EncounterDeck(Package):
     """Encounter deck package"""
     
-    def __init__(self, package_name):
-        Package.__init__(self, package_name)
+    def __init__(self, package_name, new_package=False):
+        Package.__init__(self, package_name, new_package)
         
         # Build a deck
         self.deck = []
@@ -65,8 +65,12 @@ class Power(Package):
     _dir = 'Powers/Powers'
     _img = 'power.png'
     
-    def __init__(self, package_name):
-        Package.__init__(self, package_name)
+    def __init__(self, package_name, new_package=False):
+        Package.__init__(self, package_name, new_package)
+        
+        # Create a script file if this is a new package
+        if new_package:
+            open(os.path.join(self._dir, package_name, 'power.py'), 'wb').close()
         
         # Write the script to a temp file
         pyfile = tempfile.NamedTemporaryFile(suffix=".py", delete=False)
@@ -110,7 +114,12 @@ class Power(Package):
         if self._pop:
             self._pop(self, controller, user)
         else:
-            pass        
+            pass
+    
+    def write(self):
+        Package.write(self)
+        
+           
         
     def pack(self, path):
         Package.pack(self, path)
@@ -130,8 +139,8 @@ class Status(Power):
     _dir = 'Powers/Statuses'
     _schema = 'Schemas/statusfile.json'
     
-    def __init__(self, package_name):
-        Power.__init__(self, package_name)
+    def __init__(self, package_name, new_package=False):
+        Power.__init__(self, package_name, new_package)
         self.amount = 0
     
         
@@ -184,8 +193,8 @@ class Shop(Package):
     _new = 'Schemas/shopfile_new.json'
     _dir = 'Shops'
     
-    def __init__(self, package_name):
-        Package.__init__(self, package_name)
+    def __init__(self, package_name, new_package=False):
+        Package.__init__(self, package_name, new_package)
         
         # Build item lists
         self.items = []
@@ -232,8 +241,8 @@ class Save(Package):
     _dir = '../Saves'
     _img = 'save.png'
     
-    def __init__(self, package_name):
-        Package.__init__(self, package_name)
+    def __init__(self, package_name, new_package=False):
+        Package.__init__(self, package_name, new_package)
         
         # Load up the data file
         try:

@@ -50,7 +50,7 @@ class Package:
 	
 	key = None
 	
-	def __init__(self, package_name):
+	def __init__(self, package_name, new_package=False):
 		# Combine the package name and the directory to get the filepath
 		path = self._dir + '/' + package_name
 		
@@ -127,7 +127,7 @@ class Package:
 				shutil.copyfile('Schemas/dummy.png', path+'/'+cls._img)
 				# open(path+'/'+cls._img, "wb").close()
 			
-			return cls(package_name)
+			return cls(package_name, new_package=True)
 		except Exception as e:
 			traceback.print_exc()
 			print("Unable to create package in "+path)

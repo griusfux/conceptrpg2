@@ -7,6 +7,7 @@ TYPES = [
 	'Armor',
 	'Item',
 	'Map',
+	'Power',
 	'Weapon'
 ]
 
