@@ -237,7 +237,11 @@
  <tabstops>
   <tabstop>name</tabstop>
   <tabstop>cost</tabstop>
+  <tabstop>type</tabstop>
   <tabstop>weight</tabstop>
+  <tabstop>range</tabstop>
+  <tabstop>accuracy</tabstop>
+  <tabstop>hands</tabstop>
  </tabstops>
  <resources/>
  <connections/>

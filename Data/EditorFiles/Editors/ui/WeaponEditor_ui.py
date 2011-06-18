@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'WeaponEditor.ui'
 #
-# Created: Wed Jun 15 23:03:37 2011
+# Created: Fri Jun 17 23:10:32 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -109,7 +109,11 @@ class Ui_WeaponEditor(object):
         self.retranslateUi(WeaponEditor)
         QtCore.QMetaObject.connectSlotsByName(WeaponEditor)
         WeaponEditor.setTabOrder(self.name, self.cost)
-        WeaponEditor.setTabOrder(self.cost, self.weight)
+        WeaponEditor.setTabOrder(self.cost, self.type)
+        WeaponEditor.setTabOrder(self.type, self.weight)
+        WeaponEditor.setTabOrder(self.weight, self.range)
+        WeaponEditor.setTabOrder(self.range, self.accuracy)
+        WeaponEditor.setTabOrder(self.accuracy, self.hands)
 
     def retranslateUi(self, WeaponEditor):
         WeaponEditor.setWindowTitle(QtGui.QApplication.translate("WeaponEditor", "WeaponEditor", None, QtGui.QApplication.UnicodeUTF8))
