@@ -47,22 +47,22 @@ class LevelUpLayout(Layout):
 			# Create a shorthand version of ability
 			ab = ability[0:3].lower()
 			# Display the ability name
-			lbl = bgui.Label(points_frame, "lvl_%s_ab"%ab, text=ability, pos=[.05, i*.1+0.05], pt_size=18)
+			lbl = bgui.Label(points_frame, "lvl_%s_ab"%ab, text=ability, pos=[.05, i*.1+0.05], pt_size=22)
 			lbl.on_click = self.ab_lbl_on_click
 			
 			# Display a box with the score
 			score_frame = bgui.Frame(points_frame, "lvl_%s_score_frame"%ab, size=[.1, .08], pos=[1/3+0.05, i*.1+0.025], sub_theme="Box")
-			score = bgui.Label(score_frame, "lvl_%s_score"%ab, pos=[0,0], pt_size=16, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+			score = bgui.Label(score_frame, "lvl_%s_score"%ab, pos=[0,0], pt_size=18, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
 			setattr(self, "%s_score"%ab, score)
 			
 			# Display a box with bonuses
 			bonus_frame = bgui.Frame(points_frame, "lvl_%s_bonus_frame"%ab, size=[.1, .08], pos=[0.625, i*.1+0.025], sub_theme="Box")
-			bonus = bgui.Label(bonus_frame, "lvl_%s_bonus"%ab, pos=[0,0], pt_size=16, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+			bonus = bgui.Label(bonus_frame, "lvl_%s_bonus"%ab, pos=[0,0], pt_size=18, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
 			setattr(self, "%s_bonus"%ab, bonus)
 			
 			# Display a box with the final score
 			final_frame = bgui.Frame(points_frame, "lvl_%s_final_frame"%ab, size=[.1, .08], pos=[0.8, i*.1+0.025], sub_theme="Box")
-			final = bgui.Label(final_frame, "lvl_%s_final"%ab, pos=[0,0], pt_size=16, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+			final = bgui.Label(final_frame, "lvl_%s_final"%ab, pos=[0,0], pt_size=18, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
 			setattr(self, "%s_final"%ab, final)
 			
 			# Display up and down arrows next to score box
@@ -72,14 +72,14 @@ class LevelUpLayout(Layout):
 			down.on_click = self.arrow_on_click
 
 		points_inst = bgui.TextBlock(points_frame, "lvl_points_inst", pos=[0, 0.75], size=[0.9, .125], 
-									pt_size=14, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+									pt_size=16, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		points_inst.text = "Allocate ability points until no unspent points are left"
 		
-		self.unspent_lbl = bgui.Label(points_frame, "lvl_unspent_lbl", pos=[1/3+0.05, 0.7], pt_size=16)
+		self.unspent_lbl = bgui.Label(points_frame, "lvl_unspent_lbl", pos=[1/3+0.05, 0.7], pt_size=20)
 		
-		base_lbl = bgui.Label(points_frame, "lvl_base_lbl", text="Base Score", pt_size=12, pos=[1/3+0.05, .625])
-		bonus_lbl = bgui.Label(points_frame, "lvl_bonus_lbl", text="Bonuses", pt_size=12, pos=[.625, .625])
-		final_lbl = bgui.Label(points_frame, "lvl_final_lbl", text="Final Score", pt_size=12, pos=[.8, .625])
+		base_lbl = bgui.Label(points_frame, "lvl_base_lbl", text="Base Score", pt_size=16, pos=[1/3+0.05, .625])
+		bonus_lbl = bgui.Label(points_frame, "lvl_bonus_lbl", text="Bonuses", pt_size=16, pos=[.625, .625])
+		final_lbl = bgui.Label(points_frame, "lvl_final_lbl", text="Final Score", pt_size=16, pos=[.8, .625])
 		
 		
 		#############
@@ -111,7 +111,7 @@ class LevelUpLayout(Layout):
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
 
 		inst = bgui.TextBlock(available_frame, "lvl_avail_inst", pos=[0, 0.75], size=[0.9, .125], 
-									pt_size=14, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+									pt_size=16, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		inst.text = "Select a power and click \"Learn\" to learn the power"
 
 		self.available_list = cWidgets.ListBox(available_frame, "lvl_avail_list", size=[.9,.65], pos=[.05, .125], sub_theme='Box')
@@ -127,7 +127,7 @@ class LevelUpLayout(Layout):
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
 
 		inst = bgui.TextBlock(known_frame, "lvl_avail_inst", pos=[0, 0.75], size=[0.9, .125], 
-									pt_size=14, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+									pt_size=16, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		inst.text = "Select a power and click \"Unlearn\" to unlearn the power"
 
 		self.known_list = cWidgets.ListBox(known_frame, "lvl_known_list", size=[.9,.65], pos=[.05, .125], sub_theme='Box')
