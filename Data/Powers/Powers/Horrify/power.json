@@ -1,0 +1,12 @@
+{
+    "cool_down": 4, 
+    "delivery": "SPELL", 
+    "description": "Target suffers minor reduction to reflex and arcane resistance.", 
+    "distance": 5, 
+    "effect_shape": "SINGLE", 
+    "element": "DEATH", 
+    "flags": [], 
+    "name": "Horrify", 
+    "shape_modifier": 0, 
+    "tier": 1
+}

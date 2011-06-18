@@ -1,0 +1,12 @@
+{
+    "cool_down": 6, 
+    "delivery": "WEAPON", 
+    "description": "Weapon attacks deal additional minor arcane damage, and the caster heals HP proportional to the damage dealt.", 
+    "distance": 0, 
+    "effect_shape": "SINGLE", 
+    "element": "DEATH", 
+    "flags": [], 
+    "name": "Power", 
+    "shape_modifier": 0, 
+    "tier": 3
+}

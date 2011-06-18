@@ -1,0 +1,12 @@
+{
+    "cool_down": 7, 
+    "delivery": "SPELL", 
+    "description": "Creates a large Poisonous cloud that deals light arcane damage over time to all in burst.", 
+    "distance": 10, 
+    "effect_shape": "BURST", 
+    "element": "DEATH", 
+    "flags": [], 
+    "name": "Poisonous Cloud", 
+    "shape_modifier": 3, 
+    "tier": 2
+}

@@ -1,0 +1,12 @@
+{
+    "cool_down": 3, 
+    "delivery": "WEAPON", 
+    "description": "Caster's weapon does arcane damage.", 
+    "distance": 0, 
+    "effect_shape": "SINGLE", 
+    "element": "DEATH", 
+    "flags": [], 
+    "name": "Death's Dagger", 
+    "shape_modifier": 0, 
+    "tier": 1
+}

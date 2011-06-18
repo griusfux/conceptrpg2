@@ -5,6 +5,8 @@
 	"tier" : 0,
 	"delivery" : "WEAPON",
 	"cool_down" : 0,
-	"range": "0",
+	"effect_shape" : "SINGLE",
+	"distance" : 0,
+	"shape_modifier" : 0,
 	"flags": ["WEAPON_SPEED", "WEAPON_RANGE"]
 }

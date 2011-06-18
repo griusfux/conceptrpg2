@@ -1,0 +1,12 @@
+{
+    "cool_down": 6, 
+    "delivery": "SPELL", 
+    "description": "Causes all characters targeting the caster to lose their target. ", 
+    "distance": 0, 
+    "effect_shape": "SINGLE", 
+    "element": "NEUTRAL", 
+    "flags": [], 
+    "name": "Hide", 
+    "shape_modifier": 0, 
+    "tier": 1
+}

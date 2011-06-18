@@ -1,0 +1,12 @@
+{
+    "cool_down": 15, 
+    "delivery": "SPELL", 
+    "description": "Target suffers moderate arcane damage and the caster heals the same damage dealt.", 
+    "distance": 4, 
+    "effect_shape": "SINGLE", 
+    "element": "DEATH", 
+    "flags": [], 
+    "name": "Drain Life", 
+    "shape_modifier": 0, 
+    "tier": 3
+}

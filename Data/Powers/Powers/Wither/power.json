@@ -1,0 +1,12 @@
+{
+    "cool_down": 3, 
+    "delivery": "SPELL", 
+    "description": "Target suffers moderate arcane damage.", 
+    "distance": 4, 
+    "effect_shape": "SINGLE", 
+    "element": "NEUTRAL", 
+    "flags": [], 
+    "name": "Wither", 
+    "shape_modifier": 0, 
+    "tier": 1
+}

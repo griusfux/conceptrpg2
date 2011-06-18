@@ -1,0 +1,12 @@
+{
+    "cool_down": 20, 
+    "delivery": "SPELL", 
+    "description": "Summons undead creatures to guard the caster.", 
+    "distance": 0, 
+    "effect_shape": "SINGLE", 
+    "element": "DEATH", 
+    "flags": [], 
+    "name": "Summon Undead", 
+    "shape_modifier": 0, 
+    "tier": 3
+}
