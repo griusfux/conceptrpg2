@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'PowerEditor.ui'
 #
-# Created: Wed Jun 15 22:24:58 2011
+# Created: Fri Jun 17 22:20:19 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -105,6 +105,14 @@ class Ui_PowerEditor(object):
 
         self.retranslateUi(PowerEditor)
         QtCore.QMetaObject.connectSlotsByName(PowerEditor)
+        PowerEditor.setTabOrder(self.name, self.element)
+        PowerEditor.setTabOrder(self.element, self.delivery)
+        PowerEditor.setTabOrder(self.delivery, self.effect_shape)
+        PowerEditor.setTabOrder(self.effect_shape, self.shape_modifier)
+        PowerEditor.setTabOrder(self.shape_modifier, self.distance)
+        PowerEditor.setTabOrder(self.distance, self.tier)
+        PowerEditor.setTabOrder(self.tier, self.cool_down)
+        PowerEditor.setTabOrder(self.cool_down, self.description)
 
     def retranslateUi(self, PowerEditor):
         PowerEditor.setWindowTitle(QtGui.QApplication.translate("PowerEditor", "PowerEditor", None, QtGui.QApplication.UnicodeUTF8))
