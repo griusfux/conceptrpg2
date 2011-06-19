@@ -5,6 +5,7 @@ from Scripts.character_logic import PlayerLogic
 from Scripts.power_manager import *
 from Scripts.inventory import *
 from .base_state import BaseState, BaseController
+import Scripts.items as Items
 
 
 class CharacterCreationState(BaseState, BaseController):
@@ -104,16 +105,17 @@ class CharacterCreationState(BaseState, BaseController):
 				
 				# Setup player inventory
 				
-				w = Weapon('Longsword')
+				w = Items.Weapon('Longsword', 5)
 				player.inventory.append(w)
 				player.weapon = w
 				
 				
-				a = Armor('Mighty Robes')
+				a = Items.Armor('Robes', 5)
 				player.inventory.append(a)
+				print(a.name, a.arcane_defense)
 				player.armor = a
 
-				player.inventory.append(Item('Bonsai'))
+				player.inventory.append(Items.Item('Bonsai'))
 				
 				# Give the player some starting credits
 				# player.credits = 100
