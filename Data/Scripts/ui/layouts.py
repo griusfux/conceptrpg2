@@ -327,7 +327,7 @@ class CombatLayout(DefaultStateLayout):
 		# Create new images
 		for i in range(min(8, len(powers))):
 			# Background
-			bg = "Textures/ui/hex_tile_gray.png" if powers[i].spent else hex[powers[i].usage]
+			bg = "Textures/ui/hex_tile_gray.png"# if powers[i].spent else hex[powers[i].usage]
 			img = bgui.Image(self.power_frame, "sbg"+str(i), bg,
 							 size=[1/8, 1], pos=[(1/8)*i, 0.5 if i == psys.active_index else 0])
 							 

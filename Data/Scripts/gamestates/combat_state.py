@@ -7,8 +7,8 @@ from Scripts.character_logic import MonsterLogic
 
 import random
 from math import *
-from Scripts.ai.manager import Manager as AiManager
-from Scripts.ai.state_machine import StateMachine as AiStateMachine
+import cego as AiManager
+from cego.state_machine import StateMachine as AiStateMachine
 from Scripts.mathutils import Vector, Matrix
 import Scripts.effect_manager as effects
 
@@ -18,7 +18,7 @@ HALF_UNIT_SIZE = UNIT_SIZE/2.0
 SAFE_Z = 0.01
 
 # A constant for how many frames are in a "turn"
-TURN = 90
+TURN = 240
 
 class Combat:
 	"""Combat utility class"""
@@ -49,8 +49,8 @@ class CombatState(DefaultState, BaseController):
 		logic = main['net_players'][id]
 		
 		if main['owns_combat']:
-			logic.ai = AiStateMachine(logic, "Scripts/ai/definitions/test.json", "seek")
-			self.ai_manager.add_agent(logic)
+			logic.ai = AiStateMachine(logic, "extern/cego/example_definitions/base.json", "spawn")
+			AiManager.add_agent(logic)
 		obj = logic.object
 		self.monster_list[id] = logic
 		
@@ -114,6 +114,8 @@ class CombatState(DefaultState, BaseController):
 		
 		# Place the monsters
 		if main['owns_combat']:
+			AiManager.set_controller(self)
+			AiManager.set_environment(self.room.node_list)
 			i = 0
 			for monster in [Monster(i) for i in self._generate_encounter(main['dgen'].deck, len(main['net_players']))]:
 
@@ -124,9 +126,6 @@ class CombatState(DefaultState, BaseController):
 				
 				# Update the server
 				self.server.invoke("add_monster", monster.name, str(i), x, y, SAFE_Z)
-			
-			# Initialize an ai manager
-			self.ai_manager = AiManager(self, [])
 					
 		else:
 			# Request monsters from the server
@@ -138,8 +137,7 @@ class CombatState(DefaultState, BaseController):
 		# If the player has a weapon, socket it
 		if main['player'].weapon:
 			weapon = main['player'].weapon
-			main['engine'].load_library(weapon)
-			obj = main['engine'].add_object('longsword')
+			obj = weapon.createObjectInstance(main['engine'])
 			main['player'].set_right_hand(obj)
 			
 		self.camera = 'combat'
@@ -185,9 +183,9 @@ class CombatState(DefaultState, BaseController):
 		
 		# Targeting
 		active_power = main['player'].powers.active
-		range_type = active_power.range_type
-		range_size = active_power.range_size
-		if range_type == 'RANGED':
+		range_type = active_power.effect_shape
+		range_size = active_power.distance
+		if range_type == 'SINGLE':
 			# If the player already has targets, find out if they are valid
 			if main['player'].targets:
 				# Ranged can only have one target
@@ -220,7 +218,7 @@ class CombatState(DefaultState, BaseController):
 				monster.actions = monster.ai.run()
 				
 			# Run the ai manager
-			self.ai_manager.run()
+			AiManager.run()
 		
 		# Maintain monsters
 		for id, monster in self.monster_list.items():
@@ -246,19 +244,19 @@ class CombatState(DefaultState, BaseController):
 				
 				if ("UsePower", "INPUT_CLICK") in inputs:
 					power = main['player'].powers.active
-					if not power.spent:
-						target = main['player']
-						power.use(self, main['player'])
-						if power.usage != "AT_WILL":
-							power.spent = True
-							main['player'].powers.make_next_active()
+#					if not power.spent:
+#						target = main['player']
+					power.use(self, main['player'])
+#						if power.usage != "AT_WILL":
+#							power.spent = True
+#							main['player'].powers.make_next_active()
 						
 				if ("NextPower", "INPUT_CLICK") in inputs:
 					main['player'].powers.make_next_active()
 				if ("PrevPower", "INPUT_CLICK") in inputs:
 					main['player'].powers.make_prev_active()				
 				if ("Aim", "INPUT_ACTIVE") in inputs:
-					if main['player'].powers.active.range_type == "RANGED":
+					if main['player'].powers.active.range_type == "SINGLE":
 						self.camera = 'shoulder'
 						main['ui_system'].mouse.visible = True
 						
@@ -271,7 +269,7 @@ class CombatState(DefaultState, BaseController):
 						targets = self.monster_list.values()
 						
 						# Gather some info for the target searching
-						distance = main['player'].powers.active.range_size * UNIT_SIZE
+						distance = main['player'].powers.active.distance * UNIT_SIZE
 						cam_vec = main['camera'].pivot.getAxisVect((0,0,-1))
 						
 						final_target = None
@@ -503,7 +501,7 @@ class CombatState(DefaultState, BaseController):
 		if 'ENEMIES' in target_types:
 			tlist.extend(self.monster_list.values() if character in self.hero_list.values() else self.hero_list.values())
 		
-		if type == 'MELEE':
+		if type == 'SINGLE':
 			ori_ivnt = character.object.get_orientation().inverted()
 			for target in tlist:
 				# Convert to local space
@@ -519,7 +517,7 @@ class CombatState(DefaultState, BaseController):
 				# Do a simple distance check
 				if (target.object.position - source).length < _range:
 					targets.append(target)
-		elif type == 'BLAST':
+		elif type == 'CONE':
 			pi_fourths = pi / 4
 			for target in tlist:
 			
@@ -537,6 +535,10 @@ class CombatState(DefaultState, BaseController):
 				
 		return targets		
 	
+	def spawn(self, character, position):
+		print(character.object.position, position)
+		character.object.position = position
+		character.object.position[2] += SAFE_Z
 	
 	def move(self, character, linear = (0,0,0) , angular = (0,0,0) , local = False):
 		"""Handles linear and angular movement of a character"""
@@ -547,6 +549,9 @@ class CombatState(DefaultState, BaseController):
 		# Now handle rpcs
 		self.server.invoke("rotate", character.id, *angular)
 		self.server.invoke("position", character.id, *character.object.position)
+		
+	def despawn(self, character):
+		pass
 		
 	def check_save(self, defender, def_stat, offender, off_stat):
 		def_value = 0
@@ -580,6 +585,7 @@ class CombatRoom:
 	
 	def __init__(self, room):
 		vert_list = [i for i in room.get_vertex_list() if i.z <= 0]
+		self.node_list = room.get_nav_nodes()
 		
 		# Find the smallest and largest x and y
 		sx = lx = vert_list[0].x

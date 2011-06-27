@@ -283,13 +283,13 @@ class MonsterLogic(CharacterLogic):
 		CharacterLogic.__init__(self, object)
 		# self.id = monsterdata.id
 		
-		self.xp_reward = monsterdata.xp_reward
-		self.credit_reward = monsterdata.credit_reward
-		self.role = monsterdata.role
-		self.leader = False
-		self.elite	= False
-		self.object = object
-		self.behaviors = []
+#		self.xp_reward = monsterdata.xp_reward
+#		self.credit_reward = monsterdata.credit_reward
+#		self.role = monsterdata.role
+#		self.leader = False
+#		self.elite	= False
+#		self.object = object
+#		self.behaviors = []
 		
 		self.name = monsterdata.name
 		self.hp = 20

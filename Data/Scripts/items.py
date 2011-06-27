@@ -37,6 +37,14 @@ class Item:
 		self._cost = self._datafile.cost
 		self._modified = self
 		
+	def createObjectInstance(self, engine, position=(0,0,0), orientation=(0,0,0),time=0):
+		if not self._datafile.blend:
+			return None
+		
+		engine.load_library(self._datafile)
+		obj = engine.add_object(self._datafile.name, position, orientation, time)
+		return obj
+			
 	@property
 	def cost(self):
 		return Item.Translate['cost'](self._modified._cost)

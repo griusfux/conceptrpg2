@@ -4,6 +4,7 @@
 # Contributers: Mitchell Stokes
 
 from mathutils import Matrix, Vector
+import cego
 from math import radians
 import GameLogic as gl
 
@@ -167,7 +168,38 @@ class Object:
 				vertexList.append(mesh.getVertex(matID, array))
 				
 		return [Vertex(vertex, self.gameobj) for vertex in vertexList]
+	
+	def get_nav_nodes(self):
+		nodes = []
+		nav_mesh = None
 		
+		for child in self.gameobj.parent.children:
+			if child.name.startswith("navmesh"):
+				nav_mesh = child
+				break
+			
+		if not nav_mesh:
+			return nodes
+		
+		mesh = nav_mesh.meshes[0]
+		
+		for i in range(mesh.numPolygons):
+			poly = mesh.getPolygon(i)
+			verts = []
+			for i in range(poly.getNumVertex()):
+				verts.append(mesh.getVertex(poly.material_id, getattr(poly, "v"+str(i+1))))
+				
+			position = Vector((0,0,0))
+			for i in range(poly.getNumVertex()):
+				position = position + verts[i].XYZ
+				
+			position = position / poly.getNumVertex()
+			position = position * nav_mesh.worldOrientation
+			position = position + nav_mesh.worldPosition
+			nodes.append(cego.Node(position))
+			
+		return nodes
+			
 	def set_parent(self, parent):
 		self.gameobj.setParent(parent.gameobj)
 	
