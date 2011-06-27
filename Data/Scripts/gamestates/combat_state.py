@@ -101,7 +101,7 @@ class CombatState(DefaultState, BaseController):
 		self._next_state = "Default"
 	
 	def client_init(self, main):
-		"""Intialize the client state"""
+		"""Initialize the client state"""
 		
 		main['ui_system'].load_layout("combat")
 		
@@ -118,10 +118,6 @@ class CombatState(DefaultState, BaseController):
 			
 			i = 0
 			for monster in [Monster(i) for i in self._generate_encounter(main['dgen'].deck, len(main['net_players']))]:
-
-				# Find a place to put the monster
-#				x = random.uniform(self.room.start_x+UNIT_SIZE, self.room.end_x-UNIT_SIZE)
-#				y = random.uniform(self.room.start_y+UNIT_SIZE, self.room.end_y-UNIT_SIZE)
 				i += 1
 				
 				# Update the server
@@ -594,40 +590,3 @@ class CombatState(DefaultState, BaseController):
 		
 	def _get_forward_animation(self, main):
 		return main['default_actions']['1h_walk']
-			
-class CombatRoom:
-	"""This class keeps track of room information"""
-	
-	def __init__(self, room):
-		vert_list = [i for i in room.get_vertex_list() if i.z <= 0]
-		self.node_list = room.get_nav_nodes()
-		
-		# Find the smallest and largest x and y
-		sx = lx = vert_list[0].x
-		sy = ly = vert_list[0].y
-		
-		for vert in vert_list:
-			if vert.x < sx:
-				sx = vert.x
-			elif vert.x > lx:
-				lx = vert.x
-				
-			if vert.y < sy:
-				sy = vert.y
-			elif vert.y > ly:
-				ly = vert.y
-		
-		# Record the size of the room
-		self.width = lx - sx
-		self.height = ly - sy
-		
-		self.start_x = sx
-		self.start_y = sy
-		
-		self.end_x = lx
-		self.end_y = ly
-		
-		# Find out how many tiles we need
-		self.x_steps = int(round(self.width / UNIT_SIZE))
-		self.y_steps = int(round(self.height / UNIT_SIZE))
-	
