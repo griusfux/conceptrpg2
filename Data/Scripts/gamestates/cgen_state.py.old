@@ -19,7 +19,7 @@ class CharacterCreationState(BaseState, BaseController):
 		"""Intialize the client state"""
 		
 		main['last_layout'] = ''
-		main['next_layout'] = 'CgenSelect'
+		main['next_layout'] = 'cgen_select'
 		main['cgen_input'] = {}
 		main['creation_done'] = False
 		
@@ -79,7 +79,7 @@ class CharacterCreationState(BaseState, BaseController):
 				player.race = main['cgen_input']['race']
 				
 				# Set the player's class
-				player.player_class = main['cgen_input']['class']	
+				player.player_class = main['cgen_input']['class']			
 				
 				# This levels the player to 1
 				player.xp += 0
@@ -97,12 +97,11 @@ class CharacterCreationState(BaseState, BaseController):
 				# Give the player racial traits
 				# This needs to be done after giving the player xp to ensure there
 				# is already an unspent level for level 1
-				if player.race.traits:
-					traits = player.race.traits
-					try:
-						player.powers.add(Feat(traits), self)
-					except PackageError:
-						print("Unable to open up the file %s for %s's racial traits" % (traits, player.race.name))
+				traits = player.race.traits
+				try:
+					player.powers.add(Feat(traits), self)
+				except PackageError:
+					print("Unable to open up the file %s for %s's racial traits" % (traits, player.race.name))
 				
 				# Setup player inventory
 				
@@ -127,6 +126,40 @@ class CharacterCreationState(BaseState, BaseController):
 			main['net_players'] = {main['client'].id: player}
 			main['player'] = player
 			player.id = main['client'].id
+			
+			# Fill the player's hit points
+			player.hp = player.max_hp
+			
+			# Set up the camera
+			from Scripts.blender_wrapper import Camera
+			camera_pivot = main['engine'].add_object("pivot")
+			main['camera'] = Camera(camera_pivot, main['player'].object)
+			
+			return ("DungeonGeneration", "SWITCH")
+		
+		# Check for game start
+		elif False and main['next_layout'] == 'start':
+			
+			# Add the player empty
+			gameobj = main['engine'].add_object("CharacterEmpty")
+			
+			# Setup the player logic
+			player = PlayerLogic(gameobj)
+			player.load(main['cgen_input']['character'])
+			
+			# Now add the mesh and armature based on race data
+			race = player.race
+			main['engine'].load_library(race)
+			
+			root_ob = main['engine'].add_object(race.root_object)
+			root_ob.position = gameobj.position
+			root_ob.set_parent(gameobj)
+			
+			# Setup the armature
+			gameobj.armature = root_ob
+			
+			main['net_players'][main['client'].id] = player
+			main['player'] = player
 			
 			# Fill the player's hit points
 			player.hp = player.max_hp
