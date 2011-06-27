@@ -4,7 +4,6 @@ import bge
 from Scripts.ui.layouts import *
 from Scripts.ui.cgen_layouts import *
 from Scripts.ui.shop_layout import *
-from Scripts.ui.level_up_layout import LevelUpLayout
 
 layouts = {
 	"cgen_select": CgenSelect,
@@ -19,7 +18,6 @@ layouts = {
 	"default_state": DefaultStateLayout,
 	"combat": CombatLayout,
 	"shop" : ShopLayout,
-	"level_up" : LevelUpLayout,
 	
 	"stats": StatsOverlay,
 	"start_game_overlay": StartGameOverlay,

@@ -3,7 +3,6 @@ from .default_state import DefaultState
 from .cgen_state import CharacterCreationState
 from .dgen_state import DungeonGenerationState
 from .shop_state import ShopState
-from .level_up_state import LevelUpState
 from .title_state import TitleState
 from .ingame_menu_state import InGameMenuState
 from .inventory_state import InventoryState

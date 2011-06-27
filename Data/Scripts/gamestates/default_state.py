@@ -94,9 +94,6 @@ class DefaultState(BaseState, BaseController):
 					self.camera_mode = "topdown"
 				else:
 					self.camera_mode = "frankie"
-				
-			if main['player'].unspent_levels and ("LevelUp", "INPUT_CLICK") in inputs:
-				return("LevelUp", "PUSH")
 
 			if ("Inventory", "INPUT_CLICK") in inputs:
 				return("Inventory", "PUSH")
