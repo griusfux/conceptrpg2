@@ -179,7 +179,10 @@ class CombatState(DefaultState, BaseController):
 		# Targeting
 		active_power = main['player'].powers.active
 		range_type = active_power.effect_shape
-		range_size = active_power.distance
+		if "WEAPON_RANGE" in active_power.flags:
+			range_size = main['player'].weapon.range
+		else:
+			range_size = active_power.distance
 		if range_type == 'SINGLE':
 			# If the player already has targets, find out if they are valid
 			if main['player'].targets:
