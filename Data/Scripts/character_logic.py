@@ -16,6 +16,20 @@ XP_TABLE =	[0,
 			2000,
 			3000,
 			4000,]
+			
+BASE_AFFINITIES = {
+				# Elemental Affinities
+				"STORM": 0,
+				"DEATH": 0,
+				"FIRE": 0,
+				"EARTH": 0,
+				"WATER": 0,
+				"HOLY": 0,
+				
+				# Delivery Affinities
+				"WEAPON": 0,
+				"SPELL": 0,
+				}
 
 class CharacterLogic:
 	"""A logic object that stores all the information and methods of the player"""
@@ -43,6 +57,7 @@ class CharacterLogic:
 		self.race		= ""
 		self.player_class= ""
 		self.element    = ""
+		self.affinities = BASE_AFFINITIES.copy()
 		self._xp			= 0
 		self.last_level = 0
 		self.next_level = 0
@@ -283,6 +298,7 @@ class MonsterLogic(CharacterLogic):
 		CharacterLogic.__init__(self, object)
 		# self.id = monsterdata.id
 		
+		self.xp_reward = 0
 #		self.xp_reward = monsterdata.xp_reward
 #		self.credit_reward = monsterdata.credit_reward
 #		self.role = monsterdata.role

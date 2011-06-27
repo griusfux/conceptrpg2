@@ -66,7 +66,6 @@ class CombatState(DefaultState, BaseController):
 		if id not in self.monster_list: return
 		monster = self.monster_list[id]
 		main['player'].xp += monster.xp_reward//len(self.hero_list)
-		main['player'].credits += monster.credit_reward//len(self.hero_list)
 		
 		if monster in main['player'].targets:
 			main['player'].targets.remove(monster)
@@ -193,7 +192,7 @@ class CombatState(DefaultState, BaseController):
 						main['player'].targets = []
 			else:
 				target = None
-				target_dist = range_size
+				target_dist = range_size + HALF_UNIT_SIZE
 				for monster in self.monster_list.values():
 					dist = (monster.object.position-main['player'].object.position).length
 					if dist < target_dist:
@@ -203,18 +202,6 @@ class CombatState(DefaultState, BaseController):
 		else:	
 			mask = getattr(active_power, "mask", {'ENEMIES'})
 			main['player'].targets = self.get_targets(main['player'], range_type, range_size, target_types=mask)		
-		
-			
-		####	
-		# ai
-#		if main['owns_combat']:
-#			#Dicision making
-#			for id, monster in self.monster_list.items():
-#				monster.target = main['player']
-#				monster.actions = monster.ai.run()
-#				
-#			# Run the ai manager
-#			AiManager.run()
 		
 		# Maintain monsters
 		for id, monster in self.monster_list.items():
@@ -252,7 +239,7 @@ class CombatState(DefaultState, BaseController):
 				if ("PrevPower", "INPUT_CLICK") in inputs:
 					main['player'].powers.make_prev_active()				
 				if ("Aim", "INPUT_ACTIVE") in inputs:
-					if main['player'].powers.active.range_type == "SINGLE":
+					if main['player'].powers.active.effect_shape == "SINGLE":
 						self.camera = 'shoulder'
 						main['ui_system'].mouse.visible = True
 						
@@ -285,8 +272,8 @@ class CombatState(DefaultState, BaseController):
 					else:					
 						# Show the range of the active power
 						power = main['player'].powers.active
-						type = power.range_type
-						size = power.range_size
+						type = power.effect_shape
+						size = power.distance
 						
 						if type in main['target_shapes']:
 							main['target_shapes'][type].color = [1, 0, 0, 0.25]
@@ -306,11 +293,6 @@ class CombatState(DefaultState, BaseController):
 		
 		# Put away the player's weapon
 		main['player'].clear_right_hand()
-		
-		# Restore encounter powers
-		for power in main['player'].powers.all:
-			if power.usage == "ENCOUNTER":
-				power.spent = False
 				
 		# Clear combat statuses
 		for status in self.status_list:
@@ -483,11 +465,11 @@ class CombatState(DefaultState, BaseController):
 		status_entry['save'] = duration.strip().lower() == 'save'
 		self.status_list.append(status_entry)
 
-	def get_targets(self, character, type, _range, target_types={'ENEMIES'}, source=None):
+	def get_targets(self, character, shape, distance, target_types={'ENEMIES'}, source=None):
 		"""Get targets in a range
 		
 		character -- character using the power
-		type -- the type of area (line, burst, etc)
+		shape -- the shape of area (line, burst, etc)
 		range -- the range to grab (integer)
 		target_types -- which type of targets to grab (SELF, ALLIES, ENEMIES, etc)
 		
@@ -495,7 +477,7 @@ class CombatState(DefaultState, BaseController):
 		
 		# Bump the range a bit to compensate for the first half "tile"
 		# that the player occupies
-		_range += HALF_UNIT_SIZE
+		distance += HALF_UNIT_SIZE
 		
 		if not source:
 			source = character.object.position
@@ -513,7 +495,7 @@ class CombatState(DefaultState, BaseController):
 		if 'ENEMIES' in target_types:
 			tlist.extend(self.monster_list.values() if character in self.hero_list.values() else self.hero_list.values())
 		
-		if type == 'SINGLE':
+		if shape == 'SINGLE':
 			ori_ivnt = character.object.get_orientation().inverted()
 			for target in tlist:
 				# Convert to local space
@@ -521,20 +503,20 @@ class CombatState(DefaultState, BaseController):
 				v *= ori_ivnt
 				
 				# Now do a simple bounds check
-				if v[1] < _range and abs(v[0]) < HALF_UNIT_SIZE:
+				if v[1] < distance and abs(v[0]) < HALF_UNIT_SIZE:
 					targets.append(target)
-		elif type == 'BURST':
+		elif shape == 'BURST':
 			for target in tlist:
 				
 				# Do a simple distance check
-				if (target.object.position - source).length < _range:
+				if (target.object.position - source).length < distance:
 					targets.append(target)
-		elif type == 'CONE':
+		elif shape == 'CONE':
 			pi_fourths = pi / 4
 			for target in tlist:
 			
 				# Start with a simple distance check
-				if (target.object.position - source).length < _range:
+				if (target.object.position - source).length < distance:
 					
 					# Now do an angle check
 					v1 = character.object.forward_vector
