@@ -19,17 +19,17 @@ XP_TABLE =	[0,
 			
 BASE_AFFINITIES = {
 				# Elemental Affinities
-				"STORM": 0,
-				"DEATH": 0,
-				"FIRE": 0,
-				"EARTH": 0,
-				"WATER": 0,
-				"HOLY": 0,
+				"death" : 0,
+				"storm" : 0,
+				"fire" : 0,
+				"holy" : 0,
+				"earth" : 0,
+				"water" : 0,
 				
 				# Delivery Affinities
-				"WEAPON": 0,
-				"SPELL": 0,
-				}
+				"weapon" : 0,
+				"spell" : 0
+			}
 
 class CharacterLogic:
 	"""A logic object that stores all the information and methods of the player"""
@@ -54,14 +54,16 @@ class CharacterLogic:
 		#Player information
 		self.name		= ""
 		self.level		= 0
-		self.race		= ""
-		self.player_class= ""
+		self.race		= None
+		self.player_class= None
 		self.element    = ""
 		self.affinities = BASE_AFFINITIES.copy()
 		self._xp			= 0
 		self.last_level = 0
 		self.next_level = 0
-		self.unspent_levels = []
+		self.affinity_points = 0
+		self.delivery_points = 0
+		self.power_points = 0
 		
 		#attributes
 		self.endurance		= 5
@@ -71,17 +73,6 @@ class CharacterLogic:
 		self.physical_defense=5
 		self.accuracy		= 5
 		self.reflex			= 5
-		
-		#affinities
-		self.affinities = { "death" : 0,
-							"storm" : 0,
-							"fire" : 0,
-							"holy" : 0,
-							"earth" : 0,
-							"water" : 0,
-							"weapon" : 0,
-							"spell" : 0
-							}
 							
 		#hit points
 		self.max_hp		= 0
@@ -127,7 +118,29 @@ class CharacterLogic:
 		self.max_hp = self.endurance * 5
 		hp_percent = (self.hp / self.max_hp) if self.max_hp else 1
 		self.hp = self.max_hp * hp_percent
-	
+		
+		
+	def apply_affinities(self):
+		for k, v in self.player_class.affinities.items():
+			self.affinities[k] += v
+			
+		# Still need to apply affinities based on element
+
+	def level_up(self):
+		self.level += 1
+		
+		if self.level == 1:
+			self.power_points += 3
+			self.apply_affinities()
+		elif self.level % 5:
+			self.affinity_points += 1
+			self.power_points += 1
+			self.delivery_points += 1
+			self.apply_affinities()
+		else:
+			self.affinity_points += 1
+			self.power_points += 1
+
 	# Managed access to xp
 	@property
 	def xp(self): return self._xp
@@ -136,21 +149,21 @@ class CharacterLogic:
 	def xp(self, value):
 		self._xp = value
 		
-		# if self._xp >= 100:
-			# self.level += self._xp // 100
-			# self._xp = self._xp % 100
-			# self.recalc_stats()
-		
 		while self.level < len(XP_TABLE) and self._xp >= self.next_level:
-			self.level += 1
-			self.unspent_levels.append(UnspentLevel(self.level))
+			self.level_up()
 			self.last_level = self.next_level
 			if self.level < len(XP_TABLE):
 				self.next_level = XP_TABLE[self.level]
 			else:
 				print("Level cap reached")
 			self.recalc_stats()
-	
+			
+			# Debug prints
+#			print(self.affinities)
+#			print(self.affinity_points)
+#			print(self.power_points)
+#			print(self.delivery_points)
+
 	######################
 	# Equipment properties
 	
@@ -223,7 +236,6 @@ class PlayerLogic(CharacterLogic):
 		self.race		= Race(save_data["race"])
 		self.player_class = Class(save_data["player_class"])
 		self._xp			= save_data["xp"]
-		self.unspent_levels = save_data["unspent_levels"]
 		
 		self.endurance		= save_data["endurance"]
 		self.arcane_damage	= save_data["arcane_damage"]
@@ -234,6 +246,9 @@ class PlayerLogic(CharacterLogic):
 		self.reflex = save_data["reflex"]
 
 		self.affinities = save_data["affinities"]
+		self.power_points = save_data["power_points"]
+		self.affinity_points = save_data["affinity_points"]
+		self.delivery_points = save_data["delivery_points"]
 		
 		self.speed = save_data["speed"]
 		
@@ -259,7 +274,6 @@ class PlayerLogic(CharacterLogic):
 				"race"	: self.race.package_name,
 				"player_class" : self.player_class.package_name,
 				"xp"		: self.xp,
-				"unspent_levels" : self.unspent_levels,
 				
 				"endurance" : self.endurance,
 				"arcane_damage" : self.arcane_damage,
@@ -270,6 +284,9 @@ class PlayerLogic(CharacterLogic):
 				"accuracy" : self.accuracy,
 				
 				"affinities" : self.affinities,
+				"power_ponts" : self.power_points,
+				"affinity_points" : self.affinity_points,
+				"delivery_points" : self.delivery_points,
 				
 				"speed" : self.speed,
 				
