@@ -86,7 +86,10 @@ class BlenderUISystem(bgui.System):
 		# as layouts adjust themselves.
 		if self._change_layout:
 			self._remove_widget(self.layout)
-			self.layout = layouts[self.current_layout](self)
+			if self.current_layout in globals():
+				self.layout = globals()[self.current_layout](self)
+			else:
+				self.layout = layouts[self.current_layout](self)
 			self._change_layout = False
 		
 		# Update the layout and overlays
