@@ -4,7 +4,7 @@
 # Contributers: Mitchell Stokes
 
 from mathutils import Matrix, Vector
-import cego
+from cego import Node
 from math import radians
 import GameLogic as gl
 
@@ -196,7 +196,7 @@ class Object:
 			position = position / poly.getNumVertex()
 			position = position * nav_mesh.worldOrientation
 			position = position + nav_mesh.worldPosition
-			nodes.append(cego.Node(position))
+			nodes.append(Node(position))
 			
 		return nodes
 			

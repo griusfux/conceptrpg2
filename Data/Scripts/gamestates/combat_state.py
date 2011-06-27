@@ -7,6 +7,7 @@ from Scripts.character_logic import MonsterLogic
 
 import random
 from math import *
+
 import cego as AiManager
 from cego.state_machine import StateMachine as AiStateMachine
 from Scripts.mathutils import Vector, Matrix
@@ -26,6 +27,7 @@ class Combat:
 	def __init__(self):
 		self.hero_list = []
 		self.monster_list = {}
+		self.environment = []
 
 class CombatState(DefaultState, BaseController):
 	
@@ -48,9 +50,6 @@ class CombatState(DefaultState, BaseController):
 		# Add the monster to the monster list
 		logic = main['net_players'][id]
 		
-		if main['owns_combat']:
-			logic.ai = AiStateMachine(logic, "extern/cego/example_definitions/base.json", "spawn")
-			AiManager.add_agent(logic)
 		obj = logic.object
 		self.monster_list[id] = logic
 		
@@ -105,27 +104,28 @@ class CombatState(DefaultState, BaseController):
 		"""Intialize the client state"""
 		
 		main['ui_system'].load_layout("combat")
-
-		# Get room info
-		self.room = CombatRoom(main['room'])
 		
 		self.monster_list = {}
 		self.hero_list = {main['client'].id:main['player']}
 		
 		# Place the monsters
 		if main['owns_combat']:
-			AiManager.set_controller(self)
-			AiManager.set_environment(self.room.node_list)
+			nav_nodes =  main['room'].get_nav_nodes()
+			for node in nav_nodes:
+				self.server.invoke("add_node", node)
+				
+			self.server.invoke("set_environment")
+			
 			i = 0
 			for monster in [Monster(i) for i in self._generate_encounter(main['dgen'].deck, len(main['net_players']))]:
 
 				# Find a place to put the monster
-				x = random.uniform(self.room.start_x+UNIT_SIZE, self.room.end_x-UNIT_SIZE)
-				y = random.uniform(self.room.start_y+UNIT_SIZE, self.room.end_y-UNIT_SIZE)
+#				x = random.uniform(self.room.start_x+UNIT_SIZE, self.room.end_x-UNIT_SIZE)
+#				y = random.uniform(self.room.start_y+UNIT_SIZE, self.room.end_y-UNIT_SIZE)
 				i += 1
 				
 				# Update the server
-				self.server.invoke("add_monster", monster.name, str(i), x, y, SAFE_Z)
+				self.server.invoke("add_monster", monster.name, str(i), 0, 0, SAFE_Z)
 					
 		else:
 			# Request monsters from the server
@@ -211,14 +211,14 @@ class CombatState(DefaultState, BaseController):
 			
 		####	
 		# ai
-		if main['owns_combat']:
-			#Dicision making
-			for id, monster in self.monster_list.items():
-				monster.target = main['player']
-				monster.actions = monster.ai.run()
-				
-			# Run the ai manager
-			AiManager.run()
+#		if main['owns_combat']:
+#			#Dicision making
+#			for id, monster in self.monster_list.items():
+#				monster.target = main['player']
+#				monster.actions = monster.ai.run()
+#				
+#			# Run the ai manager
+#			AiManager.run()
 		
 		# Maintain monsters
 		for id, monster in self.monster_list.items():
@@ -331,6 +331,8 @@ class CombatState(DefaultState, BaseController):
 		
 		if cid not in combat.monster_list:
 			combat.monster_list[cid] = [MonsterLogic(None, Monster(monster)), [x, y, z]]
+			combat.monster_list[cid][0].cid = cid
+			AiManager.add_agent(combat.monster_list[cid][0], "extern/cego/example_definitions/base.json", "spawn")
 			self.clients.invoke("add_player", cid, monster, 1, [x, y, z], None)
 			self.clients.invoke("add_monster", client.combat_id, monster, cid, x, y, z)
 		# else:
@@ -396,15 +398,29 @@ class CombatState(DefaultState, BaseController):
 	@rpc(server_functions, "position_monster", str, float, float, float)
 	def s_position_monster(self, main, client, cid, x, y, z):
 		self.clients.invoke("position_monster", cid, x, y, z)
+		
+	@rpc(server_functions, "add_node", "pickle")
+	def s_add_node(self, main, client, node):
+		combat = main['combats'].get(client.combat_id, None)
+		combat.environment.append(node)
+	
+	@rpc(server_functions, "set_environment")
+	def s_set_environment(selfself, main, client):
+		combat = main['combats'].get(client.combat_id, None)
+		AiManager.set_environment(combat.environment)
 	
 	def server_init(self, main):
 		"""Initialize the server state"""
-		
-		pass
+		self.monster_id = 0
+		# Setup Ai
+		AiManager.set_controller(self)
 		
 	def server_run(self, main, client):
 		"""Server-side run method"""
-
+		# Run the ai if it is set up, else try to set it up
+		if AiManager.get_environment():
+			AiManager.run()
+				
 		if main['combats'].get(client.combat_id) == -1:
 			main['combats'][client.combat_id] = Combat()
 			
@@ -536,9 +552,8 @@ class CombatState(DefaultState, BaseController):
 		return targets		
 	
 	def spawn(self, character, position):
-		print(character.object.position, position)
-		character.object.position = position
-		character.object.position[2] += SAFE_Z
+		if hasattr(self, 'clients'):
+			self.clients.invoke("position", character.cid, *position)
 	
 	def move(self, character, linear = (0,0,0) , angular = (0,0,0) , local = False):
 		"""Handles linear and angular movement of a character"""
