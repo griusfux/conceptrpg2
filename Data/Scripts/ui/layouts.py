@@ -185,6 +185,8 @@ class DefaultStateLayout(Layout):
 	def __init__(self, sys):
 		Layout.__init__(self, sys, "default_state_layout")
 		
+		self.combat = False
+		
 		# Player data frame
 		self.pframe = bgui.Frame(self, "ds_pframe", aspect=(5/2), size=[0.25, 0.20], pos=[0.01, 0.01], sub_theme="HUD")
 		self.player_name = bgui.Label(self.pframe, "ds_name", pt_size=34, pos=[0.05, 0.80])
@@ -200,23 +202,7 @@ class DefaultStateLayout(Layout):
 									sub_theme='Exp')#, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)		
 		
 		# Locked message
-		# self.lock_msg = bgui.Label(self, "lock_msg", pt_size=42, pos=[0.35, 0.90])
-		
-	def update(self, main):
-		player = main['player']
-		self.player_name.text = "%s (Lvl %d)" % (player.name, player.level)
-		self.hp_text.text = "HP (%d/%d)" % (player.hp, player.max_hp)
-		self.hp_bar._update_position([0.90*min(player.max_hp/100, 1), 0.03], self.hp_bar._base_pos)
-		self.hp_bar.percent = player.hp/player.max_hp
-		
-		self.exp_text.text = "EXP (%d/%d)" % (player.xp, player.next_level)#player.xp+100-(player.xp%100))
-		self.exp_bar.percent = (player.xp-player.last_level)/(player.next_level-player.last_level+1)
-		
-		# self.lock_msg.text = "LOCKED: %s" % (main['player'].lock - time()) if main['player'].lock else ""
-		
-class CombatLayout(DefaultStateLayout):
-	def __init__(self, sys):
-		DefaultStateLayout.__init__(self, sys)	
+		# self.lock_msg = bgui.Label(self, "lock_msg", pt_size=42, pos=[0.35, 0.90])	
 		
 		# Power Bar
 		self.power_imgs = []
@@ -240,7 +226,9 @@ class CombatLayout(DefaultStateLayout):
 		# Create new images
 		for i in range(min(8, len(powers))):
 			# Background
-			bg = "Textures/ui/hex_tile_gray.png"# if powers[i].spent else hex[powers[i].usage]
+			bg = "Textures/ui/hex_tile_blue.png"# if powers[i].spent else hex[powers[i].usage]
+			if not self.combat and "NON_COMBAT" not in powers[i].flags:
+				bg = "Textures/ui/hex_tile_gray.png"
 			img = bgui.Image(self.power_frame, "sbg"+str(i), bg,
 							 size=[1/8, 1], pos=[(1/8)*i, 0.5 if i == psys.active_index else 0])
 							 
@@ -259,9 +247,26 @@ class CombatLayout(DefaultStateLayout):
 								
 		self.power_bar_selection = psys.active_index
 		
-	def update (self, main):
-		DefaultStateLayout.update(self, main)
+	def update(self, main):
+		player = main['player']
+		self.player_name.text = "%s (Lvl %d)" % (player.name, player.level)
+		self.hp_text.text = "HP (%d/%d)" % (player.hp, player.max_hp)
+		self.hp_bar._update_position([0.90*min(player.max_hp/100, 1), 0.03], self.hp_bar._base_pos)
+		self.hp_bar.percent = player.hp/player.max_hp
+		
+		self.exp_text.text = "EXP (%d/%d)" % (player.xp, player.next_level)#player.xp+100-(player.xp%100))
+		self.exp_bar.percent = (player.xp-player.last_level)/(player.next_level-player.last_level+1)
+		
+		# self.lock_msg.text = "LOCKED: %s" % (main['player'].lock - time()) if main['player'].lock else ""
 		
 		if self.power_bar_selection != main['player'].powers.active_index:
 			self.update_powerbar(main)
+		
+class CombatLayout(DefaultStateLayout):
+	def __init__(self, sys):
+		DefaultStateLayout.__init__(self, sys)
+		self.combat = True
+		
+	def update (self, main):
+		DefaultStateLayout.update(self, main)
 	
