@@ -284,7 +284,7 @@ class PlayerLogic(CharacterLogic):
 				"accuracy" : self.accuracy,
 				
 				"affinities" : self.affinities,
-				"power_ponts" : self.power_points,
+				"power_points" : self.power_points,
 				"affinity_points" : self.affinity_points,
 				"delivery_points" : self.delivery_points,
 				
