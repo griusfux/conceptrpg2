@@ -1,0 +1,9 @@
+OUTLINES: 	0 0 0
+Background:	100 100 100
+Highlights:	180 180 180
+sun border:	140 192 209
+sun:		255 246 2
+sun orange:	255 187 2
+water outline:	2 198 255
+water droplet:	2 173 184
+waterdrop out:	83 209 217
