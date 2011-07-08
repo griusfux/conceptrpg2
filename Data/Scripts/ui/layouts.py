@@ -188,18 +188,26 @@ class DefaultStateLayout(Layout):
 		self.combat = False
 		
 		# Player data frame
-		self.pframe = bgui.Frame(self, "ds_pframe", aspect=(5/2), size=[0.25, 0.20], pos=[0.01, 0.01], sub_theme="HUD")
-		self.player_name = bgui.Label(self.pframe, "ds_name", pt_size=34, pos=[0.05, 0.80])
+		self.pframe = bgui.Frame(self, "ds_pframe", aspect=2.5, size=[0, 0.15], pos=[0, 0], sub_theme="HUD")
+		self.player_name = bgui.Label(self.pframe, "ds_name", pt_size=34, pos=[0.05, 0.70])
+		self.classlvl = bgui.Label(self.pframe, "ds_classlvl", pt_size=24, pos=[0.05, 0.50])
 		
 		# HP
-		self.hp_text = bgui.Label(self.pframe, "ds_hp", pt_size=16, pos=[0.10, 0.60])
-		self.hp_bar = bgui.ProgressBar(self.pframe, "ds_hp_bar", size=[0.90, 0.03], pos=[0.05, 0.55],
-									sub_theme='HP')#, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+		self.hp_text = bgui.Label(self.pframe, "ds_hp", pt_size=20, pos=[0.05, 0.3])
+		self.hp_bar = bgui.ProgressBar(self.pframe, "ds_hp_bar", size=[0.90, 0.03], pos=[0.05, 0.25],
+									sub_theme='HP')
 									
 		# EXP
-		self.exp_text = bgui.Label(self.pframe, "ds_exp", pt_size=16, pos=[0.10, 0.40])
-		self.exp_bar = bgui.ProgressBar(self.pframe, "ds_exp_bar", size=[0.90, 0.03], pos=[0.05, 0.35],
-									sub_theme='Exp')#, options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)		
+		self.exp_text = bgui.Label(self.pframe, "ds_exp", pt_size=20, pos=[0.05, 0.1])
+		self.exp_bar = bgui.ProgressBar(self.pframe, "ds_exp_bar", size=[0.90, 0.03], pos=[0.05, 0.05],
+									sub_theme='Exp')
+		
+		# Net Players
+		self.net_ids = []
+		self.net_frames = {}
+		self.net_names = {}
+		self.net_classlvl = {}
+		self.net_hp = {}
 		
 		# Locked message
 		# self.lock_msg = bgui.Label(self, "lock_msg", pt_size=42, pos=[0.35, 0.90])	
@@ -249,7 +257,8 @@ class DefaultStateLayout(Layout):
 		
 	def update(self, main):
 		player = main['player']
-		self.player_name.text = "%s (Lvl %d)" % (player.name, player.level)
+		self.player_name.text = player.name
+		self.classlvl.text = "%s\t\t%d" % (player.player_class.name, player.level)
 		self.hp_text.text = "HP (%d/%d)" % (player.hp, player.max_hp)
 		self.hp_bar._update_position([0.90*min(player.max_hp/100, 1), 0.03], self.hp_bar._base_pos)
 		self.hp_bar.percent = player.hp/player.max_hp
@@ -261,6 +270,39 @@ class DefaultStateLayout(Layout):
 		
 		if self.power_bar_selection != main['player'].powers.active_index:
 			self.update_powerbar(main)
+			
+		# Net Players
+		missing_players = self.net_ids[:]
+		for id, nplayer in main['net_players'].items():
+			# The player's stats are already taken care of
+			if id == main['player'].id:
+				#missing_players.remove(id)
+				continue
+			
+			# If they weren't in the old list, then the player is new
+			if id not in self.net_ids:
+				self.net_ids.append(id)
+				self.net_frames[id] = bgui.Frame(self, "ds_%sframe"%id, aspect=2.5, size=[0, 0.1], pos=[0,.15], sub_theme="HUD")
+				self.net_names[id] = bgui.Label(self.net_frames[id], "ds_%sname"%id, pt_size=28, pos=[0.05, 0.65])
+				self.net_names[id].text = id
+				self.net_classlvl[id] = bgui.Label(self.net_frames[id], "ds_%sclass"%id, pt_size=22, pos=[0.05, 0.35])
+				self.net_classlvl[id].text = "Mage\t\t1"
+				self.net_hp[id] = bgui.ProgressBar(self.net_frames[id], "ds_%shp"%id, size=[0.90, 0.03], pos=[0.05, 0.25],
+									sub_theme='HP')
+#			else:
+#				# The player is still around, so make sure their UI stays
+#				missing_players.remove(id)
+				
+			# Update Net player info and the position of the info
+			self.net_frames[id].pos = [0, .15+self.net_ids.index(id)*.1]
+			self.net_hp[id].size = [0.90*min(50/100, 1), 0.03]
+			self.net_hp[id].percent = 50/50
+			
+#		for id in missing_players:
+#			print("Removing", id)
+#			self.net_ids.remove(id)
+#			# Remove widgets
+#			self.net_frames[id].visible = False
 		
 class CombatLayout(DefaultStateLayout):
 	def __init__(self, sys):
