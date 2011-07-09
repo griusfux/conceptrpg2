@@ -1,10 +1,14 @@
 import random
 
 import Scripts.packages as Packages
+from Scripts.modifiers import *
 
 AvailableItems = [i.name for i in Packages.Item.get_package_list()]
 AvailableArmors = [i.name for i in Packages.Armor.get_package_list()]
 AvailableWeapons = [i.name for i in Packages.Weapon.get_package_list()]
+
+MOD_LEVEL_MINUS_ONE = 0.2
+MOD_LEVEL_PLUS_ONE = 0.4
 
 ArmorModifiers =[
 					"arcane_defense"
@@ -30,12 +34,47 @@ class Item:
 				"cost" : lambda x: x,
 				}
 	
-	def __init__(self, base):
+	def __init__(self, base, tier):
 		self._base = base
+		self.tier = tier
 		self._datafile = getattr(Packages, self.__class__.__name__)(base)
 		self.name = self._datafile.name
+		self.name = TierNames[tier] + " " + self.name if TierNames[tier] else self.name
 		self._cost = self._datafile.cost
 		self._modified = self
+		
+	def __str__(self):
+		retval = self.name
+		for i in self.modifiers:
+			retval += "\n\t"+i
+			
+		return retval
+		
+	def modify(self, name, value):
+		# We want to randomize modifier levels a bit
+		r = random.random()
+		if r < MOD_LEVEL_MINUS_ONE:
+			value -= 1
+		elif r < MOD_LEVEL_PLUS_ONE:
+			value += 1
+		
+		# We don't want to go above Legendary
+		if value > 5:
+			value = 5
+		try:
+			modified = globals()[name](self._modified, value)
+
+		except KeyError:
+			print("No modifier of the name %s exists" % name)
+			return False
+		if modified.mod_type != self.__class__.__name__:
+			print(modified.type)
+			print("%s is not a %s modifier" % (name, self.__class__.__name__))
+			return False
+		else:
+			self._modified = modified
+			
+		return True
 		
 	def createObjectInstance(self, engine, position=(0,0,0), orientation=(0,0,0),time=0):
 		if not self._datafile.blend:
@@ -48,6 +87,14 @@ class Item:
 	@property
 	def cost(self):
 		return Item.Translate['cost'](self._modified._cost)
+	
+	@property
+	def _modifiers(self):
+		return []
+	
+	@property
+	def modifiers(self):
+		return self._modified._modifiers
 		
 class Armor(Item):
 	Translate = {}
@@ -71,8 +118,7 @@ class Armor(Item):
 		Translate[key].update(Item.Translate)
 						
 	def __init__(self, base, tier=1):
-		Item.__init__(self, base)
-		self.name = TierNames[tier] + " " + self.name
+		Item.__init__(self, base, tier)
 		self.type = self._datafile.type
 		self._arcane_defense = self._datafile.arcane_defense
 		self._physical_defense = self._datafile.physical_defense
@@ -82,21 +128,7 @@ class Armor(Item):
 			modified = False
 			while not modified:
 				modified = self.modify(random.choice(ArmorModifiers), tier)
-		
-	def modify(self, name, value):
-		try:
-			modified = globals()['_'+name](self._modified, value)
-		except KeyError:
-			print("No modifier of the name %s exists" % name)
-			return False
-		if not isinstance(modified, Armor):
-			print("%s is not an armor modifier" % name)
-			return False
-		else:
-			self._modified = modified
-			
-		return True
-	
+
 	@property
 	def arcane_defense(self):
 		return Armor.Translate[self.type]['arcane_defense'](self._modified._arcane_defense)
@@ -157,8 +189,7 @@ class Weapon(Item):
 		Translate[key].update(Item.Translate)
 		
 	def __init__(self, base, tier=1):
-		Item.__init__(self, base)
-		self.name = TierNames[tier] + " " + self.name
+		Item.__init__(self, base, tier)
 		self.type = self._datafile.type
 		self.hands = self._datafile.hands
 		self._weight = self._datafile.weight
@@ -169,20 +200,6 @@ class Weapon(Item):
 			modified = False
 			while not modified:
 				modified = self.modify(random.choice(WeaponModifiers), tier)
-		
-	def modify(self, name, value):
-		try:
-			modified = globals()['_'+name](self._modified, value)
-		except KeyError:
-			print("No modifier of the name %s exists" % name)
-			return False
-		if not isinstance(modified, Weapon):
-			print("%s is not a weapon modifier" % name)
-			return False
-		else:
-			self._modified = modified
-			
-		return True
 	
 	@property
 	def range(self):
@@ -191,57 +208,3 @@ class Weapon(Item):
 	@property
 	def accuracy(self):
 		return Weapon.Translate[self.type]['accuracy'](self._modified._accuracy)
-	
-class _ArmorModifier(Armor):
-	def __init__(self, armor, value):
-		self._armor = armor
-		self.value = value
-		self.type = armor.type
-		
-	@property
-	def name(self):
-		return self._armor.name
-	
-	@property
-	def _arcane_defense(self):
-		return self._armor._arcane_defense
-	
-	@property
-	def _physical_defense(self):
-		return self._armor._physical_defense
-	
-	@property
-	def _reflex(self):
-		return self._armor._reflex
-
-class _arcane_defense(_ArmorModifier):
-	@property
-	def _arcane_defense(self):
-		return self._armor._arcane_defense + self.value
-	
-class _WeaponModifier(Weapon):
-	def __init__(self, weapon, value):
-		self._weapon = weapon
-		self.value = value
-		self.type = weapon.type
-		
-	@property
-	def name(self):
-		return self._weapon.name
-		
-	@property
-	def _range(self):
-		return self._weapon._range
-	
-	@property
-	def _accuracy(self):
-		return self._weapon._accuracy
-	
-	@property
-	def _cost(self):
-		return self._weapon._cost
-	
-class _accuracy(_WeaponModifier):
-	@property
-	def _accuracy(self):
-		return self._weapon._accuracy + self.value

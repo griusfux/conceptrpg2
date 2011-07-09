@@ -116,7 +116,7 @@ class CharacterCreationState(BaseState, BaseController):
 				print(a.name, a.arcane_defense)
 				player.armor = a
 
-				player.inventory.append(Items.Item('Bonsai'))
+				# player.inventory.append(Items.Item('Bonsai'))
 				
 				# Give the player some starting credits
 				# player.credits = 100
