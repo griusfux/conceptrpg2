@@ -3,7 +3,7 @@
     "cost": 5, 
     "hands": 1, 
     "name": "Longsword", 
-    "range": 0, 
+    "range": 1, 
     "type": "SWORD", 
     "weight": 0
 }
