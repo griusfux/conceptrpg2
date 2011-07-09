@@ -191,7 +191,7 @@ class CombatState(DefaultState, BaseController):
 					main['player'].targets = []
 				else:
 					# The target must be in range
-					if (main['player'].targets[0].object.position-main['player'].object.position).length > range_size:
+					if (main['player'].targets[0].object.position-main['player'].object.position).length > range_size + HALF_UNIT_SIZE:
 						main['player'].targets = []
 			else:
 				target = None
