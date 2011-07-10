@@ -61,6 +61,8 @@ class DefaultState(BaseState, BaseController):
 		main['engine'].set_active_camera(main['camera'])
 		self.camera_mode = "frankie"
 		
+		main['full_map'] = False
+		
 		main['player'].save()
 		
 		self.in_shop = False
@@ -73,6 +75,7 @@ class DefaultState(BaseState, BaseController):
 		if main['camera'].mode != self.camera_mode:
 			main['camera'].change_mode(self.camera_mode, 60)
 		main['camera'].update()
+		main['full_map'] = False
 		
 		# While the camera is still transitioning, do nothing
 		if main['camera']._transition_point != 0:
@@ -88,12 +91,8 @@ class DefaultState(BaseState, BaseController):
 		id = main['client'].id
 		
 		if inputs:
-			if ("SwitchCamera", "INPUT_CLICK") in inputs:
-				# main['engine'].set_active_camera(main['top_down_camera'])
-				if main['camera'].mode == "frankie":
-					self.camera_mode = "topdown"
-				else:
-					self.camera_mode = "frankie"
+			if ("SwitchCamera", "INPUT_ACTIVE") in inputs:
+				main['full_map'] = True
 
 			if ("Inventory", "INPUT_CLICK") in inputs:
 				return("Inventory", "PUSH")
@@ -143,6 +142,11 @@ class DefaultState(BaseState, BaseController):
 			
 		if main['room']:
 			return ('Combat', 'SWITCH')
+		
+	def client_cleanup(self, main):
+		"""Cleanup the client state"""
+		
+		del main['full_map']
 			
 	def _get_idle_animation(self, main):
 		return main['default_actions']['default_idle']

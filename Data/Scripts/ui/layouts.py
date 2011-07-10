@@ -1,5 +1,6 @@
 import bgui
 from time import time
+from Scripts.ui.custom_widgets import *
 
 class Layout(bgui.Widget):
 	def __init__(self, sys, name, use_mouse=False):
@@ -215,8 +216,17 @@ class DefaultStateLayout(Layout):
 		# Power Bar
 		self.power_imgs = []
 		self.power_bar_selection=-1
-		self.power_frame = bgui.Frame(self, "ds_sframe", aspect=8, size=[0.1, 0.1], pos=[0.35, 0.01])
+		self.power_frame = bgui.Frame(self, "ds_sframe", aspect=8, size=[0.1, 0.1],
+									 pos=[0, 0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		self.power_frame.colors = [(0, 0, 0, 0)]*4
+		
+		# Map
+		self.mmap_frame = Map(self, "ds_map", aspect=1, size=[0, .25], pos=[0,0])
+		self.mmap_frame.position = [1-self.mmap_frame.size[0]/sys.size[0], 1-self.mmap_frame.size[1]/sys.size[1]]
+		
+		self.fmap_frame = bgui.Frame(self, "ds_fmap", size=[.8, .8], pos=[0,0],
+								sub_theme="HUD", options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+		self.fmap_frame.visible = False
 		
 	def update_powerbar(self, main):
 		hex = 	{"AT_WILL" : "Textures/ui/hex_tile_blue.png",
@@ -303,6 +313,12 @@ class DefaultStateLayout(Layout):
 #			self.net_ids.remove(id)
 #			# Remove widgets
 #			self.net_frames[id].visible = False
+
+#		# Map
+		self.mmap_frame.im_buf = main['map_data']
+		if not self.combat:
+			self.fmap_frame.visible = main['full_map']
+			self.mmap_frame.visible = not main['full_map']
 		
 class CombatLayout(DefaultStateLayout):
 	def __init__(self, sys):

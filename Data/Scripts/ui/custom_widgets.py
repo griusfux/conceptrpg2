@@ -1,9 +1,27 @@
 # $Id$
 
 from bgui import *
+import bge
 
 # This file holds widgets custom made for CRPG2
 
+class Map(Image):
+	def __init__(self, parent, name, aspect=None, size=[0,0], pos=[0, 0],
+				sub_theme='', options=BGUI_DEFAULT):
+		Image.__init__(self, parent, name, "Textures/ui/map.png", aspect, size,
+						pos, sub_theme=sub_theme, options=options)
+		
+		self.im_buf = None
+		
+	def _draw(self):
+		glBindTexture(GL_TEXTURE_2D, self.tex_id)
+		
+		# Upload the texture data
+		if self.im_buf:
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 512,
+						 0,	GL_RGBA, GL_UNSIGNED_BYTE, self.im_buf)
+		Image._draw(self)
+		
 class PackageSelector(Widget):
 	"""A widget for handling selection from packages (such as race and class selection)"""
 	

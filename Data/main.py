@@ -71,6 +71,9 @@ def in_game(cont):
 		if 'exit' in own:
 			exit_game(own)
 		else:
+			if 'map_source' in own:
+				own['map_data'] = own['map_source'].image
+#				own['map_source'].refresh()
 			# Update the ui
 			if 'ui_system' in own:
 				own['ui_system'].run(own)
@@ -93,6 +96,13 @@ def init(own):
 	# Create a ui system
 	if 'ui_system' not in own:
 		own['ui_system'] = BlenderUISystem()
+		scene = bge.logic.getCurrentScene()
+		camera = scene.cameras['map_cam']
+		source = bge.texture.ImageRender(scene, camera)
+		source.alpha = True
+		source.background = [0,0,0,0]
+		own['map_source'] = source
+		own['map_data'] = None
 		
 	# Create an effect system
 	if 'effect_system' not in own:
