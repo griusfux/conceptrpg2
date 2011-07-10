@@ -224,55 +224,13 @@ class CharacterLogic:
 			self.object.socket_clear("right_hand", object)
 		else:
 			print("WARNING: Character %s has no armature to contain sockets" % self.name)
-		
-class PlayerLogic(CharacterLogic):		
-	def load(self, save):
-		"""Fills in stats from a SaveData object"""
-		
-		save_data = save.data
-		
-		self.name		= save_data["name"]
-		self.level		= save_data["level"]
-		self.race		= Race(save_data["race"])
-		self.player_class = Class(save_data["player_class"])
-		self._xp			= save_data["xp"]
-		
-		self.endurance		= save_data["endurance"]
-		self.arcane_damage	= save_data["arcane_damage"]
-		self.arcane_defense = save_data["arcane_defense"]
-		self.physical_damage = save_data["physical_damage"]
-		self.physical_defense = save_data["physical_defense"]
-		self.accuracy = save_data["accuracy"]
-		self.reflex = save_data["reflex"]
-
-		self.affinities = save_data["affinities"]
-		self.power_points = save_data["power_points"]
-		self.affinity_points = save_data["affinity_points"]
-		self.delivery_points = save_data["delivery_points"]
-		
-		self.speed = save_data["speed"]
-		
-		self.inventory = save_data["inventory"]
-		self.armor = save_data["armor"]
-		self.weapon = save_data["weapon"]
-		self.shield = save_data["shield"]
-		self.credits 		= save_data["credits"]
-		
-		self.powers		= PowerManager(self, save_data["powers"])
-		
-		if self.level == 0:
-			self.xp += 0
-		self.next_level = XP_TABLE[self.level] if self.level < len(XP_TABLE) else XP_TABLE[-1]
-		self.last_level = XP_TABLE[self.level-1]
-
-		self.recalc_stats()
-		
-	def save(self):
-		save_data = {
+			
+	def get_info(self):
+		info = {
 				"name"	: self.name,
 				"level"	: self.level,
 				"race"	: self.race.package_name,
-				"player_class" : self.player_class.package_name,
+				"player_class" : self.player_class.package_name if self.player_class else None,
 				"xp"		: self.xp,
 				
 				"endurance" : self.endurance,
@@ -298,6 +256,59 @@ class PlayerLogic(CharacterLogic):
 				
 				"powers"	: [power.package_name for power in self.powers.all]
 			}
+		
+		return info
+	
+	def load_from_info(self, info):
+		self.name		= info["name"]
+		self.level		= info["level"]
+		self.race		= Race(info["race"])
+		if info["player_class"]:
+			self.player_class = Class(info["player_class"])
+		self._xp			= info["xp"]
+		
+		self.endurance		= info["endurance"]
+		self.arcane_damage	= info["arcane_damage"]
+		self.arcane_defense = info["arcane_defense"]
+		self.physical_damage = info["physical_damage"]
+		self.physical_defense = info["physical_defense"]
+		self.accuracy = info["accuracy"]
+		self.reflex = info["reflex"]
+
+		self.affinities = info["affinities"]
+		self.power_points = info["power_points"]
+		self.affinity_points = info["affinity_points"]
+		self.delivery_points = info["delivery_points"]
+		
+		self.speed = info["speed"]
+		
+		self.inventory = info["inventory"]
+		self.armor = info["armor"]
+		self.weapon = info["weapon"]
+		self.shield = info["shield"]
+		self.credits 		= info["credits"]
+		
+		self.powers		= PowerManager(self, info["powers"])
+		
+		if self.level == 0:
+			self.xp += 0
+		self.next_level = XP_TABLE[self.level] if self.level < len(XP_TABLE) else XP_TABLE[-1]
+		self.last_level = XP_TABLE[self.level-1]
+
+		self.recalc_stats()
+		
+class PlayerLogic(CharacterLogic):		
+	def load(self, save):
+		"""Fills in stats from a SaveData object"""
+		
+		self.load_from_info(save.data)
+		
+		# We shouldn't let this happen
+		if not self.player_class:
+			raise RuntimeError("The loaded save state did not have a player class!")
+		
+	def save(self):
+		save_data = self.get_info()
 		
 		if Save.exists(self.name):
 			# We'll open and overwrite the old one
