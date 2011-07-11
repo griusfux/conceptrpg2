@@ -160,8 +160,7 @@ class DefaultState(BaseState, BaseController):
 	def _handle_item_pickup(self, main):
 		for id in main['item_collisions']:
 			if id in main['ground_items']:
-				print("I bet you really wanted that item :)")
-				self.remove_item(main, id)
+				self.server.invoke("request_item_pickup", id)
 			main['item_collisions'].remove(id)
 			
 	def _handle_generic_input(self, main, inputs):
@@ -239,7 +238,16 @@ class DefaultState(BaseState, BaseController):
 	@rpc(server_functions, "anim", str, int, int, int, int)
 	def anim(self, main, client, action, start, end, layer, blending):
 		self.clients.invoke("anim", client.id, action, start, end, layer, blending)
-		
+
+	@rpc(server_functions, "request_item_pickup", int)
+	def request_item_pickup(self, main, client, id):
+		# If the item is available, give it to the player
+		if id in main['ground_items']:
+			self.client.invoke("pickup_item", main['ground_items'][id])
+			
+		# Now remove the item from the ground for everyone
+		self.clients.invoke("remove_item", id)
+
 	@rpc(server_functions, "init_combat", str)
 	def init_combat(self, main, client, room_id):
 		if main['encounters'].get(room_id):

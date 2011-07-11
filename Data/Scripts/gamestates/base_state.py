@@ -224,12 +224,14 @@ class BaseState:
 	
 	@rpc(client_functions, "drop_item", int, "pickle", float, float, float)
 	def drop_item(self, main, id, item, x, y, z):
-		print("Item Dropped (id=%d):"%id)
-		print(item)
-		
 		obj = main['engine'].add_object("drop", [x, y, z])
 		obj.gameobj['id'] = id
 		main['ground_items'][id] = [item, obj]
+		
+	@rpc(client_functions, "pickup_item", "pickle")
+	def pickup_item(self, main, item):
+		print("You picked up this item:")
+		print(item)
 		
 	@rpc(client_functions, "remove_item", int)
 	def remove_item(self, main, id):

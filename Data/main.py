@@ -43,7 +43,6 @@ def item_pickup(cont):
 		if sens.hitObject == main['player'].object.gameobj and \
 				 id not in main['item_collisions'] and \
 				 id in main['ground_items']:
-			print("Collision with item (id=%d)!"%id)
 			main['item_collisions'].append(id)
 
 def exit_game(main):
