@@ -308,9 +308,9 @@ class DefaultStateLayout(Layout):
 				self.net_ids.append(id)
 				self.net_frames[id] = bgui.Frame(self, "ds_%sframe"%id, aspect=2.5, size=[0, 0.1], pos=[0,.15], sub_theme="HUD")
 				self.net_names[id] = bgui.Label(self.net_frames[id], "ds_%sname"%id, pt_size=28, pos=[0.05, 0.65])
-				self.net_names[id].text = id
+				self.net_names[id].text = '%s@%s' % (nplayer.name, id)
 				self.net_classlvl[id] = bgui.Label(self.net_frames[id], "ds_%sclass"%id, pt_size=22, pos=[0.05, 0.35])
-				self.net_classlvl[id].text = "Mage\t\t1"
+				self.net_classlvl[id].text = "%s\t\t%d" % (nplayer.player_class.name, nplayer.level)
 				self.net_hp[id] = bgui.ProgressBar(self.net_frames[id], "ds_%shp"%id, size=[0.90, 0.03], pos=[0.05, 0.25],
 									sub_theme='HP')
 #			else:
@@ -319,8 +319,8 @@ class DefaultStateLayout(Layout):
 				
 			# Update Net player info and the position of the info
 			self.net_frames[id].pos = [0, .15+self.net_ids.index(id)*.1]
-			self.net_hp[id].size = [0.90*min(50/100, 1), 0.03]
-			self.net_hp[id].percent = 50/50
+			self.net_hp[id].size = [0.90*min(nplayer.max_hp/100, 1), 0.03]
+			self.net_hp[id].percent = nplayer.hp/nplayer.max_hp
 			
 #		for id in missing_players:
 #			print("Removing", id)
