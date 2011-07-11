@@ -14,8 +14,8 @@ import enet
 class NetPlayer():
 		"""Class for handling player data"""
 		
-		def __init__(self, race, pos, ori):
-			self.race = race
+		def __init__(self, char_info, pos, ori):
+			self.char_info = char_info
 			self.position = pos
 			self.orientation = ori
 
@@ -37,8 +37,9 @@ class ClientHandle():
 		
 		if data:
 			# Clean up the data a little
-			self.id = data.split()[0]
-			self.data = " ".join([i for i in data.split()[1:]])
+			id = data.split()[0]
+			self.id = id.decode()
+			self.data = data[len(id)+1:]
 		
 			# print("Message %s from %s" % (data, client_addr))
 			
@@ -58,7 +59,7 @@ class ClientHandle():
 	def send(self, data):
 		"""Send a message to the client"""
 		
-		self.peer.send(0, enet.Packet(bytes(data, NET_ENCODING)))
+		self.peer.send(0, enet.Packet(data))
 
 class GameServer():
 	"""The game server"""
@@ -105,11 +106,11 @@ class GameServer():
 					# print('Client Disconnected:', event.peer.address)
 					self.drop_client(event.peer, "Disconnected")
 				elif event.type == enet.EVENT_TYPE_RECEIVE:
-					data = str(event.packet.data, NET_ENCODING)
+					data = event.packet.data
 					d = data.split()
-					client_id = d[0]
+					client_id = str(d[0], NET_ENCODING)
 					
-					if d[1].strip() == 'register':
+					if d[1].strip() == b'register':
 						self.register_client(client_id, event.peer)
 						continue
 					
@@ -137,7 +138,7 @@ class GameServer():
 				return
 			client_id += '_'
 			
-		peer.send(0, enet.Packet(b'cid:'+bytes(client_id, NET_ENCODING)))
+		peer.send(0, enet.Packet(b'cid:::'+bytes(client_id, NET_ENCODING)))
 		self.main['clients'][client_id] = ClientHandle(self, client_id, peer)
 		print("%s Registered as %s" % (peer.address, client_id))
 					
@@ -159,13 +160,13 @@ class GameServer():
 			if client_id in self.main['players']:
 				del self.main['players'][client_id]
 			
-	def add_player(self, client_id, race, position, orientation):
+	def add_player(self, client_id, char_info, position, orientation):
 		"""Adds a player to the player dictionary to cache position and orientation data.
 		
 			Having this method avoids having to import the NetPlayer class into gamestates
 		"""
 		
-		self.main['players'][client_id] = NetPlayer(race, position, orientation)
+		self.main['players'][client_id] = NetPlayer(char_info, position, orientation)
 		
 	def send(self, data):
 		"""Alias to broadcast for use with RPC"""
@@ -178,5 +179,5 @@ class GameServer():
 		# print("BROADCAST:", data)
 		
 		for cid, client in self.main['clients'].items():
-			client.peer.send(0, enet.Packet(bytes(data, NET_ENCODING)))
+			client.peer.send(0, enet.Packet(data))
 			

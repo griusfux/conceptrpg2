@@ -24,7 +24,7 @@ class GameClient:
 		self.server_addr = None
 		
 	def disconnect(self):
-		self.send('dis:')
+		self.send(b'dis:::')
 		self.host.flush()
 		
 	def restart(self, id, addr):
@@ -49,14 +49,14 @@ class GameClient:
 		if event.type == enet.EVENT_TYPE_CONNECT:
 			self.connected = True
 			self.server_addr = event.peer.address.host
-			self.send('register')
+			self.send(b'register')
 		elif event.type == enet.EVENT_TYPE_DISCONNECT:
 			self.connected = False
 			self.server_addr = "0.0.0.0"
 		elif event.type == enet.EVENT_TYPE_RECEIVE:
-			data = str(event.packet.data, NET_ENCODING)
-			if data.startswith('cid:'):
-				self.id = data.split(':')[1]
+			data = event.packet.data
+			if data.startswith(b'cid:::'):
+				self.id = str(data.split(b':::')[1], NET_ENCODING)
 				print("ID set to", self.id)
 				self.registered = True
 			else:
@@ -70,5 +70,5 @@ class GameClient:
 		if not self.connected:
 			return
 		
-		self.peer.send(0, enet.Packet(bytes(self.id+" "+msg, NET_ENCODING)))
+		self.peer.send(0, enet.Packet(bytes(self.id, NET_ENCODING)+b" "+msg,))
 				

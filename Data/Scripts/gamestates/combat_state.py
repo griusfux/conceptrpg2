@@ -120,7 +120,7 @@ class CombatState(DefaultState, BaseController):
 				i += 1
 				
 				# Update the server
-				self.server.invoke("add_monster", monster.name, str(i), 0, 0, SAFE_Z)
+				self.server.invoke("add_monster", monster.package_name, str(i), 0, 0, SAFE_Z)
 					
 		else:
 			# Request monsters from the server

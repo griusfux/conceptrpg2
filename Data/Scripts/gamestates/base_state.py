@@ -32,30 +32,30 @@ class RPC:
 			t = self.funcs[f][1][i]
 			v = args[i]
 			if t is float:
-				v = "%.4f" % v
+				v = ("%.4f" % v).encode()
 			elif t == "pickle":
-				v = str(pickle.dumps(v, 0), "ascii")
+				v = pickle.dumps(v, -1)
 			elif not isinstance(v, t):
 				print("Function:", f, "\nArgs:", args)
 				raise ValueError("Argument "+str(i)+" should have been of type "+t.__name__+" got "+v.__class__.__name__+" instead.")
 			else:
-				v = str(v)
+				v = str(v).encode()
 				
 			p.append(v)
 		# Send out the command
-		self.client.send(f+":"+"$".join(p))
+		self.client.send(f.encode()+b":::"+b"$$".join(p))
 		
 	def parse_command(self, main, data, client=None):
 		if not data:
 			return
 
 		# Grab the functions and arguments
-		s = data.split(':')
+		s = data.split(b':::')
 		if len(s) != 2:
 			print("Invalid command string", data)
 			return
 
-		f, args = s[0], s[1].split('$')
+		f, args = s[0].decode(), s[1].split(b'$$')
 		
 		# Make sure we have a function we know
 		if f not in self.funcs:
@@ -72,9 +72,9 @@ class RPC:
 			t = self.funcs[f][1][i]
 			
 			if t == "pickle":
-				args[i] = pickle.loads(bytes(args[i].replace(' ', '\n'), "ascii"))
+				args[i] = pickle.loads(args[i])
 			else:
-				args[i] = t(args[i])
+				args[i] = t(args[i].decode())
 		
 		if client:
 			if len(self.funcs[f][1]) != 0:
@@ -200,16 +200,16 @@ class BaseState:
 		
 		main['net_players'][cid].object.play_animation(action, start, end, mode=mode)
 
-	@rpc(client_functions, "add_player", str, str, int, "pickle", "pickle")
-	def add_player(self, main, cid, race, is_monster, pos, ori):
+	@rpc(client_functions, "add_player", str, "pickle", int, "pickle", "pickle")
+	def add_player(self, main, cid, char_info, is_monster, pos, ori):
 		if cid in main['net_players']:
 			# This player is already in the list, so just ignore this call
 			return
 	
 		if is_monster != 0:
-			race = packages.Monster(race)
+			race = packages.Monster(char_info)
 		else:
-			race = packages.Race(race)
+			race = packages.Race(char_info['race'])
 		main['engine'].load_library(race)
 		
 		if is_monster != 0:
@@ -219,6 +219,7 @@ class BaseState:
 			obj = main['engine'].add_object(race.root_object, pos, ori)
 			obj.armature = obj
 			main['net_players'][cid] = character_logic.PlayerLogic(obj)
+			main['net_players'][cid].load_from_info(char_info)
 		main['net_players'][cid].id = cid
 	
 	# @rpc(client_functions, "remove_player", str)
@@ -248,16 +249,16 @@ class BaseState:
 	# Server functions
 	@rpc(server_functions, "dis")
 	def dis(self, main, client):
-		client.server.broadcast("dis:"+client.id)
+		client.server.broadcast(b"dis::"+client.id.encode())
 		client.server.drop_client(client.peer, "Disconnected")
 		
-	@rpc(server_functions, "add_player", str, "pickle", "pickle")
-	def add_player(self, main, client, race, pos, ori):
-		client.server.add_player(client.id, race, pos, ori)
-		self.clients.invoke('add_player', client.id, race, 0, pos, ori)
+	@rpc(server_functions, "add_player", "pickle", "pickle", "pickle")
+	def add_player(self, main, client, char_info, pos, ori):
+		client.server.add_player(client.id, char_info, pos, ori)
+		self.clients.invoke('add_player', client.id, char_info, 0, pos, ori)
 		
 		for k, v in main['players'].items():
-			self.client.invoke('add_player', k, v.race, 0, v.position, v.orientation)
+			self.client.invoke('add_player', k, v.char_info, 0, v.position, v.orientation)
 		
 	@rpc(server_functions, "animate", str, str, int, int, int)
 	def s_animate(self, main, client, cid, action, start, end, mode):
