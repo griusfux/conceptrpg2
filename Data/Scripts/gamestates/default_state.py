@@ -86,6 +86,9 @@ class DefaultState(BaseState, BaseController):
 		
 		# Handles input
 		inputs = main['input_system'].run()
+		
+		# Handle item pickup
+		self._handle_item_pickup(main)
 
 		# Our id so we can talk with the server
 		id = main['client'].id
@@ -153,6 +156,13 @@ class DefaultState(BaseState, BaseController):
 		
 	def _get_forward_animation(self, main):
 		return main['default_actions']['default_walk']
+	
+	def _handle_item_pickup(self, main):
+		for id in main['item_collisions']:
+			if id in main['ground_items']:
+				print("I bet you really wanted that item :)")
+				self.remove_item(main, id)
+			main['item_collisions'].remove(id)
 			
 	def _handle_generic_input(self, main, inputs):
 		# Our id so we can talk with the server

@@ -162,6 +162,9 @@ class CombatState(DefaultState, BaseController):
 		# Handles input
 		inputs = main['input_system'].run()
 		
+		# Handle item pickup
+		self._handle_item_pickup(main)
+		
 		# Reset the target shapes
 		for key, shape in main['target_shapes'].items():
 			shape.visible = False
@@ -334,10 +337,13 @@ class CombatState(DefaultState, BaseController):
 			
 			# Now calculate some loot
 			main['ground_item_counter'] += 1
+			gid = main['ground_item_counter']
+			
 			# XXX do some actual calculations
 			item = Items.Weapon("Longsword", 5)
-			main['ground_items'][main['ground_item_counter']] = item
-			self.clients.invoke("drop_item", item, *position)
+			
+			main['ground_items'][gid] = item
+			self.clients.invoke("drop_item", gid, item, *position)
 			
 			del combat.monster_list[id]
 		else:
