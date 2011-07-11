@@ -249,7 +249,7 @@ class BaseState:
 	# Server functions
 	@rpc(server_functions, "dis")
 	def dis(self, main, client):
-		client.server.broadcast(b"dis::"+client.id.encode())
+		client.server.broadcast(b"dis:::"+client.id.encode())
 		client.server.drop_client(client.peer, "Disconnected")
 		
 	@rpc(server_functions, "add_player", "pickle", "pickle", "pickle")
