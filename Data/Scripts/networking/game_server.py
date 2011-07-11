@@ -7,7 +7,6 @@
 from Scripts.networking import NET_ENCODING
 from Scripts.gamestate_manager import GameStateManager
 
-import traceback
 import time
 import enet
 
@@ -121,7 +120,8 @@ class GameServer():
 					self.main['clients'][client_id].handle_request(data, event.peer)
 
 		except Exception:
-			traceback.print_exc()
+			import sys, traceback
+			traceback.print_exc(file=sys.stdout)
 		except:
 			# Grabs the KeyboardInterrupt
 			pass
