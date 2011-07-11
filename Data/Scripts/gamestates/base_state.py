@@ -222,16 +222,15 @@ class BaseState:
 			main['net_players'][cid].load_from_info(char_info)
 		main['net_players'][cid].id = cid
 	
-	# @rpc(client_functions, "remove_player", str)
-	# def remove_player(self, main, cid):
-		# """Silently removes the player"""
+	@rpc(client_functions, "drop_item", "pickle", float, float, float)
+	def drop_item(self, main, item, x, y, z):
+		print("Item Dropped:")
+		print(item)
 		
-		# if cid not in main['net_players']: return
-		# main['net_players'][cid].end_object()
-		# del main['net_players'][cid]
+		main['engine'].add_object("drop", [x, y, z])
 	
 	def client_init(self, main):
-		"""Intialize the client state"""
+		"""Initialize the client state"""
 		pass
 		
 	def client_run(self, main):

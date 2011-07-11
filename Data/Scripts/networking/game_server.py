@@ -80,6 +80,10 @@ class GameServer():
 		# The current dungeon
 		self.main['dungeon'] = []
 		
+		# Current items on the ground
+		self.main['ground_item_counter'] = 0
+		self.main['ground_items'] = {}
+		
 		# Which rooms still have encounters
 		self.main['encounters'] = {}
 		

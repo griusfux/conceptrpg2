@@ -12,6 +12,7 @@ import cego as AiManager
 from cego.state_machine import StateMachine as AiStateMachine
 from Scripts.mathutils import Vector, Matrix
 import Scripts.effect_manager as effects
+import Scripts.items as Items
 
 # Constants for grid generation
 UNIT_SIZE = 1
@@ -325,9 +326,20 @@ class CombatState(DefaultState, BaseController):
 		if combat is None: return
 		
 		if id in combat.monster_list:
-			del combat.monster_list[id]
+			monster, position = combat.monster_list[id]
+			
+			# Get rid of the monster
 			self.clients.invoke("kill_monster", client.combat_id, id)
 			self.clients.invoke("remove_player", id)
+			
+			# Now calculate some loot
+			main['ground_item_counter'] += 1
+			# XXX do some actual calculations
+			item = Items.Weapon("Longsword", 5)
+			main['ground_items'][main['ground_item_counter']] = item
+			self.clients.invoke("drop_item", item, *position)
+			
+			del combat.monster_list[id]
 		else:
 			# print("WARNING (kill_monster): Monster id, '%s', not in list, ignoring" % id)
 			return
@@ -378,6 +390,9 @@ class CombatState(DefaultState, BaseController):
 		
 	@rpc(server_functions, "position_monster", str, float, float, float)
 	def s_position_monster(self, main, client, cid, x, y, z):
+		combat = main['combats'].get(client.combat_id, None)
+		if combat is None: return
+		combat.monster_list[cid][1] = [x, y, z]
 		self.clients.invoke("position_monster", cid, x, y, z)
 		
 	@rpc(server_functions, "add_node", "pickle")
@@ -392,12 +407,17 @@ class CombatState(DefaultState, BaseController):
 	
 	def server_init(self, main):
 		"""Initialize the server state"""
+		self.main = main
+		
 		self.monster_id = 0
 		# Setup Ai
 		AiManager.set_controller(self)
 		
 	def server_run(self, main, client):
 		"""Server-side run method"""
+		self.main = main
+		self.client = client
+		
 		# Run the ai if it is set up, else try to set it up
 		if AiManager.get_environment():
 			AiManager.run()
@@ -533,7 +553,10 @@ class CombatState(DefaultState, BaseController):
 		return targets		
 	
 	def spawn(self, character, position):
-		if hasattr(self, 'clients'):
+		if hasattr(self, 'clients'):	
+			combat = self.main['combats'].get(self.client.combat_id, None)
+			if combat and character.cid in combat.monster_list:
+				combat.monster_list[character.cid][1] = position
 			self.clients.invoke("position", character.cid, *position)
 	
 	def move(self, character, linear = (0,0,0) , angular = (0,0,0) , local = False):
