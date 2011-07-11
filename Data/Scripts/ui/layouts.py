@@ -1,6 +1,7 @@
 import bgui
 from time import time
 from Scripts.ui.custom_widgets import *
+from Scripts.character_logic import PlayerLogic
 
 class Layout(bgui.Widget):
 	def __init__(self, sys, name, use_mouse=False):
@@ -220,6 +221,14 @@ class DefaultStateLayout(Layout):
 									 pos=[0, 0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		self.power_frame.colors = [(0, 0, 0, 0)]*4
 		
+		# Target info
+		self.target_frame = bgui.Frame(self, "ds_target", aspect=2.5, size=[0, 0.1],
+									 pos=[0,.9], sub_theme="HUD", options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+		self.target_name =  bgui.Label(self.target_frame, "ds_name_target", pt_size=28,
+										options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+		self.target_name.text = "Target"
+		self.target_frame.visible = False
+		
 		# Map
 		self.mmap_frame = Map(self, "ds_map", aspect=1, size=[0, .25], pos=[0,0])
 		self.mmap_frame.position = [1-self.mmap_frame.size[0]/sys.size[0], 1-self.mmap_frame.size[1]/sys.size[1]]
@@ -284,6 +293,11 @@ class DefaultStateLayout(Layout):
 		# Net Players
 		missing_players = self.net_ids[:]
 		for id, nplayer in main['net_players'].items():
+			
+			# Only display players (not monsters)
+			if not isinstance(nplayer, PlayerLogic):
+				continue
+			
 			# The player's stats are already taken care of
 			if id == main['player'].id:
 				#missing_players.remove(id)
@@ -313,6 +327,13 @@ class DefaultStateLayout(Layout):
 #			self.net_ids.remove(id)
 #			# Remove widgets
 #			self.net_frames[id].visible = False
+
+		# Target
+		if main['player'].targets:
+			self.target_frame.visible = True
+			self.target_name.text = main['player'].targets[0].name
+		else:
+			self.target_frame.visible = False
 
 #		# Map
 		self.mmap_frame.im_buf = main['map_data']
