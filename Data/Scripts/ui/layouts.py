@@ -146,6 +146,13 @@ class InGameMenuLayout(Layout):
 	def menu_click(self, widget):
 		self.main['action'] = widget.name.split('_')[-1]
 		
+class CharSelectLayout(Layout):
+	def __init__(self, sys):
+		Layout.__init__(self, sys, "char_select_layout", use_mouse=True)
+	
+	def update(self, main):
+		pass
+		
 class DunGenLayout(Layout):
 	
 	def __init__(self, sys):
@@ -217,9 +224,8 @@ class DefaultStateLayout(Layout):
 		# Power Bar
 		self.power_imgs = []
 		self.power_bar_selection=-1
-		self.power_frame = bgui.Frame(self, "ds_sframe", aspect=8, size=[0.1, 0.1],
-									 pos=[0, 0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
-		self.power_frame.colors = [(0, 0, 0, 0)]*4
+		self.power_frame = bgui.Image(self, "ds_frame_pow", "Textures/ui/power_bar.png", aspect=4, size=[0,.16],
+										pos=[0,0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		
 		# Target info
 		self.target_frame = bgui.Frame(self, "ds_target", aspect=2.5, size=[0, 0.1],
@@ -256,15 +262,8 @@ class DefaultStateLayout(Layout):
 			bg = "Textures/ui/hex_tile_blue.png"# if powers[i].spent else hex[powers[i].usage]
 			if not self.combat and "NON_COMBAT" not in powers[i].flags:
 				bg = "Textures/ui/hex_tile_gray.png"
-			img = bgui.Image(self.power_frame, "sbg"+str(i), bg,
-							 size=[1/8, 1], pos=[(1/8)*i, 0.5 if i == psys.active_index else 0])
-							 
-			# Label
-			if i == psys.active_index:
-				lbl = bgui.Label(img, "slbl"+str(i), powers[i].name,
-								pt_size=20 if i == psys.active_index else 14,
-								pos=[0, 1 if i == psys.active_index else -0.05],
-								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+			img = bgui.Image(self.power_frame, "sbg"+str(i), bg, aspect=1,
+							 size=[0, .54], pos=[.087+.0125*i, .145])
 			
 			# Power icon
 			img_name = powers[i].open_image()
@@ -284,8 +283,6 @@ class DefaultStateLayout(Layout):
 		
 		self.exp_text.text = "EXP (%d/%d)" % (player.xp, player.next_level)#player.xp+100-(player.xp%100))
 		self.exp_bar.percent = (player.xp-player.last_level)/(player.next_level-player.last_level+1)
-		
-		# self.lock_msg.text = "LOCKED: %s" % (main['player'].lock - time()) if main['player'].lock else ""
 		
 		if self.power_bar_selection != main['player'].powers.active_index:
 			self.update_powerbar(main)

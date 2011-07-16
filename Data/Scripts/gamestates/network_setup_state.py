@@ -46,4 +46,4 @@ class NetworkSetupState(BaseState):
 			return ("Title", "SWITCH")
 		
 		if main['client'].registered:
-			return ("CharacterCreation", "SWITCH")
+			return ("CharacterSelect", "SWITCH")

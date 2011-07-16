@@ -603,8 +603,12 @@ class Engine:
 		
 	def set_active_camera(self, camera):
 		"""Set the active camera"""
-		
-		gl.getCurrentScene().active_camera = camera.camera
+		if type(camera) == str:
+			scene = gl.getCurrentScene()
+			camera = scene.cameras[camera]
+			scene.active_camera = camera
+		else:
+			gl.getCurrentScene().active_camera = camera.camera
 		
 	def ray_cast(self, to_pos, from_pos, object, xray_prop=""):
 		"""Cast a ray using the object"""

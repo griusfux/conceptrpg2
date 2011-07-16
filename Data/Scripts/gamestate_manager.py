@@ -9,6 +9,7 @@ STATES = {
 		"InGameMenu": InGameMenuState,
 		"NetworkSetup": NetworkSetupState,
 		"CharacterCreation": CharacterCreationState,
+		"CharacterSelect": CharacterSelectState,
 		"DungeonGeneration": DungeonGenerationState,
 		"Combat": CombatState,
 		"Shop": ShopState,
