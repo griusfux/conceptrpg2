@@ -9,37 +9,36 @@ import subprocess
 from Scripts.packages import *
 
 INSTALL_DIRS = [
-	"bgui",
-	# "Classes",
-	# "EditorFiles",
-	# "EncounterDecks",
-	# "Items",
-	# "Maps",
-	# "Monsters",
-	# "Powers",
-	# "Races",
+	"Actions/.config",
+	"extern",
 	"Schemas",
 	"Scripts",
-	"Textures"
+	"Shops/.config",
+	"Textures",
+	"../Saves",
 ]
 
 PACKAGES = [
+	ActionSet,
 	Class,
+	Effect,
 	EncounterDeck,
 	Item,
-	Weapon,
 	Armor,
+	Weapon,
 	Map,
 	Monster,
 	Power,
-	Race
+	Feat,
+	Race,
+	Shop,
+	Status
 ]
 
 INSTALL_FILES = [
 	"data.blend",
 	"icon.png",
 	"keys.conf",
-	"Kupoman.save",
 	"main.py",
 	"mouse.conf",
 ]
@@ -70,7 +69,10 @@ def clear_py(dir):
 		if f.endswith('.py'):
 			os.remove(os.path.join(dir, f))
 		elif os.path.isdir(os.path.join(dir, f)):
-			clear_py(os.path.join(dir, f))
+			if f == '__pycache__':
+				shutil.rmtree(os.path.join(dir, f))
+			else:
+				clear_py(os.path.join(dir, f))
 
 
 def WriteRuntime(player_path, blend_path, output_path):
@@ -129,23 +131,23 @@ if __name__ == '__main__':
 	
 	# Freeze files
 	os.chdir("Data")
-	for ff in FREEZE_FILES:
-		subprocess.call("python "+ff+" build")
+	# for ff in FREEZE_FILES:
+		# subprocess.call("python "+ff+" build")
 		
 	# Copy packed packages
 	for cls in PACKAGES:
 		print("Packing %s packages..." % cls.__name__)
 		if cls.__name__ == "Item":
-			os.mkdir(os.path.join("..", "build", "Data", "Items"))
+			os.makedirs(os.path.join("..", "build", "Data", "Items"))
 		
-		os.mkdir(os.path.join("..", "build", "Data", cls._dir))
+		os.makedirs(os.path.join("..", "build", "Data", cls._dir))
 		
 		for pgk in cls.get_package_list():
 			pgk.pack(os.path.join("..", "build", "Data", pgk._path))
 	
 	os.chdir("..")
 	# shutil.copytree("Data/build/exe.win32-3.1", "build/Data")
-	subprocess.call("xcopy Data\\build\\exe.win32-3.1\\*.* build\\Data /Y")
+	# subprocess.call("xcopy Data\\build\\exe.win32-3.1\\*.* build\\Data /Y")
 	# for fi in FREEZE_INSTALL:
 		# shutil.copy2("Data/build/exe.win32-3.1/"+fi, "Build/Data/"+fi)
 	
@@ -158,14 +160,14 @@ if __name__ == '__main__':
 		shutil.copytree("Data/"+dir, "build/Data/"+dir, ignore=ct_ignore)
 		
 	# Compile py files
-	subprocess.call("python -m compileall build/Data")
+	subprocess.call("python -m compileall -b build/Data")
 	clear_py("build/Data")
 	
 	# Create the runtime
 	print("Creating runtime...", end=' ')
-	subprocess.call("xcopy Data\\release\\win32\\*.* build\\Data /Y")
+	subprocess.call("xcopy release\\win64\\*.* build\\Data /Y /E")
 	WriteRuntime("build/Data/blenderplayer.exe", "Data/data.blend", "build/Data/game.exe")
-	os.remove("build/Data/blenderplayer.exe")
-	os.remove("build/Data/data.blend")
+	# os.remove("build/Data/blenderplayer.exe")
+	# os.remove("build/Data/data.blend")
 	print("Done")
 	
