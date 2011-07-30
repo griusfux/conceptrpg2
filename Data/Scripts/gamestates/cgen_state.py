@@ -19,7 +19,7 @@ class CharacterCreationState(BaseState, BaseController):
 		"""Intialize the client state"""
 		
 		main['last_layout'] = ''
-		main['next_layout'] = 'CgenSelect'
+		main['next_layout'] = 'CgenName'
 		main['cgen_input'] = {}
 		main['creation_done'] = False
 		
@@ -40,103 +40,108 @@ class CharacterCreationState(BaseState, BaseController):
 		
 		# Check for cgen end
 		elif main['next_layout'] in ('end_cgen', 'start'):	
-			# Add the player empty
-			gameobj = main['engine'].add_object("CharacterEmpty")
-	
-			# Load the target shapes
-			main['target_shapes'] = {}
-			for child in gameobj.children:
-				if child.name == "blast":
-					main['target_shapes']['BLAST'] = child
-				elif child.name == "burst":
-					main['target_shapes']['BURST'] = child
-			
-			# Setup the player logic
-			player = PlayerLogic(gameobj)
-			
-			race = None
-			if main['next_layout'] == 'start':
-				player.load(main['cgen_input']['character'])
-				race = player.race
-			else:
-				race = main['cgen_input']['race']
-				
-			# Now add the mesh and armature based on race data
-			main['engine'].load_library(race)
-			
-			root_ob = main['engine'].add_object(race.root_object)
-			root_ob.position = gameobj.position
-			root_ob.set_parent(gameobj)
-			
-			# Setup the armature
-			gameobj.armature = root_ob
-			
-			if main['next_layout'] == 'end_cgen':
-				# Set the player's name
-				player.name = main['cgen_input']['name']
-				
-				# Set the player's race
-				player.race = main['cgen_input']['race']
-				
-				# Set the player's class
-				player.player_class = main['cgen_input']['class']	
-				
-				# This levels the player to 1
-				player.xp += 0
-				
-				
-				player.max_hp = 16
-				player.speed = 5
-				
-				# Now it is time to fill in the rest of the stats
-				player.recalc_stats()
-				
-				# Give the player an attack power
-				player.powers.add(Power('Attack'), self)
-				
-				# Give the player racial traits
-				# This needs to be done after giving the player xp to ensure there
-				# is already an unspent level for level 1
-				if player.race.traits:
-					traits = player.race.traits
-					try:
-						player.powers.add(Feat(traits), self)
-					except PackageError:
-						print("Unable to open up the file %s for %s's racial traits" % (traits, player.race.name))
-				
-				# Setup player inventory
-				
-				w = Items.Weapon('Longsword', 5)
-				player.inventory.append(w)
-				player.weapon = w
-				
-				
-				a = Items.Armor('Robes', 5)
-				player.inventory.append(a)
-				print(a.name, a.arcane_defense)
-				player.armor = a
+#			# Add the player empty
+#			gameobj = main['engine'].add_object("CharacterEmpty")
+#	
+#			# Load the target shapes
+#			main['target_shapes'] = {}
+#			for child in gameobj.children:
+#				if child.name == "blast":
+#					main['target_shapes']['BLAST'] = child
+#				elif child.name == "burst":
+#					main['target_shapes']['BURST'] = child
+#			
+#			# Setup the player logic
+#			player = PlayerLogic(gameobj)
+#			
+#			race = None
+#			if main['next_layout'] == 'start':
+#				player.load(main['cgen_input']['character'])
+#				race = player.race
+#			else:
+#				race = main['cgen_input']['race']
+#				
+#			# Now add the mesh and armature based on race data
+#			main['engine'].load_library(race)
+#			
+#			root_ob = main['engine'].add_object(race.root_object)
+#			root_ob.position = gameobj.position
+#			root_ob.set_parent(gameobj)
+#			
+#			# Setup the armature
+#			gameobj.armature = root_ob
+#			
+#			if main['next_layout'] == 'end_cgen':
 
-				# player.inventory.append(Items.Item('Bonsai'))
-				
-				# Give the player some starting credits
-				# player.credits = 100
-				
-				# Save the new player
-				player.save()
+			player = PlayerLogic(None)
+
+			# Set the player's name
+			player.name = main['cgen_input']['name']
 			
-			main['net_players'] = {main['client'].id: player}
-			main['player'] = player
-			player.id = main['client'].id
+			# Set the player's race
+			player.race = main['cgen_input']['race']
 			
-			# Fill the player's hit points
-			player.hp = player.max_hp
+			# Set the player's class
+			player.player_class = main['cgen_input']['class']	
 			
-			# Set up the camera
-			from Scripts.blender_wrapper import Camera
-			camera_pivot = main['engine'].add_object("pivot")
-			main['camera'] = Camera(camera_pivot, main['player'].object)
+			# This levels the player to 1
+			player.xp += 0
 			
-			return ("DungeonGeneration", "SWITCH")
+			
+			player.max_hp = 16
+			player.speed = 5
+			
+			# Now it is time to fill in the rest of the stats
+			player.recalc_stats()
+			
+			# Give the player an attack power
+			player.powers.add(Power('Attack'), self)
+			
+			# Give the player racial traits
+			# This needs to be done after giving the player xp to ensure there
+			# is already an unspent level for level 1
+			if player.race.traits:
+				traits = player.race.traits
+				try:
+					player.powers.add(Feat(traits), self)
+				except PackageError:
+					print("Unable to open up the file %s for %s's racial traits" % (traits, player.race.name))
+			
+			# Setup player inventory
+			
+			w = Items.Weapon('Longsword', 5)
+			player.inventory.append(w)
+			player.weapon = w
+			
+			
+			a = Items.Armor('Robes', 5)
+			player.inventory.append(a)
+			print(a.name, a.arcane_defense)
+			player.armor = a
+
+			# player.inventory.append(Items.Item('Bonsai'))
+			
+			# Give the player some starting credits
+			# player.credits = 100
+			
+			# Save the new player
+			player.save()
+			
+#			main['net_players'] = {main['client'].id: player}
+#			main['player'] = player
+#			player.id = main['client'].id
+#			
+#			# Fill the player's hit points
+#			player.hp = player.max_hp
+#			
+#			# Set up the camera
+#			from Scripts.blender_wrapper import Camera
+#			camera_pivot = main['engine'].add_object("pivot")
+#			main['camera'] = Camera(camera_pivot, main['player'].object)
+#			
+#			return ("DungeonGeneration", "SWITCH")
+
+			return("CharacterSelect", "SWITCH")
 		
 		# If the set layout differs from the previous layout, switch to the new layout.
 		# The new current layout is saved in last layout to continue checking.
