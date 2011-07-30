@@ -135,10 +135,15 @@ class Package:
 		return None
 		
 	@classmethod
-	def get_package_list(cls, show_traceback=False):
+	def get_package_list(cls, show_traceback=False, sort_date=False):
 		packages = []
 		
-		for f in os.listdir(cls._dir):
+		files = os.listdir(cls._dir)
+		
+		if sort_date:
+			files.sort(key=lambda x: os.stat(cls._dir+'/'+x).st_mtime)
+		
+		for f in files:
 			if f.startswith('.'): continue
 		
 			if os.path.isdir(os.path.join(cls._dir, f)) or f.endswith(cls._ext):
