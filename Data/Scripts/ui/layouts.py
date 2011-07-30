@@ -24,58 +24,82 @@ class StatsOverlay(Layout):
 		
 class PlayerStatsLayout(Layout):
 	def __init__(self, parent):
-		Layout.__init__(self, parent, "player_stats_overlay")
+		Layout.__init__(self, parent, "player_stats_overlay", use_mouse=True)
 		
-		self.mframe = bgui.Frame(self, "1x1_frame", aspect=1, size=[0,.8],
-							sub_theme="HUD", options=BGUI_DEFAULT|bgui.BGUI_CENTERY)
+		self.mframe = bgui.Image(self, "1x1_frame", "Textures/ui/menu_background.png",
+								 aspect=1, size=[0,.9],	sub_theme="HUD",
+								 options=BGUI_DEFAULT|bgui.BGUI_CENTERY)
 		
-		self.mframe.position = [.65-self.mframe.size[0]/parent.size[0], self.mframe.position[1]]
+		self.mframe.position = [.675-self.mframe.size[0]/parent.size[0], self.mframe.position[1]]
 		
 		bgui.Label(self.mframe, "pstats_title", text="Stats", pos=[.05, .75],
 					sub_theme="Title")
 		
 class InventoryLayout(Layout):
 	def __init__(self, parent):
-		Layout.__init__(self, parent, "inventory_overlay")
+		Layout.__init__(self, parent, "inventory_overlay", use_mouse=True)
 		
-		self.mframe = bgui.Frame(self, "1x1_frame", aspect=1, size=[0,.8],
-							sub_theme="HUD", options=BGUI_DEFAULT|bgui.BGUI_CENTERY)
+		self.mframe = bgui.Image(self, "1x1_frame", "Textures/ui/menu_background.png",
+								 aspect=1, size=[0,.9],	sub_theme="HUD",
+								 options=BGUI_DEFAULT|bgui.BGUI_CENTERY)
 		
-		self.mframe.position = [.65-self.mframe.size[0]/parent.size[0], self.mframe.position[1]]
+		self.mframe.position = [.675-self.mframe.size[0]/parent.size[0], self.mframe.position[1]]
 		
 		bgui.Label(self.mframe, "pstats_title", text="Inventory", pos=[.05, .75],
 					sub_theme="Title")
 		
 class PowersLayout(Layout):
 	def __init__(self, parent):
-		Layout.__init__(self, parent, "powers_overlay")
+		Layout.__init__(self, parent, "powers_overlay", use_mouse=True)
 		
-		self.mframe = bgui.Frame(self, "1x1_frame", aspect=1, size=[0,.8],
-							sub_theme="HUD", options=BGUI_DEFAULT|bgui.BGUI_CENTERY)
+		self.mframe = bgui.Image(self, "1x1_frame", "Textures/ui/menu_background.png",
+								 aspect=1, size=[0,.9],	sub_theme="HUD",
+								 options=BGUI_DEFAULT|bgui.BGUI_CENTERY)
 		
-		self.mframe.position = [.65-self.mframe.size[0]/parent.size[0], self.mframe.position[1]]
+		self.mframe.position = [.675-self.mframe.size[0]/parent.size[0], self.mframe.position[1]]
 
-		lframe = bgui.Frame(self.mframe, "list_frame", size=[0.57,0.72], pos=[0.025,0.025])
+		self.lframe = bgui.Frame(self.mframe, "list_frame", size=[0.545,0.695],
+								pos=[0.05,0.05], sub_theme="Menu")
 		
-		tframe = bgui.Frame(self.mframe, "title_frame", size=[0.57,0.08], pos=[0.025, 0.745])
+		self.tframe = bgui.Frame(self.mframe, "title_frame", size=[0.545,0.08],
+								pos=[0.05, 0.745], sub_theme="Menu")
 		
-		bgui.Label(tframe, "title", text="Powers", sub_theme="Title", pos=[0.05,0],
-					options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
+		self.title = bgui.Label(self.tframe, "title", text="Powers", sub_theme="Title",
+								pos=[0.05,0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
 		
-		bgui.Frame(self.mframe, "info", size=[.36,.66], pos=[.615, .165])
+		self.iframe = bgui.Frame(self.mframe, "info", size=[.335,.66],
+								pos=[.615, .165], sub_theme="Menu")
 		
-		pframe = bgui.Frame(self.mframe, "points_frame", size=[.115,.115], pos=[.615, .05])
+		self.pframe = bgui.Frame(self.mframe, "points_frame", size=[.115,.115],
+									pos=[.615, .05], sub_theme="Menu")
 		
-		self.pp = bgui.Label(pframe, "points_lbl", sub_theme="Title",
+		self.pp = bgui.Label(self.pframe, "points_lbl", sub_theme="Title", text="#",
 							options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
 		
-		acc_btn = Button(self.mframe, "accept_btn", type="EMPHASIS", text="ACCEPT", pos=[.77, .07])
+		self.pow_name = bgui.Label(self.iframe, "name_lbl", sub_theme="Title",
+									pos=[.05, .93], text="Power Title")
 		
-		can_btn = Button(self.mframe, "cancel_btn", text="CANCEL", pos=[0.77,0.01])
+		self.pow_sub = bgui.Label(self.iframe, "sub_lbl", sub_theme="Subtitle",
+									pos=[.05, .88], text="Tier # - Element")
+		
+		self.acc_btn = Button(self.mframe, "accept_btn", type="EMPHASIS",
+								text="ACCEPT", pos=[.75, .085])
+		
+		self.can_btn = Button(self.mframe, "cancel_btn", text="CANCEL", 
+								on_click=self.cancel_click, pos=[0.75,0.035])
+		
+		self.init = False
 		
 	def update(self, main):
-		self.pp.text = main['player'].power_points
-		pass
+		if not self.init:
+			self.main = main
+			self.element = main['player'].element
+			self.init= True
+		
+		self.pp.text = str(main['player'].power_points)
+	
+	def cancel_click(self, widget):
+		self.main['player_exit'] = True
 			
 class TitleLayout(Layout):
 	def __init__(self, sys):
@@ -299,12 +323,12 @@ class DefaultStateLayout(Layout):
 		self.target_frame.visible = False
 		
 		# Map
-		self.mmap_frame = Map(self, "ds_map", aspect=1, size=[0, .25], pos=[0,0])
-		self.mmap_frame.position = [1-self.mmap_frame.size[0]/sys.size[0], 1-self.mmap_frame.size[1]/sys.size[1]]
-		
-		self.fmap_frame = bgui.Frame(self, "ds_fmap", size=[.8, .8], pos=[0,0],
-								sub_theme="HUD", options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
-		self.fmap_frame.visible = False
+#		self.mmap_frame = Map(self, "ds_map", aspect=1, size=[0, .25], pos=[0,0])
+#		self.mmap_frame.position = [1-self.mmap_frame.size[0]/sys.size[0], 1-self.mmap_frame.size[1]/sys.size[1]]
+#		
+#		self.fmap_frame = bgui.Frame(self, "ds_fmap", size=[.8, .8], pos=[0,0],
+#								sub_theme="HUD", options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+#		self.fmap_frame.visible = False
 		
 	def update_powerbar(self, main):
 		hex = 	{"AT_WILL" : "Textures/ui/hex_tile_blue.png",
@@ -396,10 +420,10 @@ class DefaultStateLayout(Layout):
 			self.target_frame.visible = False
 
 #		# Map
-		self.mmap_frame.im_buf = main['map_data']
-		if not self.combat:
-			self.fmap_frame.visible = main['full_map']
-			self.mmap_frame.visible = not main['full_map']
+#		self.mmap_frame.im_buf = main['map_data']
+#		if not self.combat:
+#			self.fmap_frame.visible = main['full_map']
+#			self.mmap_frame.visible = not main['full_map']
 		
 class CombatLayout(DefaultStateLayout):
 	def __init__(self, sys):

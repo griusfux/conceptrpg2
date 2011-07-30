@@ -29,17 +29,18 @@ class Button(Image):
 		img_str = "Textures/ui/buttons/default.png"
 		text = text
 		aspect = 3
-		size = [0, 35]
+		size = [0, 45]
 		text_size = 24
-		text_color = [143/255, 59/255, 5/255, .75]
+		text_color = [0.55, 0.29, 0.16, 0.7]#[143/255, 59/255, 5/255, .75]
 		
 		if type=="EMPHASIS":
-			size[1] = 45
+			size[1] = 60
 			text_size=28
 		
+		size[1] *= parent.system.size[1]/1000
 		size[1] /= parent.size[1]
 		
-		Image.__init__(self, parent, name, img_str, aspect, size,pos)
+		Image.__init__(self, parent, name, img_str, aspect, size, pos)
 		if on_click:
 			self.on_click = on_click
 		
@@ -48,7 +49,7 @@ class Button(Image):
 		
 		if resize and self.text.size[0] > self.size[0]:
 			self.aspect=None
-			self.size = [(self.text.size[0] *1.1)/self.parent.size[0],
+			self.size = [(self.text.size[0] *1.5)/self.parent.size[0],
 						self.size[1]/self.parent.size[1]]
 			self._remove_widget(self.text)
 			self.text = Label(self, name+'lbl', text=text, pt_size=text_size,
