@@ -40,7 +40,8 @@ class Button(Image):
 		size[1] /= parent.size[1]
 		
 		Image.__init__(self, parent, name, img_str, aspect, size,pos)
-		self.on_click = on_click
+		if on_click:
+			self.on_click = on_click
 		
 		self.text = Label(self, name+'lbl', text=text, pt_size=text_size,
 							color=text_color, options=BGUI_DEFAULT|BGUI_CENTERED)

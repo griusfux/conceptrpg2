@@ -56,7 +56,7 @@ class CharacterSelectState(BaseState, BaseController):
 		inputs = main['input_system'].run()
 		
 		if ("InGameMenu", "INPUT_CLICK") in inputs:
-			return("InGameMenue", "PUSH")		
+			return("InGameMenu", "PUSH")		
 		
 		# Lets add a little bit of movement
 		idle = main['default_actions']['default_idle']
