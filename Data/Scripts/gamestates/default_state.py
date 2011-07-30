@@ -73,7 +73,7 @@ class DefaultState(BaseState, BaseController):
 		
 		# Make sure the camera is in the right mode
 		if main['camera'].mode != self.camera_mode:
-			main['camera'].change_mode(self.camera_mode, 60)
+			main['camera'].change_mode(self.camera_mode, 30)
 		main['camera'].update()
 		main['full_map'] = False
 		
@@ -97,8 +97,17 @@ class DefaultState(BaseState, BaseController):
 			if ("SwitchCamera", "INPUT_ACTIVE") in inputs:
 				main['full_map'] = True
 
+			if ("Character", "INPUT_CLICK") in inputs:
+				main['overlay'] = "PlayerStats"
+				return("Player", "PUSH")
+
+			if ("Powers", "INPUT_CLICK") in inputs:
+				main['overlay'] = "Powers"
+				return("Player", "PUSH")
+
 			if ("Inventory", "INPUT_CLICK") in inputs:
-				return("Inventory", "PUSH")
+				main['overlay'] = "Inventory"
+				return("Player", "PUSH")
 				
 			if ("Action", "INPUT_CLICK") in inputs and not self.in_shop:
 				for shop, obj in main['shop_keepers'].items():

@@ -8,7 +8,7 @@ class InventoryState(DefaultState):
 		"""Initialize the client state"""
 		
 		main['camera'].target = main['player'].object
-		main['camera'].change_mode("shop", 60)
+		main['camera'].change_mode("shop", 30)
 		
 		self.last_layout = main['ui_system'].current_layout
 		self.layout_loaded = False
@@ -24,7 +24,7 @@ class InventoryState(DefaultState):
 		
 		# If the inventory window isn't up yet, put it up
 		if not self.layout_loaded:
-			main['ui_system'].load_layout("InventoryLayout")
+			main['ui_system'].load_layout("PlayerStatsLayout")
 			self.layout_loaded = True
 			
 		# Get inputs

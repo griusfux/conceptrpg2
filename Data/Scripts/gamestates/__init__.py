@@ -6,5 +6,6 @@ from .dgen_state import DungeonGenerationState
 from .shop_state import ShopState
 from .title_state import TitleState
 from .ingame_menu_state import InGameMenuState
+from .player_state import PlayerState
 from .inventory_state import InventoryState
 from .network_setup_state import NetworkSetupState

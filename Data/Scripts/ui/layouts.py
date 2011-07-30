@@ -22,13 +22,59 @@ class StatsOverlay(Layout):
 	def update(self, main):
 		self.fps.text = "%.2f fps" % main['engine'].fps
 		
+class PlayerStatsLayout(Layout):
+	def __init__(self, parent):
+		Layout.__init__(self, parent, "player_stats_overlay")
+		
+		self.mframe = bgui.Frame(self, "1x1_frame", aspect=1, size=[0,.8],
+							sub_theme="HUD", options=BGUI_DEFAULT|bgui.BGUI_CENTERY)
+		
+		self.mframe.position = [.65-self.mframe.size[0]/parent.size[0], self.mframe.position[1]]
+		
+		bgui.Label(self.mframe, "pstats_title", text="Stats", pos=[.05, .75],
+					sub_theme="Title")
+		
 class InventoryLayout(Layout):
 	def __init__(self, parent):
 		Layout.__init__(self, parent, "inventory_overlay")
 		
-		self.frame = bgui.Frame(self, "inv_frame", size=[0.6, 0.8], pos=[0.1, 0.1], sub_theme="HUD")
+		self.mframe = bgui.Frame(self, "1x1_frame", aspect=1, size=[0,.8],
+							sub_theme="HUD", options=BGUI_DEFAULT|bgui.BGUI_CENTERY)
+		
+		self.mframe.position = [.65-self.mframe.size[0]/parent.size[0], self.mframe.position[1]]
+		
+		bgui.Label(self.mframe, "pstats_title", text="Inventory", pos=[.05, .75],
+					sub_theme="Title")
+		
+class PowersLayout(Layout):
+	def __init__(self, parent):
+		Layout.__init__(self, parent, "powers_overlay")
+		
+		self.mframe = bgui.Frame(self, "1x1_frame", aspect=1, size=[0,.8],
+							sub_theme="HUD", options=BGUI_DEFAULT|bgui.BGUI_CENTERY)
+		
+		self.mframe.position = [.65-self.mframe.size[0]/parent.size[0], self.mframe.position[1]]
+
+		lframe = bgui.Frame(self.mframe, "list_frame", size=[0.57,0.72], pos=[0.025,0.025])
+		
+		tframe = bgui.Frame(self.mframe, "title_frame", size=[0.57,0.08], pos=[0.025, 0.745])
+		
+		bgui.Label(tframe, "title", text="Powers", sub_theme="Title", pos=[0.05,0],
+					options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
+		
+		bgui.Frame(self.mframe, "info", size=[.36,.66], pos=[.615, .165])
+		
+		pframe = bgui.Frame(self.mframe, "points_frame", size=[.115,.115], pos=[.615, .05])
+		
+		self.pp = bgui.Label(pframe, "points_lbl", sub_theme="Title",
+							options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+		
+		acc_btn = Button(self.mframe, "accept_btn", type="EMPHASIS", text="ACCEPT", pos=[.77, .07])
+		
+		can_btn = Button(self.mframe, "cancel_btn", text="CANCEL", pos=[0.77,0.01])
 		
 	def update(self, main):
+		self.pp.text = main['player'].power_points
 		pass
 			
 class TitleLayout(Layout):
@@ -149,9 +195,26 @@ class InGameMenuLayout(Layout):
 class CharSelectLayout(Layout):
 	def __init__(self, sys):
 		Layout.__init__(self, sys, "char_select_layout", use_mouse=True)
+		
+		self.frame = bgui.Image(self, "csl_frame", "Textures/ui/character select/background.png",
+								aspect=.75, size=[0,.8], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
+		
+		self.frame.position=[0.45-self.frame.size[0]/sys.size[0], self.frame.position[1]]
+		
+		self.cont_btn = Button(self.frame, "cont_btn", text="CONTINUE", type="EMPHASIS",
+								pos=[.65, .12], on_click=self.continue_click)
+		
+		self.new_btn = Button(self.frame, "new_btn", text="NEW",
+								pos=[.35, .12], on_click=self.new_click)
 	
 	def update(self, main):
-		pass
+		self.main = main
+		
+	def continue_click(self, widget):
+		self.main['csl_continue'] = True
+		
+	def new_click(self, widget):
+		self.main['csl_new'] = True
 		
 class DunGenLayout(Layout):
 	

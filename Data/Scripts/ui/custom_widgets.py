@@ -22,6 +22,38 @@ class Map(Image):
 						 0,	GL_RGBA, GL_UNSIGNED_BYTE, self.im_buf)
 		Image._draw(self)
 		
+class Button(Image):
+	def __init__(self, parent, name, pos=[0,0], type="DEFUALT", text="Button",
+				on_click=None, resize=True, options=BGUI_DEFAULT):
+		
+		img_str = "Textures/ui/buttons/default.png"
+		text = text
+		aspect = 3
+		size = [0, 35]
+		text_size = 24
+		text_color = [143/255, 59/255, 5/255, .75]
+		
+		if type=="EMPHASIS":
+			size[1] = 45
+			text_size=28
+		
+		size[1] /= parent.size[1]
+		
+		Image.__init__(self, parent, name, img_str, aspect, size,pos)
+		self.on_click = on_click
+		
+		self.text = Label(self, name+'lbl', text=text, pt_size=text_size,
+							color=text_color, options=BGUI_DEFAULT|BGUI_CENTERED)
+		
+		if resize and self.text.size[0] > self.size[0]:
+			self.aspect=None
+			self.size = [(self.text.size[0] *1.1)/self.parent.size[0],
+						self.size[1]/self.parent.size[1]]
+			self._remove_widget(self.text)
+			self.text = Label(self, name+'lbl', text=text, pt_size=text_size,
+								color=text_color, options=BGUI_DEFAULT|BGUI_CENTERED)
+			
+
 class PackageSelector(Widget):
 	"""A widget for handling selection from packages (such as race and class selection)"""
 	
