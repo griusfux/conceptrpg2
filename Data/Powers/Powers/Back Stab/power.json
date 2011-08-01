@@ -1,12 +1,12 @@
 {
-	"name" : "Power",
-	"element" : "NEUTRAL",
-	"description" : "A powerfully powerful power.",
-	"tier" : 1,
-	"delivery" : "SPELL",
-	"cool_down" : 1,
-	"effect_shape" : "SINGLE",
-	"shape_modifier" : 0,
-	"distance" : 0,
-	"flags": []
+    "cool_down": 1, 
+    "delivery": "WEAPON", 
+    "description": "Moves caster behind target and deals Weapon Damage x2", 
+    "distance": 0, 
+    "effect_shape": "SINGLE", 
+    "element": "DEATH", 
+    "flags": [], 
+    "name": "Back Stab", 
+    "shape_modifier": 0, 
+    "tier": 1
 }

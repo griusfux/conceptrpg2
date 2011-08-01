@@ -4,7 +4,7 @@
     "description": "Causes all characters targeting the caster to lose their target. ", 
     "distance": 0, 
     "effect_shape": "SINGLE", 
-    "element": "NEUTRAL", 
+    "element": "DEATH", 
     "flags": [], 
     "name": "Hide", 
     "shape_modifier": 0, 

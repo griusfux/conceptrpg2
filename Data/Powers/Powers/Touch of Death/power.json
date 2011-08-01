@@ -1,12 +1,12 @@
 {
-	"name" : "Power",
-	"element" : "NEUTRAL",
-	"description" : "A powerfully powerful power.",
-	"tier" : 1,
-	"delivery" : "SPELL",
-	"cool_down" : 1,
-	"effect_shape" : "SINGLE",
-	"shape_modifier" : 0,
-	"distance" : 0,
-	"flags": []
+    "cool_down": 8, 
+    "delivery": "WEAPON", 
+    "description": "Attack has a 50% chance of decreasing targets movement and physical resistance.", 
+    "distance": 0, 
+    "effect_shape": "SINGLE", 
+    "element": "DEATH", 
+    "flags": [], 
+    "name": "Touch Of Death", 
+    "shape_modifier": 0, 
+    "tier": 2
 }

@@ -1,12 +1,12 @@
 {
-	"name" : "Power",
-	"element" : "NEUTRAL",
-	"description" : "A powerfully powerful power.",
-	"tier" : 1,
-	"delivery" : "SPELL",
-	"cool_down" : 1,
-	"effect_shape" : "SINGLE",
-	"shape_modifier" : 0,
-	"distance" : 0,
-	"flags": []
+    "cool_down": 5, 
+    "delivery": "WEAPON", 
+    "description": "Enemies in burst suffer minor arcane damage.", 
+    "distance": 0, 
+    "effect_shape": "BURST", 
+    "element": "DEATH", 
+    "flags": [], 
+    "name": "Unbearable Shriek", 
+    "shape_modifier": 3, 
+    "tier": 2
 }

@@ -1,12 +1,12 @@
 {
-	"name" : "Power",
-	"element" : "NEUTRAL",
-	"description" : "A powerfully powerful power.",
-	"tier" : 1,
-	"delivery" : "SPELL",
-	"cool_down" : 1,
-	"effect_shape" : "SINGLE",
-	"shape_modifier" : 0,
-	"distance" : 0,
-	"flags": []
+    "cool_down": 4, 
+    "delivery": "WEAPON", 
+    "description": "Next 3 attacks cause poison.", 
+    "distance": 0, 
+    "effect_shape": "SINGLE", 
+    "element": "DEATH", 
+    "flags": [], 
+    "name": "Poison Dagger", 
+    "shape_modifier": 0, 
+    "tier": 2
 }

@@ -4,7 +4,7 @@
     "description": "Target suffers moderate arcane damage.", 
     "distance": 4, 
     "effect_shape": "SINGLE", 
-    "element": "NEUTRAL", 
+    "element": "DEATH", 
     "flags": [], 
     "name": "Wither", 
     "shape_modifier": 0, 
