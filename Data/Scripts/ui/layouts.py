@@ -51,43 +51,43 @@ class InventoryLayout(Layout):
 		
 class PowersLayout(Layout):
 	class PowerCell(bgui.ListBoxRenderer):
-		def click(self, widget):
-			self.listbox.active = widget.power
 		def __init__(self, listbox):
 			bgui.ListBoxRenderer.__init__(self, listbox)
 			self.listbox = listbox
-			self.listbox.active = None
-		def render_item(self, power):
-			sub_theme = "ActiveSub" if self.listbox.active == power else "Submenu"
 			
-			frame = bgui.Frame(self.listbox, "frame"+power.name, size=[1, 0.0625],
-							   sub_theme=sub_theme)
+			self.frame = bgui.Frame(listbox, "frame", size=[1, 0.0625],
+							   sub_theme="Submenu")
 			
-			frame.power = power
-			frame.on_click = self.click
-			
-			nframe = bgui.Frame(frame, "name_f"+power.name, size=[.5, 1],
+			self.nframe = bgui.Frame(self.frame, "name_f", size=[.5, 1],
 								pos=[0,0], sub_theme="Submenu")
 		
-			dframe = bgui.Frame(frame, "del_f"+power.name, size=[.3, 1],
+			self.dframe = bgui.Frame(self.frame, "del_f", size=[.3, 1],
 								pos=[.5,0], sub_theme="Submenu")
 		
-			tframe = bgui.Frame(frame, "tier_f"+power.name, size=[.2, 1],
+			self.tframe = bgui.Frame(self.frame, "tier_f", size=[.2, 1],
 								pos=[.8,0], sub_theme="Submenu")
 		
-			nlbl = bgui.Label(nframe, "name_l"+power.name,
-								pos=[.05,.2], text=power.name, sub_theme="Menu",
+			self.nlbl = bgui.Label(self.nframe, "name_l",
+								pos=[.05,.2],sub_theme="Menu",
 								options=bgui.BGUI_DEFAULT)
 			
-			dlbl = bgui.Label(dframe, "del_l"+power.name, sub_theme="Menu",
-								pos=[0,0.2], text=power.delivery.title(),
+			self.dlbl = bgui.Label(self.dframe, "del_l", sub_theme="Menu", pos=[0,0.2],
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 			
-			tlbl = bgui.Label(tframe, "tier_l"+power.name, sub_theme="Menu",
-								pos=[0,0.2], text=str(power.tier),
+			self.tlbl = bgui.Label(self.tframe, "tier_l", sub_theme="Menu", pos=[0,0.2],
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+		def render_item(self, power):
 			
-			return frame
+			color = [[0,0,0,0]] * 4
+			if power == self.listbox.selected:
+				color = [[0,0,0,.1]] * 4
+				
+			self.frame.colors = color
+			self.nlbl.text = power.name
+			self.dlbl.text = power.delivery.title()
+			self.tlbl.text = str(power.tier)
+			
+			return self.frame
 	def __init__(self, parent):
 		Layout.__init__(self, parent, "powers_overlay", use_mouse=True)
 		
@@ -191,6 +191,7 @@ class PowersLayout(Layout):
 			self.powers = [power for power in Power.get_package_list()
 							if power.element == self.element.upper()]
 			self.lbox.items = self.powers
+			self.lbox.active = None
 				
 		self.pp_text.text = str(self.pp)
 	
@@ -198,11 +199,10 @@ class PowersLayout(Layout):
 		sub = ""
 		info = "Select a power on the left to learn more about it and to purchase it."
 		details = ""
-		
 			
 		self.buy_btn.visible = False
-		if self.lbox.active:
-			power = self.lbox.active
+		if self.lbox.selected:
+			power = self.lbox.selected
 			name = power.name
 			sub = "Tier %d - %s" % (power.tier, power.element.title())
 			info = power.description
@@ -469,12 +469,12 @@ class DefaultStateLayout(Layout):
 		self.target_frame.visible = False
 		
 		# Map
-#		self.mmap_frame = Map(self, "ds_map", aspect=1, size=[0, .25], pos=[0,0])
-#		self.mmap_frame.position = [1-self.mmap_frame.size[0]/sys.size[0], 1-self.mmap_frame.size[1]/sys.size[1]]
-#		
-#		self.fmap_frame = bgui.Frame(self, "ds_fmap", size=[.8, .8], pos=[0,0],
-#								sub_theme="HUD", options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
-#		self.fmap_frame.visible = False
+		self.mmap_frame = Map(self, "ds_map", aspect=1, size=[0, .25], pos=[0,0])
+		self.mmap_frame.position = [1-self.mmap_frame.size[0]/sys.size[0], 1-self.mmap_frame.size[1]/sys.size[1]]
+		
+		self.fmap_frame = bgui.Frame(self, "ds_fmap", size=[.8, .8], pos=[0,0],
+								sub_theme="HUD", options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+		self.fmap_frame.visible = False
 		
 	def update_powerbar(self, main):
 		hex = 	{"AT_WILL" : "Textures/ui/hex_tile_blue.png",
@@ -567,9 +567,9 @@ class DefaultStateLayout(Layout):
 
 #		# Map
 #		self.mmap_frame.im_buf = main['map_data']
-#		if not self.combat:
-#			self.fmap_frame.visible = main['full_map']
-#			self.mmap_frame.visible = not main['full_map']
+		if not self.combat:
+			self.fmap_frame.visible = main['full_map']
+			self.mmap_frame.visible = not main['full_map']
 		
 class CombatLayout(DefaultStateLayout):
 	def __init__(self, sys):
