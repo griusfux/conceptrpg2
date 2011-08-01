@@ -14,6 +14,8 @@ class PlayerState(DefaultState):
 		self.layout_loaded = False
 		
 		main['player_exit'] = False
+		main['player_new_powers'] = []
+		main['player_new_pp'] = self.main['player'].power_points
 	
 	def client_run(self, main):
 		"""Client-side run method"""
@@ -56,6 +58,9 @@ class PlayerState(DefaultState):
 			return("Player", "SWITCH")
 		
 		if ("InGameMenu", "INPUT_CLICK") in inputs or main['player_exit']:
+			for power in main['player_new_powers']:
+				main['player'].powers.add(power, self)
+			main['player'].power_points = main['player_new_pp']
 			return('', 'POP')
 		
 	def client_cleanup(self, main):
@@ -64,3 +69,8 @@ class PlayerState(DefaultState):
 		
 		# Reset the mouse position
 		main['input_system'].mouse.position = (0.5, 0.5)
+		
+		# Clean up main
+		del main['player_exit']
+		del main['player_new_powers']
+		del main['player_new_pp']

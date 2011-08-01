@@ -56,7 +56,7 @@ class CharacterLogic:
 		self.level		= 0
 		self.race		= None
 		self.player_class= None
-		self.element    = ""
+		self.element    = "Death"
 		self.affinities = BASE_AFFINITIES.copy()
 		self._xp			= 0
 		self.last_level = 0

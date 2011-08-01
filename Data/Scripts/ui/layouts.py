@@ -2,6 +2,7 @@ import bgui
 from time import time
 from Scripts.ui.custom_widgets import *
 from Scripts.character_logic import PlayerLogic
+from Scripts.packages import Power
 
 class Layout(bgui.Widget):
 	def __init__(self, sys, name, use_mouse=False):
@@ -49,23 +50,94 @@ class InventoryLayout(Layout):
 					sub_theme="Title")
 		
 class PowersLayout(Layout):
+	class PowerCell(bgui.ListBoxRenderer):
+		def click(self, widget):
+			self.listbox.active = widget.power
+		def __init__(self, listbox):
+			bgui.ListBoxRenderer.__init__(self, listbox)
+			self.listbox = listbox
+			self.listbox.active = None
+		def render_item(self, power):
+			sub_theme = "ActiveSub" if self.listbox.active == power else "Submenu"
+			
+			frame = bgui.Frame(self.listbox, "frame"+power.name, size=[1, 0.0625],
+							   sub_theme=sub_theme)
+			
+			frame.power = power
+			frame.on_click = self.click
+			
+			nframe = bgui.Frame(frame, "name_f"+power.name, size=[.5, 1],
+								pos=[0,0], sub_theme="Submenu")
+		
+			dframe = bgui.Frame(frame, "del_f"+power.name, size=[.3, 1],
+								pos=[.5,0], sub_theme="Submenu")
+		
+			tframe = bgui.Frame(frame, "tier_f"+power.name, size=[.2, 1],
+								pos=[.8,0], sub_theme="Submenu")
+		
+			nlbl = bgui.Label(nframe, "name_l"+power.name,
+								pos=[.05,.2], text=power.name, sub_theme="Menu",
+								options=bgui.BGUI_DEFAULT)
+			
+			dlbl = bgui.Label(dframe, "del_l"+power.name, sub_theme="Menu",
+								pos=[0,0.2], text=power.delivery.title(),
+								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+			
+			tlbl = bgui.Label(tframe, "tier_l"+power.name, sub_theme="Menu",
+								pos=[0,0.2], text=str(power.tier),
+								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+			
+			return frame
 	def __init__(self, parent):
 		Layout.__init__(self, parent, "powers_overlay", use_mouse=True)
 		
-		self.mframe = bgui.Image(self, "1x1_frame", "Textures/ui/menu_background.png",
-								 aspect=1, size=[0,.9],	sub_theme="HUD",
-								 options=BGUI_DEFAULT|bgui.BGUI_CENTERY)
+		self.mframe = bgui.Image(self, "1x1_frame",
+								"Textures/ui/menu_background.png",
+								aspect=1, size=[0,.9],
+								options=BGUI_DEFAULT|bgui.BGUI_CENTERY)
 		
-		self.mframe.position = [.675-self.mframe.size[0]/parent.size[0], self.mframe.position[1]]
+		self.ele_bar = ElementBar(self.mframe)
+		
+		self.mframe.position = [.675-self.mframe.size[0]/parent.size[0],
+								self.mframe.position[1]]
 
 		self.lframe = bgui.Frame(self.mframe, "list_frame", size=[0.545,0.695],
 								pos=[0.05,0.05], sub_theme="Menu")
 		
+		self.hframe = bgui.Frame(self.lframe, "header", size=[1, .0625], pos=[0, 0.9375])
+		self.hframe.colors = [[0,0,0,0]] * 4
+		
+		self.nframe = bgui.Frame(self.hframe, "name_f", size=[.5, 1],
+								pos=[0,0], sub_theme="Submenu")
+		
+		self.nlbl = bgui.Label(self.nframe, "name_l", sub_theme="Subtitle",
+								pos=[0.05,0], text="NAME OF POWER",
+								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
+		
+		self.dframe = bgui.Frame(self.hframe, "del_f", size=[.3, 1],
+								pos=[.5,0], sub_theme="Submenu")
+		
+		self.dlbl = bgui.Label(self.dframe, "del_l", sub_theme="Subtitle",
+								pos=[0.05,0], text="DELIVERY",
+								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+		
+		self.tier_frame = bgui.Frame(self.hframe, "tier_f", size=[.2, 1],
+									pos=[.8,0], sub_theme="Submenu")
+		
+		self.tier_lbl = bgui.Label(self.tier_frame, "tier_l",
+								pos=[0.05,0], text="TIER", sub_theme="Subtitle",
+								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+		
+		self.lbox = bgui.ListBox(self.lframe, "lb", size=[1, .9375])
+		
+		self.lbox.renderer = self.PowerCell(self.lbox)
+		
 		self.tframe = bgui.Frame(self.mframe, "title_frame", size=[0.545,0.08],
 								pos=[0.05, 0.745], sub_theme="Menu")
 		
-		self.title = bgui.Label(self.tframe, "title", text="Powers", sub_theme="Title",
-								pos=[0.05,0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
+		self.title = bgui.Label(self.tframe, "title", text="Powers",
+								sub_theme="Title", pos=[0.05,0],
+								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
 		
 		self.iframe = bgui.Frame(self.mframe, "info", size=[.335,.66],
 								pos=[.615, .165], sub_theme="Menu")
@@ -73,34 +145,105 @@ class PowersLayout(Layout):
 		self.pframe = bgui.Frame(self.mframe, "points_frame", size=[.115,.115],
 									pos=[.615, .05], sub_theme="Menu")
 		
-		self.pp = bgui.Label(self.pframe, "points_lbl", sub_theme="Title", text="#",
+		self.pp_text = bgui.Label(self.pframe, "pp_lbl", sub_theme="Title", text="#",
 							options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
 		
 		self.pow_name = bgui.Label(self.iframe, "name_lbl", sub_theme="Title",
-									pos=[.05, .93], text="Power Title")
+									pos=[.05, .93], text="")
 		
 		self.pow_sub = bgui.Label(self.iframe, "sub_lbl", sub_theme="Subtitle",
-									pos=[.05, .88], text="Tier # - Element")
+									pos=[.05, .88], text="")
+		
+		self.pow_info = bgui.TextBlock(self.iframe, "info", size=[0.9, .3],
+										pos=[0.05, 0.5], sub_theme="")
+		
+		self.pow_details = bgui.TextBlock(self.iframe, "details", size=[0.9, 0.3],
+											pos=[0.05, 0.2], sub_theme="")
+							
 		
 		self.acc_btn = Button(self.mframe, "accept_btn", type="EMPHASIS",
-								text="ACCEPT", pos=[.75, .085])
+								text="ACCEPT", pos=[.75, .085],
+								on_click=self.accept_click)
 		
 		self.can_btn = Button(self.mframe, "cancel_btn", text="CANCEL", 
 								on_click=self.cancel_click, pos=[0.75,0.035])
+		
+		self.buy_btn = Button(self.iframe, "buy_btn", text="BUY", on_click=self.buy_click,
+								pos=[0, .1], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		
 		self.init = False
 		
 	def update(self, main):
 		if not self.init:
 			self.main = main
-			self.element = main['player'].element
+			self.element = ""
+			self.ele_bar.timer = 20
+			self.ele_bar.element = main['player'].element
+			
+			self.powers = []
+			self.pp = main['player'].power_points
+			self.new = [] 
+			
 			self.init= True
 		
-		self.pp.text = str(main['player'].power_points)
+		if self.element != self.ele_bar.element:
+			self.element = self.ele_bar.element
+			self.powers = [power for power in Power.get_package_list()
+							if power.element == self.element.upper()]
+			self.lbox.items = self.powers
+				
+		self.pp_text.text = str(self.pp)
 	
+		name = ""
+		sub = ""
+		info = "Select a power on the left to learn more about it and to purchase it."
+		details = ""
+		
+			
+		self.buy_btn.visible = False
+		if self.lbox.active:
+			power = self.lbox.active
+			name = power.name
+			sub = "Tier %d - %s" % (power.tier, power.element.title())
+			info = power.description
+			details = "Cost: %d" % self.cost(power)
+			
+			for known in self.main['player'].powers.all + self.new:
+				if power.name == known.name:
+					break
+			else:
+				self.buy_btn.visible = True
+			
+		self.pow_name.text = name
+		self.pow_sub.text = sub
+		self.pow_info.text = info
+		self.pow_details.text = details
+		
+	def cost(self, power):
+		tier = power.tier if power.tier <= 5 else 5
+		cost = [3, 8, 15, 24, 35][tier-1]
+		player = self.main['player']
+		discount =	player.affinities[power.element.lower()] + \
+					player.affinities[power.delivery.lower()]
+		
+		return max(1, cost - discount)
+		
+	def buy_click(self, widget):
+		power = self.lbox.active
+		cost = self.cost(power)
+		
+		if cost <= self.pp:
+			self.new.append(power)
+			self.pp -= cost
+			
+	def accept_click(self, widget):
+		self.main['player_exit'] = True
+		self.main['player_new_powers'] = self.new
+		self.main['player_new_pp'] = self.pp
+			
 	def cancel_click(self, widget):
 		self.main['player_exit'] = True
-			
+		
 class TitleLayout(Layout):
 	def __init__(self, sys):
 		Layout.__init__(self, sys, "title_layout", use_mouse=True)
@@ -220,10 +363,13 @@ class CharSelectLayout(Layout):
 	def __init__(self, sys):
 		Layout.__init__(self, sys, "char_select_layout", use_mouse=True)
 		
-		self.frame = bgui.Image(self, "csl_frame", "Textures/ui/character select/background.png",
-								aspect=.75, size=[0,.8], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
+		self.frame = bgui.Image(self, "csl_frame",
+								"Textures/ui/character select/background.png",
+								aspect=.75, size=[0,.8],
+								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
 		
-		self.frame.position=[0.45-self.frame.size[0]/sys.size[0], self.frame.position[1]]
+		self.frame.position=[0.45-self.frame.size[0]/sys.size[0],
+							self.frame.position[1]]
 		
 		self.cont_btn = Button(self.frame, "cont_btn", text="CONTINUE", type="EMPHASIS",
 								pos=[.65, .12], on_click=self.continue_click)

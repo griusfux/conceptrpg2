@@ -40,7 +40,7 @@ class Button(Image):
 		size[1] *= parent.system.size[1]/1000
 		size[1] /= parent.size[1]
 		
-		Image.__init__(self, parent, name, img_str, aspect, size, pos)
+		Image.__init__(self, parent, name, img_str, aspect, size, pos, options=options)
 		if on_click:
 			self.on_click = on_click
 		
@@ -55,6 +55,58 @@ class Button(Image):
 			self.text = Label(self, name+'lbl', text=text, pt_size=text_size,
 								color=text_color, options=BGUI_DEFAULT|BGUI_CENTERED)
 			
+class ElementBar(Frame):
+	def __init__(self, parent):
+		Frame.__init__(self, parent, "ele_bar", 0, None, [.9,.1], [0,.85],
+						options=BGUI_DEFAULT|BGUI_CENTERX)
+		
+		self.colors = [[0,0,0,0]]*4
+		
+		self._element = "Neutral"
+		self.timer = 0
+		
+		path = "Textures/Elements/"
+		elements = ["Death", "Storm", "Fire", "Neutral", "Holy", "Earth", "Water"]
+		self.icons = {}
+		
+		for i, element in enumerate(elements):
+			j = 0 if i < 4 else .035
+			self.icons[element] = Image(self, element, path+element+'.png', aspect=1,
+										size=[0, .7], pos=[.0975+j+.11*i, 0],
+										options=BGUI_DEFAULT|BGUI_CENTERY)
+			self.icons[element].on_click = self.swap
+		
+		self.icons["Neutral"].size = [self.size[1]/self.size[0], 1]
+		
+	def _draw(self):
+		Frame._draw(self)
+		self.timer += 1
+	
+	@property
+	def element(self):
+		return self._element
+	
+	@element.setter
+	def element(self, value):
+		if value == self._element or self.timer < 10:
+			return
+		
+		self.timer=0
+		
+		prev = self.icons[self._element]
+		cur = self.icons[value]
+		
+		prev.size = [.7*(self.size[1]/self.size[0]), .7]
+		cur.size = 	[self.size[1]/self.size[0], 1]
+		
+#		tmp = (prev.position[0] - self.position[0])/self.size[0]
+		prev.position = [(cur.position[0]-self.position[0])/self.size[0], 0]
+		cur.position = [0.4275, 0]
+		
+		self._element = value
+		
+	def swap(self, widget):
+		self.element = widget.name
 
 class PackageSelector(Widget):
 	"""A widget for handling selection from packages (such as race and class selection)"""
@@ -148,8 +200,7 @@ class PackageSelector(Widget):
 			self.packages[i].close_image()
 			img.idx = i
 			img.on_click = self.package_image
-			self.pkg_imgs.append(img)
-			
+			self.pkg_imgs.append(img)			
 
 class ScrollBar(Widget):
 	
