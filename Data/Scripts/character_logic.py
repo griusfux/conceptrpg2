@@ -25,6 +25,7 @@ BASE_AFFINITIES = {
 				"holy" : 0,
 				"earth" : 0,
 				"water" : 0,
+				"neutral" : 0,
 				
 				# Delivery Affinities
 				"weapon" : 0,
