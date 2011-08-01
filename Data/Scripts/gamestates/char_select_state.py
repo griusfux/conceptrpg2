@@ -52,7 +52,11 @@ class CharacterSelectState(BaseState, BaseController):
 													
 			
 	def client_run(self, main):
-		"""Client-side run method"""		
+		"""Client-side run method"""
+		
+		if len(self.saves) == 0:
+			return("CharacterCreation", "SWITCH")
+		
 		inputs = main['input_system'].run()
 		
 		if ("InGameMenu", "INPUT_CLICK") in inputs:
