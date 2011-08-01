@@ -85,7 +85,8 @@ def in_game(cont):
 			exit_game(own)
 		else:
 			if 'map_source' in own:
-				own['map_data'] = own['map_source'].image
+				pass
+#				own['map_data'] = own['map_source'].image
 #				own['map_source'].refresh()
 			# Update the ui
 			if 'ui_system' in own:
@@ -111,10 +112,10 @@ def init(own):
 		own['ui_system'] = BlenderUISystem()
 		scene = bge.logic.getCurrentScene()
 		camera = scene.cameras['map_cam']
-		source = bge.texture.ImageRender(scene, camera)
-		source.alpha = True
-		source.background = [0,0,0,0]
-		own['map_source'] = source
+#		source = bge.texture.ImageRender(scene, camera)
+#		source.alpha = True
+#		source.background = [0,0,0,0]
+		own['map_source'] = None #source
 		own['map_data'] = None
 		
 	# Create an effect system
