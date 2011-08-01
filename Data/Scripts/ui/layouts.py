@@ -220,6 +220,9 @@ class PowersLayout(Layout):
 		self.pow_details.text = details
 		
 	def cost(self, power):
+		if power.tier == 0:
+			return 0
+		
 		tier = power.tier if power.tier <= 5 else 5
 		cost = [3, 8, 15, 24, 35][tier-1]
 		player = self.main['player']
