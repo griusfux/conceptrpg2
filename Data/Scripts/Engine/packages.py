@@ -140,8 +140,12 @@ class Package:
 		
 		files = os.listdir(cls._dir)
 		
+		for file in files:
+			if file.startswith('.'):
+				files.remove(file)
+		
 		if sort_date:
-			files.sort(key=lambda x: os.stat(cls._dir+'/'+x).st_mtime)
+			files.sort(key=lambda x: os.stat(cls._dir+'/'+x+'/'+cls._config).st_mtime)
 		
 		for f in files:
 			if f.startswith('.'): continue
