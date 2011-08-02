@@ -89,6 +89,10 @@ class CharacterSelectState(BaseState, BaseController):
 					main['target_shapes']['BURST'] = child
 					
 			player = self.characters[index]
+			player.object.position = gameobj.position
+			player.object.set_parent(gameobj)
+			player.object = gameobj
+
 			main['net_players'] = {main['client'].id: player}
 			main['player'] = player
 			player.id = main['client'].id
