@@ -116,7 +116,6 @@ class CharacterCreationState(BaseState, BaseController):
 			
 			a = Items.Armor('Robes', 5)
 			player.inventory.append(a)
-			print(a.name, a.arcane_defense)
 			player.armor = a
 
 			# player.inventory.append(Items.Item('Bonsai'))
