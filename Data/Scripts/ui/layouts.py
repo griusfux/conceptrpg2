@@ -37,6 +37,17 @@ class PlayerStatsLayout(Layout):
 					sub_theme="Title")
 		
 class InventoryLayout(Layout):
+	class ItemCellRenderer():
+		def __init__(self, listbox):
+			self.frame = bgui.Image(listbox, "frame", "Textures/ui/bottom_border.png",
+									size=[1, 0.0625])
+			self.label = bgui.Label(self.frame, "label", pos=[.05,.2],
+								sub_theme="Menu", options=bgui.BGUI_DEFAULT)
+			
+		def render_item(self, item):
+			self.label.text = item.name
+			return self.frame
+			
 	def __init__(self, parent):
 		Layout.__init__(self, parent, "inventory_overlay", use_mouse=True)
 		
@@ -44,10 +55,56 @@ class InventoryLayout(Layout):
 								 aspect=1, size=[0,.9],	sub_theme="HUD",
 								 options=BGUI_DEFAULT|bgui.BGUI_CENTERY)
 		
-		self.mframe.position = [.675-self.mframe.size[0]/parent.size[0], self.mframe.position[1]]
+		self.mframe.position = [.675-self.mframe.size[0]/parent.size[0],
+								self.mframe.position[1]]
 		
-		bgui.Label(self.mframe, "pstats_title", text="Inventory", pos=[.05, .75],
-					sub_theme="Title")
+		self.lframe = bgui.Frame(self.mframe, "list_frame", size=[0.4, 0.8], 
+								pos=[0.05, 0.1], sub_theme="Menu")
+		
+		self.lbox = bgui.ListBox(self.lframe, "list_box", size=[1, 0.9])
+		self.lbox.renderer = self.ItemCellRenderer(self.lbox)
+		
+		self.type_buttons = {}
+		self.type_labels = {}
+		self.selection = "weapons"
+		self.old_selection = ""
+		for i, type in enumerate(["weapons", "armor", "acc.", "misc."]):
+			self.type_buttons[type] = bgui.Frame(self.lframe, type, size=[0.25, 0.1],
+													pos=[0.25*i, 0.9])
+			self.type_buttons[type].colors = [[0,0,0,0.1]] * 4
+			self.type_buttons[type].border = 1
+			self.type_buttons[type].border_color = [0.55, 0.29, 0.16, 0.7]
+			self.type_buttons[type].on_click = self.selection_click
+			self.type_labels[type] = bgui.Label(self.type_buttons[type], type+'l',
+												text=type.title(), sub_theme="Menu",
+												options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+		
+		self.doll = bgui.Image(self.mframe, "doll", "Textures/ui/paper_doll.png",
+								size=[0.45, 0.9], pos=[0.5, .05])
+	def update(self, main):
+		if self.selection != self.old_selection:
+			self.type_buttons[self.selection].colors = [[0,0,0,0]] * 4
+			self.type_buttons[self.selection].border = 0
+			
+			if self.old_selection:
+				self.type_buttons[self.old_selection].colors = [[0,0,0,.1]] * 4
+				self.type_buttons[self.old_selection].border = 1
+			self.old_selection = self.selection
+			
+			type = ""
+			if self.selection == "weapons":
+				type = "Weapon"
+			elif self.selection == "armor":
+				type = "Armor"
+			elif self.selection == "acc.":
+				type = "Accessory"
+			elif self.selection == "misc.":
+				type = "Item"
+			self.lbox.items = [item for item in main['player'].inventory
+								if item.__class__.__name__==type]
+		
+	def selection_click(self, widget):
+		self.selection = widget.name
 		
 class PowersLayout(Layout):
 	class PowerCell(bgui.ListBoxRenderer):
@@ -104,8 +161,8 @@ class PowersLayout(Layout):
 		self.lframe = bgui.Frame(self.mframe, "list_frame", size=[0.545,0.695],
 								pos=[0.05,0.05], sub_theme="Menu")
 		
-		self.hframe = bgui.Frame(self.lframe, "header", size=[1, .0625], pos=[0, 0.9375])
-		self.hframe.colors = [[0,0,0,0]] * 4
+		self.hframe = bgui.Frame(self.lframe, "header", size=[1, .0625],
+								pos=[0, 0.9375], sub_theme="Menu")
 		
 		self.nframe = bgui.Frame(self.hframe, "name_f", size=[.5, 1],
 								pos=[0,0], sub_theme="Submenu")
