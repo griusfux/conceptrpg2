@@ -424,8 +424,8 @@ class CharSelectLayout(Layout):
 		Layout.__init__(self, sys, "char_select_layout", use_mouse=True)
 		
 		self.frame = bgui.Image(self, "csl_frame",
-								"Textures/ui/character select/background.png",
-								aspect=.75, size=[0,.8],
+								"Textures/ui/char_select_bg.png",
+								aspect=5/3, size=[0,.4],
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
 		
 		self.frame.position=[0.45-self.frame.size[0]/sys.size[0],
@@ -434,17 +434,38 @@ class CharSelectLayout(Layout):
 		self.cont_btn = Button(self.frame, "cont_btn", text="CONTINUE", type="EMPHASIS",
 								pos=[.65, .12], on_click=self.continue_click)
 		
+		self.prev_btn = Button(self.frame, "prev_btn", type="ARROW_LEFT", text="",
+								pos=[0.217, .12], on_click=self.prev_click)
+		
+		self.next_btn = Button(self.frame, "next_btn", type="ARROW_RIGHT", text="",
+								pos=[0.517, .12], on_click=self.next_click)
+		
 		self.new_btn = Button(self.frame, "new_btn", text="NEW",
-								pos=[.35, .12], on_click=self.new_click)
-	
+								pos=[.3, .12], on_click=self.new_click)
+		
+		self.char_name = bgui.Label(self.frame, "name", pos=[0.1, .8], sub_theme="Title")
+		self.subclass = bgui.Label(self.frame, "subclass", pos=[0.1, .7], sub_theme="Subtitle")
+		self.level = bgui.Label(self.frame, "level", pos=[0.1, .6], sub_theme="Subtitle")
+				
 	def update(self, main):
 		self.main = main
+		if main['csl_char']:
+			char = main['csl_char']
+			self.char_name.text = char.name
+			self.subclass.text = char.player_class.name
+			self.level.text = "Level %d" % char.level
 		
 	def continue_click(self, widget):
 		self.main['csl_continue'] = True
 		
 	def new_click(self, widget):
 		self.main['csl_new'] = True
+		
+	def prev_click(self, widget):
+		self.main['csl_index'] -= 1
+	
+	def next_click(self, widget):
+		self.main['csl_index'] += 1
 		
 class DunGenLayout(Layout):
 	

@@ -49,6 +49,7 @@ class CharacterSelectState(BaseState, BaseController):
 		main['csl_continue'] = False
 		main['csl_new'] = False
 		main['csl_char'] = None
+		main['csl_index'] = 0
 													
 			
 	def client_run(self, main):
@@ -62,11 +63,15 @@ class CharacterSelectState(BaseState, BaseController):
 		if ("InGameMenu", "INPUT_CLICK") in inputs:
 			return("InGameMenu", "PUSH")		
 		
+		index = main['csl_index'] % len(self.characters)
+		
 		# Lets add a little bit of movement
 		idle = main['default_actions']['default_idle']
 		for i in range(min(len(self.characters), 4)):
 			self.characters[i].object.play_animation(idle['name'], idle['start'],
 													idle['end'], mode=1)
+			
+		main['csl_char'] = self.characters[index]
 		
 		if main['csl_new']:
 			return("CharacterCreation", "SWITCH")
@@ -83,7 +88,7 @@ class CharacterSelectState(BaseState, BaseController):
 				elif child.name == "burst":
 					main['target_shapes']['BURST'] = child
 					
-			player = self.characters[0]
+			player = self.characters[index]
 			main['net_players'] = {main['client'].id: player}
 			main['player'] = player
 			player.id = main['client'].id

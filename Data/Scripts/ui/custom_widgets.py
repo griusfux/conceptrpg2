@@ -36,6 +36,12 @@ class Button(Image):
 		if type=="EMPHASIS":
 			size[1] = 60
 			text_size=28
+		elif type == "ARROW_LEFT":
+			img_str = "Textures/ui/buttons/arrow_left.png"
+			aspect = 1
+		elif type == "ARROW_RIGHT":
+			img_str = "Textures/ui/buttons/arrow_right.png"
+			aspect = 1
 		
 		size[1] *= parent.system.size[1]/1000
 		size[1] /= parent.size[1]
