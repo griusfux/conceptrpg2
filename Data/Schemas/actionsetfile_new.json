@@ -4,8 +4,7 @@
 	[
 		{
 				"name" : "action",
-				"start" : 0,
-				"end" : 1
+				"actions" : [{"name":"action", "start":0, "end":1}]
 		}
 	]
 }

@@ -128,30 +128,11 @@ def init(own):
 	# Build the actions list
 	print("\nLoading Actions . . .")
 	own['actions'] = {}
-	for set in ActionSet.get_package_list():
-		for action in set.action_set:
-			if action['name'] in own['actions']:
-				print("\nERROR: An action with the name %s already exists!\n" % action.name)
-				continue
-			# Load the action into the dictionary
-			own['actions'][action['name']] = {"name" : action['name'], "start" : action['start'], "end" : action['end']}
+	for actionset in ActionSet.get_package_list():
+		own['actions'][actionset.name] = actionset.actions
+		
 		# Now load the library so it can be found by the engine
-		gl.LibLoad(set.name, "Action", set.blend)
-	print()
-
-	# Load default actions		
-	own['default_actions'] = {}
-	defaults_path = os.getcwd() + "/Actions/.config/"
-	for file in os.listdir(defaults_path):
-		if file.startswith("."):
-			continue
-			
-		actions = json.load(open(defaults_path+file))
-		for action in actions:
-			if action in own['default_actions']:
-				print("\nERROR: A default action with the name %s already exists!\n" % action)
-				continue
-			own['default_actions'][action] = own['actions'][actions[action]]	
+		own['engine'].load_library(actionset, type='Action')
 
 	# Current room to use for the combat state
 	own['room'] = None

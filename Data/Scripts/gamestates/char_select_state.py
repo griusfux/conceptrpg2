@@ -32,12 +32,14 @@ class CharacterSelectState(BaseState, BaseController):
 				continue
 			character = Character.PlayerLogic(None)
 			character.load(save)
+			character.action_set = 'base'
 			
 			main['engine'].load_library(character.race)
 			obj = main['engine'].add_object(character.race.root_object,
 											(42,0,0), (0,0,math.radians(180)))
 			obj.armature = obj
 			character.object = obj
+			character.armature = obj.armature
 			
 			self.characters.append(character)
 
@@ -66,8 +68,8 @@ class CharacterSelectState(BaseState, BaseController):
 		index = main['csl_index'] % len(self.characters)
 		
 		# Lets add a little bit of movement
-		idle = main['default_actions']['default_idle']
 		for i in range(min(len(self.characters), 4)):
+			idle = main['actions'][self.characters[i].action_set]['Idle'][0]
 			self.characters[i].object.play_animation(idle['name'], idle['start'],
 													idle['end'], mode=1)
 			
@@ -91,6 +93,8 @@ class CharacterSelectState(BaseState, BaseController):
 			player = self.characters[index]
 			player.object.position = gameobj.position
 			player.object.set_parent(gameobj)
+			gameobj.armature = player.object
+			player.object.armature = player.object
 			player.object = gameobj
 
 			main['net_players'] = {main['client'].id: player}

@@ -600,7 +600,7 @@ class CombatState(DefaultState, BaseController):
 		return def_value >= off_value
 
 	def _get_idle_animation(self, main):
-		return main['default_actions']['1h_idle']
+		return '1h Idle'
 		
 	def _get_forward_animation(self, main):
-		return main['default_actions']['1h_walk']
+		return '1h Walk'

@@ -1,4 +1,9 @@
 {
 	"name": "str",
-	"action_set" : [{ "name" : "str", "start" : "int", "end" : "int"}]
+	"action_set": [
+			{
+				"name":"str",
+				"actions":[{ "name" : "str", "start" : "int", "end" : "int"}]
+			}
+		]
 }

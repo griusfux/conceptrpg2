@@ -101,6 +101,11 @@ class CharacterLogic:
 		
 		self.stat_mods = {}
 		
+		self.action_set = None
+		
+	def __str__(self):
+		return self.name
+		
 	def __del__(self):
 		if self.object:
 			self.object.end()

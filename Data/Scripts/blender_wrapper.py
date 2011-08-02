@@ -150,7 +150,7 @@ class Object:
 		
 	def play_animation(self, anim, start=0, end=0, mode=0, layer=0, blending=0):
 		if self._armature and anim != self.animation:
-			self._armature.playAction(anim, start, end, play_mode=mode)#, layer, blending)
+			self._armature.playAction(anim, start, end, play_mode=mode, layer=layer)
 			self.animation = anim
 			# self.gameobj.sendMessage("animation", anim, self._armature.name)
 			
@@ -194,7 +194,7 @@ class Object:
 				position = position + verts[i].XYZ
 				
 			position = position / poly.getNumVertex()
-			position = position * nav_mesh.worldOrientation
+			position = nav_mesh.worldOrientation * position
 			position = position + nav_mesh.worldPosition
 			nodes.append(Node(position))
 			
@@ -557,13 +557,13 @@ class Engine:
 	def __del__(self):
 		self.free_libraries()
 	
-	def load_library(self, package):
+	def load_library(self, package, type='Scene'):
 		"""Load scene data from a package file"""
 		# Don't load libraries multiple times
 		if package.name in self.library_list:
 			return
 			
-		gl.LibLoad(package.name, 'Scene', package.blend)
+		gl.LibLoad(package.name, type, package.blend)
 		self.library_list.append(package.name)
 		
 	def free_libraries(self):

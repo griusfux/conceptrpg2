@@ -183,6 +183,14 @@ class ActionSet(Package):
     _new = 'Schemas/actionsetfile_new.json'
     _dir = 'Actions'
     
+    def __init__(self, package_name, new_package=False):
+        Package.__init__(self, package_name, new_package)
+        
+        self.actions = {}
+        
+        for action in self.action_set:
+            self.actions[action['name']] = action['actions']
+    
 class Shop(Package):
     """Shop package"""
     

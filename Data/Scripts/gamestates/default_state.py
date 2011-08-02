@@ -161,10 +161,10 @@ class DefaultState(BaseState, BaseController):
 		del main['full_map']
 			
 	def _get_idle_animation(self, main):
-		return main['default_actions']['default_idle']
+		return "Idle"
 		
 	def _get_forward_animation(self, main):
-		return main['default_actions']['default_walk']
+		return "Walk"
 	
 	def _handle_item_pickup(self, main):
 		for id in main['item_collisions']:
