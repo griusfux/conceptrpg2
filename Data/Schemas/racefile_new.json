@@ -1,6 +1,7 @@
 {
 	"name": "Race",
 	"root_object": "root_object",
+	"action_set": "Base",
 	
 	"traits": ""
 }

@@ -1,6 +1,7 @@
 {
 	"name": "Kat",
 	"root_object": "KatArm",
+	"action_set": "Base",
 	
 	"traits": ""
 }

@@ -1,6 +1,7 @@
 {
 	"name": "str",
 	"root_object": "str",
+	"action_set": "str",
 	
 	"traits": "str"
 }
