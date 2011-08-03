@@ -17,14 +17,15 @@ class CharacterCreationState(BaseState, BaseController):
 	
 	def client_init(self, main):
 		"""Intialize the client state"""
-		
-		main['last_layout'] = ''
-		main['next_layout'] = 'CgenName'
-		main['cgen_input'] = {}
-		main['creation_done'] = False
+		main['cgen_data'] = None
+		main['cgen_exit'] = False
 		
 		# Load the ui
-		main['ui_system'].load_layout(main['next_layout'])
+		main['ui_system'].load_layout("CharGenLayout")
+		
+		# Setup the camera
+		self.scene = main['engine'].add_object("char_gen", (0,0,0), (0,0,0))
+		main['engine'].set_active_camera("char_gen_camera")
 		
 	def client_run(self, main):
 		"""Client-side run method"""
@@ -34,129 +35,69 @@ class CharacterCreationState(BaseState, BaseController):
 		if ("InGameMenu", "INPUT_CLICK") in inputs:
 			return("InGameMenu", "PUSH")
 		
-		# Check for cgen start
-		if main['next_layout'] == 'start' and main['cgen_input']['character'].package_name == "&new":
-			main['next_layout'] = 'cgen_name'
-		
 		# Check for cgen end
-		elif main['next_layout'] in ('end_cgen', 'start'):	
-#			# Add the player empty
-#			gameobj = main['engine'].add_object("CharacterEmpty")
-#	
-#			# Load the target shapes
-#			main['target_shapes'] = {}
-#			for child in gameobj.children:
-#				if child.name == "blast":
-#					main['target_shapes']['BLAST'] = child
-#				elif child.name == "burst":
-#					main['target_shapes']['BURST'] = child
-#			
-#			# Setup the player logic
-#			player = PlayerLogic(gameobj)
-#			
-#			race = None
-#			if main['next_layout'] == 'start':
-#				player.load(main['cgen_input']['character'])
-#				race = player.race
-#			else:
-#				race = main['cgen_input']['race']
-#				
-#			# Now add the mesh and armature based on race data
-#			main['engine'].load_library(race)
-#			
-#			root_ob = main['engine'].add_object(race.root_object)
-#			root_ob.position = gameobj.position
-#			root_ob.set_parent(gameobj)
-#			
-#			# Setup the armature
-#			gameobj.armature = root_ob
-#			
-#			if main['next_layout'] == 'end_cgen':
-
-			player = PlayerLogic(None)
-
-			# Set the player's name
-			player.name = main['cgen_input']['name']
+		if main['cgen_exit']:
 			
-			# Set the player's race
-			player.race = main['cgen_input']['race']
-			
-			# Set the player's class
-			player.player_class = main['cgen_input']['class']	
-			
-			# This levels the player to 1
-			player.xp += 0
-			
-			
-			player.max_hp = 16
-			player.speed = 5
-			
-			# Now it is time to fill in the rest of the stats
-			player.recalc_stats()
-			
-			# Give the player an attack power
-			player.powers.add(Power('Attack'), self)
-			
-			# Give the player racial traits
-			# This needs to be done after giving the player xp to ensure there
-			# is already an unspent level for level 1
-			if player.race.traits:
-				traits = player.race.traits
-				try:
-					player.powers.add(Feat(traits), self)
-				except PackageError:
-					print("Unable to open up the file %s for %s's racial traits" % (traits, player.race.name))
-			
-			# Setup player inventory
-			
-			w = Items.Weapon('Longsword', 5)
-			player.inventory.append(w)
-			player.weapon = w
-			
-			
-			a = Items.Armor('Robes', 5)
-			player.inventory.append(a)
-			player.armor = a
-
-			# player.inventory.append(Items.Item('Bonsai'))
-			
-			# Give the player some starting credits
-			# player.credits = 100
-			
-			# Save the new player
-			player.save()
-			
-#			main['net_players'] = {main['client'].id: player}
-#			main['player'] = player
-#			player.id = main['client'].id
-#			
-#			# Fill the player's hit points
-#			player.hp = player.max_hp
-#			
-#			# Set up the camera
-#			from Scripts.blender_wrapper import Camera
-#			camera_pivot = main['engine'].add_object("pivot")
-#			main['camera'] = Camera(camera_pivot, main['player'].object)
-#			
-#			return ("DungeonGeneration", "SWITCH")
+			if main['cgen_data']:
+				player = PlayerLogic(None)
+				
+				# Set the player's name
+				player.name = main['cgen_data']['name']
+						
+				# Set the player's race
+				player.race = main['cgen_data']['race']
+				
+				# Set the player's class
+				player.player_class = main['cgen_data']['class']
+				
+				# Set the player's element
+				player.element = main['cgen_data']['element']	
+				
+				# This levels the player to 1
+				player.xp += 0
+				
+				
+				player.max_hp = 16
+				player.speed = 5
+				
+				# Now it is time to fill in the rest of the stats
+				player.recalc_stats()
+				
+				# Give the player an attack power
+				player.powers.add(Power('Attack'), self)
+				
+				# Give the player racial traits
+				# This needs to be done after giving the player xp to ensure there
+				# is already an unspent level for level 1
+				if player.race.traits:
+					traits = player.race.traits
+					try:
+						player.powers.add(Feat(traits), self)
+					except PackageError:
+						print("Unable to open up the file %s for %s's racial traits" % (traits, player.race.name))
+				
+				# Setup player inventory
+				
+				w = Items.Weapon('Longsword', 5)
+				player.inventory.append(w)
+				player.weapon = w
+				
+				
+				a = Items.Armor('Robes', 5)
+				player.inventory.append(a)
+				player.armor = a
+				
+				player.save()
 
 			return("CharacterSelect", "SWITCH")
-		
-		# If the set layout differs from the previous layout, switch to the new layout.
-		# The new current layout is saved in last layout to continue checking.
-		if main['next_layout'] != main['last_layout']:
-			main['last_layout'] = main['next_layout']
-			main['ui_system'].load_layout(main['next_layout'])
 			
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
+		self.scene.end()
 		
 		# We added these so we need to get rid of them too
-		
-		del main['last_layout']
-		del main['next_layout']
-		del main['cgen_input']
-		del main['creation_done']
+		del main['cgen_data']
+		del main['cgen_exit']
 			
 	##########
 	# Server

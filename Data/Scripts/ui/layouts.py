@@ -2,7 +2,7 @@ import bgui
 from time import time
 from Scripts.ui.custom_widgets import *
 from Scripts.character_logic import PlayerLogic
-from Scripts.packages import Power
+from Scripts.packages import Power, Race, Class
 
 class Layout(bgui.Widget):
 	def __init__(self, sys, name, use_mouse=False):
@@ -428,7 +428,7 @@ class CharSelectLayout(Layout):
 								aspect=5/3, size=[0,.4],
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERY)
 		
-		self.frame.position=[0.45-self.frame.size[0]/sys.size[0],
+		self.frame.position=[0.55-self.frame.size[0]/sys.size[0],
 							self.frame.position[1]]
 		
 		self.cont_btn = Button(self.frame, "cont_btn", text="CONTINUE", type="EMPHASIS",
@@ -466,6 +466,81 @@ class CharSelectLayout(Layout):
 	
 	def next_click(self, widget):
 		self.main['csl_index'] += 1
+		
+class CharGenLayout(Layout):
+	def __init__(self, parent):
+		Layout.__init__(self, parent, "char_gen_layout", use_mouse=True)
+		
+		# Setup the main frame
+		self.mframe = bgui.Image(self, "1x1_frame",
+								"Textures/ui/menu_background.png",
+								aspect=1, size=[0,.65],
+								options=BGUI_DEFAULT|bgui.BGUI_CENTERY)
+		
+		self.mframe.position = [.5-self.mframe.size[0]/parent.size[0],
+								self.mframe.position[1]]
+		
+		# Setup the ring selector
+		self.selector = RingSelector(self)
+		
+		# Setup the name input
+		self.name_lbl = bgui.Label(self.mframe, "name_l", text="1. Name",
+									pos=[0.07, 0.9], sub_theme="Title")
+		
+		self.name_in = bgui.TextInput(self.mframe, "name_in", pos=[0.28, 0.89],
+										size=[0.2, 0.07], text="Hero", color=(0,0,0,.8))
+		
+		# Setup the display of current choices
+		self.race_lbl = bgui.Label(self.mframe, "race_l", text="2. Race",
+									pos=[0.07, 0.85], sub_theme="Subtitle")
+		self.class_lbl = bgui.Label(self.mframe, "class_l", text="3. Class",
+									pos=[0.07, 0.8], sub_theme="Subtitle")
+		self.element_lbl = bgui.Label(self.mframe, "element_l", text="4. Element",
+									pos=[0.07, 0.75], sub_theme="Subtitle")
+		
+		self.race = bgui.Label(self.mframe, "race_l2", text="Kat",
+									pos=[0.3, 0.85], sub_theme="Subtitle")
+		self.class_ = bgui.Label(self.mframe, "class_l2", text="Hunter",
+									pos=[0.3, 0.8], sub_theme="Subtitle")
+		self.element = bgui.Label(self.mframe, "element_l2", text="Death",
+									pos=[0.3, 0.75], sub_theme="Subtitle")
+		
+		# Setup description of current focus
+		self.focus_info = bgui.TextBlock(self.mframe, "finfo", pos=[0.07, 0.45],
+										size=[0.86, 0.27])
+		self.focus_details = bgui.TextBlock(self.mframe, "fdetail", pos=[0.07, 0.15],
+										size=[0.86, 0.27])
+		
+		# Add on a couple of buttons
+		self.fin_btn = Button(self.mframe, "fin_btn", text="FINISH", pos=[0.65, 0.07],
+								type="EMPHASIS", on_click=self.finish_click)
+		
+		self.cancel_btn = Button(self.mframe, "can_btn", text="CANCEL", pos=[0.4, 0.07],
+								on_click=self.finish_click)
+	
+	def update(self, main):
+		self.main = main
+		
+		string = "foosdalkfj ksdfj sdklfj sdkljf sd;g;ritrjefjrie4\
+					sldkfjk dsdkljf sdklfj dkfj "
+		print(string)
+		self.race.text = self.selector.race
+		self.class_.text = self.selector.player_class
+		self.element.text = self.selector.element
+		
+		self.focus_info.text = "Click on a Race, Class, or Element to select it.\nFor more information about a choice, hover over it."
+		self.focus_details.text = ""
+	
+	def finish_click(self, main):
+		self.main['cgen_data'] = {}
+		self.main['cgen_data']['name'] = self.name_in.text
+		self.main['cgen_data']['race'] = Race(self.race.text)
+		self.main['cgen_data']['class'] = Class(self.class_.text)
+		self.main['cgen_data']['element'] = self.element.text
+		self.main['cgen_exit'] = True
+	
+	def cancel_click(self, main):
+		self.main['cgen_exit'] = True
 		
 class DunGenLayout(Layout):
 	

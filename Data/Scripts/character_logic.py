@@ -237,6 +237,7 @@ class CharacterLogic:
 				"level"	: self.level,
 				"race"	: self.race.package_name,
 				"player_class" : self.player_class.package_name if self.player_class else None,
+				"element"	: self.element,
 				"xp"		: self.xp,
 				
 				"endurance" : self.endurance,
@@ -271,6 +272,7 @@ class CharacterLogic:
 		self.race		= Race(info["race"])
 		if info["player_class"]:
 			self.player_class = Class(info["player_class"])
+		self.element		= info["element"]
 		self._xp			= info["xp"]
 		
 		self.endurance		= info["endurance"]

@@ -1,7 +1,10 @@
 # $Id$
+import os
 
 from bgui import *
 import bge
+
+from Scripts.packages import Race, Class
 
 # This file holds widgets custom made for CRPG2
 
@@ -113,6 +116,54 @@ class ElementBar(Frame):
 		
 	def swap(self, widget):
 		self.element = widget.name
+		
+class RingSelector(Widget):
+	"""A widget to use in the character creation screen"""
+	
+	def __init__(self, parent):
+		Widget.__init__(self, parent, "ring_select", aspect=3/2, size=[0,1], pos=[.5,0])
+		self.focus = None
+		slots = [[.048, 0.27], [0.05, 0.397], [0.055, 0.545], [.063, 0.69], [.076, 0.84], [0.06, 0.155]]
+		elements = ["Death", "Storm", "Fire", "Holy", "Earth", "Water"]
+		races = Race.get_package_list()
+		classes = Class.get_package_list()
+		
+		self.classes = []	
+		for i, class_ in enumerate(classes):
+			self.classes.append(Image(self, "class&*"+class_.name, class_.open_image(),
+									aspect=1, size=[0, .065],
+									pos=[slots[i][0]+.047+.001*i, slots[i][1]]))
+			self.classes[i].on_click = self.click
+		
+		self.races = []	
+		for i, race in enumerate(races):
+			self.races.append(Image(self, "race&*"+race.name, race.open_image(),
+									aspect=1, size=[0, .065],
+									pos=[slots[i][0]+.094+.002*i, slots[i][1]]))
+			self.races[i].on_click = self.click
+		
+		self.elements = []
+		for i, element in enumerate(elements):
+			self.elements.append(Image(self, "element&*"+element,
+										"Textures/Elements/"+element+".png", aspect=1,
+										size=[0, .065], pos=slots[i]))
+			self.elements[i].on_click = self.click
+			
+		self.element = self.elements[0].name.split('&*')[1]
+		self.race = self.races[0].name.split('&*')[1]
+		self.player_class = self.classes[0].name.split('&*')[1]
+		
+	def click(self, widget):
+		self.focus = widget.name.split('&*')
+		if self.focus[0] == "element":
+			self.element = self.focus[1]
+		elif self.focus[0] == "class":
+			self.player_class = self.focus[1]
+		elif self.focus[0] == "race":
+			self.race = self.focus[1]
+			
+	def hover(self, widget):
+		self.focus = widget.name.split('&*')
 
 class PackageSelector(Widget):
 	"""A widget for handling selection from packages (such as race and class selection)"""
