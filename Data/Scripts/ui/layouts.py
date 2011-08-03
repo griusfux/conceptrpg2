@@ -520,10 +520,6 @@ class CharGenLayout(Layout):
 	
 	def update(self, main):
 		self.main = main
-		
-		string = "foosdalkfj ksdfj sdklfj sdkljf sd;g;ritrjefjrie4\
-					sldkfjk dsdkljf sdklfj dkfj "
-		print(string)
 		self.race.text = self.selector.race
 		self.class_.text = self.selector.player_class
 		self.element.text = self.selector.element
