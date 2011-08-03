@@ -31,7 +31,7 @@ class TextEffect(StaticEffect):
 		# Get some viewport info
 		view_buf = bgl.Buffer(bgl.GL_INT, 4)
 		bgl.glGetIntegerv(bgl.GL_VIEWPORT, view_buf)
-		view = view_buf.list
+		view = view_buf[:]
 
 		if 0:
 			# Save the state
