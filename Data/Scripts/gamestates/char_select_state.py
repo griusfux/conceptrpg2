@@ -32,7 +32,7 @@ class CharacterSelectState(BaseState, BaseController):
 				continue
 			character = Character.PlayerLogic(None)
 			character.load(save)
-			character.action_set = 'base'
+			character.action_set = 'Base'
 			
 			main['engine'].load_library(character.race)
 			obj = main['engine'].add_object(character.race.root_object,
