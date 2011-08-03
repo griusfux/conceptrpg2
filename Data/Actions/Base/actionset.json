@@ -1,0 +1,49 @@
+{
+	"name" : "Base",
+	
+	"action_set":
+	[
+		{
+			"name" : "Idle",
+			"actions" : [{
+			"name" : "base.idle",
+			"start" : 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "Walk",
+			"actions" : [{
+			"name" : "base.walk",
+			"start" : 1,
+			"end" : 79}]
+		},
+		{
+			"name" : "1h Idle",
+			"actions" : [{
+			"name" : "base.1h_idle",
+			"start" : 1,
+			"end" : 79}]
+		},
+		{
+			"name" : "1h Walk",
+			"actions" : [{
+			"name" : "walk_1h",
+			"start" : 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "1h Swing",
+			"actions" : [{
+			"name" : "1h_swing",
+			"start" : 0,
+			"end" : 119}]
+		},
+		{
+			"name" : "1h Swing 2",
+			"actions" : [{
+			"name" : "1h_swing_2",
+			"start": 0,
+			"end" : 79}]
+		}
+	]
+}
