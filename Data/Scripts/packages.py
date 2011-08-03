@@ -181,7 +181,7 @@ class ActionSet(Package):
     _config = 'actionset.json'
     _schema = 'Schemas/actionsetfile.json'
     _new = 'Schemas/actionsetfile_new.json'
-    _dir = 'Actions'
+    _dir = 'ActionSets'
     
     def __init__(self, package_name, new_package=False):
         Package.__init__(self, package_name, new_package)
