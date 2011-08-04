@@ -225,10 +225,7 @@ class CombatState(DefaultState, BaseController):
 		# Our id so we can talk with the server
 		id = main['client'].id
 		
-		if inputs:
-			if ("Inventory", "INPUT_CLICK") in inputs:
-				main['ui_system'].toogle_overlay("inventory_overlay")
-		
+		if inputs:		
 			# Only let the player do stuff while they are not "locked"
 			if not main['player'].lock:
 				
