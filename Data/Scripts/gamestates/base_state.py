@@ -239,6 +239,7 @@ class BaseState:
 	def pickup_item(self, main, item):
 		print("You picked up this item:")
 		print(item)
+		main['player'].inventory.append(item)
 		
 	@rpc(client_functions, "remove_item", int)
 	def remove_item(self, main, id):

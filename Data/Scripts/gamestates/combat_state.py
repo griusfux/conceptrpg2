@@ -339,8 +339,8 @@ class CombatState(DefaultState, BaseController):
 			main['ground_item_counter'] += 1
 			gid = main['ground_item_counter']
 			
-			# XXX do some actual calculations
-			item = Items.Weapon("Longsword", 5)
+			item = random.choice([Items.Weapon, Items.Armor])
+			item = item(random.choice(item.available_items), 1) # XXX level should be calculated from party level
 			
 			main['ground_items'][gid] = item
 			self.clients.invoke("drop_item", gid, item, *position)

@@ -30,6 +30,8 @@ TierNames = {
 #print(AvailableWeapons)
 
 class Item:
+	available_items = AvailableItems
+	
 	Translate = {
 				"cost" : lambda x: x,
 				}
@@ -97,6 +99,8 @@ class Item:
 		return self._modified._modifiers
 		
 class Armor(Item):
+	available_items = AvailableArmors
+	
 	Translate = {}
 	Translate['METAL'] = {
 						"arcane_defense" : lambda x: x,
@@ -142,6 +146,8 @@ class Armor(Item):
 		return Armor.Translate[self.type]['reflex'](self._reflex)
 
 class Weapon(Item):
+	available_items = AvailableWeapons
+	
 	Translate = {}
 	Translate['SWORD'] = {
 						"weight" : lambda x: x,
