@@ -63,6 +63,12 @@ class PlayerState(DefaultState):
 			main['player'].power_points = main['player_new_pp']
 			return('', 'POP')
 		
+		if main['player_exit']:
+			player = main['player']
+			for power in main['player_new_powers']:
+				player.powers.add(power)
+			player.power_points = main['player_new_pp']
+		
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
 		main['ui_system'].load_layout(self.last_layout)

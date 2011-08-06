@@ -231,12 +231,7 @@ class CombatState(DefaultState, BaseController):
 				
 				if ("UsePower", "INPUT_CLICK") in inputs:
 					power = main['player'].powers.active
-#					if not power.spent:
-#						target = main['player']
 					power.use(self, main['player'])
-#						if power.usage != "AT_WILL":
-#							power.spent = True
-#							main['player'].powers.make_next_active()
 						
 				if ("NextPower", "INPUT_CLICK") in inputs:
 					main['player'].powers.make_next_active()

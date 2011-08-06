@@ -289,7 +289,7 @@ class PowersLayout(Layout):
 		return max(1, cost - discount)
 		
 	def buy_click(self, widget):
-		power = self.lbox.active
+		power = self.lbox.selected
 		cost = self.cost(power)
 		
 		if cost <= self.pp:
@@ -628,11 +628,7 @@ class DefaultStateLayout(Layout):
 								sub_theme="HUD", options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
 		self.fmap_frame.visible = False
 		
-	def update_powerbar(self, main):
-		hex = 	{"AT_WILL" : "Textures/ui/hex_tile_blue.png",
-				 "ENCOUNTER" : "Textures/ui/hex_tile_green.png",
-				 "DAILY" : "Textures/ui/hex_tile_red.png"}
-	
+	def update_powerbar(self, main):	
 		psys = main['player'].powers
 		powers = psys.all
 	
@@ -644,11 +640,11 @@ class DefaultStateLayout(Layout):
 		# Create new images
 		for i in range(min(8, len(powers))):
 			# Background
-			bg = "Textures/ui/hex_tile_blue.png"# if powers[i].spent else hex[powers[i].usage]
+			bg = "Textures/ui/hex_tile_blue.png"
 			if not self.combat and "NON_COMBAT" not in powers[i].flags:
 				bg = "Textures/ui/hex_tile_gray.png"
 			img = bgui.Image(self.power_frame, "sbg"+str(i), bg, aspect=1,
-							 size=[0, .54], pos=[.087+.0125*i, .145])
+							 size=[0, .54], pos=[.087+.13*i, .145])
 			
 			# Power icon
 			img_name = powers[i].open_image()
