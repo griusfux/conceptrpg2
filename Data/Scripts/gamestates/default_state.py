@@ -287,5 +287,30 @@ class DefaultState(BaseState, BaseController):
 	##########
 	# Controller
 	##########
-	
-	# Empty ---
+		
+	def animate_attack(self, character, animation):
+		"""Convenience function that automatically sets the lock and mode for an animation
+		
+		character -- the character attacking
+		animation -- the attack animation to use
+		
+		"""
+				
+		if not character.action_set:
+			print("WARNING: attempting to animate character with an empty action set: %s. Skipping..." % character)
+			return
+		
+		if animation not in self.main['actions'][character.action_set]:
+			print("WARNING: animation \"%s\" not found in the action set \"%s\"" % (animation, character.action_set))
+		actions = self.main['actions'][character.action_set][animation]
+		lock = 0
+		for layer in actions:
+			duration = layer['end'] - layer['start']
+			if duration > lock:
+				lock = duration
+				
+		self.play_animation(character, animation, lock=lock, mode=0)
+		
+	def animate_spell(self, character, animation):
+		"""This function exists in case we want to handle spells and attacks differently, e.g. speed"""
+		self.animate_attack(character, animation)

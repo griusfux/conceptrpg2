@@ -93,7 +93,7 @@ class CharacterLogic:
 		self.object = obj
 		
 		# The character's current "lock", which is represented as the time at which the lock ends
-		self.lock = None
+		self.lock = 0
 		
 		self.powers = PowerManager(self, [])
 		
@@ -111,11 +111,13 @@ class CharacterLogic:
 			self.object.end()
 
 	def add_lock(self, duration):
-		self.lock = time.time()+duration
+		self.lock = duration
 		
 	def update_lock(self):
-		if self.lock and time.time() > self.lock:
-			self.lock = None
+		if self.lock > 0:
+			self.lock -= 1
+		else:
+			self.lock = 0
 
 	def recalc_stats(self):
 		"""Recalculates the player's stats that are calculated based on other stats"""
