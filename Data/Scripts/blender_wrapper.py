@@ -445,7 +445,7 @@ class Camera:
 		return
 		
 	def init_frankie(self):		
-		self._target_distance = 4
+		self._target_distance = 2
 		self._target_position = Vector((0, 0, 1.5))
 		self._target_orientation = Matrix.Rotation(radians(80), 3, 'X')
 
@@ -464,6 +464,13 @@ class Camera:
 				scale = 0.1
 		else:
 			scale = 1
+			
+		dy = 0.5 - gl.mouse.position[1]
+		if abs(dy) > 0.01: # "Dead zone"
+			x = self.pivot.localOrientation.to_euler("XYZ")[0]
+
+			if radians(45) < x + dy < radians(115):
+				self.pivot.applyRotation((dy, 0, 0), True)
 			
 			
 		self.pivot.scaling = [scale, scale, scale]
