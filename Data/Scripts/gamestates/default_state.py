@@ -65,6 +65,9 @@ class DefaultState(BaseState, BaseController):
 		
 		main['player'].save()
 		
+		# Center the mouse so the character isn't staring up or down when the game starts
+		main['input_system'].mouse.position = (0.5, 0.5)
+		
 		self.in_shop = False
 		
 	def client_run(self, main):
