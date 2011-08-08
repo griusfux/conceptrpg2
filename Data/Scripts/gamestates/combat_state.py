@@ -455,7 +455,9 @@ class CombatState(DefaultState, BaseController):
 	##########
 	# Controller
 	##########
-	
+	def deal_damage(self, character, strength, multiplier, type, delivery):
+		self.modify_health(character, -int(strength*10*multiplier))
+		
 	def modify_health(self, character, amount):
 		BaseController.modify_health(self, character, amount)
 		
@@ -471,7 +473,11 @@ class CombatState(DefaultState, BaseController):
 		self.main["effect_system"].remove(id)
 		
 	def add_status(self, character, status, amount, duration):
-		status = Status(status)
+		try:
+			status = Status(status)
+		except (PackageError):
+			print("WARNING: The status \"%s\" was not found" % status)
+			return
 		status.amount = amount
 		
 		character.powers.add(status, self)

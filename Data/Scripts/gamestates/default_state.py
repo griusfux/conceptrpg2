@@ -287,7 +287,7 @@ class DefaultState(BaseState, BaseController):
 	# Controller
 	##########
 		
-	def animate_attack(self, character, animation):
+	def animate_weapon(self, character, animation):
 		"""Convenience function that automatically sets the lock and mode for an animation
 		
 		character -- the character attacking
@@ -301,6 +301,9 @@ class DefaultState(BaseState, BaseController):
 		
 		if animation not in self.main['actions'][character.action_set]:
 			print("WARNING: animation \"%s\" not found in the action set \"%s\"" % (animation, character.action_set))
+			character.add_lock(30)
+			return
+		
 		actions = self.main['actions'][character.action_set][animation]
 		lock = 0
 		for layer in actions:
@@ -312,4 +315,4 @@ class DefaultState(BaseState, BaseController):
 		
 	def animate_spell(self, character, animation):
 		"""This function exists in case we want to handle spells and attacks differently, e.g. speed"""
-		self.animate_attack(character, animation)
+		self.animate_weapon(character, animation)
