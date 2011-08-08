@@ -89,9 +89,6 @@ class DefaultState(BaseState, BaseController):
 		
 		# Handles input
 		inputs = main['input_system'].run()
-		
-		# Handle item pickup
-		self._handle_item_pickup(main)
 
 		# Our id so we can talk with the server
 		id = main['client'].id
@@ -168,12 +165,6 @@ class DefaultState(BaseState, BaseController):
 		
 	def _get_forward_animation(self, main):
 		return "Walk"
-	
-	def _handle_item_pickup(self, main):
-		for id in main['item_collisions']:
-			if id in main['ground_items']:
-				self.server.invoke("request_item_pickup", id)
-			main['item_collisions'].remove(id)
 			
 	def _handle_generic_input(self, main, inputs):
 		# Our id so we can talk with the server
@@ -188,6 +179,11 @@ class DefaultState(BaseState, BaseController):
 			
 		if ("Stats", "INPUT_CLICK") in inputs:
 			main['ui_system'].toogle_overlay("stats")
+			
+		if ("Action", "INPUT_CLICK") in inputs:
+			for k, v in main['ground_items'].items():
+				if (Vector(v[1].position) - main['player'].object.position).length < 3:
+					self.server.invoke("request_item_pickup", k)
 
 		# Only let the player do stuff while they are not "locked"
 		if not main['player'].lock:

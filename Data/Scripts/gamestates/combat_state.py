@@ -162,9 +162,6 @@ class CombatState(DefaultState, BaseController):
 		# Handles input
 		inputs = main['input_system'].run()
 		
-		# Handle item pickup
-		self._handle_item_pickup(main)
-		
 		# Reset the target shapes
 		for key, shape in main['target_shapes'].items():
 			shape.visible = False

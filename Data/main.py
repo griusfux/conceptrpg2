@@ -31,19 +31,6 @@ def animation(cont):
 			cont.activate(mess.bodies[0])
 		else:
 			print("WARNING: No actuator found for animation: %s" % mess.bodies[0])
-			
-def item_pickup(cont):
-	main = gl.getCurrentScene().objects['DungeonEmpty']
-	if 'player' not in main: return
-	
-	sens = cont.sensors['coll']
-	
-	if sens.positive:
-		id = cont.owner['id']
-		if sens.hitObject == main['player'].object.gameobj and \
-				 id not in main['item_collisions'] and \
-				 id in main['ground_items']:
-			main['item_collisions'].append(id)
 
 def exit_game(main):
 	print("Exiting...")
