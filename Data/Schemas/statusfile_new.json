@@ -1,6 +1,4 @@
 {
 	"name": "Status",
-	"level" : 1,
-	"damage_types": [],
-	"flags": ["PASSIVE"]
+	"flags": []
 }
