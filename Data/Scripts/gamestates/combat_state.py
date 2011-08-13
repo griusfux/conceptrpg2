@@ -172,10 +172,9 @@ class CombatState(DefaultState, BaseController):
 			if status['time'] == TURN:
 				status['time'] = 0
 				status['power'].use(self, status['user'])
-				if status['save']:
-					if self.check_save(status['user'], 0, 'STATIC', status['power'].damage_types[0]):
-						status['user'].powers.remove(status['power'], self)
-						self.status_list.remove(status)
+				status['duration'] -= 1
+				if status['duration'] <= 0:
+					status['power'].pop(self, status['user'])
 		
 		# Targeting
 		active_power = main['player'].powers.active
@@ -486,7 +485,7 @@ class CombatState(DefaultState, BaseController):
 		status_entry['power'] = status
 		status_entry['user'] = character
 		status_entry['time'] = 0
-		status_entry['save'] = duration.strip().lower() == 'save'
+		status_entry['duration'] = duration
 		self.status_list.append(status_entry)
 
 	def get_targets(self, character, shape, distance, target_types={'ENEMIES'}, source=None):
