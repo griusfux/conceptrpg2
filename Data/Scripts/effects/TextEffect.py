@@ -10,13 +10,13 @@ except:
 	pass
 	
 class TextEffect(StaticEffect):
-	def __init__(self, text, position, duration=30, delay=0, continuous=-1):
+	def __init__(self, text, position, duration=30, delay=0, continuous=-1, static=False):
 		StaticEffect.__init__(self, None, position, duration, delay, continuous)
 		self.fontid = 0
 		self.pt_size = 20
 		self.color = (1, 1, 1, 1)
 		self.text = str(text)
-		self.speed = .01
+		self.speed = 0 if static else .01
 		
 		self.position = list(self.position)
 		
