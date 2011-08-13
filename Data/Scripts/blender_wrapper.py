@@ -570,7 +570,7 @@ class Engine:
 		if package.name in self.library_list:
 			return
 			
-		gl.LibLoad(package.name, type, package.blend)
+		gl.LibLoad(package.name, type, package.blend, load_actions=True)
 		self.library_list.append(package.name)
 		
 	def free_libraries(self):
