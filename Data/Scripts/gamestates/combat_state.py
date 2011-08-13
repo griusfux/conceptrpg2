@@ -177,34 +177,38 @@ class CombatState(DefaultState, BaseController):
 					status['power'].pop(self, status['user'])
 		
 		# Targeting
-		active_power = main['player'].powers.active
-		range_type = active_power.effect_shape
-		if "WEAPON_RANGE" in active_power.flags:
-			range_size = main['player'].weapon.range
-		else:
-			range_size = active_power.distance
-		if range_type == 'SINGLE':
-			# If the player already has targets, find out if they are valid
-			if main['player'].targets:
-				# Ranged can only have one target
-				if len(main['player'].targets) > 1:
-					main['player'].targets = []
-				else:
-					# The target must be in range
-					if (main['player'].targets[0].object.position-main['player'].object.position).length > range_size + HALF_UNIT_SIZE:
-						main['player'].targets = []
-			else:
-				target = None
-				target_dist = range_size + HALF_UNIT_SIZE
-				for monster in self.monster_list.values():
-					dist = (monster.object.position-main['player'].object.position).length
-					if dist < target_dist:
-						target = monster
-						target_dist = dist
-				main['player'].targets = [target,] if target else []
-		else:	
-			mask = getattr(active_power, "mask", {'ENEMIES'})
-			main['player'].targets = self.get_targets(main['player'], range_type, range_size, target_types=mask)		
+		if not main['player'].targets:
+			target = self.get_closest_target(main['player'], self.monster_list.values())
+			if target:
+				main['player'].targets = [target]
+#		active_power = main['player'].powers.active
+#		range_type = active_power.effect_shape
+#		if "WEAPON_RANGE" in active_power.flags:
+#			range_size = main['player'].weapon.range
+#		else:
+#			range_size = active_power.distance
+#		if range_type == 'SINGLE':
+#			# If the player already has targets, find out if they are valid
+#			if main['player'].targets:
+#				# Ranged can only have one target
+#				if len(main['player'].targets) > 1:
+#					main['player'].targets = []
+#				else:
+#					# The target must be in range
+#					if (main['player'].targets[0].object.position-main['player'].object.position).length > range_size + HALF_UNIT_SIZE:
+#						main['player'].targets = []
+#			else:
+#				target = None
+#				target_dist = range_size + HALF_UNIT_SIZE
+#				for monster in self.monster_list.values():
+#					dist = (monster.object.position-main['player'].object.position).length
+#					if dist < target_dist:
+#						target = monster
+#						target_dist = dist
+#				main['player'].targets = [target,] if target else []
+#		else:	
+#			mask = getattr(active_power, "mask", {'ENEMIES'})
+#			main['player'].targets = self.get_targets(main['player'], range_type, range_size, target_types=mask)		
 		
 		# Maintain monsters
 		for id, monster in self.monster_list.items():
@@ -228,11 +232,24 @@ class CombatState(DefaultState, BaseController):
 				if ("UsePower", "INPUT_CLICK") in inputs:
 					power = main['player'].powers.active
 					power.use(self, main['player'])
-						
 				if ("NextPower", "INPUT_CLICK") in inputs:
 					main['player'].powers.make_next_active()
 				if ("PrevPower", "INPUT_CLICK") in inputs:
-					main['player'].powers.make_prev_active()				
+					main['player'].powers.make_prev_active()
+
+				if ("TargetClosest", "INPUT_CLICK") in inputs:
+					target = self.get_closest_target(main['player'], self.monster_list.values())
+					if target:
+						main['player'].targets = [target]
+				if ("TargetPrevious", "INPUT_CLICK") in inputs:
+					target = self.get_prev_target(main['player'].targets[0], list(self.monster_list.values()))
+					if target:
+						main['player'].targets = [target]
+				if ("TargetNext", "INPUT_CLICK") in inputs:
+					target = self.get_next_target(main['player'].targets[0], list(self.monster_list.values()))
+					if target:
+						main['player'].targets = [target]
+
 				if ("Aim", "INPUT_ACTIVE") in inputs:
 					if main['player'].powers.active.effect_shape == "SINGLE":
 						self.camera = 'shoulder'
@@ -487,6 +504,49 @@ class CombatState(DefaultState, BaseController):
 		status_entry['time'] = 0
 		status_entry['duration'] = duration
 		self.status_list.append(status_entry)
+		
+	def get_closest_target(self, character, targets):
+		"""Get the closest target to the given character from the targets list"""
+		
+		cobj = character.object
+		
+		closest = None
+		
+		min_distance = 1000
+		
+		for target in targets:
+			v = cobj.position - target.object.position
+			distance2 = v.dot(v)
+
+			if closest == None or distance2 < min_distance:
+				closest = target
+				min_distance = distance2
+				
+		return closest
+	
+	def get_next_target(self, current, targets):
+		"""Get the next target in the targets list"""
+		
+		try:
+			idx = targets.index(current)+1
+		except ValueError:
+			return None
+		
+		if idx >= len(targets):
+			idx = 0
+			
+		return targets[idx]
+		
+	def get_prev_target(self, current, targets):
+		"""Get the previous target in the targets list"""
+		
+		try:
+			idx = targets.index(current) - 1
+		except ValueError:
+			return None
+		
+		# Negative numbers are fine, Python will just go to the back of the list, which we want.
+		return targets[idx]
 
 	def get_targets(self, character, shape, distance, target_types={'ENEMIES'}, source=None):
 		"""Get targets in a range
