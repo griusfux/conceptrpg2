@@ -589,7 +589,7 @@ class Engine:
 		return vec1.angle(vec2)
 	
 	def add_object(self, object, pos=None, ori=None, time=0):
-		"""Add an opject"""
+		"""Add an object"""
 		scene = gl.getCurrentScene()
 		
 		if pos: self.adder.worldPosition = pos
