@@ -22,6 +22,10 @@ class StaticEffect:
 		
 	def _fire(self, engine):
 		if self.fired:
+			if self.continuous > 0:
+				self.time = self.continuous
+				self.fired = False
+				return True
 			return False
 		engine.load_library(packages.Effect(self.visual))
 		self.obj = engine.add_object(self.visual, self.position, time=0)
