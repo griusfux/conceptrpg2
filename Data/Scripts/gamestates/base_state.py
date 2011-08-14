@@ -233,7 +233,7 @@ class BaseState:
 	def drop_item(self, main, id, item, x, y, z):
 		obj = main['engine'].add_object("drop", [x, y, z])
 		obj.gameobj['id'] = id
-		main['ground_items'][id] = [item, obj]
+		main['ground_items'][id] = [item, obj, None]
 		
 	@rpc(client_functions, "pickup_item", "pickle")
 	def pickup_item(self, main, item):
@@ -247,6 +247,8 @@ class BaseState:
 			return
 		
 		main['ground_items'][id][1].end()
+		if main['ground_items'][id][2] is not None:
+			main['effect_system'].remove(main['ground_items'][id][2])
 		del main['ground_items'][id]
 	
 	def client_init(self, main):

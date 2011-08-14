@@ -3,6 +3,7 @@
 from Scripts.packages import *
 from Scripts.mathutils import Vector
 from Scripts.character_logic import PlayerLogic, MonsterLogic
+from Scripts import effects
 from .base_state import *
 
 class DefaultState(BaseState, BaseController):
@@ -69,6 +70,8 @@ class DefaultState(BaseState, BaseController):
 		main['input_system'].mouse.position = (0.5, 0.5)
 		
 		self.in_shop = False
+		
+		self.item_effects = []
 		
 	def client_run(self, main):
 		"""Client-side run method"""
@@ -159,6 +162,8 @@ class DefaultState(BaseState, BaseController):
 		"""Cleanup the client state"""
 		
 		del main['full_map']
+		for i in self.item_effects:
+			main['effect_systm'].remove(i)
 			
 	def _get_idle_animation(self, main):
 		return "Idle"
@@ -184,6 +189,17 @@ class DefaultState(BaseState, BaseController):
 			for k, v in main['ground_items'].items():
 				if (Vector(v[1].position) - main['player'].object.position).length < 3:
 					self.server.invoke("request_item_pickup", k)
+		if ("ShowItemNames", "INPUT_ACTIVE") in inputs:
+			for k, v in main['ground_items'].items():
+				if v[2] is None:
+					pos = v[1].position[:2] + (v[1].position[2]+0.5,)
+					effect = effects.TextEffect(v[0].name, pos, continuous=0, static=True)
+					v[2] = main['effect_system'].add(effect)
+		elif ("ShowItemNames", "INPUT_RELEASE") in inputs:
+			for k, v in main['ground_items'].items():
+				if v[2] is not None:
+					main['effect_system'].remove(v[2])
+					v[2] = None
 
 		# Only let the player do stuff while they are not "locked"
 		if not main['player'].lock:
