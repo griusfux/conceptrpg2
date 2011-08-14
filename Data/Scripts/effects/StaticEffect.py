@@ -22,7 +22,8 @@ class StaticEffect:
 		
 	def _fire(self, engine):
 		if self.fired:
-			if self.continuous > 0:
+			if self.continuous >= 0:
+				self._unload(engine)
 				self.time = self.continuous
 				self.fired = False
 				return True
@@ -34,4 +35,4 @@ class StaticEffect:
 		self.fired = True
 		return True
 			
-		
+	

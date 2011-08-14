@@ -193,7 +193,8 @@ class DefaultState(BaseState, BaseController):
 			for k, v in main['ground_items'].items():
 				if v[2] is None:
 					pos = v[1].position[:2] + (v[1].position[2]+0.5,)
-					effect = effects.TextEffect(v[0].name, pos, continuous=0, static=True)
+					effect = effects.TextEffect(v[0].name, pos, duration=1000,
+												continuous=0, static=True)
 					v[2] = main['effect_system'].add(effect)
 		elif ("ShowItemNames", "INPUT_RELEASE") in inputs:
 			for k, v in main['ground_items'].items():
