@@ -8,5 +8,6 @@
 	"effect_shape" : "{'CONE', 'BURST', 'BEAM', 'SINGLE'}",
 	"shape_modifier" : "int",
 	"distance" : "int",
+	"target_mask" : "{'SELF', 'ALLIES', 'ENEMIES'}",
 	"flags" : "list"
 }

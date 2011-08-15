@@ -8,5 +8,6 @@
 	"effect_shape" : "SINGLE",
 	"distance" : 0,
 	"shape_modifier" : 0,
+	"target_mask" : "ENEMIES",
 	"flags": ["WEAPON_SPEED", "WEAPON_RANGE"]
 }

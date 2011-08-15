@@ -547,8 +547,17 @@ class CombatState(DefaultState, BaseController):
 		
 		# Negative numbers are fine, Python will just go to the back of the list, which we want.
 		return targets[idx]
+	
+	def get_targets(self, power, character):
+		if "WEAPON_RANGE" in power.flags:
+			distance = character.weapon.range
+		else:
+			distance = power.distance
+		
+		return self.get_targets_ex(character, power.effect_shape, distance, {power.target_mask})
+		
 
-	def get_targets(self, character, shape, distance, target_types={'ENEMIES'}, source=None):
+	def get_targets_ex(self, character, shape, distance, target_types={'ENEMIES'}, source=None):
 		"""Get targets in a range
 		
 		character -- character using the power
@@ -583,7 +592,7 @@ class CombatState(DefaultState, BaseController):
 			for target in tlist:
 				# Convert to local space
 				v = target.object.position - source
-				v *= ori_ivnt
+				v = ori_ivnt * v
 				
 				# Now do a simple bounds check
 				if v[1] < distance and abs(v[0]) < HALF_UNIT_SIZE:
