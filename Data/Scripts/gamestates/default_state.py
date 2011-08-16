@@ -66,6 +66,10 @@ class DefaultState(BaseState, BaseController):
 		
 		main['player'].save()
 		
+		# Auto-range
+		self.auto_target = None
+		self.auto_power = None
+
 		# Center the mouse so the character isn't staring up or down when the game starts
 		main['input_system'].mouse.position = (0.5, 0.5)
 		
@@ -206,7 +210,7 @@ class DefaultState(BaseState, BaseController):
 		if not main['player'].lock:
 			# Update rotations (mouse look)
 			dx = 0.5 - main['input_system'].mouse.position[0]
-			if abs(dx) > 0:
+			if not self.auto_target and abs(dx) > 0:
 				self.server.invoke("rotate", id, 0, 0, dx)
 			main['input_system'].mouse.position = (0.5, 0.5)
 
@@ -224,8 +228,39 @@ class DefaultState(BaseState, BaseController):
 		
 		# Normalize the vector to the character's speed
 		if movement != [0.0, 0.0, 0.0]:
+			self.auto_target = self.auto_power = None
 			movement = [float(i) for i in (Vector(movement).normalized()*speed)]
 			self.server.invoke("position", id, *main['player'].object.position)
+		elif self.auto_target:
+			if "WEAPON_RANGE" in self.auto_power.flags:
+				range = main['player'].weapon.range
+			else:
+				range = self.auto_power.distance
+			# vec = self.auto_target.object.position - main['player'].object.position
+			# distance = vec.dot(vec)
+			# We shouldn't be calling getVectTo() like this, but it works and I can't get my copy to work.
+			# I've left my code in here in case I want to try again.
+			distance, unused, vec = main['player'].object.gameobj.getVectTo(self.auto_target.object.gameobj)
+			
+			if distance < range:#*range:
+				self.auto_power.use(self, main['player'])
+				self.auto_power = self.auto_target = None
+			else:
+				# vec.normalize()
+				# vec = main['player'].object.get_orientation() * vec
+
+				movement = [float(i) for i in vec*speed]
+				movement[2] = 0
+				self.server.invoke("position", id, *main['player'].object.position)
+
+				ang = Vector(vec[:2]).angle(Vector([0, 1]), 0)
+				rot = 0
+				if ang > 0.2:
+					rot = 0.1
+				if vec[0] > 0:
+					rot = -rot
+
+				self.server.invoke("rotate", id, 0, 0, rot)
 
 		# Otherwise, idle
 		elif not main['player'].lock:

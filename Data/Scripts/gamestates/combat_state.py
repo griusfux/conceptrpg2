@@ -108,6 +108,10 @@ class CombatState(DefaultState, BaseController):
 		self.monster_list = {}
 		self.hero_list = {main['client'].id:main['player']}
 		
+		# Auto-range
+		self.auto_target = None
+		self.auto_power = None
+		
 		# Place the monsters
 		if main['owns_combat']:
 			nav_nodes =  main['room'].get_nav_nodes()
@@ -230,7 +234,8 @@ class CombatState(DefaultState, BaseController):
 			if not main['player'].lock:
 				
 				if ("UsePower", "INPUT_CLICK") in inputs:
-					self.use_power(main['player'], main['player'].powers.active.name)
+					self.auto_power = main['player'].powers.active
+					self.auto_target = main['player'].targets[0]
 				if ("NextPower", "INPUT_CLICK") in inputs:
 					main['player'].powers.make_next_active()
 				if ("PrevPower", "INPUT_CLICK") in inputs:
