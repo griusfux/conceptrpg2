@@ -241,8 +241,9 @@ class DefaultState(BaseState, BaseController):
 			# We shouldn't be calling getVectTo() like this, but it works and I can't get my copy to work.
 			# I've left my code in here in case I want to try again.
 			distance, unused, vec = main['player'].object.gameobj.getVectTo(self.auto_target.object.gameobj)
-			
-			if distance < range:#*range:
+			ang = Vector(vec[:2]).angle(Vector([0, 1]), 0)
+
+			if distance < range and ang < 0.2:#*range:
 				self.auto_power.use(self, main['player'])
 				self.auto_power = self.auto_target = None
 			else:
@@ -253,7 +254,6 @@ class DefaultState(BaseState, BaseController):
 				movement[2] = 0
 				self.server.invoke("position", id, *main['player'].object.position)
 
-				ang = Vector(vec[:2]).angle(Vector([0, 1]), 0)
 				rot = 0
 				if ang > 0.2:
 					rot = 0.1
