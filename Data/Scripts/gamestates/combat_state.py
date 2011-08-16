@@ -230,8 +230,7 @@ class CombatState(DefaultState, BaseController):
 			if not main['player'].lock:
 				
 				if ("UsePower", "INPUT_CLICK") in inputs:
-					power = main['player'].powers.active
-					power.use(self, main['player'])
+					self.use_power(main['player'], main['player'].powers.active.name)
 				if ("NextPower", "INPUT_CLICK") in inputs:
 					main['player'].powers.make_next_active()
 				if ("PrevPower", "INPUT_CLICK") in inputs:
@@ -496,7 +495,8 @@ class CombatState(DefaultState, BaseController):
 			return
 		status.amount = amount
 		
-		character.powers.add(status, self)
+		#character.powers.add(status, self)
+		status.push(self, character)
 		
 		status_entry = {}
 		status_entry['power'] = status
@@ -638,8 +638,21 @@ class CombatState(DefaultState, BaseController):
 		self.server.invoke("rotate", character.id, *angular)
 		self.server.invoke("position", character.id, *character.object.position)
 		
+	def reposition(self, character, position):
+		character.object.position = position
+		self.server.invoke("position", character.id, *character.object.position)
+		
 	def despawn(self, character):
 		pass
+	
+	def attack(self, power, character, animation="1h Swing", multiplier=1):
+		self.animate_weapon(character, animation)
+		for target in self.get_targets(power, character):
+			self.modify_health(target, -10*multiplier)
+	
+	def use_power(self, character, power):
+		power = Power(power)
+		power.use(self, character)
 		
 	def check_save(self, defender, def_stat, offender, off_stat):
 		def_value = 0
