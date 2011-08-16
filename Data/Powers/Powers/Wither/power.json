@@ -2,7 +2,7 @@
     "cool_down": 3, 
     "delivery": "SPELL", 
     "description": "Target suffers moderate arcane damage.", 
-    "distance": 4, 
+    "distance": 10, 
     "effect_shape": "SINGLE", 
     "element": "DEATH", 
     "flags": [], 
