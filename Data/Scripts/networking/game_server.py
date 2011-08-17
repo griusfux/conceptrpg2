@@ -6,14 +6,16 @@
 
 from Scripts.networking import NET_ENCODING
 from Scripts.gamestate_manager import GameStateManager
+from Scripts.character_logic import CharacterLogic
 
 import time
 import enet
 
-class NetPlayer():
+class NetPlayer(CharacterLogic):
 		"""Class for handling player data"""
 		
 		def __init__(self, char_info, pos, ori):
+			CharacterLogic.__init__(self, None)
 			self.char_info = char_info
 			self.position = pos
 			self.orientation = ori

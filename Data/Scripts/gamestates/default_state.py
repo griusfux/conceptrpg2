@@ -1,10 +1,15 @@
 # $Id$
 
+import time
+
 from Scripts.packages import *
 from Scripts.mathutils import Vector
 from Scripts.character_logic import PlayerLogic, MonsterLogic
 from Scripts import effects
 from .base_state import *
+
+# A constant for how many frames are in a "turn"
+TURN = 240
 
 class DefaultState(BaseState, BaseController):
 	"""The default state for the game"""
@@ -47,6 +52,18 @@ class DefaultState(BaseState, BaseController):
 		if cid not in main['net_players']: return
 		print("Playing", action)
 		main['net_players'][cid].object.play_animation(action, start, end, layer, blending)
+	
+	@rpc(client_functions, "add_status", str, str)	
+	def c_add_status(self, main, cid, status):
+		if cid not in main['net_players']: return
+		
+		try:
+			status = Status(status)
+		except (PackageError):
+			print("WARNING: The status \"%s\" was not found" % status)
+			return
+		
+		main['net_players'][cid].statuses.append(status)
 		
 	@rpc(client_functions, "init_combat", str, int)
 	def init_combat(self, main, room_id, owns):
@@ -297,6 +314,22 @@ class DefaultState(BaseState, BaseController):
 	@rpc(server_functions, "anim", str, int, int, int, int)
 	def anim(self, main, client, action, start, end, layer, blending):
 		self.clients.invoke("anim", client.id, action, start, end, layer, blending)
+		
+	@rpc(server_functions, "add_status", str, str, float, int)
+	def s_add_status(self, main, client, cid, status, amount, duration):
+		try:
+			_status = Status(status)
+		except (PackageError):
+			print("WARNING: The status \"%s\" was not found" % status)
+			return
+		_status.amount = amount
+		_status.time = duration * TURN
+		
+		character = main['players'][cid]
+		_status.push(self, character)
+		character.statuses.append(_status)
+		
+		self.clients.invoke("add_status", cid, status)
 
 	@rpc(server_functions, "request_item_pickup", int)
 	def request_item_pickup(self, main, client, id):
@@ -322,12 +355,23 @@ class DefaultState(BaseState, BaseController):
 
 	def server_init(self, main):
 		"""Initialize the server state"""
-		pass
+		self.time = time.time()
+		self.accum = 0
 		
 	def server_run(self, main, client):
 		"""Server-side run method"""
-		pass
 		
+		# This function is locked to 60/TURN executions per second
+		new_time = time.time()
+		self.accum += new_time - self.time
+		self.time = new_time
+		
+		dt = 1/60 * TURN
+		while self.accum >= dt:
+			for key in main['players']:
+				main['players'][key].manage_statuses(self)
+			self.accum -= dt
+
 	##########
 	# Other
 	##########
@@ -337,6 +381,9 @@ class DefaultState(BaseState, BaseController):
 	##########
 	# Controller
 	##########
+		
+	def add_status(self, character, status, amount, duration):		
+		self.server.invoke("add_status", character.id, status, amount, duration)
 		
 	def animate_weapon(self, character, animation):
 		"""Convenience function that automatically sets the lock and mode for an animation

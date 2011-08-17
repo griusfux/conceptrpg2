@@ -19,9 +19,6 @@ UNIT_SIZE = 1
 HALF_UNIT_SIZE = UNIT_SIZE/2.0
 SAFE_Z = 0.01
 
-# A constant for how many frames are in a "turn"
-TURN = 240
-
 class Combat:
 	"""Combat utility class"""
 	
@@ -338,6 +335,8 @@ class CombatState(DefaultState, BaseController):
 			AiManager.add_agent(combat.monster_list[cid][0], "extern/cego/example_definitions/base.json", "spawn")
 			self.clients.invoke("add_player", cid, monster, 1, [x, y, z], None)
 			self.clients.invoke("add_monster", client.combat_id, monster, cid, x, y, z)
+			
+			main['players'][cid] = combat.monster_list[cid][0]
 		# else:
 			# print("WARNING (add_monster): Monster id, '%s', has already been added, ignoring" % id)
 		
@@ -364,6 +363,7 @@ class CombatState(DefaultState, BaseController):
 			self.clients.invoke("drop_item", gid, item, *position)
 			
 			del combat.monster_list[id]
+			del main['players'][id]
 		else:
 			# print("WARNING (kill_monster): Monster id, '%s', not in list, ignoring" % id)
 			return
@@ -437,6 +437,8 @@ class CombatState(DefaultState, BaseController):
 		# Setup Ai
 		AiManager.set_controller(self)
 		
+		DefaultState.server_init(self, main)
+		
 	def server_run(self, main, client):
 		"""Server-side run method"""
 		self.main = main
@@ -448,6 +450,8 @@ class CombatState(DefaultState, BaseController):
 				
 		if main['combats'].get(client.combat_id) == -1:
 			main['combats'][client.combat_id] = Combat()
+			
+		DefaultState.server_run(self, main, client)
 			
 			
 				
@@ -500,24 +504,6 @@ class CombatState(DefaultState, BaseController):
 		
 	def end_effect(self, id):
 		self.main["effect_system"].remove(id)
-		
-	def add_status(self, character, status, amount, duration):
-		try:
-			status = Status(status)
-		except (PackageError):
-			print("WARNING: The status \"%s\" was not found" % status)
-			return
-		status.amount = amount
-		
-		#character.powers.add(status, self)
-		status.push(self, character)
-		
-		status_entry = {}
-		status_entry['power'] = status
-		status_entry['user'] = character
-		status_entry['time'] = 0
-		status_entry['duration'] = duration
-		self.status_list.append(status_entry)
 		
 	def get_closest_target(self, character, targets):
 		"""Get the closest target to the given character from the targets list"""

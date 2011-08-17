@@ -101,7 +101,7 @@ class CharacterLogic:
 		self.auto_target = None
 		self.auto_power = None
 		
-		self.stat_mods = {}
+		self.statuses = []
 		
 		self.action_set = None
 		
@@ -135,6 +135,14 @@ class CharacterLogic:
 			self.affinities[k] += v
 			
 		# Still need to apply affinities based on element
+		
+	def manage_statuses(self, controller):
+		for status in self.statuses:
+			status.use(controller, self)
+			status.time -= 1
+			if status.time <= 0:
+				status.pop(controller, self)
+				self.statuses.remove(status)
 
 	def level_up(self):
 		self.level += 1
