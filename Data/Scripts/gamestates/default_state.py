@@ -211,8 +211,6 @@ class DefaultState(BaseState, BaseController):
 			main['input_system'].mouse.position = (0.5, 0.5)
 
 			if ("MoveForward", "INPUT_ACTIVE") in inputs:
-				act = self._get_forward_animation(main)
-				self.play_animation(main['player'], act, mode=1)
 				movement[1] = speed
 			if ("MoveBackward", "INPUT_ACTIVE") in inputs:
 				movement[1] = -speed
@@ -227,6 +225,8 @@ class DefaultState(BaseState, BaseController):
 			main['player'].auto_target = main['player'].auto_power = None
 			movement = [float(i) for i in (Vector(movement).normalized()*speed)]
 			self.server.invoke("position", id, *main['player'].object.position)
+			act = self._get_forward_animation(main)
+			self.play_animation(main['player'], act, mode=1)
 		elif main['player'].auto_target:
 			if "WEAPON_RANGE" in main['player'].auto_power.flags:
 				range = main['player'].weapon.range
@@ -257,6 +257,9 @@ class DefaultState(BaseState, BaseController):
 					rot = -rot
 
 				self.server.invoke("rotate", id, 0, 0, rot)
+				
+				act = self._get_forward_animation(main)
+				self.play_animation(main['player'], act, mode=1)
 
 		# Otherwise, idle
 		elif not main['player'].lock:
