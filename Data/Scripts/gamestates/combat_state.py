@@ -322,10 +322,6 @@ class CombatState(DefaultState, BaseController):
 		
 		# Put away the player's weapon
 		main['player'].clear_right_hand()
-				
-		# Clear combat statuses
-		for status in self.status_list:
-			status['user'].powers.remove(status['power'], self)
 						
 	##########
 	# Server

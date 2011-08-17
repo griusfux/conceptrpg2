@@ -1,5 +1,4 @@
 import Scripts.effects as Effect
-import Scripts.packages as Package
 
 def power(self, controller, user):
 	targets = controller.get_targets(self, user)

@@ -3,7 +3,7 @@ from Scripts.effects import StaticEffect
 import Scripts.mathutils as mathutils
 
 class ProjectileEffect(StaticEffect):
-	def __init__(self, visual, position, target, speed=0.2, duration=1000, delay=0, continuous=-1):
+	def __init__(self, visual, position, target, speed=0.2, duration=10000, delay=0, continuous=-1):
 		StaticEffect.__init__(self, visual, position, duration, delay, continuous)
 		
 		self.target = target
@@ -31,7 +31,7 @@ class ProjectileEffect(StaticEffect):
 		
 		if distance.length < 0.25:
 			if self.f_collision:
-				self.f_collision(self, self.target_position)
+				self.f_collision(self)
 			self.time = 0
 			
 		else:
