@@ -108,10 +108,6 @@ class CombatState(DefaultState, BaseController):
 		self.monster_list = {}
 		self.hero_list = {main['client'].id:main['player']}
 		
-		# Auto-range
-		self.auto_target = None
-		self.auto_power = None
-		
 		# Place the monsters
 		if main['owns_combat']:
 			nav_nodes =  main['room'].get_nav_nodes()
@@ -234,8 +230,7 @@ class CombatState(DefaultState, BaseController):
 			if not main['player'].lock:
 				
 				if ("UsePower", "INPUT_CLICK") in inputs:
-					self.auto_power = main['player'].powers.active
-					self.auto_target = main['player'].targets[0]
+					self.use_power(main['player'], main['player'].powers.active.name)
 				if ("NextPower", "INPUT_CLICK") in inputs:
 					main['player'].powers.make_next_active()
 				if ("PrevPower", "INPUT_CLICK") in inputs:
@@ -657,7 +652,11 @@ class CombatState(DefaultState, BaseController):
 	
 	def use_power(self, character, power):
 		power = Power(power)
-		power.use(self, character)
+		if "SELF" in power.target_mask:
+			power.use(self, character)
+		else:
+			character.auto_power = power
+			character.auto_target = character.targets[0]
 		
 	def check_save(self, defender, def_stat, offender, off_stat):
 		def_value = 0

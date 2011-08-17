@@ -98,6 +98,8 @@ class CharacterLogic:
 		self.powers = PowerManager(self, [])
 		
 		self.targets = []
+		self.auto_target = None
+		self.auto_power = None
 		
 		self.stat_mods = {}
 		
