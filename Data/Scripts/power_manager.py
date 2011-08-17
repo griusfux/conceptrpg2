@@ -65,6 +65,15 @@ class PowerManager:
 		else:
 			self._current_power -= 1
 			
+	def has_power(self, idx):
+		"""Checks to see if the supplied index is in the power list"""
+		
+		try:
+			self._powers[idx]
+			return True
+		except IndexError:
+			return False
+			
 	@property
 	def all(self):
 		"""All the powers returned as a list"""
