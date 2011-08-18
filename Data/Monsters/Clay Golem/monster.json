@@ -1,5 +1,7 @@
 {
 	"name": "Clay Golem",
+    "root_object": "ClayGolemArm",
+	"action_set": "Clay Golem Actions",
 	"role" : "BRAWLER",
 	"level_adjustment" : 0,
 	"element" : "NEUTRAL"

@@ -219,12 +219,12 @@ class BaseState:
 			race = packages.Race(char_info['race'])
 		main['engine'].load_library(race)
 		
+		obj = main['engine'].add_object(race.root_object, pos, ori)
+		obj.armature = obj
+		
 		if is_monster != 0:
-			obj = main['engine'].add_object(race.name, pos, ori)
 			main['net_players'][cid] = character_logic.MonsterLogic(obj, race)
 		else:
-			obj = main['engine'].add_object(race.root_object, pos, ori)
-			obj.armature = obj
 			main['net_players'][cid] = character_logic.PlayerLogic(obj)
 			main['net_players'][cid].load_from_info(char_info)
 		main['net_players'][cid].id = cid

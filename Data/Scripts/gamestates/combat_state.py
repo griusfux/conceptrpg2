@@ -218,6 +218,10 @@ class CombatState(DefaultState, BaseController):
 			# Get rid of any dead guys
 			if main['owns_combat'] and monster.hp <= 0:
 				self.server.invoke("kill_monster", id)
+		
+			# This should get moved, but it will sit here for now
+			if monster.action_set:
+				self.play_animation(monster, "Idle", mode=1)
 			
 		# Our id so we can talk with the server
 		id = main['client'].id

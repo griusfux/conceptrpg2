@@ -1,0 +1,14 @@
+{
+	"name" : "Clay Golem Actions",
+	
+	"action_set":
+	[
+		{
+			"name" : "Idle",
+			"actions" : [{
+			"name" : "Idle",
+			"start" : 0,
+			"end" : 79}]
+		}
+	]
+}

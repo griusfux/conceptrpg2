@@ -1,5 +1,7 @@
 {
 	"name": "monster",
+	"root_object": "",
+	"action_set": "",
 	"role" : "MEAT_SHIELD",
 	"level_adjustment" : 0,
 	

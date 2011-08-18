@@ -346,6 +346,8 @@ class MonsterLogic(CharacterLogic):
 		CharacterLogic.__init__(self, object)
 		# self.id = monsterdata.id
 		
+		self.action_set = monsterdata.action_set
+		
 		self.xp_reward = 0
 #		self.xp_reward = monsterdata.xp_reward
 #		self.credit_reward = monsterdata.credit_reward

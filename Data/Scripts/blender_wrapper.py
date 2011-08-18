@@ -222,6 +222,9 @@ class Object:
 	def color(self, color):
 		self.gameobj.color = color
 		
+		for c in self.gameobj.childrenRecursive:
+			c.color = color
+		
 	@property
 	def visible(self):
 		return self.gameobj.visible
