@@ -471,21 +471,22 @@ class CombatState(DefaultState, BaseController):
 		monsters = []
 		
 		while no_brutes_soldiers:
-			remaining = num_players
+			remaining = 4*num_players
 			while remaining > 0:
 				draw = random.choice(deck.cards)
 				
-				if draw['role'] in ('soldier', 'brute'):
-					monsters.extend([draw['monster'] for i in range(2)])
+				if draw['role'] in ('soldier', 'brute') and remaining >= 2:
+					monsters.append(draw['monster'])
 					no_brutes_soldiers = False
+					remaining -= 2
 				elif draw['role'] == 'minion':
-					monsters.extend([draw['monster'] for i in range(4)])
+					monsters.append(draw['monster'])
+					remaining -= 1
 				elif draw['role']:
 					monsters.append(draw[0])
+					remaining -= 4
 				else:
 					continue
-					
-				remaining -= 1
 
 		return monsters
 	
