@@ -396,7 +396,8 @@ class CombatState(DefaultState, BaseController):
 		if client.combat_id not in combat.monster_list: return
 		
 		for i, v in combat.monster_list.items():
-			self.clients.invoke("add_monster", client.combat_id, v[0].name, i, *v[1])
+			self.client.invoke("add_player", i, v[0].name, 1, v[1], None)
+			self.client.invoke("add_monster", client.combat_id, v[0].name, i, *v[1])
 
 	@rpc(server_functions, "add_hero")
 	def s_add_hero(self, main, client):

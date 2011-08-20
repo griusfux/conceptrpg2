@@ -279,7 +279,8 @@ class BaseState:
 		self.clients.invoke('add_player', client.id, char_info, 0, pos, ori)
 		
 		for k, v in main['players'].items():
-			self.client.invoke('add_player', k, v.char_info, 0, v.position, v.orientation)
+			if v.__class__.__name__ == 'NetPlayer':
+				self.client.invoke('add_player', k, v.char_info, 0, v.position, v.orientation)
 		
 	@rpc(server_functions, "animate", str, str, int)
 	def s_animate(self, main, client, cid, action, mode):
