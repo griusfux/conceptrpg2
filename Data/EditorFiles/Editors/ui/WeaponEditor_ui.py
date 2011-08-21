@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'WeaponEditor.ui'
 #
-# Created: Sun Aug 21 00:17:29 2011
+# Created: Sun Aug 21 01:03:53 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -17,7 +17,7 @@ except AttributeError:
 class Ui_WeaponEditor(object):
     def setupUi(self, WeaponEditor):
         WeaponEditor.setObjectName(_fromUtf8("WeaponEditor"))
-        WeaponEditor.resize(400, 300)
+        WeaponEditor.resize(400, 322)
         self.verticalLayout = QtGui.QVBoxLayout(WeaponEditor)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.formLayout = QtGui.QFormLayout()
@@ -121,6 +121,13 @@ class Ui_WeaponEditor(object):
         self.verticalLayout.addLayout(self.gridLayout_2)
 
         self.retranslateUi(WeaponEditor)
+        QtCore.QObject.connect(self.name, QtCore.SIGNAL(_fromUtf8("textEdited(QString)")), WeaponEditor.modified)
+        QtCore.QObject.connect(self.cost, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), WeaponEditor.modified)
+        QtCore.QObject.connect(self.type, QtCore.SIGNAL(_fromUtf8("currentIndexChanged(int)")), WeaponEditor.modified)
+        QtCore.QObject.connect(self.weight, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), WeaponEditor.modified)
+        QtCore.QObject.connect(self.range, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), WeaponEditor.modified)
+        QtCore.QObject.connect(self.accuracy, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), WeaponEditor.modified)
+        QtCore.QObject.connect(self.hands, QtCore.SIGNAL(_fromUtf8("currentIndexChanged(int)")), WeaponEditor.modified)
         QtCore.QMetaObject.connectSlotsByName(WeaponEditor)
         WeaponEditor.setTabOrder(self.name, self.cost)
         WeaponEditor.setTabOrder(self.cost, self.type)

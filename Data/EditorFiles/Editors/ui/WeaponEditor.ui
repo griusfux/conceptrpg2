@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>322</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -289,5 +289,121 @@
   <tabstop>hands</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>name</sender>
+   <signal>textEdited(QString)</signal>
+   <receiver>WeaponEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>302</x>
+     <y>18</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>303</x>
+     <y>-3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cost</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>WeaponEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>253</x>
+     <y>48</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>257</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>type</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>WeaponEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>91</x>
+     <y>185</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>97</x>
+     <y>162</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>weight</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>WeaponEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>83</x>
+     <y>216</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>75</x>
+     <y>164</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>range</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>WeaponEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>70</x>
+     <y>239</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>204</x>
+     <y>167</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>accuracy</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>WeaponEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>104</x>
+     <y>275</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>306</x>
+     <y>171</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>hands</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>WeaponEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>123</x>
+     <y>300</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>187</x>
+     <y>317</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>modified()</slot>
+ </slots>
 </ui>

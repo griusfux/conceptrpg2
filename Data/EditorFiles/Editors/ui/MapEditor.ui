@@ -80,7 +80,7 @@
    <item>
     <widget class="QTabWidget" name="tile_tabs">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -137,5 +137,57 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>name</sender>
+   <signal>textEdited(QString)</signal>
+   <receiver>MapEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>102</x>
+     <y>23</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>94</x>
+     <y>5</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>encounter_deck</sender>
+   <signal>textEdited(QString)</signal>
+   <receiver>MapEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>173</x>
+     <y>46</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>136</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>add_tile</sender>
+   <signal>clicked()</signal>
+   <receiver>MapEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>326</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>357</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>modified()</slot>
+ </slots>
 </ui>

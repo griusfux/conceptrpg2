@@ -1,19 +1,13 @@
 from PyQt4.QtGui import *
+from .BaseEditor import BaseEditor
 from .ui.RaceEditor_ui import Ui_RaceEditor
 from ..common import get_blender_objects
 
 from Scripts.packages import ActionSet
 
-class RaceEditor(QFrame):
+class RaceEditor(BaseEditor):
 	def __init__(self, parent, data):
-		QWidget.__init__(self, parent)
-		
-		self.data = data
-
-		# Create the ui
-		self.ui = Ui_RaceEditor()
-		self.ui.setupUi(self)
-		
+		BaseEditor.__init__(self, parent, data, Ui_RaceEditor)
 		ui = self.ui
 		
 		# Fill combo boxes

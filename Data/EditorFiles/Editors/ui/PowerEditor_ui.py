@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'PowerEditor.ui'
 #
-# Created: Fri Jun 17 22:20:19 2011
+# Created: Sun Aug 21 00:59:35 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -104,6 +104,16 @@ class Ui_PowerEditor(object):
         self.verticalLayout.addLayout(self.horizontalLayout_2)
 
         self.retranslateUi(PowerEditor)
+        QtCore.QObject.connect(self.name, QtCore.SIGNAL(_fromUtf8("textEdited(QString)")), PowerEditor.modified)
+        QtCore.QObject.connect(self.element, QtCore.SIGNAL(_fromUtf8("currentIndexChanged(int)")), PowerEditor.modified)
+        QtCore.QObject.connect(self.delivery, QtCore.SIGNAL(_fromUtf8("currentIndexChanged(int)")), PowerEditor.modified)
+        QtCore.QObject.connect(self.effect_shape, QtCore.SIGNAL(_fromUtf8("currentIndexChanged(int)")), PowerEditor.modified)
+        QtCore.QObject.connect(self.shape_modifier, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), PowerEditor.modified)
+        QtCore.QObject.connect(self.distance, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), PowerEditor.modified)
+        QtCore.QObject.connect(self.distance, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), PowerEditor.modified)
+        QtCore.QObject.connect(self.cool_down, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), PowerEditor.modified)
+        QtCore.QObject.connect(self.tier, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), PowerEditor.modified)
+        QtCore.QObject.connect(self.description, QtCore.SIGNAL(_fromUtf8("textChanged()")), PowerEditor.modified)
         QtCore.QMetaObject.connectSlotsByName(PowerEditor)
         PowerEditor.setTabOrder(self.name, self.element)
         PowerEditor.setTabOrder(self.element, self.delivery)

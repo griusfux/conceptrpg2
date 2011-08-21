@@ -1,17 +1,12 @@
 from PyQt4.QtGui import *
+from .BaseEditor import BaseEditor
 from .ui.WeaponEditor_ui import Ui_WeaponEditor
 
 import json
 
-class WeaponEditor(QFrame):
+class WeaponEditor(BaseEditor):
 	def __init__(self, parent, data):
-		QWidget.__init__(self, parent)
-		
-		self.data = data
-		
-		# Create the ui
-		self.ui = Ui_WeaponEditor()
-		self.ui.setupUi(self)
+		BaseEditor.__init__(self, parent, data, Ui_WeaponEditor)
 		ui = self.ui
 		
 		# Load up the schema file so we can get acceptable subtypes

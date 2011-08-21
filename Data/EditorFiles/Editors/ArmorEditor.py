@@ -1,17 +1,13 @@
 from PyQt4.QtGui import *
+from .BaseEditor import BaseEditor
 from .ui.ArmorEditor_ui import Ui_ArmorEditor
 
 import json
 
-class ArmorEditor(QFrame):
+class ArmorEditor(BaseEditor):
 	def __init__(self, parent, data):
-		QWidget.__init__(self, parent)
-		
-		self.data = data
-		
-		# Create the ui
-		self.ui = ui = Ui_ArmorEditor()
-		ui.setupUi(self)
+		BaseEditor.__init__(self, parent, data, Ui_ArmorEditor)
+		ui = self.ui
 
 		# Load up the schema file so we can get acceptable types
 		with open(data._schema) as f:

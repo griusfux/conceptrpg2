@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MonsterEditor.ui'
 #
-# Created: Thu Feb 24 15:06:22 2011
+# Created: Sun Aug 21 00:56:40 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -33,6 +33,7 @@ class Ui_MonsterEditor(object):
         self.verticalLayout.addItem(spacerItem)
 
         self.retranslateUi(MonsterEditor)
+        QtCore.QObject.connect(self.name, QtCore.SIGNAL(_fromUtf8("textEdited(QString)")), MonsterEditor.modified)
         QtCore.QMetaObject.connectSlotsByName(MonsterEditor)
 
     def retranslateUi(self, MonsterEditor):

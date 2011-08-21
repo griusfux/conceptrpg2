@@ -201,5 +201,169 @@
   <tabstop>description</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>name</sender>
+   <signal>textEdited(QString)</signal>
+   <receiver>PowerEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>135</x>
+     <y>21</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>141</x>
+     <y>6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>element</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>PowerEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>115</x>
+     <y>46</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>124</x>
+     <y>5</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>delivery</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>PowerEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>336</x>
+     <y>48</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>effect_shape</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>PowerEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>96</x>
+     <y>72</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>99</x>
+     <y>-3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>shape_modifier</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>PowerEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>326</x>
+     <y>75</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>319</x>
+     <y>7</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>distance</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>PowerEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>354</x>
+     <y>100</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>331</x>
+     <y>-2</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>distance</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>PowerEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>389</x>
+     <y>95</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>400</x>
+     <y>105</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cool_down</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>PowerEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>376</x>
+     <y>134</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>396</x>
+     <y>136</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tier</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>PowerEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>137</x>
+     <y>135</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>111</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>description</sender>
+   <signal>textChanged()</signal>
+   <receiver>PowerEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>114</x>
+     <y>244</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>115</x>
+     <y>283</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>modified()</slot>
+ </slots>
 </ui>

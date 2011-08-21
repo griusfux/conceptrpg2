@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'RaceEditor.ui'
 #
-# Created: Sat Aug 20 22:53:08 2011
+# Created: Sun Aug 21 01:01:49 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -44,6 +44,8 @@ class Ui_RaceEditor(object):
         self.label = QtGui.QLabel(RaceEditor)
         self.label.setObjectName(_fromUtf8("label"))
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.gridLayout.addItem(spacerItem, 4, 0, 1, 1)
         self.formLayout.setLayout(1, QtGui.QFormLayout.FieldRole, self.gridLayout)
         self.race_image = QtGui.QLabel(RaceEditor)
         self.race_image.setMinimumSize(QtCore.QSize(150, 150))
@@ -55,10 +57,14 @@ class Ui_RaceEditor(object):
         self.race_image.setObjectName(_fromUtf8("race_image"))
         self.formLayout.setWidget(1, QtGui.QFormLayout.LabelRole, self.race_image)
         self.verticalLayout.addLayout(self.formLayout)
-        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.verticalLayout.addItem(spacerItem)
+        spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem1)
 
         self.retranslateUi(RaceEditor)
+        QtCore.QObject.connect(self.name, QtCore.SIGNAL(_fromUtf8("textEdited(QString)")), RaceEditor.modified)
+        QtCore.QObject.connect(self.root_object, QtCore.SIGNAL(_fromUtf8("currentIndexChanged(int)")), RaceEditor.modified)
+        QtCore.QObject.connect(self.action_set, QtCore.SIGNAL(_fromUtf8("currentIndexChanged(int)")), RaceEditor.modified)
+        QtCore.QObject.connect(self.root_object, QtCore.SIGNAL(_fromUtf8("editTextChanged(QString)")), RaceEditor.modified)
         QtCore.QMetaObject.connectSlotsByName(RaceEditor)
 
     def retranslateUi(self, RaceEditor):

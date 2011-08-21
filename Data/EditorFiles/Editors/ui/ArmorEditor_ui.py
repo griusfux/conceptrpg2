@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ArmorEditor.ui'
 #
-# Created: Sun Aug 21 00:22:12 2011
+# Created: Sun Aug 21 00:50:27 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -107,6 +107,12 @@ class Ui_ArmorEditor(object):
         self.verticalLayout.addLayout(self.gridLayout)
 
         self.retranslateUi(ArmorEditor)
+        QtCore.QObject.connect(self.name, QtCore.SIGNAL(_fromUtf8("textEdited(QString)")), ArmorEditor.modified)
+        QtCore.QObject.connect(self.cost, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), ArmorEditor.modified)
+        QtCore.QObject.connect(self.type, QtCore.SIGNAL(_fromUtf8("currentIndexChanged(int)")), ArmorEditor.modified)
+        QtCore.QObject.connect(self.arcane_defense, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), ArmorEditor.modified)
+        QtCore.QObject.connect(self.physical_defense, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), ArmorEditor.modified)
+        QtCore.QObject.connect(self.reflex, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), ArmorEditor.modified)
         QtCore.QMetaObject.connectSlotsByName(ArmorEditor)
         ArmorEditor.setTabOrder(self.cost, self.type)
         ArmorEditor.setTabOrder(self.type, self.arcane_defense)

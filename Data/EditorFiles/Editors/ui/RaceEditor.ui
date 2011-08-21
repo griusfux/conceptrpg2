@@ -55,6 +55,19 @@
          </property>
         </widget>
        </item>
+       <item row="4" column="0">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
      </item>
      <item row="1" column="0">
@@ -103,5 +116,73 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>name</sender>
+   <signal>textEdited(QString)</signal>
+   <receiver>RaceEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>284</x>
+     <y>26</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>304</x>
+     <y>6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>root_object</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>RaceEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>341</x>
+     <y>44</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>371</x>
+     <y>7</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>action_set</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>RaceEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>364</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>396</x>
+     <y>75</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>root_object</sender>
+   <signal>editTextChanged(QString)</signal>
+   <receiver>RaceEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>374</x>
+     <y>48</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>395</x>
+     <y>48</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>modified()</slot>
+ </slots>
 </ui>

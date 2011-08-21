@@ -2,32 +2,38 @@
 
 # Form implementation generated from reading ui file 'ClassEditor.ui'
 #
-# Created: Sat Jan 15 13:08:43 2011
-#      by: PyQt4 UI code generator 4.7.3
+# Created: Sun Aug 21 00:52:04 2011
+#      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
 
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    _fromUtf8 = lambda s: s
+
 class Ui_ClassEditor(object):
     def setupUi(self, ClassEditor):
-        ClassEditor.setObjectName("ClassEditor")
+        ClassEditor.setObjectName(_fromUtf8("ClassEditor"))
         ClassEditor.resize(400, 300)
         self.verticalLayout = QtGui.QVBoxLayout(ClassEditor)
-        self.verticalLayout.setObjectName("verticalLayout")
+        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.gridLayout = QtGui.QGridLayout()
-        self.gridLayout.setObjectName("gridLayout")
+        self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.label = QtGui.QLabel(ClassEditor)
-        self.label.setObjectName("label")
+        self.label.setObjectName(_fromUtf8("label"))
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
         self.name = QtGui.QLineEdit(ClassEditor)
-        self.name.setObjectName("name")
+        self.name.setObjectName(_fromUtf8("name"))
         self.gridLayout.addWidget(self.name, 0, 1, 1, 1)
         self.verticalLayout.addLayout(self.gridLayout)
         spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
 
         self.retranslateUi(ClassEditor)
+        QtCore.QObject.connect(self.name, QtCore.SIGNAL(_fromUtf8("textEdited(QString)")), ClassEditor.modified)
         QtCore.QMetaObject.connectSlotsByName(ClassEditor)
 
     def retranslateUi(self, ClassEditor):
