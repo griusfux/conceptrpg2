@@ -19,6 +19,11 @@ class ArmorEditor(QFrame):
 		
 		ui.type.addItems([i for i in types])
 		
+		# Setup the image
+		image = QPixmap(data.open_image())
+		data.close_image()
+		ui.armor_image.setPixmap(image)
+		
 		# Set the text fields
 		ui.name.setText(data.name)
 		ui.cost.setValue(data.cost)
