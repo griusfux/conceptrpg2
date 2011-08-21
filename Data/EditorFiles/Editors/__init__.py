@@ -4,6 +4,7 @@ from .ItemEditor import ItemEditor
 from .MapEditor import MapEditor
 from .MonsterEditor import MonsterEditor
 from .PowerEditor import PowerEditor
+from .RaceEditor import RaceEditor
 from .WeaponEditor import WeaponEditor
 
 # import EditorFiles.Editors.ArmorEditor as ArmorEditor

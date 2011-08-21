@@ -23,6 +23,7 @@ class EditorWindow(QMainWindow):
 		'Maps': MapEditor,
 		'Monsters': MonsterEditor,
 		'Powers': PowerEditor,
+		'Races': RaceEditor,
 		'Weapons': WeaponEditor,
 		}
 
