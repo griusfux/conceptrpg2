@@ -110,5 +110,41 @@
   <tabstop>cost</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>name</sender>
+   <signal>textEdited(QString)</signal>
+   <receiver>ItemEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>326</x>
+     <y>32</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>259</x>
+     <y>232</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cost</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ItemEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>251</x>
+     <y>59</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>223</x>
+     <y>254</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>modified()</slot>
+ </slots>
 </ui>

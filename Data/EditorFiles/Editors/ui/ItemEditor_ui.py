@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ItemEditor.ui'
 #
-# Created: Sun Aug 21 00:13:53 2011
+# Created: Sun Aug 21 00:37:23 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -55,6 +55,8 @@ class Ui_ItemEditor(object):
         self.formLayout_2.setLayout(1, QtGui.QFormLayout.FieldRole, self.gridLayout)
 
         self.retranslateUi(ItemEditor)
+        QtCore.QObject.connect(self.name, QtCore.SIGNAL(_fromUtf8("textEdited(QString)")), ItemEditor.modified)
+        QtCore.QObject.connect(self.cost, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), ItemEditor.modified)
         QtCore.QMetaObject.connectSlotsByName(ItemEditor)
         ItemEditor.setTabOrder(self.name, self.cost)
 

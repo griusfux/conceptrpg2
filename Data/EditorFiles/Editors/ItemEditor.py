@@ -1,15 +1,11 @@
 from PyQt4.QtGui import *
+from .BaseEditor import BaseEditor
 from .ui.ItemEditor_ui import Ui_ItemEditor
 
-class ItemEditor(QFrame):
+class ItemEditor(BaseEditor):
 	def __init__(self, parent, data):
-		QWidget.__init__(self, parent)
+		BaseEditor.__init__(self, parent, data, Ui_ItemEditor)
 		
-		self.data = data
-
-		# Create the ui
-		self.ui = Ui_ItemEditor()
-		self.ui.setupUi(self)
 		ui = self.ui
 		
 		# Setup the image

@@ -188,11 +188,6 @@ class EditorWindow(QMainWindow):
 			self.data_files[type][file] = arc_file
 		
 	def change_editor(self, editor):
-		# Save changes so they can be restored
-		if hasattr(self.editor, "save"):
-			self.editor.save()
-			self.editor.qtitem.setText("*"+self.editor.data.name)
-		
 		# Now change the editor
 		editor.setFrameShape(QFrame.StyledPanel)
 		self.editor = editor
