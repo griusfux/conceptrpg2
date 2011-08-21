@@ -77,6 +77,7 @@ class DefaultState(BaseState, BaseController):
 		
 		main['ui_system'].load_layout("default_state")
 		main['engine'].set_active_camera(main['camera'])
+		main['engine'].play_bgm('The Cannery.mp3')
 		self.camera_mode = "frankie"
 		
 		main['full_map'] = False

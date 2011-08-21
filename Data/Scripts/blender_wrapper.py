@@ -7,6 +7,8 @@ from mathutils import Matrix, Vector
 from cego import Node
 from math import radians
 import GameLogic as gl
+import aud
+import os
 
 # Movement modes
 MOVE_LINV = 0
@@ -558,11 +560,20 @@ class Camera:
 class Engine:
 	"""Wrapper for engine functionality"""
 	
+	audio_folder = "Audio"
+	
 	def __init__(self, adder):
 		self.adder = adder
 		
 		# So we can keep track of already loaded libraries
 		self.library_list = []
+		
+		# Handle for background music
+		self.bgm_handle = None
+		self.bgm_file = None
+		
+		# XXX This should be replaced by some user setting
+		self.volume = 0.5
 		
 	def __del__(self):
 		self.free_libraries()
@@ -631,3 +642,38 @@ class Engine:
 	def fps(self):
 		"""The current fps"""
 		return gl.getAverageFrameRate()
+
+	#===========================================================================
+	# Audio API
+	#===========================================================================
+	
+	@property
+	def volume(self):
+		"""The audio volume"""
+		return aud.device().volume
+	
+	@volume.setter
+	def volume(self, value):
+		aud.device().volume = value
+	
+	def play_bgm(self, music):
+		if self.bgm_handle:
+			# Fade out the previous music
+			p = self.bgm_handle.position
+			self.bgm_handle.stop()
+			
+			f = aud.Factory(self.bgm_file).fadeout(p, 1)
+			aud.device().play(f).position = p
+			
+		# Now fadein the new music
+		af = os.path.join(self.audio_folder, music)
+		self.bgm_handle = aud.device().play(aud.Factory(af).fadein(0, 2))
+		self.bgm_handle.loop_count = -1
+		self.bgm_file = af
+		
+	def stop_bgm(self):
+		if self.bgm_handle:
+			self.bgm_handle.stop()
+			self.bgm_handle = None
+			self.bgm_file = None
+	

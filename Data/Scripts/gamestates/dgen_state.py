@@ -130,6 +130,9 @@ class DungeonGenerationState(BaseState):
 			ori = [[a, b, c] for a, b, c in pobj.get_orientation()]
 			self.server.invoke('add_player', main['player'].get_info(), pos, ori)
 			
+			
+			main['engine'].stop_bgm()
+			
 			# Switch to the default state now
 			self.server.invoke('switch_state', "Default")
 			return ("Default", "SWITCH")

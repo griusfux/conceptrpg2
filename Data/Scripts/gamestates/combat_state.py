@@ -101,6 +101,7 @@ class CombatState(DefaultState, BaseController):
 		"""Initialize the client state"""
 		
 		main['ui_system'].load_layout("combat")
+		main['engine'].play_bgm('Take the Lead.mp3')
 		
 		self.monster_list = {}
 		self.hero_list = {main['client'].id:main['player']}
