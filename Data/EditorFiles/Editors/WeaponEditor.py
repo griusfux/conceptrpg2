@@ -15,12 +15,7 @@ class WeaponEditor(BaseEditor):
 		
 		ui.type.addItems([i.title() for i in types])
 		ui.hands.addItems(["One", "Two"])
-		
-		# Setup the image
-		image = QPixmap(data.open_image())
-		data.close_image()
-		ui.weapon_image.setPixmap(image)
-		
+
 		# Set the text fields
 		ui.name.setText(data.name)
 		ui.cost.setValue(data.cost)

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ItemEditor.ui'
 #
-# Created: Sun Aug 21 00:37:23 2011
+# Created: Sun Aug 21 13:02:52 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -21,15 +21,15 @@ class Ui_ItemEditor(object):
         self.formLayout_2 = QtGui.QFormLayout(ItemEditor)
         self.formLayout_2.setFieldGrowthPolicy(QtGui.QFormLayout.AllNonFixedFieldsGrow)
         self.formLayout_2.setObjectName(_fromUtf8("formLayout_2"))
-        self.item_image = QtGui.QLabel(ItemEditor)
-        self.item_image.setMinimumSize(QtCore.QSize(150, 150))
-        self.item_image.setMaximumSize(QtCore.QSize(150, 150))
-        self.item_image.setFrameShape(QtGui.QFrame.Box)
-        self.item_image.setLineWidth(2)
-        self.item_image.setText(_fromUtf8(""))
-        self.item_image.setScaledContents(True)
-        self.item_image.setObjectName(_fromUtf8("item_image"))
-        self.formLayout_2.setWidget(1, QtGui.QFormLayout.LabelRole, self.item_image)
+        self.data_image = QtGui.QLabel(ItemEditor)
+        self.data_image.setMinimumSize(QtCore.QSize(150, 150))
+        self.data_image.setMaximumSize(QtCore.QSize(150, 150))
+        self.data_image.setFrameShape(QtGui.QFrame.Box)
+        self.data_image.setLineWidth(2)
+        self.data_image.setText(_fromUtf8(""))
+        self.data_image.setScaledContents(True)
+        self.data_image.setObjectName(_fromUtf8("data_image"))
+        self.formLayout_2.setWidget(1, QtGui.QFormLayout.LabelRole, self.data_image)
         self.gridLayout = QtGui.QGridLayout()
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.label = QtGui.QLabel(ItemEditor)

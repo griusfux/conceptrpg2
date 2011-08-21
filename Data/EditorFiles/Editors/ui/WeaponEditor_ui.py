@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'WeaponEditor.ui'
 #
-# Created: Sun Aug 21 01:03:53 2011
+# Created: Sun Aug 21 13:04:40 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -22,15 +22,15 @@ class Ui_WeaponEditor(object):
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.formLayout = QtGui.QFormLayout()
         self.formLayout.setObjectName(_fromUtf8("formLayout"))
-        self.weapon_image = QtGui.QLabel(WeaponEditor)
-        self.weapon_image.setMinimumSize(QtCore.QSize(150, 150))
-        self.weapon_image.setMaximumSize(QtCore.QSize(150, 150))
-        self.weapon_image.setFrameShape(QtGui.QFrame.Box)
-        self.weapon_image.setLineWidth(2)
-        self.weapon_image.setText(_fromUtf8(""))
-        self.weapon_image.setScaledContents(True)
-        self.weapon_image.setObjectName(_fromUtf8("weapon_image"))
-        self.formLayout.setWidget(0, QtGui.QFormLayout.LabelRole, self.weapon_image)
+        self.data_image = QtGui.QLabel(WeaponEditor)
+        self.data_image.setMinimumSize(QtCore.QSize(150, 150))
+        self.data_image.setMaximumSize(QtCore.QSize(150, 150))
+        self.data_image.setFrameShape(QtGui.QFrame.Box)
+        self.data_image.setLineWidth(2)
+        self.data_image.setText(_fromUtf8(""))
+        self.data_image.setScaledContents(True)
+        self.data_image.setObjectName(_fromUtf8("data_image"))
+        self.formLayout.setWidget(0, QtGui.QFormLayout.LabelRole, self.data_image)
         self.gridLayout = QtGui.QGridLayout()
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.label = QtGui.QLabel(WeaponEditor)

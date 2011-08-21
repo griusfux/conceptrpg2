@@ -65,7 +65,7 @@
       </layout>
      </item>
      <item row="0" column="0">
-      <widget class="QLabel" name="armor_image">
+      <widget class="QLabel" name="data_image">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>

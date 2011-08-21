@@ -66,7 +66,7 @@
     </layout>
    </item>
    <item row="1" column="0">
-    <widget class="QLabel" name="monster_image">
+    <widget class="QLabel" name="data_image">
      <property name="minimumSize">
       <size>
        <width>150</width>

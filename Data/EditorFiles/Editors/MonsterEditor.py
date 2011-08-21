@@ -15,9 +15,9 @@ class MonsterEditor(BaseEditor):
 		ui.action_set.addItems([i.name for i in ActionSet.get_package_list()])
 		
 		# Setup the image
-		image = QPixmap(data.open_image())
-		data.close_image()
-		ui.monster_image.setPixmap(image)
+#		image = QPixmap(data.open_image())
+#		data.close_image()
+#		ui.monster_image.setPixmap(image)
 		
 		# Setup the values
 		ui.name.setText(data.name)

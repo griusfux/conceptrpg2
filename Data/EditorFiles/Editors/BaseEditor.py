@@ -11,6 +11,12 @@ class BaseEditor(QFrame):
         self.ui = ui()
         self.ui.setupUi(self)
         
+        # Setup an image if we have one
+        if hasattr(self.ui, "data_image"):
+            image = QPixmap(data.open_image())
+            data.close_image()
+            self.ui.data_image.setPixmap(image)
+        
     def save(self):
         raise NotImplementedError("save")
     

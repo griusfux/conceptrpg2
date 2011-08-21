@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ArmorEditor.ui'
 #
-# Created: Sun Aug 21 00:50:27 2011
+# Created: Sun Aug 21 13:01:48 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -44,20 +44,20 @@ class Ui_ArmorEditor(object):
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.gridLayout_2.addWidget(self.label_2, 2, 0, 1, 1)
         self.formLayout.setLayout(0, QtGui.QFormLayout.FieldRole, self.gridLayout_2)
-        self.armor_image = QtGui.QLabel(ArmorEditor)
+        self.data_image = QtGui.QLabel(ArmorEditor)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.armor_image.sizePolicy().hasHeightForWidth())
-        self.armor_image.setSizePolicy(sizePolicy)
-        self.armor_image.setMinimumSize(QtCore.QSize(150, 150))
-        self.armor_image.setMaximumSize(QtCore.QSize(150, 150))
-        self.armor_image.setFrameShape(QtGui.QFrame.Box)
-        self.armor_image.setLineWidth(2)
-        self.armor_image.setText(_fromUtf8(""))
-        self.armor_image.setScaledContents(True)
-        self.armor_image.setObjectName(_fromUtf8("armor_image"))
-        self.formLayout.setWidget(0, QtGui.QFormLayout.LabelRole, self.armor_image)
+        sizePolicy.setHeightForWidth(self.data_image.sizePolicy().hasHeightForWidth())
+        self.data_image.setSizePolicy(sizePolicy)
+        self.data_image.setMinimumSize(QtCore.QSize(150, 150))
+        self.data_image.setMaximumSize(QtCore.QSize(150, 150))
+        self.data_image.setFrameShape(QtGui.QFrame.Box)
+        self.data_image.setLineWidth(2)
+        self.data_image.setText(_fromUtf8(""))
+        self.data_image.setScaledContents(True)
+        self.data_image.setObjectName(_fromUtf8("data_image"))
+        self.formLayout.setWidget(0, QtGui.QFormLayout.LabelRole, self.data_image)
         self.verticalLayout.addLayout(self.formLayout)
         spacerItem1 = QtGui.QSpacerItem(20, 97, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem1)

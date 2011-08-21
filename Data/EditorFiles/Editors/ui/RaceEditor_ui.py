@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'RaceEditor.ui'
 #
-# Created: Sun Aug 21 01:01:49 2011
+# Created: Sun Aug 21 13:04:05 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -47,15 +47,15 @@ class Ui_RaceEditor(object):
         spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem, 4, 0, 1, 1)
         self.formLayout.setLayout(1, QtGui.QFormLayout.FieldRole, self.gridLayout)
-        self.race_image = QtGui.QLabel(RaceEditor)
-        self.race_image.setMinimumSize(QtCore.QSize(150, 150))
-        self.race_image.setMaximumSize(QtCore.QSize(150, 150))
-        self.race_image.setFrameShape(QtGui.QFrame.Box)
-        self.race_image.setLineWidth(2)
-        self.race_image.setText(_fromUtf8(""))
-        self.race_image.setScaledContents(True)
-        self.race_image.setObjectName(_fromUtf8("race_image"))
-        self.formLayout.setWidget(1, QtGui.QFormLayout.LabelRole, self.race_image)
+        self.data_image = QtGui.QLabel(RaceEditor)
+        self.data_image.setMinimumSize(QtCore.QSize(150, 150))
+        self.data_image.setMaximumSize(QtCore.QSize(150, 150))
+        self.data_image.setFrameShape(QtGui.QFrame.Box)
+        self.data_image.setLineWidth(2)
+        self.data_image.setText(_fromUtf8(""))
+        self.data_image.setScaledContents(True)
+        self.data_image.setObjectName(_fromUtf8("data_image"))
+        self.formLayout.setWidget(1, QtGui.QFormLayout.LabelRole, self.data_image)
         self.verticalLayout.addLayout(self.formLayout)
         spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem1)
