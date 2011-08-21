@@ -1,14 +1,19 @@
 import sys
+import json
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
 from Scripts.packages import *
 
-from .LogWidget import *
 from .Editors import *
+from .LogWidget import *
 from .NewDialog import NewDialog
+from .SettingsDialog import SettingsDialog
 
+from .common import SETTINGS
+
+	
 class EditorWindow(QMainWindow):
 
 	EDITORS = {
@@ -31,6 +36,9 @@ class EditorWindow(QMainWindow):
 		# Logger
 		logger = LogWidget(self)
 		
+		# Load up saved settings if there are any
+		self.load_settings()
+		
 		# Menu
 		new = QAction('&New', self)
 		new.setShortcut('Ctrl+N')
@@ -41,6 +49,10 @@ class EditorWindow(QMainWindow):
 		save.setShortcut('Ctrl+S')
 		save.setStatusTip('Save the currently selected package')
 		self.connect(save, SIGNAL('triggered()'), self.save_file)
+		
+		settings = QAction('Settings', self)
+		save.setStatusTip('Change settings')
+		self.connect(settings, SIGNAL('triggered()'), self.open_settings)
 		
 		exit = QAction('E&xit', self)
 		exit.setShortcut('Ctrl+Q')
@@ -108,12 +120,41 @@ class EditorWindow(QMainWindow):
 		dialog = NewDialog(self)
 		dialog.exec()
 		
+	def open_settings(self):
+		dialog = SettingsDialog(self)
+		dialog.exec()
+		
 	def save_file(self):
 		if hasattr(self.editor, "data"):
 			print("Saving %s..." % self.editor.data.name)
 			self.editor.save()
 			self.editor.data.write()
 			self.editor.qtitem.setText(self.editor.data.name)
+			
+	def load_settings(self):
+		try:
+			f = open('editor_settings.conf')
+		except IOError:
+			msg = QMessageBox();
+			msg.setText("No settings file found, please check your settings.")
+			msg.exec()
+			
+			self.open_settings()
+			return
+		
+		settings = json.loads(f.read())
+		f.close()
+		
+		for key in SETTINGS:
+			SETTINGS[key] = settings[key]
+			
+	def save_settings(self):
+		with open('editor_settings.conf', 'w') as f:
+			f.write(json.dumps(SETTINGS))
+		
+	def closeEvent(self, *args, **kwargs):
+		self.save_settings()
+		return QMainWindow.closeEvent(self, *args, **kwargs)
 		
 	def create_subtree(self, type, package):
 		sub_root = QStandardItem(type)

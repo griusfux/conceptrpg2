@@ -1,5 +1,11 @@
 import sys
 import os
+
+# This allows the editor to find the necessary libs when in a "release" configuration
+# sys.path.append(os.path.join(os.getcwd(), '2.58', 'python', 'lib', 'site-packages'))
+open("log.txt", "w").write(str(sys.path))
+
+
 from PyQt4.QtGui import *
 from EditorFiles.EditorWindow import EditorWindow
 
