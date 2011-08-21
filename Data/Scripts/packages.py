@@ -35,6 +35,7 @@ class Monster(Package):
     _config = 'monster.json'
     _schema = 'Schemas/monsterfile.json'
     _dir = 'Monsters'
+    _img = 'monster.png'
     
 class Race(Package):
     """Race package"""
