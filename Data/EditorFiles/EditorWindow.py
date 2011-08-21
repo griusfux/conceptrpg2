@@ -113,6 +113,7 @@ class EditorWindow(QMainWindow):
 			print("Saving %s..." % self.editor.data.name)
 			self.editor.save()
 			self.editor.data.write()
+			self.editor.qtitem.setText(self.editor.data.name)
 		
 	def create_subtree(self, type, package):
 		sub_root = QStandardItem(type)
@@ -138,15 +139,17 @@ class EditorWindow(QMainWindow):
 				print('Unable to open', file)
 				continue
 
-			item =  QStandardItem(file)
+			item =  QStandardItem(arc_file.name)
+			item.setData(arc_file)
 			item.setEditable(False)
 			sub_root.appendRow(item)
-			self.data_files[type][file] = arc_file		
+			self.data_files[type][file] = arc_file
 		
 	def change_editor(self, editor):
 		# Save changes so they can be restored
 		if hasattr(self.editor, "save"):
 			self.editor.save()
+			self.editor.qtitem.setText("*"+self.editor.data.name)
 		
 		# Now change the editor
 		editor.setFrameShape(QFrame.StyledPanel)
@@ -165,7 +168,9 @@ class EditorWindow(QMainWindow):
 			text = item.parent().text()
 
 			if text in self.EDITORS:
-				self.change_editor(self.EDITORS[text](self, self.data_files[text][item.text()]))
+				editor = self.EDITORS[text](self, item.data())
+				editor.qtitem = item
+				self.change_editor(editor)
 			else:
 				print("No editor found for", text)
 				
