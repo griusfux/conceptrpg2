@@ -10,11 +10,16 @@ class ItemEditor(QFrame):
 		# Create the ui
 		self.ui = Ui_ItemEditor()
 		self.ui.setupUi(self)
+		ui = self.ui
+		
+		# Setup the image
+		image = QPixmap(data.open_image())
+		data.close_image()
+		ui.item_image.setPixmap(image)
 		
 		# Set the text fields
-		self.ui.name.setText(data.name)
-		self.ui.cost.setValue(data.cost)
-		self.ui.type.setText(data.type)
+		ui.name.setText(data.name)
+		ui.cost.setValue(data.cost)
 		
 		
 	def save(self):
