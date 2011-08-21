@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'RaceEditor.ui'
 #
-# Created: Sat Aug 20 22:49:01 2011
+# Created: Sat Aug 20 22:53:08 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -20,8 +20,9 @@ class Ui_RaceEditor(object):
         RaceEditor.resize(400, 300)
         self.verticalLayout = QtGui.QVBoxLayout(RaceEditor)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.horizontalLayout = QtGui.QHBoxLayout()
-        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
+        self.formLayout = QtGui.QFormLayout()
+        self.formLayout.setFieldGrowthPolicy(QtGui.QFormLayout.AllNonFixedFieldsGrow)
+        self.formLayout.setObjectName(_fromUtf8("formLayout"))
         self.gridLayout = QtGui.QGridLayout()
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.name = QtGui.QLineEdit(RaceEditor)
@@ -43,9 +44,7 @@ class Ui_RaceEditor(object):
         self.label = QtGui.QLabel(RaceEditor)
         self.label.setObjectName(_fromUtf8("label"))
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
-        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.gridLayout.addItem(spacerItem, 4, 2, 1, 1)
-        self.horizontalLayout.addLayout(self.gridLayout)
+        self.formLayout.setLayout(1, QtGui.QFormLayout.FieldRole, self.gridLayout)
         self.race_image = QtGui.QLabel(RaceEditor)
         self.race_image.setMinimumSize(QtCore.QSize(150, 150))
         self.race_image.setMaximumSize(QtCore.QSize(150, 150))
@@ -54,10 +53,10 @@ class Ui_RaceEditor(object):
         self.race_image.setText(_fromUtf8(""))
         self.race_image.setScaledContents(True)
         self.race_image.setObjectName(_fromUtf8("race_image"))
-        self.horizontalLayout.addWidget(self.race_image)
-        self.verticalLayout.addLayout(self.horizontalLayout)
-        spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.verticalLayout.addItem(spacerItem1)
+        self.formLayout.setWidget(1, QtGui.QFormLayout.LabelRole, self.race_image)
+        self.verticalLayout.addLayout(self.formLayout)
+        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem)
 
         self.retranslateUi(RaceEditor)
         QtCore.QMetaObject.connectSlotsByName(RaceEditor)
