@@ -1,8 +1,9 @@
 {
-	"name": "Clay Golem",
-    "root_object": "ClayGolemArm",
-	"action_set": "Clay Golem Actions",
-	"role" : "BRAWLER",
-	"level_adjustment" : 0,
-	"element" : "NEUTRAL"
+    "action_set": "Clay Golem Actions", 
+    "element": "NEUTRAL", 
+    "hp_per_level": 5, 
+    "level_adjustment": 0, 
+    "name": "Clay Golem", 
+    "role": "BRAWLER", 
+    "root_object": "ClayGolemArm"
 }

@@ -26,7 +26,7 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="name"/>
      </item>
-     <item row="3" column="0">
+     <item row="6" column="0">
       <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -62,6 +62,77 @@
         <string>Action Set: </string>
        </property>
       </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Element: </string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="element"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>HP Per Level: </string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QSpinBox" name="hp_per_level"/>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Level Adjustment: </string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QSpinBox" name="level_adjustment">
+         <property name="minimum">
+          <number>-10</number>
+         </property>
+         <property name="maximum">
+          <number>10</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
@@ -104,12 +175,108 @@
    <slot>modified()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>220</x>
-     <y>21</y>
+     <x>389</x>
+     <y>35</y>
     </hint>
     <hint type="destinationlabel">
      <x>194</x>
      <y>5</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>root_object</sender>
+   <signal>editTextChanged(QString)</signal>
+   <receiver>MonsterEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>304</x>
+     <y>58</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>253</x>
+     <y>9</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>action_set</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>MonsterEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>278</x>
+     <y>78</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>204</x>
+     <y>1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>element</sender>
+   <signal>editTextChanged(QString)</signal>
+   <receiver>MonsterEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>301</x>
+     <y>106</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>313</x>
+     <y>-3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>hp_per_level</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MonsterEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>268</x>
+     <y>132</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>393</x>
+     <y>123</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>level_adjustment</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MonsterEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>266</x>
+     <y>158</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>394</x>
+     <y>157</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>element</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>MonsterEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>357</x>
+     <y>102</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>398</x>
+     <y>96</y>
     </hint>
    </hints>
   </connection>
