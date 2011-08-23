@@ -130,7 +130,7 @@ class EditorWindow(QMainWindow):
 			print("Saving %s..." % self.editor.data.name)
 			self.editor.save()
 			self.editor.data.write()
-			self.editor.qtitem.setText(self.editor.data.name)
+			self.editor.qtitem.setForeground(Qt.black)
 			
 	def load_settings(self):
 		try:
