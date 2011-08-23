@@ -342,10 +342,12 @@ class PlayerLogic(CharacterLogic):
 		save.write()		
 	
 class MonsterLogic(CharacterLogic):
-	def __init__(self, object, monsterdata):
+	def __init__(self, object, monsterdata, level):
 		CharacterLogic.__init__(self, object)
 		# self.id = monsterdata.id
 		
+		level += monsterdata.level_adjustment
+		self.level = level
 		self.action_set = monsterdata.action_set
 		
 		self.xp_reward = 0
@@ -358,7 +360,8 @@ class MonsterLogic(CharacterLogic):
 #		self.behaviors = []
 		
 		self.name = monsterdata.name
-		self.hp = 20
+		self.hp = self.max_hp = monsterdata.hp_per_level * level
+		self.element = monsterdata.element
 		# self.level = monsterdata.level
 		# self.role = monsterdata.role
 		# self.leader = monsterdata.leader

@@ -2,6 +2,7 @@
 	"name": "monster",
 	"root_object": "",
 	"action_set": "",
+	"hp_per_level": 5,
 	"role" : "MEAT_SHIELD",
 	"level_adjustment" : 0,
 	

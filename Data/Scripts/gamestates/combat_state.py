@@ -3,7 +3,7 @@
 from .base_state import *
 from .default_state import DefaultState
 from Scripts.packages import *
-from Scripts.character_logic import MonsterLogic
+from Scripts.character_logic import MonsterLogic, PlayerLogic
 
 import random
 from math import *
@@ -114,12 +114,18 @@ class CombatState(DefaultState, BaseController):
 				
 			self.server.invoke("set_environment")
 			
-			i = 0
-			for monster in [Monster(i) for i in self._generate_encounter(main['dgen'].deck, len(main['net_players']))]:
-				i += 1
+			players = [i for i in main['net_players'].values() if isinstance(i, PlayerLogic)]
+			num_players = len(players)
+			
+			party_level = 0
+			for i in players:
+				party_level += i.level
+			party_level //= num_players
+				
+			for i, monster in enumerate(self._generate_encounter(main['dgen'].deck, num_players)):
 				
 				# Update the server
-				self.server.invoke("add_monster", monster.package_name, str(i), 0, 0, SAFE_Z)
+				self.server.invoke("add_monster", monster, party_level, str(i), 0, 0, SAFE_Z)
 					
 		else:
 			# Request monsters from the server
@@ -329,16 +335,16 @@ class CombatState(DefaultState, BaseController):
 	# Server
 	##########
 	
-	@rpc(server_functions, "add_monster", str, str, float, float, float)
-	def s_add_monster(self, main, client, monster, cid, x, y, z):
+	@rpc(server_functions, "add_monster", str, int, str, float, float, float)
+	def s_add_monster(self, main, client, monster, level, cid, x, y, z):
 		combat = main['combats'].get(client.combat_id, None)
 		if combat is None: return
 		
 		if cid not in combat.monster_list:
-			combat.monster_list[cid] = [MonsterLogic(None, Monster(monster)), [x, y, z]]
+			combat.monster_list[cid] = [MonsterLogic(None, Monster(monster), level), [x, y, z]]
 			combat.monster_list[cid][0].cid = cid
 			AiManager.add_agent(combat.monster_list[cid][0], "extern/cego/example_definitions/base.json", "spawn")
-			self.clients.invoke("add_player", cid, monster, 1, [x, y, z], None)
+			self.clients.invoke("add_player", cid, [monster, level], 1, [x, y, z], None)
 			self.clients.invoke("add_monster", client.combat_id, monster, cid, x, y, z)
 			
 			main['players'][cid] = combat.monster_list[cid][0]

@@ -214,7 +214,7 @@ class BaseState:
 			return
 	
 		if is_monster != 0:
-			race = packages.Monster(char_info)
+			race = packages.Monster(char_info[0])
 		else:
 			race = packages.Race(char_info['race'])
 		main['engine'].load_library(race)
@@ -223,7 +223,7 @@ class BaseState:
 		obj.armature = obj
 		
 		if is_monster != 0:
-			main['net_players'][cid] = character_logic.MonsterLogic(obj, race)
+			main['net_players'][cid] = character_logic.MonsterLogic(obj, race, char_info[1])
 		else:
 			main['net_players'][cid] = character_logic.PlayerLogic(obj)
 			main['net_players'][cid].load_from_info(char_info)
