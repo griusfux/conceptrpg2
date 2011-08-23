@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'PowerEditor.ui'
 #
-# Created: Sun Aug 21 00:59:35 2011
+# Created: Mon Aug 22 16:52:07 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -91,17 +91,31 @@ class Ui_PowerEditor(object):
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem1, 2, 2, 1, 1)
         self.verticalLayout.addLayout(self.gridLayout)
+        self.label_10 = QtGui.QLabel(PowerEditor)
+        self.label_10.setObjectName(_fromUtf8("label_10"))
+        self.verticalLayout.addWidget(self.label_10)
+        self.horizontalLayout_6 = QtGui.QHBoxLayout()
+        self.horizontalLayout_6.setObjectName(_fromUtf8("horizontalLayout_6"))
+        self.tm_enemies = QtGui.QCheckBox(PowerEditor)
+        self.tm_enemies.setObjectName(_fromUtf8("tm_enemies"))
+        self.horizontalLayout_6.addWidget(self.tm_enemies)
+        self.tm_self = QtGui.QCheckBox(PowerEditor)
+        self.tm_self.setObjectName(_fromUtf8("tm_self"))
+        self.horizontalLayout_6.addWidget(self.tm_self)
+        self.tm_allies = QtGui.QCheckBox(PowerEditor)
+        self.tm_allies.setObjectName(_fromUtf8("tm_allies"))
+        self.horizontalLayout_6.addWidget(self.tm_allies)
+        spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_6.addItem(spacerItem2)
+        self.verticalLayout.addLayout(self.horizontalLayout_6)
         self.label_6 = QtGui.QLabel(PowerEditor)
         self.label_6.setObjectName(_fromUtf8("label_6"))
         self.verticalLayout.addWidget(self.label_6)
         self.description = QtGui.QPlainTextEdit(PowerEditor)
         self.description.setObjectName(_fromUtf8("description"))
         self.verticalLayout.addWidget(self.description)
-        spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.verticalLayout.addItem(spacerItem2)
-        self.horizontalLayout_2 = QtGui.QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
-        self.verticalLayout.addLayout(self.horizontalLayout_2)
+        spacerItem3 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem3)
 
         self.retranslateUi(PowerEditor)
         QtCore.QObject.connect(self.name, QtCore.SIGNAL(_fromUtf8("textEdited(QString)")), PowerEditor.modified)
@@ -114,6 +128,9 @@ class Ui_PowerEditor(object):
         QtCore.QObject.connect(self.cool_down, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), PowerEditor.modified)
         QtCore.QObject.connect(self.tier, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), PowerEditor.modified)
         QtCore.QObject.connect(self.description, QtCore.SIGNAL(_fromUtf8("textChanged()")), PowerEditor.modified)
+        QtCore.QObject.connect(self.tm_enemies, QtCore.SIGNAL(_fromUtf8("stateChanged(int)")), PowerEditor.modified)
+        QtCore.QObject.connect(self.tm_self, QtCore.SIGNAL(_fromUtf8("stateChanged(int)")), PowerEditor.modified)
+        QtCore.QObject.connect(self.tm_allies, QtCore.SIGNAL(_fromUtf8("stateChanged(int)")), PowerEditor.modified)
         QtCore.QMetaObject.connectSlotsByName(PowerEditor)
         PowerEditor.setTabOrder(self.name, self.element)
         PowerEditor.setTabOrder(self.element, self.delivery)
@@ -134,5 +151,9 @@ class Ui_PowerEditor(object):
         self.label_8.setText(QtGui.QApplication.translate("PowerEditor", "Cool Down: ", None, QtGui.QApplication.UnicodeUTF8))
         self.label_7.setText(QtGui.QApplication.translate("PowerEditor", "Tier:", None, QtGui.QApplication.UnicodeUTF8))
         self.label_9.setText(QtGui.QApplication.translate("PowerEditor", "Distance:", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_10.setText(QtGui.QApplication.translate("PowerEditor", "Target Mask:", None, QtGui.QApplication.UnicodeUTF8))
+        self.tm_enemies.setText(QtGui.QApplication.translate("PowerEditor", "Enemies", None, QtGui.QApplication.UnicodeUTF8))
+        self.tm_self.setText(QtGui.QApplication.translate("PowerEditor", "Self", None, QtGui.QApplication.UnicodeUTF8))
+        self.tm_allies.setText(QtGui.QApplication.translate("PowerEditor", "Allies", None, QtGui.QApplication.UnicodeUTF8))
         self.label_6.setText(QtGui.QApplication.translate("PowerEditor", "Description:", None, QtGui.QApplication.UnicodeUTF8))
 

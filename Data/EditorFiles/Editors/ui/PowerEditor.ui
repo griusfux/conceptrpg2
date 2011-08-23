@@ -162,6 +162,51 @@
     </layout>
    </item>
    <item>
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>Target Mask:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <widget class="QCheckBox" name="tm_enemies">
+       <property name="text">
+        <string>Enemies</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="tm_self">
+       <property name="text">
+        <string>Self</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="tm_allies">
+       <property name="text">
+        <string>Allies</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QLabel" name="label_6">
      <property name="text">
       <string>Description:</string>
@@ -183,9 +228,6 @@
       </size>
      </property>
     </spacer>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2"/>
    </item>
   </layout>
  </widget>
@@ -359,6 +401,54 @@
     <hint type="destinationlabel">
      <x>115</x>
      <y>283</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tm_enemies</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>PowerEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>40</x>
+     <y>179</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2</x>
+     <y>176</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tm_self</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>PowerEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>112</x>
+     <y>180</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>203</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tm_allies</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>PowerEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>162</x>
+     <y>177</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>237</y>
     </hint>
    </hints>
   </connection>

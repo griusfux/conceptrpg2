@@ -8,6 +8,6 @@
 	"effect_shape" : "SINGLE",
 	"shape_modifier" : 0,
 	"distance" : 0,
-	"target_mask" : "ENEMIES",
+	"target_mask" : ["ENEMIES"],
 	"flags": []
 }

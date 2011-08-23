@@ -561,7 +561,7 @@ class CombatState(DefaultState, BaseController):
 		else:
 			distance = power.distance
 		
-		return self.get_targets_ex(character, power.effect_shape, distance, {power.target_mask})
+		return self.get_targets_ex(character, power.effect_shape, distance, power.target_mask)
 		
 
 	def get_targets_ex(self, character, shape, distance, target_types={'ENEMIES'}, source=None):

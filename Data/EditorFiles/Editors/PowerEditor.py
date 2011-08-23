@@ -32,15 +32,31 @@ class PowerEditor(BaseEditor):
 		ui.cool_down.setValue(data.cool_down)
 		ui.description.setPlainText(data.description)
 		
+		# Setup target mask
+		ui.tm_self.setChecked("SELF" in data.target_mask)
+		ui.tm_enemies.setChecked("ENEMIES" in data.target_mask)
+		ui.tm_allies.setChecked("ALLIES" in data.target_mask)
+		
 		
 	def save(self):
-		self.data.name = self.ui.name.text()
-		self.data.element = self.ui.element.itemText(self.ui.element.currentIndex()).upper()
-		self.data.delivery = self.ui.delivery.itemText(self.ui.delivery.currentIndex()).upper()
-		self.data.effect_shape = self.ui.effect_shape.itemText(self.ui.effect_shape.currentIndex()).upper()
-		self.data.shape_modifier = self.ui.shape_modifier.value()
-		self.data.distance = self.ui.distance.value()
-		self.data.tier = self.ui.tier.value()
-		self.data.cool_down = self.ui.cool_down.value()
-		self.data.description = self.ui.description.toPlainText()		
+		data = self.data
+		ui = self.ui
 		
+		data.name = ui.name.text()
+		data.element = ui.element.itemText(ui.element.currentIndex()).upper()
+		data.delivery = ui.delivery.itemText(ui.delivery.currentIndex()).upper()
+		data.effect_shape = ui.effect_shape.itemText(ui.effect_shape.currentIndex()).upper()
+		data.shape_modifier = ui.shape_modifier.value()
+		data.distance = ui.distance.value()
+		data.tier = ui.tier.value()
+		data.cool_down = ui.cool_down.value()
+		data.description = ui.description.toPlainText()
+		
+		# Handle the target mask
+		tm = []
+			
+		if ui.tm_self.isChecked(): tm.append("SELF")
+		if ui.tm_enemies.isChecked(): tm.append("ENEMIES")
+		if ui.tm_allies.isChecked(): tm.append("ALLIES")
+		
+		data.target_mask = tm
