@@ -23,8 +23,19 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="blender_path"/>
+     <item row="0" column="2">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLineEdit" name="blender_path"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="browse_button">
+         <property name="text">
+          <string>Browse</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
@@ -49,8 +60,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>257</x>
+     <y>290</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -65,8 +76,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>325</x>
+     <y>290</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -74,5 +85,24 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>browse_button</sender>
+   <signal>clicked()</signal>
+   <receiver>SettingsDialog</receiver>
+   <slot>find_file()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>368</x>
+     <y>134</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>397</x>
+     <y>133</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>find_file()</slot>
+ </slots>
 </ui>

@@ -63,6 +63,7 @@ class EditorWindow(QMainWindow):
 		file = self.menuBar().addMenu('&File')
 		file.addAction(new)
 		file.addAction(save)
+		file.addAction(settings)
 		file.addAction(exit)
 		
 		# The current editor
