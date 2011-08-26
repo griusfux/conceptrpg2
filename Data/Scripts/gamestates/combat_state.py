@@ -448,6 +448,8 @@ class CombatState(DefaultState, BaseController):
 		self.monster_id = 0
 		# Setup Ai
 		AiManager.set_controller(self)
+		AiManager.set_extern_actions("Scripts.ai.actions")
+		AiManager.set_extern_transitions("Scripts.ai.transitions")
 		
 		DefaultState.server_init(self, main)
 		
