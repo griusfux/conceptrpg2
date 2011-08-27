@@ -637,11 +637,12 @@ class CombatState(DefaultState, BaseController):
 		return targets		
 	
 	def spawn(self, character, position):
-		if hasattr(self, 'clients'):	
+		if hasattr(self, 'clients'):
 			combat = self.main['combats'].get(self.client.combat_id, None)
 			if combat and character.cid in combat.monster_list:
 				combat.monster_list[character.cid][1] = position
-			self.clients.invoke("position", character.cid, *position)
+				self.play_animation(character, "Spawn")
+				self.clients.invoke("position", character.cid, *position)
 	
 	def move(self, character, linear = (0,0,0) , angular = (0,0,0) , local = False):
 		"""Handles linear and angular movement of a character"""

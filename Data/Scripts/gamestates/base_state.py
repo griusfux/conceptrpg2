@@ -117,7 +117,7 @@ class BaseState:
 			self.client_init(main)
 			self.cleanup = self.client_cleanup
 			
-		self._is_server = is_server
+		self.is_server = is_server
 		
 	def run(self, main, client=None):
 		if self._next_state: return (self._next_state, "SWITCH")
@@ -126,7 +126,7 @@ class BaseState:
 		self.main = main
 		
 		# Run the appropriate method
-		if self._is_server:
+		if self.is_server:
 			self.client = RPC(self, client, self.client_functions)
 			self.server.parse_command(main, client.data, client)
 			return self.server_run(main, client)
@@ -203,9 +203,13 @@ class BaseState:
 		if not character.action_set:
 			print("WARNING: attempting to animate character with an empty action set: %s. Skipping..." % character)
 			return
-		actions = main['actions'][character.action_set][action]
-		for i, v in enumerate(actions):
-			character.object.play_animation(v['name'], v['start'], v['end'], mode=mode, layer=i)
+		
+		if action in main['actions'][character.action_set]:
+			actions = main['actions'][character.action_set][action]
+			for i, v in enumerate(actions):
+				character.object.play_animation(v['name'], v['start'], v['end'], mode=mode, layer=i)
+		else:
+			print("WARNING: action %s not found in action set %s." % (action, character.action_set))
 
 	@rpc(client_functions, "add_player", str, "pickle", int, "pickle", "pickle")
 	def add_player(self, main, cid, char_info, is_monster, pos, ori):
@@ -324,10 +328,13 @@ class BaseController:
 		
 		"""
 		
-		if lock:
-			character.add_lock(lock)
-			
-		self.server.invoke("animate", character.id, animation, mode)
+		if self.is_server:
+			self.clients.invoke('animate', character.cid, animation, mode)
+		else:
+			if lock:
+				character.add_lock(lock)
+				
+			self.server.invoke("animate", character.id, animation, mode)
 		
 	def get_targets(self, type, range):
 		"""Get targets in a range
