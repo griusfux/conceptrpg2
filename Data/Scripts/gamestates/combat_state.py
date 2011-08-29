@@ -610,7 +610,7 @@ class CombatState(DefaultState, BaseController):
 				v = ori_ivnt * v
 				
 				# Now do a simple bounds check
-				if v[1] < distance and abs(v[0]) < HALF_UNIT_SIZE:
+				if v[1] < distance and abs(v[0]) < HALF_UNIT_SIZE * 2: # Multiply by 2 to allow for more error
 					targets.append(target)
 		elif shape == 'BURST':
 			for target in tlist:
