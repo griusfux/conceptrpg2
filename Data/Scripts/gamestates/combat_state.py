@@ -154,7 +154,7 @@ class CombatState(DefaultState, BaseController):
 			main['camera'].change_mode(self.camera, 15)
 			self.last_camera = self.camera
 		else:
-			main['camera'].update()
+			main['camera'].update(main['player'].lock)
 		self.camera = 'combat'
 		
 		# Update the effect system

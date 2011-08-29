@@ -337,8 +337,13 @@ class Camera:
 		self.camera.parent.timeOffset = 0
 		
 		self._first_frame = False
+		
+		# Whether or not to lock the camera
+		self.lock = False
 	
-	def update(self):
+	def update(self, lock=False):
+		self.lock = lock
+		
 		if self._transition_point != 0:
 			# For the first frame save old data and run the mode's init function
 			if self._first_frame:
@@ -469,13 +474,14 @@ class Camera:
 				scale = 0.1
 		else:
 			scale = 1
-			
-		dy = 0.5 - gl.mouse.position[1]
-		if abs(dy) > 0.01: # "Dead zone"
-			x = self.pivot.localOrientation.to_euler("XYZ")[0]
-
-			if radians(45) < x + dy < radians(115):
-				self.pivot.applyRotation((dy, 0, 0), True)
+		
+		if not self.lock:
+			dy = 0.5 - gl.mouse.position[1]
+			if abs(dy) > 0.01: # "Dead zone"
+				x = self.pivot.localOrientation.to_euler("XYZ")[0]
+	
+				if radians(45) < x + dy < radians(115):
+					self.pivot.applyRotation((dy, 0, 0), True)
 			
 			
 		self.pivot.scaling = [scale, scale, scale]
