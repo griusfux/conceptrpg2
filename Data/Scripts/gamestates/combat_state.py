@@ -582,6 +582,10 @@ class CombatState(DefaultState, BaseController):
 		
 		"""
 		
+		# If we have a shape of "SELF" just return the character
+		if shape == 'SELF':
+			return [character]
+		
 		# Bump the range a bit to compensate for the first half "tile"
 		# that the player occupies
 		distance += HALF_UNIT_SIZE
@@ -669,7 +673,7 @@ class CombatState(DefaultState, BaseController):
 	def use_power(self, character, power):
 		if isinstance(power, str):
 			power = Power(power)
-		if "SELF" in power.target_mask:
+		if power.effect_shape == 'SELF':
 			power.use(self, character)
 		else:
 			character.auto_power = power

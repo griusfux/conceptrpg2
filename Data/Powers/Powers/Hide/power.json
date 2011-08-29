@@ -3,10 +3,13 @@
     "delivery": "SPELL", 
     "description": "Causes all characters targeting the caster to lose their target. ", 
     "distance": 0, 
-    "effect_shape": "SINGLE", 
+    "effect_shape": "SELF", 
     "element": "DEATH", 
     "flags": [], 
     "name": "Hide", 
     "shape_modifier": 0, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
     "tier": 1
 }

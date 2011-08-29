@@ -5,7 +5,7 @@
 	"tier" : "int",
 	"delivery" : "{'WEAPON', 'SPELL'}",
 	"cool_down" : "int",
-	"effect_shape" : "{'CONE', 'BURST', 'BEAM', 'SINGLE'}",
+	"effect_shape" : "{'CONE', 'BURST', 'BEAM', 'SINGLE', 'SELF'}",
 	"shape_modifier" : "int",
 	"distance" : "int",
 	"target_mask" : "list",
