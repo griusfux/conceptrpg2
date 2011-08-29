@@ -17,12 +17,16 @@ def get_blender_objects(datafile):
 	with open("tmp", "wb") as f:
 		f.write(datafile.blend)	
 	
-		p = subprocess.Popen([blender, '-b', "tmp", '-P', './EditorFiles/blender_grabber.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		p = subprocess.Popen([blender, '-b', "tmp", '-P', './extern/blender_grabber.py'],
+								shell=True,
+								stdout=subprocess.PIPE,
+								stderr=subprocess.STDOUT,
+								creationflags=subprocess._subprocess.SW_HIDE,)
 		
 		p.wait()
 		
 		with open('grabber.txt') as f:
-			retval = f.read().split()
+			retval = f.read().split('\n')
 		
 	os.unlink('tmp')
 	os.unlink('grabber.txt')
