@@ -6,9 +6,9 @@ from Scripts.networking.game_client import GameClient
 
 # Server script/runtime (in order of precedence)
 servers = [
-	"python server.py",
-	"python server.pyc",
-	"server.exe"
+	"python ./server.py",
+	"python ./server.pyc",
+	"./server.exe"
 ]
 
 class NetworkSetupState(BaseState):
