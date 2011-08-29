@@ -7,6 +7,7 @@ import time
 import sys
 
 sys.path.append("extern")
+sys.path.append("2.59/python/lib") # Used in release configuration
 from Scripts.networking.game_server import GameServer
 
 class Log:

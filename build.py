@@ -1,16 +1,16 @@
 import sys
-sys.path.append("Data")
-
-
 import os
 import shutil
 import struct
 import subprocess
+
+sys.path.append(os.path.abspath("Data"))
+
 from Scripts.packages import *
 
 INSTALL_DIRS = [
-	"Actions/.config",
-	"extern",
+	"Audio",
+	"EditorFiles",
 	"Schemas",
 	"Scripts",
 	"Shops/.config",
@@ -36,33 +36,14 @@ PACKAGES = [
 ]
 
 INSTALL_FILES = [
-	"data.blend",
 	"icon.png",
 	"keys.conf",
 	"main.py",
 	"mouse.conf",
 ]
 
-FREEZE_FILES = [
-	"setup_editor.py",
-	"setup_server.py"
-]
-
-# FREEZE_INSTALL = [
-	# "server.exe",
-	# "py_editor.exe",
-	# "libgcc_s_dw2-1.dll",
-	# "mingwm10.dll",
-	# "PyQt4.QtCore.pyd",
-	# "PyQt4.QtGui.pyd",
-	# "python31.dll",
-	# "QtCore4.dll",
-	# "QtGui4.dll",
-	# "sip.pyd"
-# ]
-
 def ct_ignore(dir, contents):
-	return [i for i in contents if i.startswith('.') or i.endswith('.pyc')]
+	return [i for i in contents if i.startswith('.') or i.endswith('.pyc') or i == '__pycache__']
 	
 def clear_py(dir):
 	for f in os.listdir(dir):
@@ -112,7 +93,7 @@ def WriteRuntime(player_path, blend_path, output_path):
     output.write(struct.pack('B', (offset>>0)&0xFF))
     
     # Stuff for the runtime
-    output.write("BRUNTIME".encode())
+    output.write(b'BRUNTIME')
     output.close()
     
     # Make the runtime executable on Linux
@@ -128,11 +109,12 @@ if __name__ == '__main__':
 		
 	os.mkdir("build")
 	os.mkdir("build/Data")
+	os.chdir("Data")
 	
 	# Freeze files
-	os.chdir("Data")
-	# for ff in FREEZE_FILES:
-		# subprocess.call("python "+ff+" build")
+	subprocess.call("C:/Python32/Scripts/cxfreeze.bat py_editor.pyw -s --base-name=Win32GUI --target-dir ../build/tmp")
+	subprocess.call("C:/Python32/Scripts/cxfreeze.bat server.py -s --target-dir ../build/tmp")
+
 		
 	# Copy packed packages
 	for cls in PACKAGES:
@@ -142,14 +124,17 @@ if __name__ == '__main__':
 		
 		os.makedirs(os.path.join("..", "build", "Data", cls._dir))
 		
-		for pgk in cls.get_package_list():
+		for pgk in cls.get_package_list(show_traceback=True):
 			pgk.pack(os.path.join("..", "build", "Data", pgk._path))
 	
 	os.chdir("..")
-	# shutil.copytree("Data/build/exe.win32-3.1", "build/Data")
-	# subprocess.call("xcopy Data\\build\\exe.win32-3.1\\*.* build\\Data /Y")
-	# for fi in FREEZE_INSTALL:
-		# shutil.copy2("Data/build/exe.win32-3.1/"+fi, "Build/Data/"+fi)
+	
+	
+	shutil.copy2(os.path.join("build", "tmp", "py_editor.exe"),
+				 os.path.join("build", "Data", "py_editor.exe"))
+	shutil.copy2(os.path.join("build", "tmp", "server.exe"),
+				 os.path.join("build", "Data", "server.exe"))
+	shutil.rmtree(os.path.join("build", "tmp"))
 	
 	# Copy files
 	for file in INSTALL_FILES:
@@ -163,11 +148,13 @@ if __name__ == '__main__':
 	subprocess.call("python -m compileall -b build/Data")
 	clear_py("build/Data")
 	
+	# Now copy extern (this avoid compiling the modules in extern, which is known to cause problems)
+	shutil.copytree("Data/extern", "build/Data/extern", ignore=ct_ignore)
+	
 	# Create the runtime
 	print("Creating runtime...", end=' ')
 	subprocess.call("xcopy release\\win64\\*.* build\\Data /Y /E")
-	WriteRuntime("build/Data/blenderplayer.exe", "Data/data.blend", "build/Data/game.exe")
-	# os.remove("build/Data/blenderplayer.exe")
-	# os.remove("build/Data/data.blend")
+	WriteRuntime("build/Data/blenderplayer.exe", "Data/data.blend", "build/Data/data.exe")
+	os.remove("build/Data/blenderplayer.exe")
 	print("Done")
 	
