@@ -309,10 +309,6 @@ class BaseState:
 	##########
 	# Other
 	##########
-		
-	def add_effect(self, effect):
-		id = self.main["effect_system"].add(effect)
-		return id
 
 # All states should have a controller interface by which things like the AI system may make use
 # of the state. Subclass this controller and override methods as you need them.
@@ -329,7 +325,7 @@ class BaseController:
 		"""
 		
 		if self.is_server:
-			self.clients.invoke('animate', character.cid, animation, mode)
+			self.clients.invoke('animate', character.id, animation, mode)
 		else:
 			if lock:
 				character.add_lock(lock)
@@ -362,3 +358,9 @@ class BaseController:
 		character.stat_mods[stat] += amount
 		character.recalc_stats()
 		
+	def add_effect(self, effect):
+		id = self.main["effect_system"].add(effect)
+		return id
+	
+	def remove_effect(self, id):
+		self.main["effect_system"].remove(id)
