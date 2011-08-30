@@ -32,6 +32,10 @@ BASE_AFFINITIES = {
 				"spell" : 0
 			}
 
+CALLBACKS = {
+			"ATTACK" : [],
+			}
+
 class CharacterLogic:
 	"""A logic object that stores all the information and methods of the player"""
 	
@@ -96,6 +100,7 @@ class CharacterLogic:
 		self.lock = 0
 		
 		self.powers = PowerManager(self, [])
+		self.stance = ""
 		
 		self.targets = []
 		self.auto_target = None
@@ -104,6 +109,8 @@ class CharacterLogic:
 		self.statuses = []
 		
 		self.action_set = None
+		
+		self.callbacks = CALLBACKS.copy()
 		
 	def __str__(self):
 		return self.name
@@ -143,7 +150,23 @@ class CharacterLogic:
 			if status.time <= 0:
 				status.pop(controller, self)
 				self.statuses.remove(status)
-
+				
+	def add_callback(self, type, callback):
+		if type not in CALLBACKS:
+			print("WARNING: %s is not a supported character callback. Supported callbacks are:"%type)
+			for key in CALLBACKS:
+				print(key)
+			return
+		self.callbacks[type].append(callback)
+		
+	def remove_callback(self, type, callback):
+		if type not in CALLBACKS:
+			print("WARNING: %s is not a supported character callback. Supported callbacks are:"%type)
+			for key in CALLBACKS:
+				print(key)
+			return
+		self.callbacks[type].remove(callback)
+		
 	def level_up(self):
 		self.level += 1
 		
