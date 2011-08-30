@@ -317,6 +317,22 @@ class CharacterLogic:
 
 		self.recalc_stats()
 		
+	@property
+	def position(self):
+		return self.object.position
+	
+	@position.setter
+	def position(self, v):
+		self.object.position = v
+		
+	@property
+	def orientation(self):
+		return self.object.orientation
+	
+	@orientation.setter
+	def orientation(self, v):
+		self.object.orientation = v
+		
 class PlayerLogic(CharacterLogic):		
 	def load(self, save):
 		"""Fills in stats from a SaveData object"""
