@@ -23,7 +23,7 @@ class Combat:
 	"""Combat utility class"""
 	
 	def __init__(self):
-		self.hero_list = []
+		self.hero_list = {}
 		self.monster_list = {}
 		self.environment = []
 
@@ -341,13 +341,19 @@ class CombatState(DefaultState, BaseController):
 		if combat is None: return
 		
 		if cid not in combat.monster_list:
-			combat.monster_list[cid] = [MonsterLogic(None, Monster(monster), level), [x, y, z]]
-			combat.monster_list[cid][0].cid = cid
-			AiManager.add_agent(combat.monster_list[cid][0], "extern/cego/example_definitions/base.json", "spawn")
+			ori = [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+			combat.monster_list[cid] = client.server.create_monster(Monster(monster), level, [x, y, z], ori)
+																#[MonsterLogic(None, Monster(monster), level), [x, y, z]]
+			combat.monster_list[cid].cid = cid
+			AiManager.add_agent(combat.monster_list[cid], "extern/cego/example_definitions/base.json", "spawn")
 			self.clients.invoke("add_player", cid, [monster, level], 1, [x, y, z], None)
 			self.clients.invoke("add_monster", client.combat_id, monster, cid, x, y, z)
 			
-			main['players'][cid] = combat.monster_list[cid][0]
+			main['players'][cid] = combat.monster_list[cid]
 		# else:
 			# print("WARNING (add_monster): Monster id, '%s', has already been added, ignoring" % id)
 		
@@ -357,7 +363,7 @@ class CombatState(DefaultState, BaseController):
 		if combat is None: return
 		
 		if id in combat.monster_list:
-			monster, position = combat.monster_list[id]
+			monster = combat.monster_list[id]
 			
 			# Get rid of the monster
 			self.clients.invoke("kill_monster", client.combat_id, id)
@@ -371,7 +377,7 @@ class CombatState(DefaultState, BaseController):
 			item = item(random.choice(item.available_items), 1) # XXX level should be calculated from party level
 			
 			main['ground_items'][gid] = item
-			self.clients.invoke("drop_item", gid, item, *position)
+			self.clients.invoke("drop_item", gid, item, *monster.position)
 			
 			del combat.monster_list[id]
 			del main['players'][id]
@@ -390,7 +396,7 @@ class CombatState(DefaultState, BaseController):
 		if combat is None: return
 		if id not in combat.monster_list: return
 		
-		monster = combat.monster_list[id][0]
+		monster = combat.monster_list[id]
 		monster.hp += amount
 		
 		if monster.hp <= 0:
@@ -403,8 +409,8 @@ class CombatState(DefaultState, BaseController):
 		if client.combat_id not in combat.monster_list: return
 		
 		for i, v in combat.monster_list.items():
-			self.client.invoke("add_player", i, v[0].name, 1, v[1], None)
-			self.client.invoke("add_monster", client.combat_id, v[0].name, i, *v[1])
+			self.client.invoke("add_player", i, v.name, 1, v.position, None)
+			self.client.invoke("add_monster", client.combat_id, v.name, i, *v.position)
 
 	@rpc(server_functions, "add_hero")
 	def s_add_hero(self, main, client):
@@ -415,6 +421,8 @@ class CombatState(DefaultState, BaseController):
 			# Already added, ignore
 			return
 			
+		combat.hero_list[client.id] = main['player'][client.id]	
+		
 		self.clients.invoke('add_hero', client.combat_id, client.id)
 		
 		for hero in combat.hero_list:
@@ -428,7 +436,7 @@ class CombatState(DefaultState, BaseController):
 	def s_position_monster(self, main, client, cid, x, y, z):
 		combat = main['combats'].get(client.combat_id, None)
 		if combat is None: return
-		combat.monster_list[cid][1] = [x, y, z]
+		combat.monster_list[cid].position = [x, y, z]
 		self.clients.invoke("position_monster", cid, x, y, z)
 		
 	@rpc(server_functions, "add_node", "pickle")
@@ -463,7 +471,8 @@ class CombatState(DefaultState, BaseController):
 			AiManager.run()
 				
 		if main['combats'].get(client.combat_id) == -1:
-			main['combats'][client.combat_id] = Combat()
+			main['combats'][client.combat_id] = combat =Combat()
+			combat.hero_list[client.id] = main['players'][client.id]
 			
 		DefaultState.server_run(self, main, client)
 			
@@ -520,6 +529,17 @@ class CombatState(DefaultState, BaseController):
 	def end_effect(self, id):
 		self.main["effect_system"].remove(id)
 		
+	def get_potential_targets(self):
+		l = []
+		
+		if self.is_server:
+			combat = self.client.server.main['combats'].get(self.client.combat_id)
+			if combat:
+				l.extend(combat.hero_list.values())
+				l.extend(combat.monster_list.values())
+				
+		return l
+		
 	def get_closest_target(self, character, targets):
 		"""Get the closest target to the given character from the targets list"""
 		
@@ -571,7 +591,6 @@ class CombatState(DefaultState, BaseController):
 		
 		return self.get_targets_ex(character, power.effect_shape, distance, power.target_mask)
 		
-
 	def get_targets_ex(self, character, shape, distance, target_types={'ENEMIES'}, source=None):
 		"""Get targets in a range
 		
@@ -644,7 +663,7 @@ class CombatState(DefaultState, BaseController):
 		if hasattr(self, 'clients'):
 			combat = self.main['combats'].get(self.client.combat_id, None)
 			if combat and character.cid in combat.monster_list:
-				combat.monster_list[character.cid][1] = position
+				combat.monster_list[character.cid].position = position
 				self.play_animation(character, "Spawn")
 				self.clients.invoke("position", character.cid, *position)
 	

@@ -6,19 +6,41 @@
 
 from Scripts.networking import NET_ENCODING
 from Scripts.gamestate_manager import GameStateManager
-from Scripts.character_logic import CharacterLogic
+from Scripts.character_logic import CharacterLogic, MonsterLogic
 
 import time
 import enet
 
 class NetPlayer(CharacterLogic):
-		"""Class for handling player data"""
+	"""Class for handling player data"""
 		
-		def __init__(self, char_info, pos, ori):
-			CharacterLogic.__init__(self, None)
-			self.char_info = char_info
-			self.position = pos
-			self.orientation = ori
+	def __init__(self, char_info, pos, ori):
+		CharacterLogic.__init__(self, None)
+		self.char_info = char_info
+		self._position = pos
+		self._orientation = ori
+		
+	@property
+	def position(self):
+		return self._position
+	
+	@position.setter
+	def position(self, v):
+		self._position = v
+		
+	@property
+	def orientation(self):
+		return self._orientation
+	
+	@orientation.setter
+	def orientation(self, v):
+		self._orientation = v
+			
+class NetMonster(NetPlayer):
+	def __init__(self, monsterdata, level, pos, ori):
+		MonsterLogic.__init__(self, None, monsterdata, level)
+		self._position = pos
+		self._orientation = ori
 
 class ClientHandle():
 	"""Class for handling client requests"""
@@ -173,6 +195,11 @@ class GameServer():
 		"""
 		
 		self.main['players'][client_id] = NetPlayer(char_info, position, orientation)
+		
+	def create_monster(self, monster, level, pos, ori):
+		"""We have this function to avoid importing NetMonster into various gamestates"""
+		
+		return NetMonster(monster, level, pos, ori)
 		
 	def send(self, data):
 		"""Alias to broadcast for use with RPC"""
