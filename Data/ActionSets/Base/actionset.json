@@ -34,7 +34,7 @@
 		{
 			"name" : "1h Swing",
 			"actions" : [{
-			"name" : "1h_swing",
+			"name" : "1h_swing_2",
 			"start" : 0,
 			"end" : 119}]
 		},
