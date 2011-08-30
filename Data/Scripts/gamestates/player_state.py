@@ -57,17 +57,19 @@ class PlayerState(DefaultState):
 			main['overlay'] = "Inventory"
 			return("Player", "SWITCH")
 		
-		if ("InGameMenu", "INPUT_CLICK") in inputs or main['player_exit']:
-			for power in main['player_new_powers']:
-				main['player'].powers.add(power, self)
-			main['player'].power_points = main['player_new_pp']
+		if ("InGameMenu", "INPUT_CLICK") in inputs:
+#			for power in main['player_new_powers']:
+#				main['player'].powers.add(power, self)
+#			main['player'].power_points = main['player_new_pp']
 			return('', 'POP')
 		
 		if main['player_exit']:
 			player = main['player']
 			for power in main['player_new_powers']:
-				player.powers.add(power)
+				player.powers.add(power, self)
 			player.power_points = main['player_new_pp']
+			player.save()
+			return('', 'POP')
 		
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
