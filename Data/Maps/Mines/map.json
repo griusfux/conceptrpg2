@@ -13,8 +13,10 @@
 		],
 	"corridor_tiles": [
 			{ "obj": "corridor_8" },
-			{ "obj": "corridor_T" },
-			{ "obj": "corridor_+" }
+			{ "obj": "corridor_8" },
+			{ "obj": "corridor_8" },
+			{ "obj": "corridor_+" },
+			{ "obj": "corridor_T" }
 		],
 	"end_tiles": [
 			{ "obj": "end" }
