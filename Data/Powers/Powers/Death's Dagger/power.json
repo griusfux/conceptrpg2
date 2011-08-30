@@ -3,9 +3,9 @@
     "delivery": "WEAPON", 
     "description": "Caster's weapon does arcane damage.", 
     "distance": 0, 
-    "effect_shape": "SINGLE", 
+    "effect_shape": "SELF", 
     "element": "DEATH", 
-    "flags": [], 
+    "flags": ["NON_COMBAT"], 
     "name": "Death's Dagger", 
     "shape_modifier": 0, 
     "tier": 1
