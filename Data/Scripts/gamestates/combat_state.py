@@ -6,6 +6,7 @@ from Scripts.packages import *
 from Scripts.character_logic import MonsterLogic, PlayerLogic
 
 import random
+import time
 from math import *
 
 import cego as AiManager
@@ -78,7 +79,11 @@ class CombatState(DefaultState, BaseController):
 	@rpc(client_functions, "move_monster", str, float, float, float)
 	def move_monster(self, main, cid, x, y, z):
 		if cid not in self.monster_list: return
-		self.monster_list[cid].object.position = (x, y, z)
+		
+		if main['is_host']:
+			monster = self.monster_list[cid]
+			monster.object.move((x, y, z), min=[-50, -50, 0], max=[50, 50, 0], local=True)
+			self.server.invoke("position", cid, *monster.position)
 		
 	@rpc(client_functions, "rotate_monster", str, float, float, float)
 	def rotate_monster(self, main, cid, x, y, z):
@@ -348,7 +353,7 @@ class CombatState(DefaultState, BaseController):
 			]
 			combat.monster_list[cid] = client.server.create_monster(Monster(monster), level, [x, y, z], ori)
 																#[MonsterLogic(None, Monster(monster), level), [x, y, z]]
-			combat.monster_list[cid].cid = cid
+			combat.monster_list[cid].id = cid
 			AiManager.add_agent(combat.monster_list[cid], "extern/cego/example_definitions/base.json", "spawn")
 			self.clients.invoke("add_player", cid, [monster, level], 1, [x, y, z], None)
 			self.clients.invoke("add_monster", client.combat_id, monster, cid, x, y, z)
@@ -467,8 +472,15 @@ class CombatState(DefaultState, BaseController):
 		self.client = client
 		
 		# Run the ai if it is set up, else try to set it up
-		if AiManager.get_environment():
-			AiManager.run()
+		new_time = time.time()
+		self.accum += new_time - self.time
+		self.time = new_time
+		
+		dt = 1/30
+		while self.accum >= dt:
+			if AiManager.get_environment():
+				AiManager.run()
+			self.accum -= dt
 				
 		if main['combats'].get(client.combat_id) == -1:
 			main['combats'][client.combat_id] = combat =Combat()
@@ -662,20 +674,23 @@ class CombatState(DefaultState, BaseController):
 	def spawn(self, character, position):
 		if hasattr(self, 'clients'):
 			combat = self.main['combats'].get(self.client.combat_id, None)
-			if combat and character.cid in combat.monster_list:
-				combat.monster_list[character.cid].position = position
+			if combat and character.id in combat.monster_list:
+				combat.monster_list[character.id].position = position
 				self.play_animation(character, "Spawn")
-				self.clients.invoke("position", character.cid, *position)
+				self.clients.invoke("position", character.id, *position)
 	
 	def move(self, character, linear = (0,0,0) , angular = (0,0,0) , local = False):
 		"""Handles linear and angular movement of a character"""
 		
-		# Move the character
-		character.object.move(linear, min=[-50, -50, 0], max=[50, 50, 0], local=local)
-		
-		# Now handle rpcs
-		self.server.invoke("rotate", character.id, *angular)
-		self.server.invoke("position", character.id, *character.object.position)
+		if self.is_server:
+			self.clients.invoke("move", character.id, *linear)
+		else:
+			# Move the character
+			character.object.move(linear, min=[-50, -50, 0], max=[50, 50, 0], local=local)
+			
+			# Now handle rpcs
+			self.server.invoke("rotate", character.id, *angular)
+			self.server.invoke("position", character.id, *character.position)
 		
 	def reposition(self, character, position):
 		character.object.position = position
@@ -687,7 +702,16 @@ class CombatState(DefaultState, BaseController):
 	def attack(self, power, character, animation="1h Swing", multiplier=1):
 		self.animate_weapon(character, animation)
 		for target in self.get_targets(power, character):
-			self.modify_health(target, -10*multiplier)
+			damage = 10*multiplier
+			hit = True #character.accuracy - target.reflex + random.randint(3, 18) >= 11
+			for callback in character.callbacks['ATTACK']:
+				target, hit, damage, complete = callback(target, hit, damage)
+				if complete:
+					character.remove_callback("ATTACK", callback)
+			if hit:
+				self.modify_health(target, -damage)
+			else:
+				self.modify_health(target, 0)
 	
 	def use_power(self, character, power):
 		if isinstance(power, str):
