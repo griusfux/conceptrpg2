@@ -25,17 +25,15 @@ class DefaultState(BaseState, BaseController):
 	@rpc(client_functions, "position", str, float, float, float)
 	def position(self, main, cid, x, y, z):
 		if cid not in main['net_players']: return
-		if main['player'].id == cid:
-			# Check to make sure we are still where the server says we are
-			server_pos = [x, y, z]
-			client_pos = main['net_players'][cid].object.position
-			
-			for i in range(3):
-				if abs(server_pos[i]-client_pos[i]) > 1.0:
-					client_pos[i] = server_pos[i]
-			main['net_players'][cid].object.position = client_pos
-		else:
-			main['net_players'][cid].object.position = (x, y, z)
+
+		# Check to make sure we are still where the server says we are
+		server_pos = [x, y, z]
+		client_pos = main['net_players'][cid].position
+		
+		for i in range(3):
+			if abs(server_pos[i]-client_pos[i]) > 0.5:
+				client_pos[i] = server_pos[i]
+		main['net_players'][cid].position = client_pos
 		
 	@rpc(client_functions, "move", str, float, float, float)
 	def move(self, main, cid, x, y, z):
