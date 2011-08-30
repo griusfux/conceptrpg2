@@ -5,5 +5,5 @@
     "level_adjustment": 0, 
     "name": "Clay Golem", 
     "role": "BRAWLER", 
-    "root_object": "ClayGolemArm"
+    "root_object": "ClayEmpty"
 }

@@ -1,8 +1,9 @@
 {
-    "element": "NEUTRAL",
-    "root_object": "Bomb Golem",
-    "action_set": "",
+    "action_set": "", 
+    "element": "NEUTRAL", 
+    "hp_per_level": 5, 
     "level_adjustment": 0, 
     "name": "Bomb Golem", 
-    "role": "MEAT_SHIELD"
+    "role": "MEAT_SHIELD", 
+    "root_object": "Empty"
 }
