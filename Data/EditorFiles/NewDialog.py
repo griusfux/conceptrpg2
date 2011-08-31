@@ -45,6 +45,7 @@ class NewDialog(QDialog):
 				child = self.editor.root.child(i, 0)
 				if child.text() == package_type:
 					item = QStandardItem(package_name)
+					item.setData(package)
 					item.setEditable(False)
 					child.appendRow(item)
 					child.sortChildren(0)
