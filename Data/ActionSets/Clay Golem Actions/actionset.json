@@ -6,7 +6,7 @@
 		{
 			"name" : "Idle",
 			"actions" : [{
-			"name" : "Idle",
+			"name" : "cg.Idle",
 			"start" : 0,
 			"end" : 79}]
 		}
