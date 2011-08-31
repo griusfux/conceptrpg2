@@ -683,7 +683,8 @@ class CombatState(DefaultState, BaseController):
 		"""Handles linear and angular movement of a character"""
 		
 		if self.is_server:
-			self.clients.invoke("move", character.id, *linear)
+			# The only people that should be moving server side are monsters
+			self.clients.invoke("move_monster", character.id, *linear)
 		else:
 			# Move the character
 			character.object.move(linear, min=[-50, -50, 0], max=[50, 50, 0], local=local)
