@@ -2,22 +2,22 @@
 	"name": "str",
 	
 	"subclass" : {
-				"death" : "str",
-				"storm" : "str",
-				"fire" : "str",
-				"holy" : "str",
-				"earth" : "str",
-				"water" : "str"
+				"DEATH" : "str",
+				"STORM" : "str",
+				"FIRE" : "str",
+				"HOLY" : "str",
+				"EARTH" : "str",
+				"WATER" : "str"
 				},
 				
 	"affinities" : {
-				"death" : "int",
-				"storm" : "int",
-				"fire" : "int",
-				"holy" : "int",
-				"earth" : "int",
-				"water" : "int",
-				"weapon" : "int",
-				"spell" : "int"
+				"DEATH" : "int",
+				"STORM" : "int",
+				"FIRE" : "int",
+				"HOLY" : "int",
+				"EARTH" : "int",
+				"WATER" : "int",
+				"WEAPON" : "int",
+				"SPELL" : "int"
 				}
 }

@@ -97,6 +97,8 @@ class ElementBar(Frame):
 	
 	@element.setter
 	def element(self, value):
+		value = value.title()
+		
 		if value == self._element or self.timer < 10:
 			return
 		

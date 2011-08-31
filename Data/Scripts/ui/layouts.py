@@ -284,8 +284,8 @@ class PowersLayout(Layout):
 		tier = power.tier if power.tier <= 5 else 5
 		cost = [3, 8, 15, 24, 35][tier-1]
 		player = self.main['player']
-		discount =	player.affinities[power.element.lower()] + \
-					player.affinities[power.delivery.lower()]
+		discount =	player.affinities[power.element.upper()] + \
+					player.affinities[power.delivery.upper()]
 		
 		return max(1, cost - discount)
 		
@@ -453,7 +453,7 @@ class CharSelectLayout(Layout):
 		if main['csl_char']:
 			char = main['csl_char']
 			self.char_name.text = char.name
-			self.subclass.text = char.player_class.name
+			self.subclass.text = char.player_class.subclass[char.element]
 			self.level.text = "Level %d" % char.level
 		
 	def continue_click(self, widget):
@@ -523,7 +523,7 @@ class CharGenLayout(Layout):
 		self.main = main
 		self.race.text = self.selector.race
 		self.class_.text = self.selector.player_class
-		self.element.text = self.selector.element
+		self.element.text = self.selector.element.title()
 		
 		self.focus_info.text = "Click on a Race, Class, or Element to select it.\nFor more information about a choice, hover over it."
 		self.focus_details.text = ""
@@ -533,7 +533,7 @@ class CharGenLayout(Layout):
 		self.main['cgen_data']['name'] = self.name_in.text
 		self.main['cgen_data']['race'] = Race(self.race.text)
 		self.main['cgen_data']['class'] = Class(self.class_.text)
-		self.main['cgen_data']['element'] = self.element.text
+		self.main['cgen_data']['element'] = self.element.text.upper()
 		self.main['cgen_exit'] = True
 	
 	def cancel_click(self, main):

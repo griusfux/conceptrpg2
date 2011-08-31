@@ -2,22 +2,22 @@
 	"name": "Mage",
 	
 	"subclass" : {
-				"death" : "Necromancer",
-				"storm" : "Sorcerer",
-				"fire" : "Pyromancer",
-				"holy" : "Sage",
-				"earth" : "Templar",
-				"water" : "Seer"
+				"DEATH" : "Necromancer",
+				"STORM" : "Sorcerer",
+				"FIRE" : "Pyromancer",
+				"HOLY" : "Sage",
+				"EARTH" : "Templar",
+				"WATER" : "Seer"
 				},
 				
 	"affinities" : {
-				"death" : 0,
-				"storm" : 0,
-				"fire" : 0,
-				"holy" : 0,
-				"earth" : 0,
-				"water" : 0,
-				"weapon" : 0,
-				"spell" : 2
+				"DEATH" : 0,
+				"STORM" : 0,
+				"FIRE" : 0,
+				"HOLY" : 0,
+				"EARTH" : 0,
+				"WATER" : 0,
+				"WEAPON" : 0,
+				"SPELL" : 2
 				}
 }

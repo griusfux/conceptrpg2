@@ -19,17 +19,17 @@ XP_TABLE =	[0,
 			
 BASE_AFFINITIES = {
 				# Elemental Affinities
-				"death" : 0,
-				"storm" : 0,
-				"fire" : 0,
-				"holy" : 0,
-				"earth" : 0,
-				"water" : 0,
-				"neutral" : 0,
+				"DEATH" : 0,
+				"STORM" : 0,
+				"FIRE" : 0,
+				"HOLY" : 0,
+				"EARTH" : 0,
+				"WATER" : 0,
+				"NEUTRAL" : 0,
 				
 				# Delivery Affinities
-				"weapon" : 0,
-				"spell" : 0
+				"WEAPON" : 0,
+				"SPELL" : 0
 			}
 
 CALLBACKS = {
@@ -61,7 +61,7 @@ class CharacterLogic:
 		self.level		= 0
 		self.race		= None
 		self.player_class= None
-		self.element    = "Death"
+		self.element    = "DEATH"
 		self.affinities = BASE_AFFINITIES.copy()
 		self._xp			= 0
 		self.last_level = 0
@@ -71,7 +71,6 @@ class CharacterLogic:
 		self.power_points = 0
 		
 		#attributes
-		self.endurance		= 5
 		self.arcane_damage	= 5
 		self.arcane_defense = 5
 		self.physical_damage= 5
@@ -80,8 +79,9 @@ class CharacterLogic:
 		self.reflex			= 5
 							
 		#hit points
-		self.max_hp		= 0
-		self.hp			= 0
+		self.max_hp		= 1
+		self.hp			= 1
+		self.hp_per_level = 5
 		
 		#speed
 		self.speed		= 5
@@ -112,6 +112,8 @@ class CharacterLogic:
 		
 		self.callbacks = CALLBACKS.copy()
 		
+		self.recalc_stats()
+		
 	def __str__(self):
 		return self.name
 		
@@ -132,8 +134,8 @@ class CharacterLogic:
 		"""Recalculates the player's stats that are calculated based on other stats"""
 		
 		#hit points
-		self.max_hp = self.endurance * 5
-		hp_percent = (self.hp / self.max_hp) if self.max_hp else 1
+		hp_percent = (self.hp / self.max_hp)
+		self.max_hp = self.hp_per_level * (self.level+1+self.affinities['NEUTRAL']) 
 		self.hp = self.max_hp * hp_percent
 		
 		
@@ -274,8 +276,7 @@ class CharacterLogic:
 				"player_class" : self.player_class.package_name if self.player_class else None,
 				"element"	: self.element,
 				"xp"		: self.xp,
-				
-				"endurance" : self.endurance,
+
 				"arcane_damage" : self.arcane_damage,
 				"arcane_defense" : self.arcane_defense,
 				"physical_damage" : self.physical_damage,
@@ -309,8 +310,7 @@ class CharacterLogic:
 			self.player_class = Class(info["player_class"])
 		self.element		= info["element"]
 		self._xp			= info["xp"]
-		
-		self.endurance		= info["endurance"]
+
 		self.arcane_damage	= info["arcane_damage"]
 		self.arcane_defense = info["arcane_defense"]
 		self.physical_damage = info["physical_damage"]
@@ -399,8 +399,10 @@ class MonsterLogic(CharacterLogic):
 #		self.behaviors = []
 		
 		self.name = monsterdata.name
-		self.hp = self.max_hp = monsterdata.hp_per_level * level
+		self.hp_per_level = monsterdata.hp_per_level
 		self.element = monsterdata.element
+		
+		self.recalc_stats()
 		# self.level = monsterdata.level
 		# self.role = monsterdata.role
 		# self.leader = monsterdata.leader
