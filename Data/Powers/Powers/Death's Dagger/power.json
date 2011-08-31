@@ -1,5 +1,5 @@
 {
-    "cool_down": 3, 
+    "cool_down": 0, 
     "delivery": "WEAPON", 
     "description": "Caster's weapon does arcane damage.", 
     "distance": 0, 

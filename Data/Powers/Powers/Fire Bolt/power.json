@@ -1,0 +1,15 @@
+{
+    "cool_down": 3, 
+    "delivery": "SPELL", 
+    "description": "Target takes moderate physical damage.", 
+    "distance": 4, 
+    "effect_shape": "SINGLE", 
+    "element": "FIRE", 
+    "flags": [], 
+    "name": "Fire Bolt", 
+    "shape_modifier": 0, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
+    "tier": 1
+}

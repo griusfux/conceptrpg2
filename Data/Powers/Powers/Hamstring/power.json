@@ -1,0 +1,15 @@
+{
+    "cool_down": 6, 
+    "delivery": "WEAPON", 
+    "description": "Target suffers weapon damage and has a 45% chance of suffering reduced speed and accuracy.", 
+    "distance": 1, 
+    "effect_shape": "SINGLE", 
+    "element": "FIRE", 
+    "flags": [], 
+    "name": "Hamstring", 
+    "shape_modifier": 0, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
+    "tier": 1
+}

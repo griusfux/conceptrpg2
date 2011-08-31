@@ -1,0 +1,15 @@
+{
+    "cool_down": 5, 
+    "delivery": "WEAPON", 
+    "description": "Target suffers a minor reduction to accuracy.", 
+    "distance": 1, 
+    "effect_shape": "SINGLE", 
+    "element": "FIRE", 
+    "flags": [], 
+    "name": "Blind", 
+    "shape_modifier": 0, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
+    "tier": 1
+}

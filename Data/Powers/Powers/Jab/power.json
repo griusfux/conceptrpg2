@@ -1,0 +1,15 @@
+{
+    "cool_down": 4, 
+    "delivery": "WEAPON", 
+    "description": "Caster attacks with a minor accuracy increase.", 
+    "distance": 1, 
+    "effect_shape": "SINGLE", 
+    "element": "FIRE", 
+    "flags": [], 
+    "name": "Jab", 
+    "shape_modifier": 0, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
+    "tier": 1
+}

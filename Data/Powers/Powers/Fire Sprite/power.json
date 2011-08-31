@@ -1,0 +1,15 @@
+{
+    "cool_down": 3, 
+    "delivery": "SPELL", 
+    "description": "Summons a sprite that attacks the caster's target with light arcane damage.", 
+    "distance": 0, 
+    "effect_shape": "SELF", 
+    "element": "FIRE", 
+    "flags": [], 
+    "name": "Fire Sprite", 
+    "shape_modifier": 0, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
+    "tier": 1
+}

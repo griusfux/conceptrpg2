@@ -1,0 +1,15 @@
+{
+    "cool_down": 4, 
+    "delivery": "SPELL", 
+    "description": "Targets hit suffer a minor reduction to accuracy and reflex.", 
+    "distance": 3, 
+    "effect_shape": "CONE", 
+    "element": "FIRE", 
+    "flags": [], 
+    "name": "Flash", 
+    "shape_modifier": 90, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
+    "tier": 1
+}
