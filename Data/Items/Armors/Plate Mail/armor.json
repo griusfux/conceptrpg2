@@ -1,9 +1,9 @@
 {
-	"name" : "Plate Mail",
-	"cost" : 0,
-	
-	"type" : "METAL",
-	"arcane_defense" : 1,
-	"physical_defense" : 4,
-	"reflex" : 1
+    "arcane_defense": 1, 
+    "cost": 0, 
+    "description": "", 
+    "name": "Plate Mail", 
+    "physical_defense": 4, 
+    "reflex": 1, 
+    "type": "METAL"
 }

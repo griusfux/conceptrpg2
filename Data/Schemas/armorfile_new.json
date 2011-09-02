@@ -1,6 +1,7 @@
 {
 	"name" : "Armor",
 	"cost" : 0,
+	"description": "",
 	
 	"type" : "CLOTH",
 	"arcane_defense" : 0,

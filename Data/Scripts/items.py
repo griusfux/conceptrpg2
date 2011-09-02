@@ -42,6 +42,7 @@ class Item:
 		self._datafile = getattr(Packages, self.__class__.__name__)(base)
 		self.name = self._datafile.name
 		self.name = TierNames[tier] + " " + self.name if TierNames[tier] else self.name
+		self.description = self._datafile.description
 		self._cost = self._datafile.cost
 		self._modified = self
 		

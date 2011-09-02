@@ -1,6 +1,7 @@
 {
     "accuracy": 1, 
     "cost": 0, 
+    "description": "", 
     "hands": 1, 
     "name": "Club", 
     "range": -1, 

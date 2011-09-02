@@ -1,6 +1,7 @@
 {
     "accuracy": 0, 
     "cost": 0, 
+    "description": "", 
     "hands": 2, 
     "name": "Staff", 
     "range": 0, 

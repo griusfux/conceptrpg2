@@ -1,5 +1,5 @@
 {
 	"name": "Item",
-	"class": "other",
-	"cost": 0
+	"cost": 0,
+	"description": ""
 }

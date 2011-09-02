@@ -1,6 +1,7 @@
 {
     "accuracy": 0, 
     "cost": 0, 
+    "description": "", 
     "hands": 1, 
     "name": "Mace", 
     "range": 0, 

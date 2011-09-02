@@ -1,6 +1,7 @@
 {
 	"name": "Weapon",
 	"cost": 0,
+	"description": "",
 
 	"type" : "SWORD",
 	"weight" : 0,

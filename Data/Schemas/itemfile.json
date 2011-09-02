@@ -1,4 +1,5 @@
 {
 	"name": "str",
-	"cost": "int"
+	"cost": "int",
+	"description": "str"
 }

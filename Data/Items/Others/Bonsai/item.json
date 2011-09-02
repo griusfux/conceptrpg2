@@ -1,4 +1,5 @@
 {
-	"name": "Bonsai",
-	"cost": 42
+    "cost": 42, 
+    "description": "", 
+    "name": "Bonsai"
 }

@@ -1,6 +1,7 @@
 {
     "accuracy": 0, 
     "cost": 5, 
+    "description": "", 
     "hands": 1, 
     "name": "Longsword", 
     "range": 0, 
