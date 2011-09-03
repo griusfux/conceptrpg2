@@ -19,6 +19,7 @@ class WeaponEditor(BaseEditor):
 		# Set the text fields
 		ui.name.setText(data.name)
 		ui.cost.setValue(data.cost)
+		ui.description.setPlainText(data.description)
 		
 		ui.type.setCurrentIndex(self.ui.type.findText(data.type.title()))
 		ui.weight.setValue(data.weight)
@@ -35,6 +36,7 @@ class WeaponEditor(BaseEditor):
 		
 		data.name = ui.name.text()
 		data.cost = ui.cost.value()
+		data.description = ui.description.toPlainText()
 		
 		data.type = ui.type.itemText(self.ui.type.currentIndex()).upper()
 		data.weight = ui.weight.value()

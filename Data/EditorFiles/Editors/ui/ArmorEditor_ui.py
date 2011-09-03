@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ArmorEditor.ui'
 #
-# Created: Sun Aug 21 13:01:48 2011
+# Created: Sat Sep  3 15:57:51 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -43,6 +43,12 @@ class Ui_ArmorEditor(object):
         self.label_2 = QtGui.QLabel(ArmorEditor)
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.gridLayout_2.addWidget(self.label_2, 2, 0, 1, 1)
+        self.label_7 = QtGui.QLabel(ArmorEditor)
+        self.label_7.setObjectName(_fromUtf8("label_7"))
+        self.gridLayout_2.addWidget(self.label_7, 3, 0, 1, 1)
+        self.description = QtGui.QPlainTextEdit(ArmorEditor)
+        self.description.setObjectName(_fromUtf8("description"))
+        self.gridLayout_2.addWidget(self.description, 3, 1, 1, 1)
         self.formLayout.setLayout(0, QtGui.QFormLayout.FieldRole, self.gridLayout_2)
         self.data_image = QtGui.QLabel(ArmorEditor)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
@@ -113,6 +119,7 @@ class Ui_ArmorEditor(object):
         QtCore.QObject.connect(self.arcane_defense, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), ArmorEditor.modified)
         QtCore.QObject.connect(self.physical_defense, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), ArmorEditor.modified)
         QtCore.QObject.connect(self.reflex, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), ArmorEditor.modified)
+        QtCore.QObject.connect(self.description, QtCore.SIGNAL(_fromUtf8("textChanged()")), ArmorEditor.modified)
         QtCore.QMetaObject.connectSlotsByName(ArmorEditor)
         ArmorEditor.setTabOrder(self.cost, self.type)
         ArmorEditor.setTabOrder(self.type, self.arcane_defense)
@@ -121,6 +128,7 @@ class Ui_ArmorEditor(object):
         ArmorEditor.setWindowTitle(QtGui.QApplication.translate("ArmorEditor", "ArmorEditor", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("ArmorEditor", "Name:           ", None, QtGui.QApplication.UnicodeUTF8))
         self.label_2.setText(QtGui.QApplication.translate("ArmorEditor", "Cost:", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_7.setText(QtGui.QApplication.translate("ArmorEditor", "Description: ", None, QtGui.QApplication.UnicodeUTF8))
         self.label_4.setText(QtGui.QApplication.translate("ArmorEditor", "Type:", None, QtGui.QApplication.UnicodeUTF8))
         self.label_5.setText(QtGui.QApplication.translate("ArmorEditor", "Arcane Defense: ", None, QtGui.QApplication.UnicodeUTF8))
         self.label_3.setText(QtGui.QApplication.translate("ArmorEditor", "Physical Defense: ", None, QtGui.QApplication.UnicodeUTF8))

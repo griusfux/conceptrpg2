@@ -18,6 +18,7 @@ class ArmorEditor(BaseEditor):
 		# Set the text fields
 		ui.name.setText(data.name)
 		ui.cost.setValue(data.cost)
+		ui.description.setPlainText(data.description)
 		
 		ui.type.setCurrentIndex(ui.type.findText(data.type))
 		ui.arcane_defense.setValue(data.arcane_defense)
@@ -30,6 +31,7 @@ class ArmorEditor(BaseEditor):
 		
 		data.name = ui.name.text()
 		data.cost = ui.cost.value()
+		data.description = ui.description.toPlainText()
 		data.type = ui.type.itemText(ui.type.currentIndex())
 		data.arcane_defense = ui.arcane_defense.value()
 		data.physical_defense = ui.physical_defense.value()

@@ -62,6 +62,16 @@
          </property>
         </widget>
        </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Description: </string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QPlainTextEdit" name="description"/>
+       </item>
       </layout>
      </item>
      <item row="0" column="0">
@@ -248,8 +258,8 @@
    <slot>modified()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>249</x>
-     <y>99</y>
+     <x>282</x>
+     <y>57</y>
     </hint>
     <hint type="destinationlabel">
      <x>408</x>
@@ -318,6 +328,22 @@
     <hint type="destinationlabel">
      <x>399</x>
      <y>289</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>description</sender>
+   <signal>textChanged()</signal>
+   <receiver>ArmorEditor</receiver>
+   <slot>modified()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>359</x>
+     <y>99</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>395</x>
+     <y>102</y>
     </hint>
    </hints>
   </connection>
