@@ -79,9 +79,74 @@ class InventoryLayout(Layout):
 												text=type.title(), sub_theme="Menu",
 												options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
 		
-		self.doll = bgui.Image(self.mframe, "doll", "Textures/ui/paper_doll.png",
-								size=[0.45, 0.9], pos=[0.5, .05])
+		self.rframe = bgui.Frame(self.mframe, "right_frame", size=[0.4, 0.8], pos=[0.5, 0.1])
+		self.rframe.colors = [[0, 0, 0, 0] for i in range(4)]
+		self.pframe = bgui.Frame(self.rframe, "player_frame", size=[1, 0.4], pos=[0, 0.6], sub_theme="Menu")
+		self.iframe = bgui.Frame(self.rframe, "item_frame", size=[1, 0.55], pos=[0, 0], sub_theme="Menu")
+		
+		# Player equipment
+		self.weaponlbl = bgui.Label(self.pframe, 'weaponlbl', text="Weapon:", sub_theme="Menu", pos=[0.03, 0.90])
+		self.weapon = bgui.Label(self.pframe, 'weapon', sub_theme='Menu', pos=[0.3, 0.90])
+		self.shieldlbl = bgui.Label(self.pframe, 'shieldlbl', text="Shield:", sub_theme="Menu", pos=[0.03, 0.83])
+		self.shield = bgui.Label(self.pframe, 'shield', sub_theme='Menu', pos=[0.3, 0.83])
+		self.armorlbl = bgui.Label(self.pframe, 'armorlbl', text="Armor:", sub_theme="Menu", pos=[0.03, 0.76])
+		self.armor = bgui.Label(self.pframe, 'armor', sub_theme='Menu', pos=[0.3, 0.76])
+		# Uncomment these when we actually have accessories.
+		self.acclbl = bgui.Label(self.pframe, 'acclbl', text="Accessory:", sub_theme="Menu", pos=[0.03, 0.69])
+		self.acc = bgui.Label(self.pframe, 'acc', sub_theme='Menu', pos=[0.3, 0.69])
+		
+		# XXX We need some sort of horizontal rule
+		
+		# Player stats
+		self.hplbl = bgui.Label(self.pframe, 'hplbl', text='HP:', sub_theme='Menu', pos=[0.03, 0.55])
+		self.hp = bgui.Label(self.pframe, 'hp', sub_theme='Menu', pos=[0.15, 0.55])
+		self.physdlbl = bgui.Label(self.pframe, 'physdlbl', text='Physical Damage:', sub_theme="Menu", pos=[0.03, 0.40])
+		self.physd = bgui.Label(self.pframe, 'physd', sub_theme='Menu', pos=[0.4, 0.40])
+		self.arcdlbl = bgui.Label(self.pframe, 'arcdlbl', text='Arcane Damage:', sub_theme="Menu", pos=[0.03, 0.33])
+		self.arcd = bgui.Label(self.pframe, 'arcd', sub_theme='Menu', pos=[0.4, 0.33])
+		self.accylbl = bgui.Label(self.pframe, 'accylbl', text='Accuracy:', sub_theme="Menu", pos=[0.03, 0.26])
+		self.accy = bgui.Label(self.pframe, 'accy', sub_theme='Menu', pos=[0.4, 0.26])
+		self.physdeflbl = bgui.Label(self.pframe, 'physdeflbl', text='Physical Defense:', sub_theme="Menu", pos=[0.53, 0.40])
+		self.physdef = bgui.Label(self.pframe, 'physdef', sub_theme='Menu', pos=[0.91, 0.40])
+		self.arcdeflbl = bgui.Label(self.pframe, 'arcdeflbl', text='Arcane Defense:', sub_theme="Menu", pos=[0.53, 0.33])
+		self.arcdef = bgui.Label(self.pframe, 'arcdef', sub_theme='Menu', pos=[0.91, 0.33])
+		self.reflexlbl = bgui.Label(self.pframe, 'reflexlbl', text='Reflex:', sub_theme="Menu", pos=[0.53, 0.26])
+		self.reflex = bgui.Label(self.pframe, 'reflex', sub_theme='Menu', pos=[0.91, 0.26])
+		
+		# Item stats
+		self.itemname = bgui.Label(self.iframe, 'inlbl', sub_theme='Menu', pos=[0.03, 0.95])
+		self.type = bgui.Label(self.iframe, 'type', text='Type:', sub_theme='Menu', pos=[0.03, 0.85])
+		self.idesc =  bgui.TextBlock(self.iframe, "info", size=[0.9, .3],
+										pos=[0.05, 0.3], sub_theme="")
+		
+		# Item buttons
+		self.drop = Button(self.iframe, "drop_btn", text="DROP", 
+								on_click=self.drop_click, pos=[0.2,0.03])
+		self.equip = Button(self.iframe, "equip_btn", text="EQUIP", 
+								on_click=self.equip_click, pos=[0.6,0.03])
+		
+	def drop_click(self, widget):
+		item = self.lbox.selected
+		if item:
+			self.lbox.items.remove(item)
+			self.main['drop_item'] = item
+			
+		
+	def equip_click(self, widget):
+		item = self.lbox.selected
+		player = self.main['player']
+
+		if item:
+			if self.selection == "weapons":
+				player.weapon = item
+			elif self.selection == "armor":
+				player.armor = item
+				
+
 	def update(self, main):
+		self.main = main
+		player = main['player']
+		
 		if self.selection != self.old_selection:
 			self.type_buttons[self.selection].colors = [[0,0,0,0]] * 4
 			self.type_buttons[self.selection].border = 0
@@ -100,8 +165,32 @@ class InventoryLayout(Layout):
 				type = "Accessory"
 			elif self.selection == "misc.":
 				type = "Item"
-			self.lbox.items = [item for item in main['player'].inventory
+			self.lbox.items = [item for item in player.inventory
 								if item.__class__.__name__==type]
+			
+		# Update player info
+		self.weapon.text = player.weapon.name
+		self.shield.text = player.shield.name
+		self.armor.text = player.armor.name
+		
+		self.hp.text = "%d/%d" % (player.hp, player.max_hp)
+		self.physd.text = str(player.physical_damage)
+		self.arcd.text = str(player.arcane_damage)
+		self.accy.text = str(player.accuracy)
+		self.physdef.text = str(player.physical_defense)
+		self.arcdef.text = str(player.arcane_defense)
+		self.reflex.text = str(player.reflex)
+		
+		# Update item info
+		if self.lbox.selected:
+			for i in self.iframe.children.values(): i.visible = True
+			
+			item = self.lbox.selected
+			self.itemname.text = item.name
+			self.type.text = "Type: %s" % item.type.title()
+			self.idesc.text = item.description
+		else:
+			for i in self.iframe.children.values(): i.visible = False
 		
 	def selection_click(self, widget):
 		self.selection = widget.name

@@ -16,9 +16,12 @@ class PlayerState(DefaultState):
 		main['player_exit'] = False
 		main['player_new_powers'] = []
 		main['player_new_pp'] = self.main['player'].power_points
+		main['drop_item'] = None
 	
 	def client_run(self, main):
 		"""Client-side run method"""
+		player = main['player']
+		
 		# Update the camera (this allows it to be animated)
 		main['camera'].update()
 		
@@ -63,8 +66,21 @@ class PlayerState(DefaultState):
 #			main['player'].power_points = main['player_new_pp']
 			return('', 'POP')
 		
+		if main['drop_item']:
+			item = main['drop_item']
+			main['player'].inventory.remove(item)
+			
+			if item == player.armor:
+				player.armor = None
+			elif item == player.weapon:
+				player.weapon = None
+			elif item == player.shield:
+				player.shield = None
+			
+			self.drop_item(item, player.position)
+			main['drop_item'] = None
+		
 		if main['player_exit']:
-			player = main['player']
 			for power in main['player_new_powers']:
 				player.powers.add(power, self)
 			player.power_points = main['player_new_pp']

@@ -234,7 +234,7 @@ class BaseState:
 		main['net_players'][cid].id = cid
 	
 	@rpc(client_functions, "drop_item", int, "pickle", float, float, float)
-	def drop_item(self, main, id, item, x, y, z):
+	def c_drop_item(self, main, id, item, x, y, z):
 		obj = main['engine'].add_object("drop", [x, y, z])
 		obj.gameobj['id'] = id
 		main['ground_items'][id] = [item, obj, None]
@@ -293,6 +293,10 @@ class BaseState:
 	@rpc(server_functions, "switch_state", str)
 	def switch_state(self, main, client, state):
 		self._next_state = state
+		
+	@rpc(server_functions, "drop_item", "pickle", float, float, float)
+	def s_drop_item(self, main, client, item, x, y, z):
+		self.drop_item(item, [x, y, z])
 		
 	def server_init(self, main):
 		"""Initialize the server state"""
@@ -364,3 +368,15 @@ class BaseController:
 	
 	def remove_effect(self, id):
 		self.main["effect_system"].remove(id)
+		
+	def drop_item(self, item, position):
+		if self.is_server:
+			main = self.main
+			
+			main['ground_item_counter'] += 1
+			gid = main['ground_item_counter']
+			
+			main['ground_items'][gid] = item
+			self.clients.invoke("drop_item", gid, item, *position)
+		else:
+			self.server.invoke("drop_item", item, *position)
