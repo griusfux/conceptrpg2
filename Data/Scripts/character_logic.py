@@ -410,7 +410,6 @@ class MonsterLogic(CharacterLogic):
 #		self.behaviors = []
 		
 		# Handle affinities
-		print(level)
 		if level > 1:
 			totals = {}
 			running_total = 0
@@ -420,17 +419,13 @@ class MonsterLogic(CharacterLogic):
 				totals[k] = running_total
 				self.affinities[k] = v
 				
-			print(totals)
-				
-			for i in range(level):
+			for i in range(level-1):
 				rnd = random.random()*running_total
 				
 				for k, v in totals.items():
 					if rnd < v:
 						self.affinities[k] += 1
 						break
-			
-		print(self.affinities)
 		
 		self.name = monsterdata.name
 		self.hp_per_level = monsterdata.hp_per_level
