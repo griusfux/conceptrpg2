@@ -3,7 +3,6 @@
 	"root_object": "str",
 	"action_set": "str",
 	"hp_per_level": "int",
-	"role" : "{'MEAT_SHIELD', 'PEON', 'SPEEDSTER', 'BRAWLER', 'SUPPORT', 'BLASTER'}",
 	"level_adjustment" : "int",
 	
 	"element" : "{'DEATH', 'STORM', 'FIRE', 'HOLY', 'EARTH', 'WATER', 'NEUTRAL'}",

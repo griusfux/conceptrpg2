@@ -1,7 +1,7 @@
 {
 	"name": "Golem Deck",
 	"cards": [
-		{ "monster": "Clay Golem", "role": "brute", "count": 50 },
-		{ "monster": "Bomb Golem", "role": "brute", "count": 50 }
+		{ "monster": "Clay Golem", "points": 2, "count": 50 },
+		{ "monster": "Bomb Golem", "points": 2, "count": 50 }
 	]
 }

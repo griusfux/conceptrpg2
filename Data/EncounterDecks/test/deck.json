@@ -1,6 +1,6 @@
 {
 	"name": "Test Deck",
 	"cards": [
-		{ "monster": "dire_rat", "role": "brute", "count": 50 }
+		{ "monster": "dire_rat", "points": 2, "count": 50 }
 	]
 }

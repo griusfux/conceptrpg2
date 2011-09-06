@@ -19,7 +19,7 @@ class EncounterDeck(Package):
         self.deck = []
         
         for card in self.cards:
-            self.deck.extend([(card['monster'], card['role']) for i in range(card['count'])])
+            self.deck.extend([(card['monster'], card['points']) for i in range(card['count'])])
     
     _ext = 'deck'
     _blend = ''

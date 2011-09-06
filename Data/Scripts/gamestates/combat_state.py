@@ -497,27 +497,16 @@ class CombatState(DefaultState, BaseController):
 	def _generate_encounter(self, deck, num_players=1):
 		"""Generate an encounter by drawing cards from the encounter deck"""
 		random.seed()
-		
-		no_brutes_soldiers = True
+
 		monsters = []
 		
-		while no_brutes_soldiers:
-			remaining = 4*num_players
-			while remaining > 0:
-				draw = random.choice(deck.cards)
-				
-				if draw['role'] in ('soldier', 'brute') and remaining >= 2:
-					monsters.append(draw['monster'])
-					no_brutes_soldiers = False
-					remaining -= 2
-				elif draw['role'] == 'minion':
-					monsters.append(draw['monster'])
-					remaining -= 1
-				elif draw['role']:
-					monsters.append(draw[0])
-					remaining -= 4
-				else:
-					continue
+		remaining = 4*num_players
+		while remaining > 0:
+			draw = random.choice(deck.cards)
+			
+			if draw['points'] <= remaining:
+				monsters.append(draw['monster'])
+				remaining -= draw['points']
 
 		return monsters
 	
