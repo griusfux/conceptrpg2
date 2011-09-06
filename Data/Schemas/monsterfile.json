@@ -6,5 +6,15 @@
 	"role" : "{'MEAT_SHIELD', 'PEON', 'SPEEDSTER', 'BRAWLER', 'SUPPORT', 'BLASTER'}",
 	"level_adjustment" : "int",
 	
-	"element" : "{'DEATH', 'STORM', 'FIRE', 'HOLY', 'EARTH', 'WATER', 'NEUTRAL'}"
+	"element" : "{'DEATH', 'STORM', 'FIRE', 'HOLY', 'EARTH', 'WATER', 'NEUTRAL'}",
+	
+	"affinities" : {
+				"DEATH" : "int",
+				"STORM" : "int",
+				"FIRE" : "int",
+				"HOLY" : "int",
+				"EARTH" : "int",
+				"WATER" : "int",
+				"NEUTRAL": "int"
+				}
 }

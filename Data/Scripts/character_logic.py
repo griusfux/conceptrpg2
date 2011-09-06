@@ -138,6 +138,15 @@ class CharacterLogic:
 		self.max_hp = self.hp_per_level * (self.level+1+self.affinities['NEUTRAL']) 
 		self.hp = self.max_hp * hp_percent
 		
+		#other stats
+		#XXX handle "mods" from statuses
+		self.physical_damage = self.affinities['STORM']
+		self.physical_defense = self.affinities['EARTH']
+		self.arcane_damage = self.affinities['DEATH']
+		self.arcane_defense = self.affinities['HOLY']
+		self.reflex = self.affinities['WATER']
+		self.accuracy = self.affinities['FIRE']
+		
 		
 	def apply_affinities(self):
 		for k, v in self.player_class.affinities.items():
@@ -305,7 +314,6 @@ class CharacterLogic:
 	def load_from_info(self, info):
 		self.name		= info["name"]
 		self.level		= info["level"]
-		self.race		= Race(info["race"])
 		if info["player_class"]:
 			self.player_class = Class(info["player_class"])
 		self.element		= info["element"]
@@ -378,15 +386,18 @@ class PlayerLogic(CharacterLogic):
 			
 		save.data = save_data
 		save.name = self.name
-		save.write()		
+		save.write()
+		
+	def load_from_info(self, info):
+		CharacterLogic.load_from_info(self, info)
+		
+		self.race		= Race(info["race"])
 	
 class MonsterLogic(CharacterLogic):
-	def __init__(self, object, monsterdata, level):
+	def __init__(self, object, monsterdata, level=1):
 		CharacterLogic.__init__(self, object)
-		# self.id = monsterdata.id
-		
-		level += monsterdata.level_adjustment
-		self.level = level
+
+		self.level = max(level+monsterdata.level_adjustment, 1)
 		self.action_set = monsterdata.action_set
 		
 		self.xp_reward = 0
@@ -398,9 +409,33 @@ class MonsterLogic(CharacterLogic):
 #		self.object = object
 #		self.behaviors = []
 		
+		# Handle affinities
+		print(level)
+		if level > 1:
+			totals = {}
+			running_total = 0
+			
+			for k, v in monsterdata.affinities.items():
+				running_total += v
+				totals[k] = running_total
+				self.affinities[k] = v
+				
+			print(totals)
+				
+			for i in range(level):
+				rnd = random.random()*running_total
+				
+				for k, v in totals.items():
+					if rnd < v:
+						self.affinities[k] += 1
+						break
+			
+		print(self.affinities)
+		
 		self.name = monsterdata.name
 		self.hp_per_level = monsterdata.hp_per_level
 		self.element = monsterdata.element
+		self.race = monsterdata
 		
 		self.recalc_stats()
 		# self.level = monsterdata.level
@@ -410,6 +445,11 @@ class MonsterLogic(CharacterLogic):
 		
 		# self.ai_keywords = monsterdata.ai_keywords
 		# self.ai_start_state = monsterdata.ai_start_state
+		
+	def load_from_info(self, info):
+		CharacterLogic.load_from_info(self, info)
+		
+		self.race = Monster(info['race'])
 
 		# self.recalc_stats()
 		

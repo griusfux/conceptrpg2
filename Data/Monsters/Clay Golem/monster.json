@@ -1,5 +1,13 @@
 {
     "action_set": "Clay Golem Actions", 
+    "affinities": {
+        "DEATH": 3, 
+        "EARTH": 3, 
+        "FIRE": 3, 
+        "HOLY": 3, 
+        "STORM": 3, 
+        "WATER": 3
+    }, 
     "element": "NEUTRAL", 
     "hp_per_level": 5, 
     "level_adjustment": 0, 

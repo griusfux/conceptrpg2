@@ -6,5 +6,15 @@
 	"role" : "MEAT_SHIELD",
 	"level_adjustment" : 0,
 	
-	"element" : "NEUTRAL"
+	"element" : "NEUTRAL",
+	
+	"affinities" : {
+				"DEATH" : 3,
+				"STORM" : 3,
+				"FIRE" : 3,
+				"HOLY" : 3,
+				"EARTH" : 3,
+				"WATER" : 3,
+				"NEUTRAL": 3
+				}
 }

@@ -355,7 +355,7 @@ class CombatState(DefaultState, BaseController):
 																#[MonsterLogic(None, Monster(monster), level), [x, y, z]]
 			combat.monster_list[cid].id = cid
 			AiManager.add_agent(combat.monster_list[cid], "extern/cego/example_definitions/base.json", "spawn")
-			self.clients.invoke("add_player", cid, [monster, level], 1, [x, y, z], None)
+			self.clients.invoke("add_player", cid, combat.monster_list[cid].get_info(), 1, [x, y, z], None)
 			self.clients.invoke("add_monster", client.combat_id, monster, cid, x, y, z)
 			
 			main['players'][cid] = combat.monster_list[cid]
