@@ -152,7 +152,28 @@ class CharacterLogic:
 		for k, v in self.player_class.affinities.items():
 			self.affinities[k] += v
 			
-		# Still need to apply affinities based on element
+		affinities = ("STORM",
+					  "FIRE",
+					  "HOLY",
+					  "EARTH",
+					  "WATER",
+					  "DEATH")
+
+		idx = affinities.index(self.element)
+		
+		def mod_affinity(i, val):
+			i %= len(affinities)
+			
+			self.affinities[affinities[i]] += val
+			
+		mod_affinity(idx+0, 2)
+		mod_affinity(idx+1, 1)
+		mod_affinity(idx-1, 1)
+		
+		mod_affinity(idx+3, -2)
+		mod_affinity(idx+2, -1)
+		mod_affinity(idx-2, -1)
+				
 		
 	def manage_statuses(self, controller):
 		for status in self.statuses:
