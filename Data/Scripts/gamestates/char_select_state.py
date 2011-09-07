@@ -3,6 +3,9 @@ import math
 from .base_state import BaseState, BaseController
 import Scripts.packages as Package
 import Scripts.character_logic as Character
+
+import shutil
+
 _POSITIONS = 	[
 					(0, 0, 0.2),
 					(1.170, 3.214, 0.2),
@@ -50,6 +53,7 @@ class CharacterSelectState(BaseState, BaseController):
 
 		main['csl_continue'] = False
 		main['csl_new'] = False
+		main['cls_del'] = False
 		main['csl_char'] = None
 		main['csl_index'] = 0
 													
@@ -77,6 +81,13 @@ class CharacterSelectState(BaseState, BaseController):
 		
 		if main['csl_new']:
 			return("CharacterCreation", "SWITCH")
+		
+		if main['cls_del']:
+			try:
+				shutil.rmtree(Package.Save._dir+"/"+self.saves[index].package_name)
+			except:
+				print("Error when trying to delete save:", self.saves[index].package_name)
+			return ("CharacterSelect", "SWITCH")
 		
 		if main['csl_continue']:	
 			# Add the player empty
@@ -122,3 +133,4 @@ class CharacterSelectState(BaseState, BaseController):
 		del main['csl_continue']
 		del main['csl_new']
 		del main['csl_char']
+		del main['cls_del']

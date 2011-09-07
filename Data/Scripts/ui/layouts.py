@@ -525,13 +525,16 @@ class CharSelectLayout(Layout):
 								pos=[.65, .12], on_click=self.continue_click)
 		
 		self.prev_btn = Button(self.frame, "prev_btn", type="ARROW_LEFT", text="",
-								pos=[0.217, .12], on_click=self.prev_click)
+								pos=[0.047, .12], on_click=self.prev_click)
 		
 		self.next_btn = Button(self.frame, "next_btn", type="ARROW_RIGHT", text="",
-								pos=[0.517, .12], on_click=self.next_click)
+								pos=[0.557, .12], on_click=self.next_click)
 		
 		self.new_btn = Button(self.frame, "new_btn", text="NEW",
-								pos=[.3, .12], on_click=self.new_click)
+								pos=[.34, .12], on_click=self.new_click)
+		
+		self.del_btn = Button(self.frame, "del_btn", text="DELETE",
+								pos=[.13, .12], on_click=self.del_click)
 		
 		self.char_name = bgui.Label(self.frame, "name", pos=[0.1, .8], sub_theme="Title")
 		self.subclass = bgui.Label(self.frame, "subclass", pos=[0.1, .7], sub_theme="Subtitle")
@@ -550,6 +553,9 @@ class CharSelectLayout(Layout):
 		
 	def new_click(self, widget):
 		self.main['csl_new'] = True
+		
+	def del_click(self, widget):
+		self.main['cls_del'] = True
 		
 	def prev_click(self, widget):
 		self.main['csl_index'] -= 1
