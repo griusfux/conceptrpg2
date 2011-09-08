@@ -34,6 +34,14 @@ class MonsterEditor(BaseEditor):
 		ui.hp_per_level.setValue(data.hp_per_level)
 		ui.level_adjustment.setValue(data.level_adjustment)
 		
+		# Affinities
+		ui.fire.setValue(data.affinities['FIRE'])
+		ui.storm.setValue(data.affinities['STORM'])
+		ui.death.setValue(data.affinities['DEATH'])
+		ui.water.setValue(data.affinities['WATER'])
+		ui.earth.setValue(data.affinities['EARTH'])
+		ui.holy.setValue(data.affinities['HOLY'])
+		
 		
 	def save(self):
 		data = self.data
@@ -45,3 +53,11 @@ class MonsterEditor(BaseEditor):
 		data.element = ui.element.currentText().upper()
 		data.hp_per_level = ui.hp_per_level.value()
 		data.level_adjustment = ui.level_adjustment.value()
+		
+		# Affinities
+		data.affinities['FIRE'] = ui.fire.value()
+		data.affinities['STORM'] = ui.storm.value()
+		data.affinities['DEATH'] = ui.death.value()
+		data.affinities['WATER'] = ui.water.value()
+		data.affinities['EARTH'] = ui.earth.value()
+		data.affinities['HOLY'] = ui.holy.value()
