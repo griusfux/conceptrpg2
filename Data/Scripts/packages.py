@@ -16,10 +16,11 @@ class EncounterDeck(Package):
         Package.__init__(self, package_name, new_package)
         
         # Build a deck
-        self.deck = []
+        self._cards = self.cards[:]
         
-        for card in self.cards:
-            self.deck.extend([(card['monster'], card['points']) for i in range(card['count'])])
+        self.cards = []
+        for card in self._cards:
+            self.cards.extend([card for i in range(card['weight'])])
     
     _ext = 'deck'
     _blend = ''

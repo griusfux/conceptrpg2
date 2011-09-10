@@ -1,4 +1,4 @@
 {
 	"name": "str",
-	"cards": [{ "monster": "str", "points": "int", "count": "int" }]
+	"cards": [{ "monster": "str", "points": "int", "weight": "int" }]
 }

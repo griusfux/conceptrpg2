@@ -1,6 +1,6 @@
 {
 	"name": "Deck",
 	"cards": [
-		{ "monster": "Monster", "points": 2, "count": 10 }
+		{ "monster": "Monster", "points": 2, "weight": 1 }
 	]
 }

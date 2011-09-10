@@ -1,9 +1,9 @@
 {
 	"name": "Golem Deck",
 	"cards": [
-		{ "monster": "Clay Golem", "points": 2, "count": 50 },
-		{ "monster": "Bomb Golem", "points": 2, "count": 50 },
-		{ "monster": "Furnace Golem", "points": 2, "count": 50},
-		{ "monster": "Water Elemental", "points": 2, "count": 50}
+		{ "monster": "Clay Golem", "points": 2, "weight": 1 },
+		{ "monster": "Bomb Golem", "points": 2, "weight": 1 },
+		{ "monster": "Furnace Golem", "points": 2, "weight": 1},
+		{ "monster": "Water Elemental", "points": 2, "weight": 1}
 	]
 }
