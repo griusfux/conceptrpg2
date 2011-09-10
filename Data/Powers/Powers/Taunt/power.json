@@ -1,0 +1,15 @@
+{
+    "cool_down": 5, 
+    "delivery": "WEAPON", 
+    "description": "Causes the caster's target to target the caster.", 
+    "distance": 8, 
+    "effect_shape": "SINGLE", 
+    "element": "EARTH", 
+    "flags": [], 
+    "name": "Taunt", 
+    "shape_modifier": 0, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
+    "tier": 1
+}

@@ -1,0 +1,15 @@
+{
+    "cool_down": 2, 
+    "delivery": "SPELL", 
+    "description": "Target suffers minor physical damage.", 
+    "distance": 8, 
+    "effect_shape": "SINGLE", 
+    "element": "EARTH", 
+    "flags": [], 
+    "name": "Pelt", 
+    "shape_modifier": 0, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
+    "tier": 1
+}

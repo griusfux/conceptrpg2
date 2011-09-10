@@ -1,0 +1,15 @@
+{
+    "cool_down": 8, 
+    "delivery": "SPELL", 
+    "description": "Holds a target.", 
+    "distance": 8, 
+    "effect_shape": "SINGLE", 
+    "element": "EARTH", 
+    "flags": [], 
+    "name": "Sink Hole", 
+    "shape_modifier": 0, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
+    "tier": 1
+}

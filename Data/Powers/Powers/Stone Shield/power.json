@@ -1,0 +1,15 @@
+{
+    "cool_down": 7, 
+    "delivery": "SPELL", 
+    "description": "Gives the caster a high increase to physical resistance.", 
+    "distance": 0, 
+    "effect_shape": "SINGLE", 
+    "element": "EARTH", 
+    "flags": [], 
+    "name": "Stone Shield", 
+    "shape_modifier": 0, 
+    "target_mask": [
+        "SELF"
+    ], 
+    "tier": 1
+}

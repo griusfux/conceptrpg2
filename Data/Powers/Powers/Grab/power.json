@@ -1,0 +1,15 @@
+{
+    "cool_down": 6, 
+    "delivery": "WEAPON", 
+    "description": "Holds the target.", 
+    "distance": 1, 
+    "effect_shape": "SINGLE", 
+    "element": "EARTH", 
+    "flags": [], 
+    "name": "Grab", 
+    "shape_modifier": 0, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
+    "tier": 1
+}
