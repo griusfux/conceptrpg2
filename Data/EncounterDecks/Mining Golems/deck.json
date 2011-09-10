@@ -3,6 +3,7 @@
 	"cards": [
 		{ "monster": "Clay Golem", "points": 2, "count": 50 },
 		{ "monster": "Bomb Golem", "points": 2, "count": 50 },
-		{ "monster": "Furnace Golem", "points": 2, "count": 50}
+		{ "monster": "Furnace Golem", "points": 2, "count": 50},
+		{ "monster": "Water Elemental", "points": 2, "count": 50}
 	]
 }

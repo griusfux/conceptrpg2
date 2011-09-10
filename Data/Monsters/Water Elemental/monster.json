@@ -1,0 +1,17 @@
+{
+    "action_set": "", 
+    "affinities": {
+        "DEATH": 3, 
+        "EARTH": 3, 
+        "FIRE": 3, 
+        "HOLY": 3, 
+        "NEUTRAL": 3, 
+        "STORM": 3, 
+        "WATER": 3
+    }, 
+    "element": "WATER", 
+    "hp_per_level": 5, 
+    "level_adjustment": 0, 
+    "name": "Water Elemental", 
+    "root_object": "Water Elemental"
+}
