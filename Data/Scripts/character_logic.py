@@ -140,12 +140,12 @@ class CharacterLogic:
 		
 		#other stats
 		#XXX handle "mods" from statuses
-		self.physical_damage = self.affinities['STORM']
-		self.physical_defense = self.affinities['EARTH']
-		self.arcane_damage = self.affinities['DEATH']
-		self.arcane_defense = self.affinities['HOLY']
-		self.reflex = self.affinities['WATER']
-		self.accuracy = self.affinities['FIRE']
+		self.physical_damage = max(1, 10+self.affinities['STORM'])
+		self.physical_defense = max(1, 10+self.affinities['EARTH'])
+		self.arcane_damage = max(1, 10+self.affinities['DEATH'])
+		self.arcane_defense = max(1, 10+self.affinities['HOLY'])
+		self.reflex = max(1, 10+self.affinities['WATER'])
+		self.accuracy = max(1, 10+self.affinities['FIRE'])
 		
 		
 	def apply_affinities(self):
@@ -436,7 +436,8 @@ class MonsterLogic(CharacterLogic):
 			running_total = 0
 			
 			for k, v in monsterdata.affinities.items():
-				running_total += v
+				weight = max(1, v+5)
+				running_total += weight
 				totals[k] = running_total
 				self.affinities[k] = v
 				
