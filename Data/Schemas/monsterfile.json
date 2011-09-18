@@ -4,6 +4,7 @@
 	"action_set": "str",
 	"hp_per_level": "int",
 	"level_adjustment" : "int",
+	"xp_reward": "int",
 	
 	"element" : "{'DEATH', 'STORM', 'FIRE', 'HOLY', 'EARTH', 'WATER', 'NEUTRAL'}",
 	

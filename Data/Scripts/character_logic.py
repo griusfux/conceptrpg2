@@ -421,8 +421,7 @@ class MonsterLogic(CharacterLogic):
 		self.level = max(level+monsterdata.level_adjustment, 1)
 		self.action_set = monsterdata.action_set
 		
-		self.xp_reward = 0
-#		self.xp_reward = monsterdata.xp_reward
+		self.xp_reward = monsterdata.xp_reward
 #		self.credit_reward = monsterdata.credit_reward
 #		self.role = monsterdata.role
 #		self.leader = False

@@ -255,6 +255,11 @@ class BaseState:
 		if main['ground_items'][id][2] is not None:
 			main['effect_system'].remove(main['ground_items'][id][2])
 		del main['ground_items'][id]
+		
+	@rpc(client_functions, "reward_xp", "pickle", int)
+	def reward_xp(self, main, heroes, xp):
+		if main['player'].id in heroes:
+			main['player'].xp += xp
 	
 	def client_init(self, main):
 		"""Initialize the client state"""

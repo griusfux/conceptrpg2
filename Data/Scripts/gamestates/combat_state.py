@@ -384,6 +384,9 @@ class CombatState(DefaultState, BaseController):
 			main['ground_items'][gid] = item
 			self.clients.invoke("drop_item", gid, item, *monster.position)
 			
+			# Now give all the participants some xp
+			self.clients.invoke("reward_xp", [i for i in combat.hero_list.keys()], monster.xp_reward)
+			
 			del combat.monster_list[id]
 			del main['players'][id]
 		else:

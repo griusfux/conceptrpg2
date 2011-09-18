@@ -4,6 +4,7 @@
 	"action_set": "",
 	"hp_per_level": 5,
 	"level_adjustment" : 0,
+	"xp_reward": 50,
 	
 	"element" : "NEUTRAL",
 	
