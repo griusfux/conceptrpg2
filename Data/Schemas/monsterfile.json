@@ -5,7 +5,7 @@
 	"hp_per_level": "int",
 	"level_adjustment" : "int",
 	"xp_reward": "int",
-	
+	"size": "float",
 	"element" : "{'DEATH', 'STORM', 'FIRE', 'HOLY', 'EARTH', 'WATER', 'NEUTRAL'}",
 	
 	"affinities" : {

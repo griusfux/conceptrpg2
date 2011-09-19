@@ -5,6 +5,7 @@
 	"hp_per_level": 5,
 	"level_adjustment" : 0,
 	"xp_reward": 50,
+	"size": 0.5,
 	
 	"element" : "NEUTRAL",
 	

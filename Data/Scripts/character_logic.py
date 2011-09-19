@@ -425,6 +425,8 @@ class MonsterLogic(CharacterLogic):
 		self.action_set = monsterdata.action_set
 		
 		self.xp_reward = monsterdata.xp_reward
+		
+		self.size = monsterdata.size
 #		self.credit_reward = monsterdata.credit_reward
 #		self.role = monsterdata.role
 #		self.leader = False
