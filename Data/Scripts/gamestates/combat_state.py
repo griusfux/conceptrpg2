@@ -516,8 +516,11 @@ class CombatState(DefaultState, BaseController):
 	##########
 	# Controller
 	##########
-	def deal_damage(self, character, strength, multiplier, type, delivery):
-		self.modify_health(character, -int(strength*10*multiplier))
+	def deal_damage(self, caster, target, power, damage):
+		damage += caster.affinities[power.element]
+		damage -= target.affinities[power.element]
+		
+		self.modify_health(target, -val)
 		
 	def modify_health(self, character, amount):
 		BaseController.modify_health(self, character, amount)
