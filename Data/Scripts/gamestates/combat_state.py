@@ -614,10 +614,10 @@ class CombatState(DefaultState, BaseController):
 		
 		# Bump the range a bit to compensate for the first half "tile"
 		# that the player occupies
-		distance += HALF_UNIT_SIZE
+		distance += character.size
 		
 		if not source:
-			source = character.object.position
+			source = character.position
 
 		targets = []
 		
@@ -636,28 +636,28 @@ class CombatState(DefaultState, BaseController):
 			ori_ivnt = character.object.get_orientation().inverted()
 			for target in tlist:
 				# Convert to local space
-				v = target.object.position - source
+				v = target.position - source
 				v = ori_ivnt * v
 				
 				# Now do a simple bounds check
-				if v[1] < distance and abs(v[0]) < HALF_UNIT_SIZE * 2: # Multiply by 2 to allow for more error
+				if v[1] < distance and abs(v[0]) < target.size * 2: # Multiply by 2 to allow for more error
 					targets.append(target)
 		elif shape == 'BURST':
 			for target in tlist:
 				
 				# Do a simple distance check
-				if (target.object.position - source).length < distance:
+				if (target.position - source).length < distance:
 					targets.append(target)
 		elif shape == 'CONE':
 			pi_fourths = pi / 4
 			for target in tlist:
 			
 				# Start with a simple distance check
-				if (target.object.position - source).length < distance:
+				if (target.position - source).length < distance:
 					
 					# Now do an angle check
 					v1 = character.object.forward_vector
-					v2 = target.object.position - character.object.position
+					v2 = target.position - character.position
 					
 					angle = v1.angle(v2, 0)
 					

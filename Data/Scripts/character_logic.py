@@ -86,6 +86,9 @@ class CharacterLogic:
 		#speed
 		self.speed		= 5
 		
+		# Size for range checks
+		self.size		= 0.5
+		
 		#inventory and equipment
 		self.inventory = []
 		self._armor	= self.Dummy()
