@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MonsterEditor.ui'
 #
-# Created: Thu Sep  8 16:49:23 2011
+# Created: Tue Sep 20 01:37:25 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -17,7 +17,7 @@ except AttributeError:
 class Ui_MonsterEditor(object):
     def setupUi(self, MonsterEditor):
         MonsterEditor.setObjectName(_fromUtf8("MonsterEditor"))
-        MonsterEditor.resize(400, 300)
+        MonsterEditor.resize(500, 335)
         self.formLayout = QtGui.QFormLayout(MonsterEditor)
         self.formLayout.setObjectName(_fromUtf8("formLayout"))
         self.gridLayout = QtGui.QGridLayout()
@@ -57,6 +57,14 @@ class Ui_MonsterEditor(object):
         self.horizontalLayout.addWidget(self.hp_per_level)
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
+        self.label_14 = QtGui.QLabel(MonsterEditor)
+        self.label_14.setObjectName(_fromUtf8("label_14"))
+        self.horizontalLayout.addWidget(self.label_14)
+        self.xp_reward = QtGui.QSpinBox(MonsterEditor)
+        self.xp_reward.setMaximum(1000)
+        self.xp_reward.setSingleStep(10)
+        self.xp_reward.setObjectName(_fromUtf8("xp_reward"))
+        self.horizontalLayout.addWidget(self.xp_reward)
         self.gridLayout.addLayout(self.horizontalLayout, 4, 1, 1, 1)
         self.label_6 = QtGui.QLabel(MonsterEditor)
         self.label_6.setObjectName(_fromUtf8("label_6"))
@@ -70,6 +78,15 @@ class Ui_MonsterEditor(object):
         self.horizontalLayout_2.addWidget(self.level_adjustment)
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem1)
+        self.label_15 = QtGui.QLabel(MonsterEditor)
+        self.label_15.setObjectName(_fromUtf8("label_15"))
+        self.horizontalLayout_2.addWidget(self.label_15)
+        self.size = QtGui.QDoubleSpinBox(MonsterEditor)
+        self.size.setDecimals(1)
+        self.size.setMaximum(10.0)
+        self.size.setSingleStep(0.5)
+        self.size.setObjectName(_fromUtf8("size"))
+        self.horizontalLayout_2.addWidget(self.size)
         self.gridLayout.addLayout(self.horizontalLayout_2, 5, 1, 1, 1)
         self.formLayout.setLayout(1, QtGui.QFormLayout.FieldRole, self.gridLayout)
         self.data_image = QtGui.QLabel(MonsterEditor)
@@ -147,7 +164,9 @@ class Ui_MonsterEditor(object):
         self.label_4.setText(QtGui.QApplication.translate("MonsterEditor", "Action Set: ", None, QtGui.QApplication.UnicodeUTF8))
         self.label_2.setText(QtGui.QApplication.translate("MonsterEditor", "Element: ", None, QtGui.QApplication.UnicodeUTF8))
         self.label_5.setText(QtGui.QApplication.translate("MonsterEditor", "HP Per Level: ", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_14.setText(QtGui.QApplication.translate("MonsterEditor", "XP Reward: ", None, QtGui.QApplication.UnicodeUTF8))
         self.label_6.setText(QtGui.QApplication.translate("MonsterEditor", "Level Adjustment: ", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_15.setText(QtGui.QApplication.translate("MonsterEditor", "Size: ", None, QtGui.QApplication.UnicodeUTF8))
         self.label_7.setText(QtGui.QApplication.translate("MonsterEditor", "Affinities", None, QtGui.QApplication.UnicodeUTF8))
         self.label_8.setText(QtGui.QApplication.translate("MonsterEditor", "Fire: ", None, QtGui.QApplication.UnicodeUTF8))
         self.label_9.setText(QtGui.QApplication.translate("MonsterEditor", "Storm: ", None, QtGui.QApplication.UnicodeUTF8))

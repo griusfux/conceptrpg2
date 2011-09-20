@@ -33,6 +33,8 @@ class MonsterEditor(BaseEditor):
 		ui.element.setCurrentIndex(ui.element.findText(data.element.title()))
 		ui.hp_per_level.setValue(data.hp_per_level)
 		ui.level_adjustment.setValue(data.level_adjustment)
+		ui.xp_reward.setValue(data.xp_reward)
+		ui.size.setValue(data.size)
 		
 		# Affinities
 		ui.fire.setValue(data.affinities['FIRE'])
@@ -53,6 +55,8 @@ class MonsterEditor(BaseEditor):
 		data.element = ui.element.currentText().upper()
 		data.hp_per_level = ui.hp_per_level.value()
 		data.level_adjustment = ui.level_adjustment.value()
+		data.xp_reward = ui.xp_reward.value()
+		data.size = ui.size.value()
 		
 		# Affinities
 		data.affinities['FIRE'] = ui.fire.value()
