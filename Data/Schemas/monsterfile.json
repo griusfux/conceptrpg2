@@ -6,6 +6,7 @@
 	"level_adjustment" : "int",
 	"xp_reward": "int",
 	"size": "float",
+	"speed": "float",
 	"element" : "{'DEATH', 'STORM', 'FIRE', 'HOLY', 'EARTH', 'WATER', 'NEUTRAL'}",
 	
 	"affinities" : {

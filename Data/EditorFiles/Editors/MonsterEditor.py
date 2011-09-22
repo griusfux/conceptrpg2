@@ -35,6 +35,7 @@ class MonsterEditor(BaseEditor):
 		ui.level_adjustment.setValue(data.level_adjustment)
 		ui.xp_reward.setValue(data.xp_reward)
 		ui.size.setValue(data.size)
+		ui.speed.setValue(data.speed)
 		
 		# Affinities
 		ui.fire.setValue(data.affinities['FIRE'])
@@ -57,6 +58,7 @@ class MonsterEditor(BaseEditor):
 		data.level_adjustment = ui.level_adjustment.value()
 		data.xp_reward = ui.xp_reward.value()
 		data.size = ui.size.value()
+		data.speed = ui.sped.value()
 		
 		# Affinities
 		data.affinities['FIRE'] = ui.fire.value()
