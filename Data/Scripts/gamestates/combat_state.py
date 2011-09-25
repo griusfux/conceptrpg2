@@ -624,13 +624,24 @@ class CombatState(DefaultState, BaseController):
 		if not target_types:
 			return targets
 			
+		if self.is_server:
+			combat = self.main['combats'].get(self.client.combat_id, None)
+			if not combat:
+				hero_list = monster_list = {}
+			else:
+				hero_list = combat.hero_list
+				monster_list = combat.monster_list
+		else:
+			hero_list = self.hero_list
+			monster_list = self.monster_list
+	
 		tlist = []
 		if 'SELF' in target_types:
-			tlist.append(self.main['player'])
+			tlist.append(character)
 		if 'ALLIES' in target_types:
-			tlist.extend(self.hero_list.values() if character in self.hero_list.values() else self.monster_list.values())
+			tlist.extend(hero_list.values() if character in hero_list.values() else monster_list.values())
 		if 'ENEMIES' in target_types:
-			tlist.extend(self.monster_list.values() if character in self.hero_list.values() else self.hero_list.values())
+			tlist.extend(monster_list.values() if character in hero_list.values() else hero_list.values())
 		
 		if shape == 'SINGLE':
 			ori_ivnt = character.object.get_orientation().inverted()
