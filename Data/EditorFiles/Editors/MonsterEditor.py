@@ -58,7 +58,7 @@ class MonsterEditor(BaseEditor):
 		data.level_adjustment = ui.level_adjustment.value()
 		data.xp_reward = ui.xp_reward.value()
 		data.size = ui.size.value()
-		data.speed = ui.sped.value()
+		data.speed = ui.speed.value()
 		
 		# Affinities
 		data.affinities['FIRE'] = ui.fire.value()
