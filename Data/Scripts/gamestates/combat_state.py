@@ -516,11 +516,20 @@ class CombatState(DefaultState, BaseController):
 	##########
 	# Controller
 	##########
-	def deal_damage(self, caster, target, power, damage):
+	def deal_damage(self, caster, target, power, damage, type):
 		damage += caster.affinities[power.element]
 		damage -= target.affinities[power.element]
 		
-		self.modify_health(target, -val)
+		if type == "PHYSICAL":
+			damage += caster.physical_damage
+			damage -= target.physical_defense
+		elif type == "ARCANE":
+			damage += caster.arcane_damage
+			damage -= target.arcane_defense
+		else:
+			print("WARNING: invalid type supplied to deal_damage() from power:", power.name)
+		
+		self.modify_health(target, -damage)
 		
 	def modify_health(self, character, amount):
 		BaseController.modify_health(self, character, amount)
