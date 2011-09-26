@@ -33,8 +33,84 @@ class PlayerStatsLayout(Layout):
 		
 		self.mframe.position = [.675-self.mframe.size[0]/parent.size[0], self.mframe.position[1]]
 		
-		bgui.Label(self.mframe, "pstats_title", text="Stats", pos=[.05, .75],
-					sub_theme="Title")
+		#=======================================================================
+		# Character Frame
+		#=======================================================================
+		self.cframe = bgui.Frame(self.mframe, "char_frame", size=[0.35, 0.3],
+								pos=[0.05, 0.65], sub_theme="Menu")
+		self.pname = bgui.Label(self.cframe, "pname", text="", sub_theme="Title", pos=[0, 0.9],
+							options=BGUI_DEFAULT|bgui.BGUI_CENTERX)
+		self.element = bgui.Label(self.cframe, "element", text="", sub_theme="Menu", pos=[0.03, 0.8])
+		self.raceclass = bgui.Label(self.cframe, "raceclass", text="", sub_theme="Menu", pos=[0.03, 0.73])
+		# HP
+		self.hp_text = bgui.Label(self.cframe, "ds_hp", sub_theme="Menu", pos=[0.03, 0.6])
+		self.hp_bar = bgui.ProgressBar(self.cframe, "ds_hp_bar", size=[0.90, 0.05], pos=[0.03, 0.50],
+									sub_theme='HP')
+									
+		# EXP
+		self.exp_text = bgui.Label(self.cframe, "ds_exp", sub_theme="Menu", pos=[0.03, 0.4])
+		self.exp_bar = bgui.ProgressBar(self.cframe, "ds_exp_bar", size=[0.90, 0.05], pos=[0.03, 0.30],
+									sub_theme='Exp')
+		
+		#=======================================================================
+		# Stats Frame
+		#=======================================================================
+		self.sframe = bgui.Frame(self.mframe, "stat_frame", size=[0.50, 0.3],
+								pos=[0.45, 0.65], sub_theme="Menu")
+
+		self.pstatlbl = bgui.Label(self.sframe, "pstatlbl", text="Player Stats", sub_theme="Title", pos=[0, 0.9],
+							options=BGUI_DEFAULT|bgui.BGUI_CENTERX)
+
+		self.physdlbl = bgui.Label(self.sframe, 'physdlbl', text='Physical Damage:', sub_theme="Menu", pos=[0.03, 0.80])
+		self.physd = bgui.Label(self.sframe, 'physd', sub_theme='Menu', pos=[0.4, 0.80])
+		self.arcdlbl = bgui.Label(self.sframe, 'arcdlbl', text='Arcane Damage:', sub_theme="Menu", pos=[0.03, 0.73])
+		self.arcd = bgui.Label(self.sframe, 'arcd', sub_theme='Menu', pos=[0.4, 0.73])
+		self.accylbl = bgui.Label(self.sframe, 'accylbl', text='Accuracy:', sub_theme="Menu", pos=[0.03, 0.66])
+		self.accy = bgui.Label(self.sframe, 'accy', sub_theme='Menu', pos=[0.4, 0.66])
+		self.physdeflbl = bgui.Label(self.sframe, 'physdeflbl', text='Physical Defense:', sub_theme="Menu", pos=[0.53, 0.80])
+		self.physdef = bgui.Label(self.sframe, 'physdef', sub_theme='Menu', pos=[0.91, 0.80])
+		self.arcdeflbl = bgui.Label(self.sframe, 'arcdeflbl', text='Arcane Defense:', sub_theme="Menu", pos=[0.53, 0.73])
+		self.arcdef = bgui.Label(self.sframe, 'arcdef', sub_theme='Menu', pos=[0.91, 0.73])
+		self.reflexlbl = bgui.Label(self.sframe, 'reflexlbl', text='Reflex:', sub_theme="Menu", pos=[0.53, 0.66])
+		self.reflex = bgui.Label(self.sframe, 'reflex', sub_theme='Menu', pos=[0.91, 0.66])
+		
+		#=======================================================================
+		# Affinities Frame
+		#=======================================================================
+		self.aframe = bgui.Frame(self.mframe, "aff_frame", size=[0.9, 0.55],
+								pos=[0.05, 0.05], sub_theme="Menu")
+
+		self.afflbl = bgui.Label(self.aframe, "afflbl", text="Affinities", sub_theme="Title", pos=[0, 0.9],
+							options=BGUI_DEFAULT|bgui.BGUI_CENTERX)
+		self.affinities = AffinityWidget(self.aframe, size=[0.9, 0.85], pos=[0, 0.03])
+		
+	def update(self, main):
+		player = main['player']
+		
+		# Update player info
+		self.pname.text = player.name+"  [Level %d]"%player.level
+		if not self.element.text:
+			# Labels here should remain static, and don't need to be updated
+			self.element.text = player.element.title()
+			self.raceclass.text = player.race.name + " -- " + player.player_class.subclass[player.element]
+		
+		self.hp_text.text = "HP (%d/%d)" % (player.hp, player.max_hp)
+		self.hp_bar._update_position([0.90*min(player.max_hp/100, 1), 0.03], self.hp_bar._base_pos)
+		self.hp_bar.percent = player.hp/player.max_hp
+		
+		self.exp_text.text = "EXP (%d/%d)" % (player.xp, player.next_level)
+		self.exp_bar.percent = (player.xp-player.last_level)/(player.next_level-player.last_level+1)
+		
+		self.physd.text = str(player.physical_damage)
+		self.arcd.text = str(player.arcane_damage)
+		self.accy.text = str(player.accuracy)
+		self.physdef.text = str(player.physical_defense)
+		self.arcdef.text = str(player.arcane_defense)
+		self.reflex.text = str(player.reflex)
+		
+		# Update affinity info
+		self.afflbl.text = "Affinities  [Points %d]"%player.affinity_points
+		self.affinities.update(player)
 		
 class InventoryLayout(Layout):
 	class ItemCellRenderer():

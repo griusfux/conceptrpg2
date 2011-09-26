@@ -207,6 +207,7 @@ class CharacterLogic:
 		
 		if self.level == 1:
 			self.power_points += 3
+			self.affinity_points += 2
 			self.apply_affinities()
 		elif self.level % 5:
 			self.affinity_points += 1
@@ -427,12 +428,7 @@ class MonsterLogic(CharacterLogic):
 		self.xp_reward = monsterdata.xp_reward
 		
 		self.size = monsterdata.size
-#		self.credit_reward = monsterdata.credit_reward
-#		self.role = monsterdata.role
-#		self.leader = False
-#		self.elite	= False
-#		self.object = object
-#		self.behaviors = []
+		self.speed = monsterdata.speed
 		
 		# Handle affinities
 		if level > 1:
@@ -459,13 +455,6 @@ class MonsterLogic(CharacterLogic):
 		self.race = monsterdata
 		
 		self.recalc_stats()
-		# self.level = monsterdata.level
-		# self.role = monsterdata.role
-		# self.leader = monsterdata.leader
-		# self.elite = monsterdata.elite
-		
-		# self.ai_keywords = monsterdata.ai_keywords
-		# self.ai_start_state = monsterdata.ai_start_state
 		
 	def load_from_info(self, info):
 		CharacterLogic.load_from_info(self, info)

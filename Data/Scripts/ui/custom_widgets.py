@@ -119,6 +119,38 @@ class ElementBar(Frame):
 	def swap(self, widget):
 		self.element = widget.name
 		
+class AffinityWidget(Frame):
+	def __init__(self, parent, size, pos):
+		Frame.__init__(self, parent, "aw", size=size, pos=pos, options=BGUI_DEFAULT|BGUI_CENTERX)
+		self.colors = [[0,0,0,0]]*4
+
+		path = "Textures/Elements/"
+		self.elements = elements = ["Death", "Storm", "Fire", "Neutral", "Holy", "Earth", "Water"]
+		self.icons = {}
+		self.labels = {}
+		
+		for i, element in enumerate(elements):
+			y = 1-((i+1)*0.14)
+			i = self.icons[element] = Image(self, element, path+element+'.png', aspect=1,
+										size=[0, .12], pos=[0, y],
+										options=BGUI_DEFAULT|BGUI_CENTERX)
+			i.on_click = self.aff_click
+			self.labels[element] = Label(self, element+"lbl", sub_theme="Affinity", pos=[.55, y+0.04])
+			
+	def update(self, player):
+		self.player = player
+		
+		for element in self.elements:
+			self.labels[element].text = str(player.affinities[element.upper()])
+			
+	def aff_click(self, widget):
+		element = widget.name.upper()
+		
+		if self.player.affinity_points > 0:
+			self.player.affinity_points -= 1
+			self.player.affinities[element] += 1
+			self.player.recalc_stats()
+		
 class RingSelector(Widget):
 	"""A widget to use in the character creation screen"""
 	
