@@ -113,16 +113,19 @@ class DungeonGenerationState(BaseState):
 			main['player'].object.position = pos
 			
 			# Add the shop keeper
-			if (main['dgen'].shop_node):
-				shop_node = main['dgen'].shop_node
-				shop = Shop(self.map.shop)
-				main['engine'].load_library(shop)
-				shop_obj = main['engine'].add_object(shop.root_object, shop_node.position)
-				shop_obj.set_orientation(shop_node.orientation)
-				main['shop_keepers'] = {shop: shop_obj}
-			else:
-				main['shop_keepers'] = {}
-				print("Could not find a shop empty!")
+			# XXX This code is working fine, but shops aren't ready for the playtesting.
+			# Uncomment this to bring shops back.
+			main['shop_keepers'] = {} # also delete this line
+#			if (main['dgen'].shop_node):
+#				shop_node = main['dgen'].shop_node
+#				shop = Shop(self.map.shop)
+#				main['engine'].load_library(shop)
+#				shop_obj = main['engine'].add_object(shop.root_object, shop_node.position)
+#				shop_obj.set_orientation(shop_node.orientation)
+#				main['shop_keepers'] = {shop: shop_obj}
+#			else:
+#				main['shop_keepers'] = {}
+#				print("Could not find a shop empty!")
 			
 			# Add the player to the server state
 			pobj = main['player'].object
