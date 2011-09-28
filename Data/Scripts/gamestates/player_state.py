@@ -15,7 +15,6 @@ class PlayerState(DefaultState):
 		
 		main['player_exit'] = False
 		main['player_new_powers'] = []
-		main['player_new_pp'] = self.main['player'].power_points
 		main['drop_item'] = None
 	
 	def client_run(self, main):
@@ -81,10 +80,12 @@ class PlayerState(DefaultState):
 			main['drop_item'] = None
 		
 		if main['player_exit']:
-			for power in main['player_new_powers']:
-				player.powers.add(power, self)
-			player.power_points = main['player_new_pp']
-			player.save()
+			if main['player_new_powers']:
+				player.powers.remove_all(self)
+				for power in main['player_new_powers']:
+					player.powers.add(power, self)
+				player.recalc_stats()
+				player.save()
 			return('', 'POP')
 		
 	def client_cleanup(self, main):
@@ -97,4 +98,3 @@ class PlayerState(DefaultState):
 		# Clean up main
 		del main['player_exit']
 		del main['player_new_powers']
-		del main['player_new_pp']

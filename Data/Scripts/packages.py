@@ -133,6 +133,17 @@ class Power(Package):
         
         zip.close()
         
+    def cost(self, affinities):
+    	if self.tier == 0:
+    		return 0
+    	
+    	tier = min(self.tier, 5)
+    	
+    	cost = [3, 8, 15, 24, 35][tier-1]
+    	cost -= affinities[self.element.upper()] + affinities[self.delivery.upper()]
+    	
+    	return max(1, cost)
+        
 class Feat(Power):
     _dir = 'Powers/Feats'
     _schema = 'Schemas/featfile.json'

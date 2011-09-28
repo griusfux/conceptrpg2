@@ -23,6 +23,9 @@ class PowerManager:
 		
 		self._current_power = 0
 		
+	def __iter__(self):
+		return iter(self._powers)
+		
 	def add(self, power, controller):
 		"""Add a power to the manager
 		
@@ -48,6 +51,14 @@ class PowerManager:
 			power.pop(controller, self.owner)
 		else:
 			self._powers.remove(power)
+			
+	def remove_all(self, controller):
+		"""Remove all of the powers from the manager"""
+		
+		# Iterate a copy of the list so we aren't deleting
+		# items through a list we're iterating.
+		for i in self._powers[:]:
+			self.remove(i, controller)
 		
 	def make_next_active(self):
 		"""Make the power after the current power active"""

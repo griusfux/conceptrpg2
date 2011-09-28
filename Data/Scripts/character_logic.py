@@ -68,7 +68,8 @@ class CharacterLogic:
 		self.next_level = 0
 		self.affinity_points = 0
 		self.delivery_points = 0
-		self.power_points = 0
+		self.power_pool_max = 0
+		self.power_pool = 0
 		
 		#attributes
 		self.arcane_damage	= 5
@@ -150,6 +151,10 @@ class CharacterLogic:
 		self.reflex = max(1, 10+self.affinities['WATER'])
 		self.accuracy = max(1, 10+self.affinities['FIRE'])
 		
+		# Recalc power pool
+		self.power_pool = self.power_pool_max
+		for power in self.powers:
+			self.power_pool -= power.cost(self.affinities)
 		
 	def apply_affinities(self):
 		for k, v in self.player_class.affinities.items():
@@ -206,17 +211,17 @@ class CharacterLogic:
 		self.level += 1
 		
 		if self.level == 1:
-			self.power_points += 3
+			self.power_pool_max += 3
 			self.affinity_points += 2
 			self.apply_affinities()
 		elif self.level % 5:
 			self.affinity_points += 1
-			self.power_points += 1
+			self.power_pool_max += 1
 			self.delivery_points += 1
 			self.apply_affinities()
 		else:
 			self.affinity_points += 1
-			self.power_points += 1
+			self.power_pool_max += 1
 
 	# Managed access to xp
 	@property
@@ -319,7 +324,7 @@ class CharacterLogic:
 				"accuracy" : self.accuracy,
 				
 				"affinities" : self.affinities,
-				"power_points" : self.power_points,
+				"power_pool_max" : self.power_pool_max,
 				"affinity_points" : self.affinity_points,
 				"delivery_points" : self.delivery_points,
 				
@@ -352,7 +357,7 @@ class CharacterLogic:
 		self.reflex = info["reflex"]
 
 		self.affinities = info["affinities"]
-		self.power_points = info["power_points"]
+		self.power_pool_max = info["power_pool_max"]
 		self.affinity_points = info["affinity_points"]
 		self.delivery_points = info["delivery_points"]
 		

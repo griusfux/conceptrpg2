@@ -309,6 +309,17 @@ class PowersLayout(Layout):
 			self.dlbl.text = power.delivery.title()
 			self.tlbl.text = str(power.tier)
 			
+			# Mark known powers as white
+			if hasattr(self, "known_powers"):
+				for i in self.known_powers:
+					if power.name == i.name:
+						power_color = [1, 1, 1, 1]
+						break
+				else:
+					power_color = self.nlbl.theme['Color']
+					
+				self.nlbl.color = self.dlbl.color = self.tlbl.color = power_color
+			
 			return self.frame
 	def __init__(self, parent):
 		Layout.__init__(self, parent, "powers_overlay", use_mouse=True)
@@ -392,19 +403,24 @@ class PowersLayout(Layout):
 		
 		self.buy_btn = Button(self.iframe, "buy_btn", text="BUY", on_click=self.buy_click,
 								pos=[0, .1], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+
+		self.sell_btn = Button(self.iframe, "sell_btn", text="SELL", on_click=self.sell_click,
+								pos=[0, .1], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		
 		self.init = False
 		
 	def update(self, main):
+		player = main['player']
+		
 		if not self.init:
 			self.main = main
 			self.element = ""
 			self.ele_bar.timer = 20
-			self.ele_bar.element = main['player'].element
+			self.ele_bar.element = player.element
 			
 			self.powers = []
-			self.pp = main['player'].power_points
-			self.new = [] 
+			self.new = player.powers.all[:]
+			self.pp = player.power_pool
 			
 			self.init= True
 		
@@ -422,17 +438,22 @@ class PowersLayout(Layout):
 		sub = ""
 		info = "Select a power on the left to learn more about it and to purchase it."
 		details = ""
-			
+
+		# Kinda hacky, but should be fine
+		self.lbox.renderer.known_powers = self.new
+		
 		self.buy_btn.visible = False
+		self.sell_btn.visible = False
 		if self.lbox.selected:
 			power = self.lbox.selected
 			name = power.name
 			sub = "Tier %d - %s" % (power.tier, power.element.title())
 			info = power.description
-			details = "Cost: %d" % self.cost(power)
+			details = "Cost: %d" % power.cost(player.affinities)
 			
-			for known in self.main['player'].powers.all + self.new:
-				if power.name == known.name:
+			for i in self.new:
+				if power.name == i.name:
+					self.sell_btn.visible = True
 					break
 			else:
 				self.buy_btn.visible = True
@@ -442,33 +463,32 @@ class PowersLayout(Layout):
 		self.pow_info.text = info
 		self.pow_details.text = details
 		
-	def cost(self, power):
-		if power.tier == 0:
-			return 0
-		
-		tier = power.tier if power.tier <= 5 else 5
-		cost = [3, 8, 15, 24, 35][tier-1]
-		player = self.main['player']
-		discount =	player.affinities[power.element.upper()] + \
-					player.affinities[power.delivery.upper()]
-		
-		return max(1, cost - discount)
-		
 	def buy_click(self, widget):
 		power = self.lbox.selected
-		cost = self.cost(power)
+		cost = power.cost(self.main['player'].affinities)
 		
 		if cost <= self.pp:
 			self.new.append(power)
 			self.pp -= cost
 			
+	def sell_click(self, widget):
+		power = self.lbox.selected
+		cost = power.cost(self.main['player'].affinities)
+		
+		self.pp += cost
+		
+		for i in self.new:
+			if i.name == power.name:
+				self.new.remove(i)
+				break
+			
 	def accept_click(self, widget):
 		self.main['player_exit'] = True
 		self.main['player_new_powers'] = self.new
-		self.main['player_new_pp'] = self.pp
 			
 	def cancel_click(self, widget):
 		self.main['player_exit'] = True
+		self.main['player_new_powers'] = []
 		
 class TitleLayout(Layout):
 	def __init__(self, sys):
