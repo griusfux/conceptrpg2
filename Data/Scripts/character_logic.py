@@ -44,7 +44,14 @@ class CharacterLogic:
 		def __init__(self):
 			self.name = "None"
 			self.type = "none"
-			self.weight = self.ac = self.bonus = self.speed = 0
+			
+			# Stats (could be for any item type)
+			self.physical_damage = 0
+			self.physical_defense = 0
+			self.arcane_damage = 0
+			self.arcane_defense = 0
+			self.reflex = 0
+			self.accuracy = 0
 			
 		def __bool__(self):
 			return False
@@ -150,6 +157,11 @@ class CharacterLogic:
 		self.arcane_defense = max(1, 10+self.affinities['HOLY'])
 		self.reflex = max(1, 10+self.affinities['WATER'])
 		self.accuracy = max(1, 10+self.affinities['FIRE'])
+		
+		# Stats from items
+		self.physical_defense += self.armor.physical_defense
+		self.arcane_defense += self.armor.arcane_defense
+		self.reflex += self.armor.reflex
 		
 		# Recalc power pool
 		self.power_pool = self.power_pool_max
@@ -258,6 +270,7 @@ class CharacterLogic:
 			self._armor = value
 		else:
 			self._armor = self.Dummy()
+		self.recalc_stats()
 	
 	@property
 	def shield(self):
@@ -268,6 +281,7 @@ class CharacterLogic:
 			self._shield = value
 		else:
 			self._shield = self.Dummy()
+		self.recalc_stats()
 	
 	@property
 	def weapon(self):
@@ -279,6 +293,7 @@ class CharacterLogic:
 		else:
 			self._weapon = self.Dummy()
 			self._weapon.name = "Unarmed"
+		self.recalc_stats()
 	
 	#######################
 	# Hand socket functions
