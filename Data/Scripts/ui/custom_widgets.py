@@ -79,13 +79,16 @@ class ElementBar(Frame):
 		self.icons = {}
 		
 		for i, element in enumerate(elements):
-			j = 0 if i < 4 else .035
 			self.icons[element] = Image(self, element, path+element+'.png', aspect=1,
-										size=[0, .7], pos=[.0975+j+.11*i, 0],
+										size=[0, .7], pos=[.0975+.11*i, 0],
 										options=BGUI_DEFAULT|BGUI_CENTERY)
 			self.icons[element].on_click = self.swap
 		
-		self.icons["Neutral"].size = [self.size[1]/self.size[0], 1]
+		cur = self.icons[self._element]
+		cur.size = [self.size[1]/self.size[0], 1]
+		
+		offset = (cur.size[0] - self.icons["Earth"].size[0])/self.size[0]/2
+		cur.position = [(cur.position[0]-self.position[0])/self.size[0] - offset, 0]
 		
 	def _draw(self):
 		Frame._draw(self)
@@ -110,10 +113,10 @@ class ElementBar(Frame):
 		prev.size = [.7*(self.size[1]/self.size[0]), .7]
 		cur.size = 	[self.size[1]/self.size[0], 1]
 		
-#		tmp = (prev.position[0] - self.position[0])/self.size[0]
-		prev.position = [(cur.position[0]-self.position[0])/self.size[0], 0]
-		cur.position = [0.4275, 0]
-		
+		offset = (cur.size[0] - prev.size[0])/self.size[0]/2
+		prev.position = [(prev.position[0]-self.position[0])/self.size[0] + offset, 0]
+		cur.position = [(cur.position[0]-self.position[0])/self.size[0] - offset, 0]
+
 		self._element = value
 		
 	def swap(self, widget):
