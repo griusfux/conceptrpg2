@@ -40,8 +40,8 @@ class PlayerStatsLayout(Layout):
 								pos=[0.05, 0.65], sub_theme="Menu")
 		self.pname = bgui.Label(self.cframe, "pname", text="", sub_theme="Title", pos=[0, 0.9],
 							options=BGUI_DEFAULT|bgui.BGUI_CENTERX)
-		self.element = bgui.Label(self.cframe, "element", text="", sub_theme="Menu", pos=[0.03, 0.8])
-		self.raceclass = bgui.Label(self.cframe, "raceclass", text="", sub_theme="Menu", pos=[0.03, 0.73])
+		self.race = bgui.Label(self.cframe, "element", text="", sub_theme="Menu", pos=[0.03, 0.8])
+		self.classinfo = bgui.Label(self.cframe, "raceclass", text="", sub_theme="Menu", pos=[0.03, 0.73])
 		# HP
 		self.hp_text = bgui.Label(self.cframe, "ds_hp", sub_theme="Menu", pos=[0.03, 0.6])
 		self.hp_bar = bgui.ProgressBar(self.cframe, "ds_hp_bar", size=[0.90, 0.05], pos=[0.03, 0.50],
@@ -89,10 +89,10 @@ class PlayerStatsLayout(Layout):
 		
 		# Update player info
 		self.pname.text = player.name+"  [Level %d]"%player.level
-		if not self.element.text:
+		if not self.race.text:
 			# Labels here should remain static, and don't need to be updated
-			self.element.text = player.element.title()
-			self.raceclass.text = player.race.name + " -- " + player.player_class.subclass[player.element]
+			self.race.text = player.race.name
+			self.classinfo.text = "%s (%s/%s)" % (player.player_class.subclass[player.element], player.player_class.name, player.element.title())
 		
 		self.hp_text.text = "HP (%d/%d)" % (player.hp, player.max_hp)
 		self.hp_bar._update_position([0.90*min(player.max_hp/100, 1), 0.03], self.hp_bar._base_pos)
@@ -641,7 +641,7 @@ class CharSelectLayout(Layout):
 		if main['csl_char']:
 			char = main['csl_char']
 			self.char_name.text = char.name
-			self.subclass.text = char.player_class.subclass[char.element]
+			self.subclass.text = "%s (%s/%s)" % (char.player_class.subclass[char.element], char.player_class.name, char.element.title())
 			self.level.text = "Level %d" % char.level
 		
 	def continue_click(self, widget):
@@ -858,7 +858,7 @@ class DefaultStateLayout(Layout):
 	def update(self, main):
 		player = main['player']
 		self.player_name.text = player.name
-		self.classlvl.text = "%s\t\t%d" % (player.player_class.name, player.level)
+		self.classlvl.text = "%s\t\t%d" % (player.player_class.subclass[player.element], player.level)
 		self.hp_text.text = "HP (%d/%d)" % (player.hp, player.max_hp)
 		self.hp_bar._update_position([0.90*min(player.max_hp/100, 1), 0.03], self.hp_bar._base_pos)
 		self.hp_bar.percent = player.hp/player.max_hp
