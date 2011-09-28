@@ -48,7 +48,8 @@ class CharacterCreationState(BaseState, BaseController):
 				player.race = main['cgen_data']['race']
 				
 				# Set the player's class
-				player.player_class = main['cgen_data']['class']
+				player_class = main['cgen_data']['class']
+				player.player_class = player_class
 				
 				# Set the player's element
 				player.element = main['cgen_data']['element']	
@@ -78,12 +79,12 @@ class CharacterCreationState(BaseState, BaseController):
 				
 				# Setup player inventory
 				
-				w = Items.Weapon('Longsword', 5)
+				w = Items.Weapon(player_class.starting_weapon, 1)
 				player.inventory.append(w)
 				player.weapon = w
 				
 				
-				a = Items.Armor('Robes', 5)
+				a = Items.Armor(player_class.starting_armor, 1)
 				player.inventory.append(a)
 				player.armor = a
 				
