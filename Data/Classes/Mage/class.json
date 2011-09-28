@@ -1,23 +1,23 @@
 {
-	"name": "Mage",
-	
-	"subclass" : {
-				"DEATH" : "Necromancer",
-				"STORM" : "Sorcerer",
-				"FIRE" : "Pyromancer",
-				"HOLY" : "Sage",
-				"EARTH" : "Templar",
-				"WATER" : "Seer"
-				},
-				
-	"affinities" : {
-				"DEATH" : 0,
-				"STORM" : 0,
-				"FIRE" : 0,
-				"HOLY" : 0,
-				"EARTH" : 0,
-				"WATER" : 0,
-				"WEAPON" : 0,
-				"SPELL" : 2
-				}
+    "affinities": {
+        "DEATH": 0, 
+        "EARTH": 0, 
+        "FIRE": 0, 
+        "HOLY": 0, 
+        "SPELL": 2, 
+        "STORM": 0, 
+        "WATER": 0, 
+        "WEAPON": 0
+    }, 
+    "name": "Mage", 
+    "starting_armor": "Robes", 
+    "starting_weapon": "Longsword", 
+    "subclass": {
+        "DEATH": "Necromancer", 
+        "EARTH": "Templar", 
+        "FIRE": "Pyromancer", 
+        "HOLY": "Sage", 
+        "STORM": "Sorcerer", 
+        "WATER": "Seer"
+    }
 }

@@ -1,5 +1,7 @@
 {
 	"name": "Class",
+	"starting_armor": "Robes",
+	"starting_weapon": "Longsword",
 	
 	"subclass" : {
 				"DEATH" : "",

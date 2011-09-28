@@ -1,23 +1,23 @@
 {
-	"name": "Hunter",
-	
-	"subclass" : {
-				"DEATH" : "Assassin",
-				"STORM" : "Grenadier",
-				"FIRE" : "Arsonist",
-				"HOLY" : "Monk",
-				"EARTH" : "Ranger",
-				"WATER" : "Pirate"
-				},
-				
-	"affinities" : {
-				"DEATH" : 0,
-				"STORM" : 0,
-				"FIRE" : 0,
-				"HOLY" : 0,
-				"EARTH" : 0,
-				"WATER" : 0,
-				"WEAPON" : 1,
-				"SPELL" : 1
-				}
+    "affinities": {
+        "DEATH": 0, 
+        "EARTH": 0, 
+        "FIRE": 0, 
+        "HOLY": 0, 
+        "SPELL": 1, 
+        "STORM": 0, 
+        "WATER": 0, 
+        "WEAPON": 1
+    }, 
+    "name": "Hunter", 
+    "starting_armor": "Robes", 
+    "starting_weapon": "Longsword", 
+    "subclass": {
+        "DEATH": "Assassin", 
+        "EARTH": "Ranger", 
+        "FIRE": "Arsonist", 
+        "HOLY": "Monk", 
+        "STORM": "Grenadier", 
+        "WATER": "Pirate"
+    }
 }

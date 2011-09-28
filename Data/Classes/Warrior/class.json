@@ -1,23 +1,23 @@
 {
-	"name": "Warrior",
-	
-	"subclass" : {
-				"DEATH" : "Slayer",
-				"STORM" : "Berserker",
-				"FIRE" : "Barbarian",
-				"HOLY" : "Paladin",
-				"EARTH" : "Guardian",
-				"WATER" : "Guerrilla"
-				},
-				
-	"affinities" : {
-				"DEATH" : 0,
-				"STORM" : 0,
-				"FIRE" : 0,
-				"HOLY" : 0,
-				"EARTH" : 0,
-				"WATER" : 0,
-				"WEAPON" : 2,
-				"SPELL" : 0
-				}
+    "affinities": {
+        "DEATH": 0, 
+        "EARTH": 0, 
+        "FIRE": 0, 
+        "HOLY": 0, 
+        "SPELL": 0, 
+        "STORM": 0, 
+        "WATER": 0, 
+        "WEAPON": 2
+    }, 
+    "name": "Warrior", 
+    "starting_armor": "Plate Mail", 
+    "starting_weapon": "Longsword", 
+    "subclass": {
+        "DEATH": "Slayer", 
+        "EARTH": "Guardian", 
+        "FIRE": "Barbarian", 
+        "HOLY": "Paladin", 
+        "STORM": "Berserker", 
+        "WATER": "Guerrilla"
+    }
 }
