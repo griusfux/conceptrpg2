@@ -801,7 +801,7 @@ class DefaultStateLayout(Layout):
 		# Power Bar
 		self.power_imgs = []
 		self.power_bar_selection=-1
-		self.power_frame = bgui.Image(self, "ds_frame_pow", "Textures/ui/power_bar.png", aspect=4, size=[0,.16],
+		self.power_frame = bgui.Image(self, "ds_frame_pow", "Textures/ui/power_bar.png", aspect=5.1, size=[0,.13],
 										pos=[0,0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		
 		# Target info
