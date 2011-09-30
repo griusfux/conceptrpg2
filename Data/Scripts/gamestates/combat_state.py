@@ -155,12 +155,13 @@ class CombatState(DefaultState, BaseController):
 		"""Client-side run method"""
 		
 		# Update the camera
-		if self.camera != self.last_camera:
-			main['camera'].change_mode(self.camera, 15)
-			self.last_camera = self.camera
-		else:
-			main['camera'].update(main['player'].lock)
-		self.camera = 'combat'
+		if not self.suspended:
+			if self.camera != self.last_camera:
+				main['camera'].change_mode(self.camera, 15)
+				self.last_camera = self.camera
+			else:
+				main['camera'].update(main['player'].lock)
+			self.camera = 'combat'
 		
 		# Update the effect system
 		main['effect_system'].update()
@@ -238,7 +239,7 @@ class CombatState(DefaultState, BaseController):
 		# Our id so we can talk with the server
 		id = main['client'].id
 		
-		if inputs:		
+		if inputs and not self.suspended:		
 			# Only let the player do stuff while they are not "locked"
 			if not main['player'].lock:
 				

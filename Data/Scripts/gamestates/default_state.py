@@ -94,14 +94,15 @@ class DefaultState(BaseState, BaseController):
 		main['effect_system'].update()
 		
 		# Make sure the camera is in the right mode
-		if main['camera'].mode != self.camera_mode:
-			main['camera'].change_mode(self.camera_mode, 30)
-		main['camera'].update()
-		main['full_map'] = False
-		
-		# While the camera is still transitioning, do nothing
-		if main['camera']._transition_point != 0:
-			return
+		if not self.suspended:
+			if main['camera'].mode != self.camera_mode:
+				main['camera'].change_mode(self.camera_mode, 30)
+			main['camera'].update(lock=main['player'].lock)
+			main['full_map'] = False
+			
+			# While the camera is still transitioning, do nothing
+			if main['camera']._transition_point != 0:
+				return
 
 		# Update the player's lock
 		main['player'].update_lock()
@@ -112,7 +113,7 @@ class DefaultState(BaseState, BaseController):
 		# Our id so we can talk with the server
 		id = main['client'].id
 		
-		if inputs:
+		if inputs and not self.suspended:
 			if ("SwitchCamera", "INPUT_ACTIVE") in inputs:
 				main['full_map'] = True
 

@@ -104,6 +104,10 @@ class BaseState:
 		
 		# This variable allows for switching states without a return (used for RPC functions)
 		self._next_state = ""
+		
+		# Note whether or note the state is "suspended" (not the top of the stack).
+		# This allows the state to alter it's behavior in its suspended state, but still allow necessary code to run.
+		self.suspended = False
 
 		# Setup the Remote Procedure Calls
 		c = main['server'] if is_server else main.get('client')

@@ -54,30 +54,36 @@ class GameStateManager:
 			raise RuntimeWarning("State stack is empty!")
 			return
 			
-		# Run the top state on the stack and check it's return to see what to do next
-		if client:
-			val = self.states[0].run(main, client)
-		else:
-			val = self.states[0].run(main)
-		
-		if val:
-			# Make sure the state is good
-			if val[1] != 'POP' and val[0] not in STATES:
-				RuntimeWarning(val[0]+" is not in the states list, ignoring")
-				return
+		last_idx = len(self.states) - 1
+		# Run the all the states on the queue and check the return values to see what to do next
+		for idx, state in enumerate(self.states[:]): # Use a copy of self.states so we can remove items from it if we need to
 			
-			if val[1] == 'SWITCH':
-				# The state is done so remove it from the stack and transition to the new state
-				self.states[0].cleanup(main)
-				self.states.pop(0)
-				self.states.insert(0, STATES[val[0]](main, self.is_server))
-			elif val[1] == 'PUSH':
-				# Suspend the current state and push the new state
-				self.states.insert(0, STATES[val[0]](main, self.is_server))
-			elif val[1] == 'POP':
-				# Pop the state from the stack
-				self.states[0].cleanup(main)
-				self.states.pop(0)
+			# Only the last state is "active"
+			state.suspended = idx != last_idx
+			
+			if client:
+				val = state.run(main, client)
 			else:
-				raise RuntimeError(val[1]+" is an invalid state flag!")
+				val = state.run(main)
 			
+			if val:
+				# Make sure the state is good
+				if val[1] != 'POP' and val[0] not in STATES:
+					RuntimeWarning(val[0]+" is not in the states list, ignoring")
+					return
+				
+				if val[1] == 'SWITCH':
+					# The state is done so remove it from the "queue" and transition to the new state
+					state.cleanup(main)
+					self.states.remove(state)
+					self.states.insert(idx, STATES[val[0]](main, self.is_server))
+				elif val[1] == 'PUSH':
+					# Suspend the current state and enqueue the new state
+					self.states.append(STATES[val[0]](main, self.is_server))
+				elif val[1] == 'POP':
+					# Remove the state from the "queue"
+					state.cleanup(main)
+					self.states.remove(state)
+				else:
+					raise RuntimeError(val[1]+" is an invalid state flag!")
+				
