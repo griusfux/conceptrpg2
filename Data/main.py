@@ -12,9 +12,11 @@ from Scripts.packages import *
 from Scripts.gamestate_manager import GameStateManager
 
 from Scripts.blender_input_system import BlenderInputSystem
+from Scripts.Engine.log import Log
 
 import json
 import os
+import sys
 
 # Create a shorthand for gl
 import bge
@@ -50,9 +52,12 @@ def exit_game(main):
 			main['server'].terminate()
 			del main['server']
 	except Exception as e:
-		print(e)
+		import traceback
+		traceback.print_exc()
 	
 	gl.error = True
+	
+	sys.stdout.close()
 	if main['exit'] == "RESTART":
 		gl.restartGame()
 	else:
@@ -90,6 +95,12 @@ def in_game(cont):
 		gl.error = True
 		
 def init(own):
+	
+	# Start logging
+	sys.stderr = sys.stdout
+	sys.stdout = Log(sys.stdout, open('log.txt', 'w'))
+	print("Log start")
+	
 	# Create a wrapper for the engine
 	if 'engine' not in own:
 		own['engine'] = BlenderWrapper.Engine(own)

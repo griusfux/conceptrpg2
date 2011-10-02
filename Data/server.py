@@ -9,18 +9,8 @@ import sys
 sys.path.append("extern")
 sys.path.append("2.59/python/lib") # Used in release configuration
 from Scripts.networking.game_server import GameServer
+from Scripts.Engine.log import Log
 
-class Log:
-	def __init__(self, stream, log):
-		self.stream = stream
-		self.log = log
-		
-	def write(self, msg):
-		self.stream.write(msg)
-		self.log.write(msg)
-		
-	def flush(self):
-		self.stream.flush()
 	
 def main():
 	if len(sys.argv) > 1:
