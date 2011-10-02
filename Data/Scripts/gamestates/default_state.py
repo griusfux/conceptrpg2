@@ -192,9 +192,11 @@ class DefaultState(BaseState, BaseController):
 		# Our id so we can talk with the server
 		id = main['client'].id
 		
+		player = main['player']
+		
 		# Our movement vector and player speed
 		movement = [0.0, 0.0, 0.0]
-		speed = main['player'].speed
+		speed = player.speed
 		
 		if ("InGameMenu", "INPUT_CLICK") in inputs:
 			return("InGameMenu", "PUSH")
@@ -204,7 +206,7 @@ class DefaultState(BaseState, BaseController):
 			
 		if ("Action", "INPUT_CLICK") in inputs:
 			for k, v in main['ground_items'].items():
-				if (Vector(v[1].position) - main['player'].object.position).length < 3:
+				if (Vector(v[1].position) - player.object.position).length < 3:
 					self.server.invoke("request_item_pickup", k)
 		if ("ShowItemNames", "INPUT_ACTIVE") in inputs:
 			for k, v in main['ground_items'].items():
@@ -220,10 +222,10 @@ class DefaultState(BaseState, BaseController):
 					v[2] = None
 
 		# Only let the player do stuff while they are not "locked"
-		if not main['player'].lock:
+		if not player.lock:
 			# Update rotations (mouse look)
 			dx = 0.5 - main['input_system'].mouse.position[0]
-			if not main['player'].auto_target and abs(dx) > 0:
+			if not player.auto_target and abs(dx) > 0:
 				self.server.invoke("rotate", id, 0, 0, dx)
 			main['input_system'].mouse.position = (0.5, 0.5)
 
@@ -239,33 +241,33 @@ class DefaultState(BaseState, BaseController):
 		
 		# Normalize the vector to the character's speed
 		if movement != [0.0, 0.0, 0.0]:
-			main['player'].auto_target = main['player'].auto_power = None
+			player.auto_target = player.auto_power = None
 			movement = [float(i) for i in (Vector(movement).normalized()*speed)]
-			self.server.invoke("position", id, *main['player'].object.position)
+			self.server.invoke("position", id, *player.position)
 			act = self._get_forward_animation(main)
-			self.play_animation(main['player'], act, mode=1)
-		elif main['player'].auto_target:
-			if "WEAPON_RANGE" in main['player'].auto_power.flags:
-				range = main['player'].weapon.range
+			self.play_animation(player, act, mode=1)
+		elif player.auto_target:
+			if "WEAPON_RANGE" in player.auto_power.flags:
+				range = player.weapon.range
 			else:
-				range = main['player'].auto_power.distance
-			# vec = self.auto_target.object.position - main['player'].object.position
+				range = player.auto_power.distance
+			# vec = self.auto_target.object.position - player.object.position
 			# distance = vec.dot(vec)
 			# We shouldn't be calling getVectTo() like this, but it works and I can't get my copy to work.
 			# I've left my code in here in case I want to try again.
-			distance, unused, vec = main['player'].object.gameobj.getVectTo(main['player'].auto_target.object.gameobj)
+			distance, unused, vec = player.object.gameobj.getVectTo(player.auto_target.object.gameobj)
 			ang = Vector(vec[:2]).angle(Vector([0, 1]), 0)
 
 			if distance < range and ang < 0.2:#*range:
-				main['player'].auto_power.use(self, main['player'])
-				main['player'].auto_power = main['player'].auto_target = None
+				player.auto_power.use(self, player)
+				player.auto_power = player.auto_target = None
 			else:
 				# vec.normalize()
-				# vec = main['player'].object.get_orientation() * vec
+				# vec = player.object.get_orientation() * vec
 
 				movement = [float(i) for i in vec*speed]
 				movement[2] = 0
-				self.server.invoke("position", id, *main['player'].object.position)
+				self.server.invoke("position", id, *player.position)
 
 				rot = 0
 				if ang > 0.2:
@@ -276,16 +278,16 @@ class DefaultState(BaseState, BaseController):
 				self.server.invoke("rotate", id, 0, 0, rot)
 				
 				act = self._get_forward_animation(main)
-				self.play_animation(main['player'], act, mode=1)
+				self.play_animation(player, act, mode=1)
 
 		# Otherwise, idle
-		elif not main['player'].lock:
+		elif not player.lock:
 			act = self._get_idle_animation(main)
-			self.play_animation(main['player'], act, mode=1)
+			self.play_animation(player, act, mode=1)
 
 		# Send the message
 		# self.server.invoke("move", id, *movement)
-		main['player'].object.move(movement, min=[-50, -50, 0], max=[50, 50, 0])
+		player.object.move(movement, min=[-50, -50, 0], max=[50, 50, 0])
 
 	##########
 	# Server

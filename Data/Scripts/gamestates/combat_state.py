@@ -240,49 +240,52 @@ class CombatState(DefaultState, BaseController):
 		id = main['client'].id
 		
 		if inputs and not self.suspended:		
+		if inputs and not self.suspended:
 			# Only let the player do stuff while they are not "locked"
 			if not main['player'].lock:
 				
+				player = main['player']
+				
 				if ("UsePower", "INPUT_CLICK") in inputs:
-					self.use_power(main['player'], main['player'].powers.active.name)
+					self.use_power(player, player.powers.active.name)
 				if ("NextPower", "INPUT_CLICK") in inputs:
-					main['player'].powers.make_next_active()
+					player.powers.make_next_active()
 				if ("PrevPower", "INPUT_CLICK") in inputs:
-					main['player'].powers.make_prev_active()
+					player.powers.make_prev_active()
 				if ("UsePowerOne", "INPUT_CLICK") in inputs:
-					if main['player'].powers.has_power(0):
-						self.use_power(main['player'], main['player'].powers.all[0])
+					if player.powers.has_power(0):
+						self.use_power(player, player.powers.all[0])
 				if ("UsePowerTwo", "INPUT_CLICK") in inputs:
-					if main['player'].powers.has_power(1):
-						self.use_power(main['player'], main['player'].powers.all[1])
+					if player.powers.has_power(1):
+						self.use_power(player, player.powers.all[1])
 				if ("UsePowerThree", "INPUT_CLICK") in inputs:
-					if main['player'].powers.has_power(2):
-						self.use_power(main['player'], main['player'].powers.all[2])
+					if player.powers.has_power(2):
+						self.use_power(player, player.powers.all[2])
 				if ("UsePowerFour", "INPUT_CLICK") in inputs:
-					if main['player'].powers.has_power(3):
-						self.use_power(main['player'], main['player'].powers.all[3])
+					if player.powers.has_power(3):
+						self.use_power(player, player.powers.all[3])
 				if ("UsePowerFive", "INPUT_CLICK") in inputs:
-					if main['player'].powers.has_power(4):
-						self.use_power(main['player'], main['player'].powers.all[4])
+					if player.powers.has_power(4):
+						self.use_power(player, player.powers.all[4])
 				if ("UsePowerSix", "INPUT_CLICK") in inputs:
-					if main['player'].powers.has_power(5):
-						self.use_power(main['player'], main['player'].powers.all[5])
+					if player.powers.has_power(5):
+						self.use_power(player, player.powers.all[5])
 
 				if ("TargetClosest", "INPUT_CLICK") in inputs:
-					target = self.get_closest_target(main['player'], self.monster_list.values())
+					target = self.get_closest_target(player, self.monster_list.values())
 					if target:
-						main['player'].targets = [target]
+						player.targets = [target]
 				if ("TargetPrevious", "INPUT_CLICK") in inputs:
-					target = self.get_prev_target(main['player'].targets[0], list(self.monster_list.values()))
+					target = self.get_prev_target(player.targets[0], list(self.monster_list.values()))
 					if target:
-						main['player'].targets = [target]
+						player.targets = [target]
 				if ("TargetNext", "INPUT_CLICK") in inputs:
-					target = self.get_next_target(main['player'].targets[0], list(self.monster_list.values()))
+					target = self.get_next_target(player.targets[0], list(self.monster_list.values()))
 					if target:
-						main['player'].targets = [target]
+						player.targets = [target]
 
 				if ("Aim", "INPUT_ACTIVE") in inputs:
-					if main['player'].powers.active.effect_shape == "SINGLE":
+					if player.powers.active.effect_shape == "SINGLE":
 						self.camera = 'shoulder'
 						main['ui_system'].mouse.visible = True
 						
@@ -295,7 +298,7 @@ class CombatState(DefaultState, BaseController):
 						targets = self.monster_list.values()
 						
 						# Gather some info for the target searching
-						distance = main['player'].powers.active.distance * UNIT_SIZE
+						distance = player.powers.active.distance * UNIT_SIZE
 						cam_vec = main['camera'].pivot.getAxisVect((0,0,-1))
 						
 						final_target = None
@@ -309,12 +312,12 @@ class CombatState(DefaultState, BaseController):
 									final_target = target
 									final_factor = factor
 									
-						main['player'].targets = [final_target] if final_target else []
+						player.targets = [final_target] if final_target else []
 									
 						
 					else:					
 						# Show the range of the active power
-						power = main['player'].powers.active
+						power = player.powers.active
 						type = power.effect_shape
 						size = power.distance
 						
