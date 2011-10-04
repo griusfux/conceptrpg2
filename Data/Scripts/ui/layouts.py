@@ -919,3 +919,9 @@ class CombatLayout(DefaultStateLayout):
 	def update (self, main):
 		DefaultStateLayout.update(self, main)
 	
+class DeadLayout(Layout):
+	def __init__(self, sys):
+		Layout.__init__(self, sys, "dead_state_layout")
+		
+		self.deadlbl = bgui.Label(self, "deadlbl", pt_size=42, text="You have died. :(\nPress Attack to respawn",
+								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)

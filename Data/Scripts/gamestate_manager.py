@@ -15,6 +15,7 @@ STATES = {
 		"Shop": ShopState,
 		"Player": PlayerState,
 		"Inventory": InventoryState,
+		"Dead": DeadState,
 		}
 		
 

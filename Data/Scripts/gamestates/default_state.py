@@ -62,6 +62,21 @@ class DefaultState(BaseState, BaseController):
 			return
 		
 		main['net_players'][cid].statuses.append(status)
+
+	@rpc(client_functions, "modify_health", str, float)
+	def c_modify_health(self, main, cid, amount):
+		if cid not in main['net_players']: return
+		
+		player = main['net_players'][cid]
+		
+		player.hp += amount
+		if player.hp < 0: player.hp = 0
+		
+	@rpc(client_functions, "kill_player", str)
+	def kill_player(self, main, cid):
+		if cid != main['player'].id: return
+		
+		self._next_state = "Dead"
 		
 	@rpc(client_functions, "init_combat", str, int)
 	def init_combat(self, main, room_id, owns):

@@ -145,6 +145,8 @@ class DungeonGenerator:
 		self.exit_nodes.append(n)
 		self.place_tile(n, 'Starts')
 		
+		self.start_position = self._tiles[0].position
+		
 	def generate_next(self):
 		"""Generate the next tile"""
 		

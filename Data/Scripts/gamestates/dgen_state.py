@@ -107,10 +107,12 @@ class DungeonGenerationState(BaseState):
 			# Dungeon is done
 			print("\nDungeon generation complete with %d rooms\n in %.4f seconds" % (main['dgen'].room_count, time.time() - self.start_time))
 			
+			player = main['player']
+			
 			# Move the player to the start tile
-			pos = main['dgen']._tiles[0].position
+			pos = main['dgen'].start_position
 			pos[2] += 1
-			main['player'].object.position = pos
+			player.position = main['dgen'].start_position = pos
 			
 			# Add the shop keeper
 			# XXX This code is working fine, but shops aren't ready for the playtesting.
@@ -128,10 +130,11 @@ class DungeonGenerationState(BaseState):
 #				print("Could not find a shop empty!")
 			
 			# Add the player to the server state
-			pobj = main['player'].object
+			pobj = player.object
 			pos = pobj.position[:]
 			ori = [[a, b, c] for a, b, c in pobj.get_orientation()]
-			self.server.invoke('add_player', main['player'].get_info(), pos, ori)
+			self.server.invoke('add_player', player.get_info(), pos, ori)
+			self.server.invoke('set_health', player.id, player.hp)
 			
 			
 			main['engine'].stop_bgm()

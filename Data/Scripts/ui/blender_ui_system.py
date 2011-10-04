@@ -17,6 +17,7 @@ layouts = {
 	"dun_gen": DunGenLayout,
 	"default_state": DefaultStateLayout,
 	"combat": CombatLayout,
+	"dead": DeadLayout,
 	"shop" : ShopLayout,
 	
 	"stats": StatsOverlay,
@@ -75,6 +76,14 @@ class BlenderUISystem(bgui.System):
 			del self.overlays[layout]
 		else:
 			print("WARNING: Overlay: %s was not found, nothing was removed" % layout)
+		
+	def render(self):
+		try:
+			bgui.System.render(self)
+		except:
+			import traceback
+			traceback.print_exc()
+			bge.logic.getCurrentScene().post_draw.remove(self.render)
 		
 	def run(self, main):
 		"""A high-level method to be run every frame"""

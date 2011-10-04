@@ -114,14 +114,14 @@ class BaseState:
 		self.clients = RPC(self, c, self.client_functions)
 		self.server = RPC(self, c, self.server_functions)
 		
+		self.is_server = is_server
+		
 		if is_server:
 			self.server_init(main)
 			self.cleanup = self.server_cleanup
 		else:
 			self.client_init(main)
 			self.cleanup = self.client_cleanup
-			
-		self.is_server = is_server
 		
 	def run(self, main, client=None):
 		if self._next_state: return (self._next_state, "SWITCH")
@@ -264,6 +264,12 @@ class BaseState:
 	def reward_xp(self, main, heroes, xp):
 		if main['player'].id in heroes:
 			main['player'].xp += xp
+			
+	@rpc(client_functions, "set_health", str, int)
+	def c_set_health(self, main, cid, amount):
+		if cid not in main['net_players']: return
+		
+		main['net_players'][cid].hp = amount
 	
 	def client_init(self, main):
 		"""Initialize the client state"""
@@ -307,6 +313,14 @@ class BaseState:
 	@rpc(server_functions, "drop_item", "pickle", float, float, float)
 	def s_drop_item(self, main, client, item, x, y, z):
 		self.drop_item(item, [x, y, z])
+		
+	@rpc(server_functions, "set_health", str, int)
+	def s_set_health(self, main, client, cid, amount):
+		if cid not in main['players']: return
+		
+		main['players'][cid].hp = amount
+		
+		self.clients.invoke('set_health', cid, amount)
 		
 	def server_init(self, main):
 		"""Initialize the server state"""
@@ -363,8 +377,8 @@ class BaseController:
 		amount -- the amount to change the health by (negative for damage, positive to heal)
 		
 		"""
-		
-		character.hp += amount
+
+		self.server.invoke("modify_health", character.id, amount)
 				
 	def modify_stat(self, character, stat, amount):
 		if stat not in character.stat_mods:
