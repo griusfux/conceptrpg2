@@ -1,6 +1,6 @@
 {
-	"name": "Provian",
-	"root_object": "ProvianArm",
-	
-	"traits": ""
+    "action_set": "Base", 
+    "name": "Provian", 
+    "root_object": "ProvianArm", 
+    "traits": ""
 }
