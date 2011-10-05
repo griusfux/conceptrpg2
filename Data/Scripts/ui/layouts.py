@@ -820,10 +820,19 @@ class DefaultStateLayout(Layout):
 								sub_theme="HUD", options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
 		self.fmap_frame.visible = False
 		
-	def update_powerbar(self, main):	
+	def update_powerbar(self, main, update_all):	
 		psys = main['player'].powers
 		powers = psys.all
-	
+		
+		if self.power_imgs:
+			for i, power in enumerate(powers):
+				if power.timer>0:
+					self.power_imgs[i].update_image("Textures/ui/hex_tile_gray.png")
+				else:
+					self.power_imgs[i].update_image("Textures/ui/hex_tile_blue.png")
+			
+		if not update_all:
+			return
 		# Clear the old images
 		for i in self.power_imgs:
 			self.power_frame._remove_widget(i)
@@ -833,7 +842,7 @@ class DefaultStateLayout(Layout):
 		for i in range(min(8, len(powers))):
 			# Background
 			bg = "Textures/ui/hex_tile_blue.png"
-			if not self.combat and "NON_COMBAT" not in powers[i].flags:
+			if (not self.combat and "NON_COMBAT" not in powers[i].flags):
 				bg = "Textures/ui/hex_tile_gray.png"
 			img = bgui.Image(self.power_frame, "sbg"+str(i), bg, aspect=1,
 							 size=[0, .54], pos=[.087+.13*i, .145])
@@ -857,8 +866,7 @@ class DefaultStateLayout(Layout):
 		self.exp_text.text = "EXP (%d/%d)" % (player.xp, player.next_level)#player.xp+100-(player.xp%100))
 		self.exp_bar.percent = (player.xp-player.last_level)/(player.next_level-player.last_level+1)
 		
-		if self.power_bar_selection != main['player'].powers.active_index:
-			self.update_powerbar(main)
+		self.update_powerbar(main, self.power_bar_selection != main['player'].powers.active_index)
 			
 		# Net Players
 		missing_players = self.net_ids[:]

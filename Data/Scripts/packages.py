@@ -96,8 +96,8 @@ class Power(Package):
         self._push = None
         self._pop = None
         
-        # Set up a boolean property to determine if the power is used or not
-        self.spent = False
+        # Set up a timer to use for cooldowns
+        self.timer = 0
         
         if "PASSIVE" in self.flags:
             self._push = p.push

@@ -1,0 +1,64 @@
+{
+	"global_transitions" :
+	[
+		["hp <= 0", "death"]
+	],
+	
+	"states" :
+	[
+		{
+			"name" : "spawn",
+			"entry_actions" : [],
+			"actions" : [],
+			"exit_actions" : ["spawn_random"],
+			
+			"transitions" : [["always", "target"]]
+		},
+		
+		{
+			"name" : "target",
+			"entry_actions" : [],
+			"actions" : ["target_closest_enemy"],
+			"exit_actions" : [],
+			
+			"transitions" : [["has_target", "chase"]]			
+		},
+		
+		{
+			"name" : "chase",
+			"entry_actions" : [],
+			"actions" : ["seek"],
+			"exit_actions" : [],
+			
+			"transitions" : [["target_range_power < attack", "attack"]]
+		},
+		
+		{
+			"name" : "attack",
+			"entry_actions" : [],
+			"actions" : [],
+			"exit_actions" : ["use_power attack"],
+			
+			"transitions" : [["always", "lock"]]
+		},
+		
+		{
+			"name" : "lock",
+			"entry_actions" : [],
+			"actions" : [],
+			"exit_actions" : [],
+			
+			"transitions" : [["unlocked", "target"]]			
+		},
+		
+		{
+			"name" : "death",
+			"entry_actions" : [],
+			"actions" : ["die"],
+			"exit_actions" : [],
+			
+			"transitions" : []
+		}
+	]
+}
+			

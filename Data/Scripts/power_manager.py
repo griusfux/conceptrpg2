@@ -100,3 +100,7 @@ class PowerManager:
 		"""The  currently active power"""
 		
 		return self._powers[self._current_power]
+	
+	def update_cooldown(self):
+		for power in self.all:
+			power.timer -= 1

@@ -1,7 +1,7 @@
 # $Id$
 
 from .base_state import *
-from .default_state import DefaultState
+from .default_state import DefaultState, TURN
 from Scripts.packages import *
 from Scripts.character_logic import MonsterLogic, PlayerLogic
 
@@ -169,6 +169,8 @@ class CombatState(DefaultState, BaseController):
 
 		# Update the player's lock
 		main['player'].update_lock()
+		
+		main['player'].powers.update_cooldown()
 		
 		# Handles input
 		inputs = main['input_system'].run()
@@ -361,7 +363,7 @@ class CombatState(DefaultState, BaseController):
 			combat.monster_list[cid] = client.server.create_monster(Monster(monster), level, [x, y, z], ori)
 																#[MonsterLogic(None, Monster(monster), level), [x, y, z]]
 			combat.monster_list[cid].id = cid
-			AiManager.add_agent(combat.monster_list[cid], "extern/cego/example_definitions/base.json", "spawn")
+			AiManager.add_agent(combat.monster_list[cid], "Scripts/ai/definitions/base.json", "spawn")
 			self.clients.invoke("add_player", cid, combat.monster_list[cid].get_info(), 1, [x, y, z], None)
 			self.clients.invoke("add_monster", client.combat_id, monster, cid, x, y, z)
 			
@@ -690,7 +692,9 @@ class CombatState(DefaultState, BaseController):
 		if 'ENEMIES' in target_types:
 			tlist.extend(monster_list.values() if character in hero_list.values() else hero_list.values())
 		
-		if shape == 'SINGLE':
+		if shape == 'ALL':
+			targets = tlist
+		elif shape == 'SINGLE':
 			ori_ivnt = character.object.get_orientation().inverted()
 			for target in tlist:
 				# Convert to local space
@@ -734,7 +738,6 @@ class CombatState(DefaultState, BaseController):
 	
 	def move(self, character, linear = (0,0,0) , angular = (0,0,0) , local = False):
 		"""Handles linear and angular movement of a character"""
-		
 		if self.is_server:
 			# The only people that should be moving server side are monsters
 			self.clients.invoke("move_monster", character.id, *linear)
@@ -767,11 +770,15 @@ class CombatState(DefaultState, BaseController):
 			else:
 				self.modify_health(target, 0)
 	
-	def use_power(self, character, power):
+	def use_power(self, character, power, auto_range=True):
 		if isinstance(power, str):
 			power = Power(power)
-		if power.effect_shape == 'SELF':
+			
+		if power.timer > 0:
+			return
+		if power.effect_shape == 'SELF' or not auto_range:
 			power.use(self, character)
+			power.timer = power.cool_down * TURN
 		else:
 			character.auto_power = power
 			character.auto_target = character.targets[0]

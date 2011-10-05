@@ -276,6 +276,7 @@ class DefaultState(BaseState, BaseController):
 			if distance < range and ang < 0.2:#*range:
 				player.auto_power.use(self, player)
 				player.auto_power = player.auto_target = None
+				player.auto_power.timer = player.auto_power.cool_down * TURN
 			else:
 				# vec.normalize()
 				# vec = player.object.get_orientation() * vec
