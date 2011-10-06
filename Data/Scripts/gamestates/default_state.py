@@ -184,7 +184,6 @@ class DefaultState(BaseState, BaseController):
 			room_id = main.sensors['encounter_mess'].bodies[0]
 			self.server.invoke("init_combat", room_id)
 			room = main['dgen'].rooms[room_id]
-			del room.gameobj['encounter']
 			
 			
 		if main['room']:

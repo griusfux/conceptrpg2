@@ -101,6 +101,8 @@ class CombatState(DefaultState, BaseController):
 	@rpc(client_functions, "end_combat", str)
 	def end_combat(self, main, cid):
 		if cid != main['combat_id']: return
+		# XXX We shouldn't be calling gameobj here
+		del main['combat_room'].gameobj['encounter']
 		self._next_state = "Default"
 	
 	def client_init(self, main):
@@ -136,9 +138,6 @@ class CombatState(DefaultState, BaseController):
 		else:
 			# Request monsters from the server
 			self.server.invoke("request_monsters")
-			
-			# Let others know we're here
-			self.server.invoke("add_hero")
 		
 		# If the player has a weapon, socket it
 		if main['player'].weapon:
@@ -477,12 +476,12 @@ class CombatState(DefaultState, BaseController):
 	def server_run(self, main, client):
 		"""Server-side run method"""
 		self.main = main
-		self.client = client
+		self.client_handle = client
 		
 		combat = main['combats'].get(client.combat_id)
 				
 		if combat == -1:
-			# Init combat here so we have access to main
+			# Init combat here so we have access to the client
 			main['combats'][client.combat_id] = combat =Combat()
 			combat.owner = client.id
 			combat.hero_list[client.id] = main['players'][client.id]
@@ -491,7 +490,15 @@ class CombatState(DefaultState, BaseController):
 			AiManager.set_controller(self)
 			AiManager.set_extern_actions("Scripts.ai.actions")
 			AiManager.set_extern_transitions("Scripts.ai.transitions")
-		elif not combat.owner:
+		elif client.id not in combat.hero_list:
+			combat.hero_list[client.id] = main['players'][client.id]	
+			
+			self.clients.invoke('add_hero', client.combat_id, client.id)
+			
+			for hero in combat.hero_list:
+				self.client.invoke('add_hero', client.combat_id, hero)
+			
+		if not combat.owner:
 			# If we don't have an owner, just grab the "first" hero.
 			# combat.hero_list should never be empty (someone has to be in combat to get here).
 			combat.owner = next(iter(combat.hero_list.keys()))
@@ -576,7 +583,7 @@ class CombatState(DefaultState, BaseController):
 		l = []
 		
 		if self.is_server:
-			combat = self.client.server.main['combats'].get(self.client.combat_id)
+			combat = self.client_handle.server.main['combats'].get(self.client_handle.combat_id)
 			if combat:
 				l.extend(combat.hero_list.values())
 				l.extend(combat.monster_list.values())
@@ -661,7 +668,7 @@ class CombatState(DefaultState, BaseController):
 			return targets
 			
 		if self.is_server:
-			combat = self.main['combats'].get(self.client.combat_id, None)
+			combat = self.main['combats'].get(self.client_handle.combat_id, None)
 			if not combat:
 				hero_list = monster_list = {}
 			else:
@@ -717,7 +724,7 @@ class CombatState(DefaultState, BaseController):
 	
 	def spawn(self, character, position):
 		if hasattr(self, 'clients'):
-			combat = self.main['combats'].get(self.client.combat_id, None)
+			combat = self.main['combats'].get(self.client_handle.combat_id, None)
 			if combat and character.id in combat.monster_list:
 				combat.monster_list[character.id].position = position
 				self.play_animation(character, "Spawn")

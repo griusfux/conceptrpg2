@@ -28,6 +28,8 @@ class DeadState(CombatState):
 				("Action", "INPUT_CLICK") in inputs:
 				player.position = main['dgen'].start_position
 				self.server.invoke("position", player.id, *player.position)
+				player.hp = player.max_hp
+				self.server.invoke("set_health", player.id, player.hp)
 				return ("Default", "SWITCH")
 			
 	def client_cleanup(self, main):
