@@ -377,8 +377,20 @@ class BaseController:
 		amount -- the amount to change the health by (negative for damage, positive to heal)
 		
 		"""
+		id = character.id
 
-		self.server.invoke("modify_health", character.id, amount)
+		if self.is_server:
+			character.hp += amount
+	
+			self.clients.invoke("modify_health", id, amount)
+			
+			if character.hp <= 0:
+				# XXX We shouldn't be checking the class like this, but at the moment,
+				# it's the only method we have for knowing if we have a "player" verus a "monster"
+				if character.__class__.__name__ == "NetPlayer":
+					self.clients.invoke("kill_player", id)
+		else:
+			self.server.invoke("modify_health", id, amount)
 				
 	def modify_stat(self, character, stat, amount):
 		if stat not in character.stat_mods:

@@ -413,24 +413,10 @@ class CombatState(DefaultState, BaseController):
 		if combat is None: return
 		
 		if id in combat.hero_list:
-			hero = combat.hero_list[id]
-			hero.hp += amount
-			
-			self.clients.invoke("modify_health", id, amount)
-			
-			if hero.hp <= 0:
-				self.clients.invoke("kill_player", id)
-				del combat.hero_list[id]
-				if id == combat.owner:
-					combat.owner = None
-				# If this was our client, we want to change the state
-				if id == client.id:
-					self._next_state = "Dead"
+			self.modify_health(combat.hero_list[id], amount)
 		elif id in combat.monster_list:
-			monster = combat.monster_list[id]
-			monster.hp += amount
-			
-			if monster.hp <= 0:
+			self.modify_health(combat.monster_list[id], amount)
+			if character.hp <= 0:
 				self.s_kill_monster(main, client, id)
 			
 	@rpc(server_functions, "request_monsters")
@@ -493,14 +479,7 @@ class CombatState(DefaultState, BaseController):
 		self.main = main
 		self.client = client
 		
-		# XXX Kinda hacky and probabably should be replaced by a nicer solution. We shouldn't
-		# be checking the _next_state for when we want the dead state. The problem is, the player is cleared
-		# out of the hero_list and switched to the DeadState while before the last server_run() before the server
-		# switches to DeadState as well.
-		if self._next_state == "Dead": return
-		
 		combat = main['combats'].get(client.combat_id)
-
 				
 		if combat == -1:
 			# Init combat here so we have access to main
@@ -517,6 +496,13 @@ class CombatState(DefaultState, BaseController):
 			# combat.hero_list should never be empty (someone has to be in combat to get here).
 			combat.owner = next(iter(combat.hero_list.keys()))
 		
+		# Check to see if the player has died
+		if combat.hero_list[client.id].hp <= 0:
+			if client.id == combat.owner:
+				combat.owner = None
+			del combat.hero_list[client.id]
+			return ("Dead", "SWITCH")
+
 		# Run the ai if it is set up, else try to set it up
 		if client.id == combat.owner:
 			new_time = time.time()
@@ -574,13 +560,14 @@ class CombatState(DefaultState, BaseController):
 	def modify_health(self, character, amount):
 		BaseController.modify_health(self, character, amount)
 		
-		for i, v in self.monster_list.items():
-			if character == v:
-				self.server.invoke("modify_health", i, amount)
-				
-				pos = character.object.position[:2]+(character.object.position[2]+2,)
-				effect = effects.TextEffect(amount, pos, 90)
-				self.add_effect(effect)
+		if not self.is_server:
+			for i, v in self.monster_list.items():
+				if character == v:
+					self.server.invoke("modify_health", i, amount)
+					
+					pos = character.object.position[:2]+(character.object.position[2]+2,)
+					effect = effects.TextEffect(amount, pos, 90)
+					self.add_effect(effect)
 		
 	def end_effect(self, id):
 		self.main["effect_system"].remove(id)

@@ -194,7 +194,9 @@ class GameServer():
 			Having this method avoids having to import the NetPlayer class into gamestates
 		"""
 		
-		self.main['players'][client_id] = NetPlayer(char_info, position, orientation)
+		net_player = NetPlayer(char_info, position, orientation)
+		net_player.id = client_id
+		self.main['players'][client_id] = net_player
 		
 	def create_monster(self, monster, level, pos, ori):
 		"""We have this function to avoid importing NetMonster into various gamestates"""
