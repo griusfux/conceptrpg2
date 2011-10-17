@@ -215,3 +215,7 @@ class Weapon(Item):
 	@property
 	def accuracy(self):
 		return Weapon.Translate[self.type]['accuracy'](self._modified._accuracy)
+	
+	@property
+	def damage(self):
+		return 5

@@ -415,7 +415,7 @@ class CombatState(DefaultState, BaseController):
 			self.modify_health(combat.hero_list[id], amount)
 		elif id in combat.monster_list:
 			self.modify_health(combat.monster_list[id], amount)
-			if character.hp <= 0:
+			if combat.monster_list[id].hp <= 0:
 				self.s_kill_monster(main, client, id)
 			
 	@rpc(server_functions, "request_monsters")
@@ -521,6 +521,10 @@ class CombatState(DefaultState, BaseController):
 				if AiManager.get_environment():
 					AiManager.run()
 				self.accum -= dt
+				
+				# update monster lock
+				for monster in combat.monster_list.values():
+					monster.update_lock()
 			
 		DefaultState.server_run(self, main, client)
 			
@@ -686,10 +690,10 @@ class CombatState(DefaultState, BaseController):
 		if 'ENEMIES' in target_types:
 			tlist.extend(monster_list.values() if character in hero_list.values() else hero_list.values())
 		
-		if shape == 'ALL':
+		if shape == 'ALL' or (self.is_server and shape == 'SINGLE'):
 			targets = tlist
 		elif shape == 'SINGLE':
-			ori_ivnt = character.object.get_orientation().inverted()
+			ori_ivnt = character.orientation.inverted()
 			for target in tlist:
 				# Convert to local space
 				v = target.position - source
@@ -753,14 +757,14 @@ class CombatState(DefaultState, BaseController):
 	def attack(self, power, character, animation="1h Swing", multiplier=1):
 		self.animate_weapon(character, animation)
 		for target in self.get_targets(power, character):
-			damage = 10*multiplier
+			damage = character.weapon.damage*multiplier
 			hit = True #character.accuracy - target.reflex + random.randint(3, 18) >= 11
 			for callback in character.callbacks['ATTACK']:
 				target, hit, damage, complete = callback(target, hit, damage)
 				if complete:
 					character.remove_callback("ATTACK", callback)
 			if hit:
-				self.modify_health(target, -damage)
+				self.deal_damage(character, target, power, damage, 'PHYSICAL')
 			else:
 				self.modify_health(target, 0)
 	

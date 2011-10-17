@@ -7,7 +7,7 @@
 from Scripts.networking import NET_ENCODING
 from Scripts.gamestate_manager import GameStateManager
 from Scripts.character_logic import CharacterLogic, MonsterLogic
-
+from Scripts.packages import ActionSet
 import time
 import enet
 
@@ -113,6 +113,11 @@ class GameServer():
 		
 		# Current "combats"
 		self.main['combats'] = {}
+		
+		# Available animation actions
+		self.main['actions'] = {}
+		for actionset in ActionSet.get_package_list():
+			self.main['actions'][actionset.name] = actionset.actions	
 		
 		# Create the host
 		self.host = enet.Host(enet.Address(b'', port), 10, 0, 0, 0)

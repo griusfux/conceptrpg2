@@ -46,6 +46,8 @@ class CharacterLogic:
 		def __init__(self):
 			self.name = "None"
 			self.type = "none"
+			self.range = 1
+			self.damage =1
 			
 			# Stats (could be for any item type)
 			self.physical_damage = 0
@@ -405,7 +407,7 @@ class CharacterLogic:
 		
 	@property
 	def orientation(self):
-		return self.object.orientation
+		return self.object.get_orientation()
 	
 	@orientation.setter
 	def orientation(self, v):
