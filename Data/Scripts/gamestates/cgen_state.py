@@ -1,5 +1,7 @@
 # $Id$
 
+import math
+
 from Scripts.packages import *
 from Scripts.character_logic import PlayerLogic
 from Scripts.power_manager import *
@@ -17,7 +19,7 @@ class CharacterCreationState(BaseState, BaseController):
 	
 	def client_init(self, main):
 		"""Intialize the client state"""
-		main['cgen_data'] = None
+		main['cgen_data'] = {}
 		main['cgen_exit'] = False
 		
 		# Load the ui
@@ -27,6 +29,11 @@ class CharacterCreationState(BaseState, BaseController):
 		self.scene = main['engine'].add_object("char_gen", (0,0,0), (0,0,0))
 		main['engine'].set_active_camera("char_gen_camera")
 		
+		# Some variables for viewing the character
+		self.character = None
+		self.race = None
+		self.pclass = None
+		self.element = ""
 	def client_run(self, main):
 		"""Client-side run method"""
 		
@@ -34,6 +41,22 @@ class CharacterCreationState(BaseState, BaseController):
 		
 		if ("InGameMenu", "INPUT_CLICK") in inputs:
 			return("InGameMenu", "PUSH")
+		
+		if main['cgen_data']:
+			if not self.race or self.race.name != main['cgen_data']['race'].name:
+				self.race = main['cgen_data']['race']
+				if self.character:
+					self.character.end()
+				main['engine'].load_library(self.race)
+				self.character = main['engine'].add_object(self.race.root_object,
+															(0.5,-1.7,1.3),
+															(0,0,math.radians(180)))
+				# Need this for animations to work
+				self.character.armature = self.character
+				
+			idle = main['actions'][self.race.action_set]['Idle'][0]
+			self.character.play_animation(idle['name'], idle['start'], idle['end'], mode=1)
+				
 		
 		# Check for cgen end
 		if main['cgen_exit']:
@@ -88,6 +111,7 @@ class CharacterCreationState(BaseState, BaseController):
 				player.inventory.append(a)
 				player.armor = a
 				
+				player.new = True
 				player.save()
 
 			return("CharacterSelect", "SWITCH")
@@ -95,6 +119,9 @@ class CharacterCreationState(BaseState, BaseController):
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
 		self.scene.end()
+		
+		if self.character:
+			self.character.end()
 		
 		# We added these so we need to get rid of them too
 		del main['cgen_data']

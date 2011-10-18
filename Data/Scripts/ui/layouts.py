@@ -710,7 +710,7 @@ class CharGenLayout(Layout):
 		self.cancel_btn = Button(self.mframe, "can_btn", text="CANCEL", pos=[0.4, 0.07],
 								on_click=self.finish_click)
 	
-	def update(self, main):
+	def update(self, main):			
 		self.main = main
 		self.race.text = self.selector.race
 		self.class_.text = self.selector.player_class
@@ -718,13 +718,19 @@ class CharGenLayout(Layout):
 		
 		self.focus_info.text = "Click on a Race, Class, or Element to select it.\nFor more information about a choice, hover over it."
 		self.focus_details.text = ""
+		
+		data = self.main['cgen_data']
+		
+		data['name'] = self.name_in.text
+		
+		if 'race' not in data or data['race'].name != self.race.text:
+			data['race'] = Race(self.race.text)
+		if 'class' not in data or data['class'].name != self.class_.text:
+			data['class'] = Class(self.class_.text)
+		if 'element' not in data or data['element'] != self.element.text.upper():
+			data['element'] = self.element.text.upper()
 	
 	def finish_click(self, main):
-		self.main['cgen_data'] = {}
-		self.main['cgen_data']['name'] = self.name_in.text
-		self.main['cgen_data']['race'] = Race(self.race.text)
-		self.main['cgen_data']['class'] = Class(self.class_.text)
-		self.main['cgen_data']['element'] = self.element.text.upper()
 		self.main['cgen_exit'] = True
 	
 	def cancel_click(self, main):
