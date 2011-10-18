@@ -11,7 +11,7 @@
     }, 
     "name": "Mage", 
     "starting_armor": "Robes", 
-    "starting_weapon": "Longsword", 
+    "starting_weapon": "Staff", 
     "subclass": {
         "DEATH": "Necromancer", 
         "EARTH": "Templar", 

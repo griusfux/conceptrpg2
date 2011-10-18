@@ -31,6 +31,7 @@ class CharacterCreationState(BaseState, BaseController):
 		
 		# Some variables for viewing the character
 		self.character = None
+		self.weapon = None
 		self.race = None
 		self.pclass = None
 		self.element = ""
@@ -53,6 +54,16 @@ class CharacterCreationState(BaseState, BaseController):
 															(0,0,math.radians(180)))
 				# Need this for animations to work
 				self.character.armature = self.character
+				# Need this to reload the weapon
+				self.pclass = None
+				
+			if not self.pclass or self.pclass.name != main['cgen_data']['class'].name:
+				self.pclass = main['cgen_data']['class']
+				if self.weapon:
+					self.weapon.end()
+				main['engine'].load_library((Weapon(self.pclass.starting_weapon)))
+				self.weapon = main['engine'].add_object(self.pclass.starting_weapon)			
+				self.character.socket_fill('right_hand', self.weapon)
 				
 			idle = main['actions'][self.race.action_set]['Idle'][0]
 			self.character.play_animation(idle['name'], idle['start'], idle['end'], mode=1)

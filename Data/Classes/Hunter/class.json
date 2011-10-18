@@ -11,7 +11,7 @@
     }, 
     "name": "Hunter", 
     "starting_armor": "Robes", 
-    "starting_weapon": "Longsword", 
+    "starting_weapon": "Longbow", 
     "subclass": {
         "DEATH": "Assassin", 
         "EARTH": "Ranger", 
