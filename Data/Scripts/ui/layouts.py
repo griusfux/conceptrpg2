@@ -708,7 +708,7 @@ class CharGenLayout(Layout):
 								type="EMPHASIS", on_click=self.finish_click)
 		
 		self.cancel_btn = Button(self.mframe, "can_btn", text="CANCEL", pos=[0.4, 0.07],
-								on_click=self.finish_click)
+								on_click=self.cancel_click)
 	
 	def update(self, main):			
 		self.main = main
@@ -734,6 +734,7 @@ class CharGenLayout(Layout):
 		self.main['cgen_exit'] = True
 	
 	def cancel_click(self, main):
+		self.main['cgen_data'] = {}
 		self.main['cgen_exit'] = True
 		
 class DunGenLayout(Layout):
@@ -939,3 +940,167 @@ class DeadLayout(Layout):
 		
 		self.deadlbl = bgui.Label(self, "deadlbl", pt_size=42, text="You have died. :(\nPress Attack to respawn",
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+		
+
+class ShopLayout(Layout):
+	class ItemCellRenderer():
+		def __init__(self, listbox):
+			self.frame = bgui.Image(listbox, "frame", "Textures/ui/bottom_border.png",
+									size=[1, 0.0625])
+			self.label = bgui.Label(self.frame, "label", pos=[.05,.2],
+								sub_theme="Menu", options=bgui.BGUI_DEFAULT)
+			
+		def render_item(self, item):
+			self.label.text = item.name
+			return self.frame
+			
+	def __init__(self, parent):
+		Layout.__init__(self, parent, "inventory_overlay", use_mouse=True)
+		
+		self.mframe = bgui.Image(self, "1x1_frame", "Textures/ui/menu_background.png",
+								 aspect=1, size=[0,.9],	sub_theme="HUD",
+								 options=BGUI_DEFAULT|bgui.BGUI_CENTERY)
+		
+		self.mframe.position = [.675-self.mframe.size[0]/parent.size[0],
+								self.mframe.position[1]]
+		
+		self.lframe = bgui.Frame(self.mframe, "list_frame", size=[0.4, 0.8], 
+								pos=[0.05, 0.1], sub_theme="Menu")
+		
+		self.lbox = bgui.ListBox(self.lframe, "list_box", size=[1, 0.9])
+		self.lbox.renderer = self.ItemCellRenderer(self.lbox)
+		
+		self.type_buttons = {}
+		self.type_labels = {}
+		self.selection = "weapons"
+		self.old_selection = ""
+		for i, type in enumerate(["weapons", "armor", "acc.", "misc."]):
+			self.type_buttons[type] = bgui.Frame(self.lframe, type, size=[0.25, 0.1],
+													pos=[0.25*i, 0.9])
+			self.type_buttons[type].colors = [[0,0,0,0.1]] * 4
+			self.type_buttons[type].border = 1
+			self.type_buttons[type].border_color = [0.55, 0.29, 0.16, 0.7]
+			self.type_buttons[type].on_click = self.selection_click
+			self.type_labels[type] = bgui.Label(self.type_buttons[type], type+'l',
+												text=type.title(), sub_theme="Menu",
+												options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+		
+		self.rframe = bgui.Frame(self.mframe, "right_frame", size=[0.4, 0.8], pos=[0.5, 0.1])
+		self.rframe.colors = [[0, 0, 0, 0] for i in range(4)]
+		self.pframe = bgui.Frame(self.rframe, "player_frame", size=[1, 0.4], pos=[0, 0.6], sub_theme="Menu")
+		self.iframe = bgui.Frame(self.rframe, "item_frame", size=[1, 0.55], pos=[0, 0], sub_theme="Menu")
+		
+		# Player equipment
+		self.weaponlbl = bgui.Label(self.pframe, 'weaponlbl', text="Weapon:", sub_theme="Menu", pos=[0.03, 0.90])
+		self.weapon = bgui.Label(self.pframe, 'weapon', sub_theme='Menu', pos=[0.3, 0.90])
+		self.shieldlbl = bgui.Label(self.pframe, 'shieldlbl', text="Shield:", sub_theme="Menu", pos=[0.03, 0.83])
+		self.shield = bgui.Label(self.pframe, 'shield', sub_theme='Menu', pos=[0.3, 0.83])
+		self.armorlbl = bgui.Label(self.pframe, 'armorlbl', text="Armor:", sub_theme="Menu", pos=[0.03, 0.76])
+		self.armor = bgui.Label(self.pframe, 'armor', sub_theme='Menu', pos=[0.3, 0.76])
+		# Uncomment these when we actually have accessories.
+		self.acclbl = bgui.Label(self.pframe, 'acclbl', text="Accessory:", sub_theme="Menu", pos=[0.03, 0.69])
+		self.acc = bgui.Label(self.pframe, 'acc', sub_theme='Menu', pos=[0.3, 0.69])
+		
+		# XXX We need some sort of horizontal rule
+		
+		# Player stats
+		self.hplbl = bgui.Label(self.pframe, 'hplbl', text='HP:', sub_theme='Menu', pos=[0.03, 0.55])
+		self.hp = bgui.Label(self.pframe, 'hp', sub_theme='Menu', pos=[0.15, 0.55])
+		self.physdlbl = bgui.Label(self.pframe, 'physdlbl', text='Physical Damage:', sub_theme="Menu", pos=[0.03, 0.40])
+		self.physd = bgui.Label(self.pframe, 'physd', sub_theme='Menu', pos=[0.4, 0.40])
+		self.arcdlbl = bgui.Label(self.pframe, 'arcdlbl', text='Arcane Damage:', sub_theme="Menu", pos=[0.03, 0.33])
+		self.arcd = bgui.Label(self.pframe, 'arcd', sub_theme='Menu', pos=[0.4, 0.33])
+		self.accylbl = bgui.Label(self.pframe, 'accylbl', text='Accuracy:', sub_theme="Menu", pos=[0.03, 0.26])
+		self.accy = bgui.Label(self.pframe, 'accy', sub_theme='Menu', pos=[0.4, 0.26])
+		self.physdeflbl = bgui.Label(self.pframe, 'physdeflbl', text='Physical Defense:', sub_theme="Menu", pos=[0.53, 0.40])
+		self.physdef = bgui.Label(self.pframe, 'physdef', sub_theme='Menu', pos=[0.91, 0.40])
+		self.arcdeflbl = bgui.Label(self.pframe, 'arcdeflbl', text='Arcane Defense:', sub_theme="Menu", pos=[0.53, 0.33])
+		self.arcdef = bgui.Label(self.pframe, 'arcdef', sub_theme='Menu', pos=[0.91, 0.33])
+		self.reflexlbl = bgui.Label(self.pframe, 'reflexlbl', text='Reflex:', sub_theme="Menu", pos=[0.53, 0.26])
+		self.reflex = bgui.Label(self.pframe, 'reflex', sub_theme='Menu', pos=[0.91, 0.26])
+		
+		# Item stats
+		self.itemname = bgui.Label(self.iframe, 'inlbl', sub_theme='Menu', pos=[0.03, 0.95])
+		self.type = bgui.Label(self.iframe, 'type', text='Type:', sub_theme='Menu', pos=[0.03, 0.85])
+		self.idesc =  bgui.TextBlock(self.iframe, "info", size=[0.9, .3],
+										pos=[0.05, 0.3], sub_theme="")
+		
+		# Item buttons
+		self.exit = Button(self.iframe, "exit_btn", text="EXIT", 
+								on_click=self.exit_click, pos=[0.2,0.03])
+		self.buy = Button(self.iframe, "buy_btn", text="BUY", 
+								on_click=self.buy_click, pos=[0.6,0.03])
+		
+	def exit_click(self, widget):
+		self.main['shop_exit'] = True
+		pass
+#		item = self.lbox.selected
+#		if item:
+#			self.lbox.items.remove(item)
+#			self.main['drop_item'] = item
+			
+		
+	def buy_click(self, widget):
+		pass
+#		item = self.lbox.selected
+#		player = self.main['player']
+#
+#		if item:
+#			if self.selection == "weapons":
+#				player.weapon = item
+#			elif self.selection == "armor":
+#				player.armor = item
+				
+
+	def update(self, main):
+		self.main = main
+		player = main['player']
+		shopkeeper = main['shop_keeper']
+		
+		if self.selection != self.old_selection:
+			self.type_buttons[self.selection].colors = [[0,0,0,0]] * 4
+			self.type_buttons[self.selection].border = 0
+			
+			if self.old_selection:
+				self.type_buttons[self.old_selection].colors = [[0,0,0,.1]] * 4
+				self.type_buttons[self.old_selection].border = 1
+			self.old_selection = self.selection
+			
+			type = ""
+			if self.selection == "weapons":
+				type = "weapons"
+			elif self.selection == "armor":
+				type = "armors"
+			elif self.selection == "acc.":
+				type = "items"
+			elif self.selection == "misc.":
+				type = "items"
+			self.lbox.items = [item for item in getattr(shopkeeper, type)]
+			
+		# Update player info
+		self.weapon.text = player.weapon.name
+		self.shield.text = player.shield.name
+		self.armor.text = player.armor.name
+		
+		self.hp.text = "%d/%d" % (player.hp, player.max_hp)
+		self.physd.text = str(player.physical_damage)
+		self.arcd.text = str(player.arcane_damage)
+		self.accy.text = str(player.accuracy)
+		self.physdef.text = str(player.physical_defense)
+		self.arcdef.text = str(player.arcane_defense)
+		self.reflex.text = str(player.reflex)
+		
+		# Update item info
+		if self.lbox.selected:
+			for i in self.iframe.children.values(): i.visible = True
+			
+			item = self.lbox.selected
+			self.itemname.text = item.name
+			self.type.text = "Type: %s" % item.type.title()
+			self.idesc.text = item.description
+			self.buy.visible = True
+		else:
+			self.buy.visible = False
+		
+	def selection_click(self, widget):
+		self.selection = widget.name
