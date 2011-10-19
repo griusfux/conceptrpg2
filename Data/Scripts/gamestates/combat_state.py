@@ -341,8 +341,15 @@ class CombatState(DefaultState, BaseController):
 		
 		main['room'] = None
 		
+		player = main['player']
+		
 		# Put away the player's weapon
-		main['player'].clear_right_hand()
+		player.clear_right_hand()
+		
+		# Clear any targeting
+		player.targets = []
+		player.auto_target = player.auto_range = None
+		
 						
 	##########
 	# Server
