@@ -425,7 +425,7 @@ class CombatState(DefaultState, BaseController):
 		if client.combat_id not in combat.monster_list: return
 		
 		for i, v in combat.monster_list.items():
-			self.client.invoke("add_player", i, v.name, 1, v.position, None)
+			self.client.invoke("add_player", i, v.get_info(), 1, v.position, None)
 			self.client.invoke("add_monster", client.combat_id, v.name, i, *v.position)
 
 	@rpc(server_functions, "add_hero")
@@ -700,7 +700,7 @@ class CombatState(DefaultState, BaseController):
 				v = ori_ivnt * v
 				
 				# Now do a simple bounds check
-				if v[1] < distance and abs(v[0]) < target.size * 2: # Multiply by 2 to allow for more error
+				if v[1] < distance + target.size and abs(v[0]) < target.size * 2: # Multiply by 2 to allow for more error
 					targets.append(target)
 		elif shape == 'BURST':
 			for target in tlist:

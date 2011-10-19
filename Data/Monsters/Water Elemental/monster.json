@@ -1,17 +1,20 @@
 {
-    "action_set": "", 
+    "action_set": "Base", 
     "affinities": {
-        "DEATH": 3, 
-        "EARTH": 3, 
-        "FIRE": 3, 
-        "HOLY": 3, 
+        "DEATH": 0, 
+        "EARTH": 2, 
+        "FIRE": -2, 
+        "HOLY": 0, 
         "NEUTRAL": 3, 
-        "STORM": 3, 
+        "STORM": 0, 
         "WATER": 3
     }, 
     "element": "WATER", 
     "hp_per_level": 5, 
-    "level_adjustment": 0, 
+    "level_adjustment": 2, 
     "name": "Water Elemental", 
-    "root_object": "Water Elemental"
+    "root_object": "Water Elemental", 
+    "size": 0.8, 
+    "speed": 3.0, 
+    "xp_reward": 100
 }

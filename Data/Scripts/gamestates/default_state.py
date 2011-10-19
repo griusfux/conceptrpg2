@@ -265,6 +265,8 @@ class DefaultState(BaseState, BaseController):
 				range = player.weapon.range
 			else:
 				range = player.auto_power.distance
+				
+			range += player.auto_target.size
 			# vec = self.auto_target.object.position - player.object.position
 			# distance = vec.dot(vec)
 			# We shouldn't be calling getVectTo() like this, but it works and I can't get my copy to work.

@@ -1,17 +1,20 @@
 {
-    "action_set": "", 
+    "action_set": "Base", 
     "affinities": {
-        "DEATH": 3, 
-        "EARTH": 3, 
-        "FIRE": 3, 
-        "HOLY": 3, 
+        "DEATH": 0, 
+        "EARTH": 4, 
+        "FIRE": -1, 
+        "HOLY": 0, 
         "NEUTRAL": 3, 
-        "STORM": 3, 
-        "WATER": 3
+        "STORM": -1, 
+        "WATER": 0
     }, 
     "element": "EARTH", 
     "hp_per_level": 5, 
-    "level_adjustment": 0, 
+    "level_adjustment": 1, 
     "name": "Rock Golem", 
-    "root_object": "Rock Golem"
+    "root_object": "Rock Golem", 
+    "size": 1.5, 
+    "speed": 3.0, 
+    "xp_reward": 75
 }
