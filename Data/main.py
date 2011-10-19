@@ -57,10 +57,10 @@ def exit_game(main):
 	
 	gl.error = True
 	
-	sys.stdout.close()
 	if main['exit'] == "RESTART":
 		gl.restartGame()
 	else:
+		sys.stdout.close()
 		gl.endGame()
 					
 def in_game(cont):
