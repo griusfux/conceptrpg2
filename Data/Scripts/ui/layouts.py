@@ -529,15 +529,23 @@ class StartGameOverlay(Layout):
 		# Background frame
 		self.frame = bgui.Frame(self, "sgo_frame", size=[.33, .66], pos=[0.30, 0.05],
 			sub_theme='HUD')
-			
-		self.user = bgui.TextInput(self.frame, "sgo_user", prefix="Username: ",
-				size=[0.5, 0.07], pos=[0.05, 0.8], text="User")
+		
+		ysize = 0.05 # Tweak this to get the inputs and labels to line up
+		
+		self.userlbl = bgui.Label(self.frame, "sgo_usr_lbl", text="Username: ", pos=[0.05, 0.8])
+		self.user = bgui.TextInput(self.frame, "sgo_user",
+				size=[0.5, ysize], pos=[0.3, 0.8], text="User")
 				
-		self.ip = bgui.TextInput(self.frame, "sgo_ip", prefix="Server IP: ",
-				size=[0.5, 0.07], pos=[0.05, 0.7], text="localhost")
+		self.iplbl = bgui.Label(self.frame, "sgo_ip_lbl", text="Server IP: ", pos=[0.05, 0.7])
+		self.ip = bgui.TextInput(self.frame, "sgo_ip",
+				size=[0.5, ysize], pos=[0.3, 0.7], text="localhost")
 				
-		self.port = bgui.TextInput(self.frame, "sgo_port", prefix="Server Port: ",
-				size=[0.5, 0.07], pos=[0.05, 0.6], text="9999")
+		self.portlbl = bgui.Label(self.frame, "sgo_port_lbl", text="Server Port: ", pos=[0.05, 0.6])
+		self.port = bgui.TextInput(self.frame, "sgo_port",
+				size=[0.5, ysize], pos=[0.3, 0.6], text="9999")
+		
+		self.tabs = [self.user, self.ip, self.port]
+		self.tab_idx = 0
 
 		# "Go" button
 		self.go_button = bgui.FrameButton(self.frame, "sgo_go", text="",
@@ -548,13 +556,36 @@ class StartGameOverlay(Layout):
 		self.main = main
 		if not self.go_button.text:
 			self.go_button.text = "Start" if main['is_host'] else "Join"
-		if main['is_host'] and self.ip.visible:
-			self.ip.visible = False
+		if main['is_host']:
+			if self.ip.visible:
+				self.ip.visible = False
+				self.iplbl.visible = False
+			if self.ip in self.tabs:
+				self.tabs.remove(self.ip)
+			
 			
 	def button_click(self, widget):
 		self.main['user'] = self.user.text
 		self.main['addr'] = (self.ip.text, int(self.port.text))
 		self.main['start_game'] = True
+
+	def _handle_key(self, key, is_shifted):
+		keys = bgui.key_defs
+		
+		if key == keys.TABKEY:
+			if is_shifted:
+				self.tab_idx -= 1
+				if self.tab_idx < 0:
+					self.tab_idx = len(self.tabs) - 1
+			else:
+				self.tab_idx = (self.tab_idx + 1) % len(self.tabs)
+			for v in self.tabs:
+					v.deactivate()
+			self.tabs[self.tab_idx].activate()
+		if key in (keys.ENTERKEY, keys.PADENTER):
+			self.button_click(self.go_button)
+			
+		Widget._handle_key(self, key, is_shifted)
 
 class CreditsOverlay(Layout):
 	def __init__(self, sys):
