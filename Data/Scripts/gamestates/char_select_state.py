@@ -44,6 +44,11 @@ class CharacterSelectState(BaseState, BaseController):
 			character.object = obj
 			character.armature = obj.armature
 			
+			if character.weapon:
+				weapon = character.weapon
+				obj = weapon.createObjectInstance(main['engine'])
+				character.set_right_hand(obj)
+
 			self.characters.append(character)
 
 		for i in range(min(len(self.characters), 4)):
@@ -114,6 +119,9 @@ class CharacterSelectState(BaseState, BaseController):
 			
 			# Fill the player's hit points
 			player.hp = player.max_hp
+			
+			# Make sure the player's stats are in order
+			player.recalc_stats()
 			
 			# Set up the camera
 			from Scripts.blender_wrapper import Camera
