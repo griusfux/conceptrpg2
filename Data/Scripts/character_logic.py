@@ -150,8 +150,8 @@ class CharacterLogic:
 		
 		#hit points
 		hp_percent = (self.hp / self.max_hp)
-		self.max_hp = self.hp_per_level * (self.level+1+self.affinities['NEUTRAL']) 
-		self.hp = self.max_hp * hp_percent
+		self.max_hp = int(self.hp_per_level * (self.level+1+self.affinities['NEUTRAL'])) 
+		self.hp = int(self.max_hp * hp_percent)
 		
 		#other stats
 		#XXX handle "mods" from statuses
