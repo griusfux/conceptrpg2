@@ -124,35 +124,78 @@ class ElementBar(Frame):
 		
 class AffinityWidget(Frame):
 	def __init__(self, parent, size, pos):
-		Frame.__init__(self, parent, "aw", size=size, pos=pos, options=BGUI_DEFAULT|BGUI_CENTERX)
+		Frame.__init__(self, parent, "aw", size=size, pos=pos)
 		self.colors = [[0,0,0,0]]*4
 
-		path = "Textures/Elements/"
-		self.elements = elements = ["Death", "Storm", "Fire", "Neutral", "Holy", "Earth", "Water"]
 		self.icons = {}
 		self.labels = {}
 		
+		# These will be updated in update()
+		self.affinities = None
+		self.affinity_points = 0
+		self.delivery_points = 0
+		
+		# Element Affinities
+		elements_path = "Textures/Elements/"
+		self.elements = elements = ["Death", "Storm", "Fire", "Neutral", "Holy", "Earth", "Water"]
+		
+		self.elementlbl = Label(self, 'ele_affinities', sub_theme="Menu", pos=[0, 0.95],
+							options = BGUI_DEFAULT|BGUI_CENTERX)
+
 		for i, element in enumerate(elements):
-			y = 1-((i+1)*0.14)
-			i = self.icons[element] = Image(self, element, path+element+'.png', aspect=1,
-										size=[0, .12], pos=[0, y],
-										options=BGUI_DEFAULT|BGUI_CENTERX)
-			i.on_click = self.aff_click
-			self.labels[element] = Label(self, element+"lbl", sub_theme="Affinity", pos=[.55, y+0.04])
+			# We play around with i to so we get a second column after the 4th element
+			x = 0.10 if i < 4 else 0.50
+			if i >= 4:
+				i -= 4
+			y = 0.95 - ((i+1)*0.14)
+			
+			icon = self.icons[element] = Image(self, element, elements_path+element+'.png', aspect=1,
+										size=[0, .12], pos=[x, y])
+			icon.on_click = self.aff_click
+			self.labels[element] = Label(self, element+"lbl", sub_theme="Affinity", pos=[x+0.25, y+0.04])
+			
+		# Delivery Affinities
+		deliveries_path = "Textures/Deliveries/"
+		self.deliveries = deliveries = ["Weapon", "Spell"]
+			
+		self.deliverylbl = Label(self, 'del_affinities', sub_theme="Menu", pos=[0, 0.3],
+							options = BGUI_DEFAULT|BGUI_CENTERX)
+		
+		for i, delivery in enumerate(deliveries):
+			x = 0.10
+			y = 0.3-((i+1)*0.14)
+			
+			icon = self.icons[delivery] = Image(self, delivery, deliveries_path+delivery+'.png', aspect=1,
+										size=[0, .12], pos=[x, y])
+			icon.on_click = self.aff_click
+			self.labels[delivery] = Label(self, delivery+"lbl", sub_theme="Affinity", pos=[x+0.25, y+0.04])
 			
 	def update(self, player):
 		self.player = player
 		
-		for element in self.elements:
-			self.labels[element].text = str(player.affinities[element.upper()])
+		if self.affinities is None:
+			self.affinities = player.affinities.copy()
+			self.affinity_points = player.affinity_points
+			self.delivery_points = player.delivery_points
+		
+		self.elementlbl.text = "Elemental [Points %d]" % self.affinity_points
+		self.deliverylbl.text = "Delivery [Points %d]" % self.delivery_points
+		
+		for affinity in self.elements + self.deliveries:
+			self.labels[affinity].text = "%3d" % self.affinities[affinity.upper()]
 			
 	def aff_click(self, widget):
-		element = widget.name.upper()
+		affinity = widget.name.upper()
 		
-		if self.player.affinity_points > 0:
-			self.player.affinity_points -= 1
-			self.player.affinities[element] += 1
+		if self.affinity_points > 0:
+			self.affinity_points -= 1
+			self.affinities[affinity] += 1
+			
+			# Temporarily change the player's affinity
+			aff = self.player.affinities.copy()
+			self.player.affinities = self.affinities.copy()
 			self.player.recalc_stats()
+			self.player.affinities = aff
 		
 class RingSelector(Widget):
 	"""A widget to use in the character creation screen"""

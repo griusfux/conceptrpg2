@@ -77,14 +77,27 @@ class PlayerStatsLayout(Layout):
 		#=======================================================================
 		# Affinities Frame
 		#=======================================================================
-		self.aframe = bgui.Frame(self.mframe, "aff_frame", size=[0.9, 0.55],
+		self.aframe = bgui.Frame(self.mframe, "aff_frame", size=[0.35, 0.55],
 								pos=[0.05, 0.05], sub_theme="Menu")
 
 		self.afflbl = bgui.Label(self.aframe, "afflbl", text="Affinities", sub_theme="Title", pos=[0, 0.9],
 							options=BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		self.affinities = AffinityWidget(self.aframe, size=[0.9, 0.85], pos=[0, 0.03])
+
+		#=======================================================================
+		# Description Frame
+		#=======================================================================
+		self.dframe = bgui.Frame(self.mframe, "desc_frame", size=[0.50, 0.55],
+								pos=[0.45, 0.05], sub_theme="Menu")
+		self.can_btn = Button(self.dframe, "revert_btn", text="CANCEL",
+							on_click=self.cancel_click, pos=[0.3, 0.05])
+		self.acc_btn = Button(self.dframe, "accept_btn", text="ACCEPT",
+							on_click=self.accept_click, pos=[0.65, 0.05])
+		
 		
 	def update(self, main):
+		self.main = main
+		
 		player = main['player']
 		
 		# Update player info
@@ -93,7 +106,14 @@ class PlayerStatsLayout(Layout):
 			# Labels here should remain static, and don't need to be updated
 			self.race.text = player.race.name
 			self.classinfo.text = "%s (%s/%s)" % (player.player_class.subclass[player.element], player.player_class.name, player.element.title())
-		
+		if self.affinities.affinities is None:
+			self.affinities.affinities = player.affinities.copy()
+			self.affinities.affinity_points = player.affinity_points
+			self.affinities.delivery_points = player.delivery_points
+				
+		# Update affinity info
+		self.affinities.update(player)
+
 		self.hp_text.text = "HP (%d/%d)" % (player.hp, player.max_hp)
 		self.hp_bar._update_position([0.90*min(player.max_hp/100, 1), 0.03], self.hp_bar._base_pos)
 		self.hp_bar.percent = player.hp/player.max_hp
@@ -108,9 +128,18 @@ class PlayerStatsLayout(Layout):
 		self.arcdef.text = str(player.arcane_defense)
 		self.reflex.text = str(player.reflex)
 		
-		# Update affinity info
-		self.afflbl.text = "Affinities  [Points %d]"%player.affinity_points
-		self.affinities.update(player)
+	def accept_click(self, widget):
+		player = self.main['player']
+		player.affinities = self.affinities.affinities.copy()
+		player.affinity_points = self.affinities.affinity_points
+		player.delivery_points = self.affinities.delivery_points
+		
+		player.recalc_stats()
+		self.main['player_exit'] = True
+		
+	def cancel_click(self, widget):
+		self.main['player'].recalc_stats()
+		self.main['player_exit'] = True
 		
 class InventoryLayout(Layout):
 	class ItemCellRenderer():
