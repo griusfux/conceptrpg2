@@ -79,7 +79,7 @@ class Item:
 			
 		return True
 		
-	def createObjectInstance(self, engine, position=(0,0,0), orientation=(0,0,0),time=0):
+	def createObjectInstance(self, engine, position=None, orientation=None,time=0):
 		if not self._datafile.blend:
 			return None
 		

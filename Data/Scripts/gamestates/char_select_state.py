@@ -46,8 +46,8 @@ class CharacterSelectState(BaseState, BaseController):
 			
 			if character.weapon:
 				weapon = character.weapon
-				obj = weapon.createObjectInstance(main['engine'])
-				character.set_right_hand(obj)
+				wobj = weapon.createObjectInstance(main['engine'])
+				character.set_right_hand(wobj)
 
 			self.characters.append(character)
 
@@ -96,7 +96,7 @@ class CharacterSelectState(BaseState, BaseController):
 		
 		if main['csl_continue']:	
 			# Add the player empty
-			gameobj = main['engine'].add_object("CharacterEmpty")
+			gameobj = main['engine'].add_object("CharacterEmpty", pos=(0, 0, 0.1))
 	
 			# Load the target shapes
 			main['target_shapes'] = {}
@@ -134,6 +134,7 @@ class CharacterSelectState(BaseState, BaseController):
 		"""Cleanup the client state"""
 		main['engine'].remove_object(self.scene)
 		for character in self.characters:
+			character.clear_right_hand()
 			if character == main['player']:
 				continue
 			main['engine'].remove_object(character.object)
