@@ -18,6 +18,17 @@ XP_TABLE =	[0,
 			2000,
 			3000,
 			4000,]
+
+ELEMENT_COLOR = {
+				"DEATH" : [0.2, 0.8, 0.4],
+				"STORM" : [1.0, 1.0, 0.4],
+				"FIRE" : [1.0, 0.6, 0.2],
+				"HOLY" : [1.0, 1.0, 1.0],
+				"EARTH" : [0.4, 0.2, 0.0],
+				"WATER" : [0.2, 0.4, 0.8],
+				"NEUTRAL" : [0.5, 0.5 ,0.5],
+				
+				}
 			
 BASE_AFFINITIES = {
 				# Elemental Affinities
@@ -109,7 +120,7 @@ class CharacterLogic:
 		self.credits	= 100
 		
 		# the character's game object
-		self.object = obj
+		self._object = obj
 		
 		# The character's current "lock", which is represented as the time at which the lock ends
 		self.lock = 0
@@ -413,7 +424,19 @@ class CharacterLogic:
 	def orientation(self, v):
 		self.object.orientation = v
 		
-class PlayerLogic(CharacterLogic):		
+	@property
+	def object(self):
+		return self._object
+	
+	@object.setter
+	def object(self, obj):
+		# Apply accent color
+		if obj:
+			obj.accent = ELEMENT_COLOR[self.element]
+		self._object = obj
+		
+		
+class PlayerLogic(CharacterLogic):	
 	def load(self, save):
 		"""Fills in stats from a SaveData object"""
 		

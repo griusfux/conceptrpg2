@@ -24,6 +24,9 @@ class Object:
 		self.gameobj = gameobj
 		self._armature = armature
 		
+		# Set a property for accent color
+		self.gameobj['accent'] = [0.5, 0.5, 0.5]
+		
 		# Create the socket dictionary
 		if self._armature and self_armature.children:
 			self.initialize_sockets()
@@ -226,6 +229,17 @@ class Object:
 		
 		for c in self.gameobj.childrenRecursive:
 			c.color = color
+			
+	@property
+	def accent(self):
+		return self.gameobj['accent']
+	
+	@accent.setter
+	def accent(self, accent):
+		self.gameobj['accent'] = accent
+		
+		for c in self.gameobj.childrenRecursive:
+			c['accent'] = accent
 		
 	@property
 	def visible(self):
