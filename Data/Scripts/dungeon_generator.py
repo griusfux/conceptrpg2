@@ -9,6 +9,8 @@ from Scripts.packages import EncounterDeck
 GEN_LINEAR = 0
 GEN_RANDOM = 1
 
+BIAS = 0.1
+
 # ExitNode types
 EN_ROOM = 0
 EN_CORR = 1
@@ -185,10 +187,10 @@ class DungeonGenerator:
 				elif roll == 19:
 					if not self.has_stairs: tile = 'Stairs'
 					else: tile = 'Corridors'
-				elif roll < 19 and roll >= 13:
+				elif roll < 19 and roll >= 10:
 					tile = 'Rooms'
-				elif roll <13 and roll >= 10:
-					tile = 'Rooms'
+#				elif roll <13 and roll >= 10:
+#					tile = 'Rooms'
 				else:
 					tile = 'Corridors'
 			
@@ -324,8 +326,8 @@ class DungeonGenerator:
 					vert_pos = vert.getXYZ().copy()
 					
 					# Scale the vert_pos on the x and y a bit to account for slight overlaps (where the tiles connect)
-					vert_pos[0] *= 0.9
-					vert_pos[1] *= 0.9
+					vert_pos[0] *= 1-BIAS
+					vert_pos[1] *= 1-BIAS
 					
 					# Convert the vertex's local position to world space
 					
