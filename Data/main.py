@@ -141,5 +141,8 @@ def init(own):
 	own['ground_items'] = {}
 	own['item_collisions'] = []
 	
+	# Used to determine any tutorials that need to be displayed
+	own['tutorial_queue'] = []
+	
 	own['net_players'] = {}
 	

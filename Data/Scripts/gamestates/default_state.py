@@ -104,8 +104,15 @@ class DefaultState(BaseState, BaseController):
 		
 		self.item_effects = []
 		
+		# Some helpful tutorials for the player
+		player = main['player']
+		self.display_tutorial(player, "Controls")
+		self.display_tutorial(player, "Combat")
+		
 	def client_run(self, main):
 		"""Client-side run method"""
+		BaseState.client_run(self, main)
+		
 		main['effect_system'].update()
 		
 		# Make sure the camera is in the right mode

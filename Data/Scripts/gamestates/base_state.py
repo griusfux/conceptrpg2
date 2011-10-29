@@ -277,7 +277,20 @@ class BaseState:
 		
 	def client_run(self, main):
 		"""Client-side run method"""
-		pass
+		if not self.suspended and main['tutorial_queue']:
+			# Peek at the first item
+			tutorial = main['tutorial_queue'][0]
+			
+			# Make sure duplicates didn't sneak in
+			if tutorial not in main['player'].tutorials:
+				
+				# Display the tutorial
+				print(tutorial)
+				
+				# Note that the player has seen the tutorial, and remove it from the queue
+				# (To be Done in tutorial state)
+				main['player'].tutorials.append(tutorial)
+				main['tutorial_queue'].remove(tutorial)
 			
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
@@ -416,3 +429,7 @@ class BaseController:
 			self.clients.invoke("drop_item", gid, item, *position)
 		else:
 			self.server.invoke("drop_item", item, *position)
+			
+	def display_tutorial(self, player, tip):
+		if player.tutorials != None and tip not in player.tutorials:
+			self.main['tutorial_queue'].append(tip)

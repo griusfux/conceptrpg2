@@ -80,6 +80,7 @@ class CharacterLogic:
 			
 		#Player information
 		self.name		= ""
+		self.tutorials	= []
 		self.level		= 0
 		self.race		= None
 		self.player_class= None
@@ -340,6 +341,7 @@ class CharacterLogic:
 	def get_info(self):
 		info = {
 				"name"	: self.name,
+				"tutorials" : self.tutorials,
 				"level"	: self.level,
 				"race"	: self.race.package_name,
 				"player_class" : self.player_class.package_name if self.player_class else None,
@@ -373,6 +375,7 @@ class CharacterLogic:
 	
 	def load_from_info(self, info):
 		self.name		= info["name"]
+		self.tutorials	= info["tutorials"]
 		self.level		= info["level"]
 		if info["player_class"]:
 			self.player_class = Class(info["player_class"])
