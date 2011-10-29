@@ -1,5 +1,3 @@
-import random
-
 import Scripts.effects as Effect
 
 def power(self, controller, user):
@@ -9,4 +7,4 @@ def power(self, controller, user):
 	target = targets[0]
 	
 	controller.animate_weapon(user, "throw")
-	controller.add_status(target, "Accuracy", -0.2, 0)
+	controller.add_status(target, "Accuracy", -0.2, 2)
