@@ -3,7 +3,7 @@
 import math
 
 from Scripts.packages import *
-from Scripts.character_logic import PlayerLogic
+from Scripts.character_logic import PlayerLogic, ELEMENT_COLOR
 from Scripts.power_manager import *
 from Scripts.inventory import *
 from .base_state import BaseState, BaseController
@@ -56,6 +56,8 @@ class CharacterCreationState(BaseState, BaseController):
 				self.character.armature = self.character
 				# Need this to reload the weapon
 				self.pclass = None
+				# Need this to reapply accent color
+				self.element = ""
 				
 			if not self.pclass or self.pclass.name != main['cgen_data']['class'].name:
 				self.pclass = main['cgen_data']['class']
@@ -64,6 +66,10 @@ class CharacterCreationState(BaseState, BaseController):
 				main['engine'].load_library((Weapon(self.pclass.starting_weapon)))
 				self.weapon = main['engine'].add_object(self.pclass.starting_weapon)			
 				self.character.socket_fill('right_hand', self.weapon)
+				
+			if self.element != main['cgen_data']['element']:
+				self.element = main['cgen_data']['element']
+				self.character.accent = ELEMENT_COLOR[self.element]
 				
 			idle = main['actions'][self.race.action_set]['Idle'][0]
 			self.character.play_animation(idle['name'], idle['start'], idle['end'], mode=1)
