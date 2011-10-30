@@ -16,6 +16,7 @@ STATES = {
 		"Player": PlayerState,
 		"Inventory": InventoryState,
 		"Dead": DeadState,
+		"Tutorial" : TutorialState,
 		}
 		
 

@@ -107,11 +107,9 @@ class DefaultState(BaseState, BaseController):
 		# Some helpful tutorials for the player
 		player = main['player']
 		self.display_tutorial(player, "Controls")
-		self.display_tutorial(player, "Combat")
 		
 	def client_run(self, main):
 		"""Client-side run method"""
-		BaseState.client_run(self, main)
 		
 		main['effect_system'].update()
 		
@@ -126,6 +124,24 @@ class DefaultState(BaseState, BaseController):
 			if main['camera']._transition_point != 0:
 				return
 
+		# Display any queued tutorials
+		if not self.suspended and main['tutorial_queue']:
+			# Peek at the first item
+			tutorial = main['tutorial_queue'][0]
+			
+			# Make sure duplicates didn't sneak in
+			if tutorial not in main['player'].tutorials:
+		
+				# Note that the player has seen the tutorial,
+				# and remove it from the queue
+				main['player'].tutorials.append(tutorial)
+				main['tutorial_queue'].remove(tutorial)
+				
+				main['tutorial_string'] = tutorial
+				
+				# Display the tutorial
+				return("Tutorial", "PUSH")
+			
 		# Update the player's lock
 		main['player'].update_lock()
 		

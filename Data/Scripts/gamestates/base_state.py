@@ -277,20 +277,7 @@ class BaseState:
 		
 	def client_run(self, main):
 		"""Client-side run method"""
-		if not self.suspended and main['tutorial_queue']:
-			# Peek at the first item
-			tutorial = main['tutorial_queue'][0]
-			
-			# Make sure duplicates didn't sneak in
-			if tutorial not in main['player'].tutorials:
-				
-				# Display the tutorial
-				print(tutorial)
-				
-				# Note that the player has seen the tutorial, and remove it from the queue
-				# (To be Done in tutorial state)
-				main['player'].tutorials.append(tutorial)
-				main['tutorial_queue'].remove(tutorial)
+		pass
 			
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""

@@ -3,6 +3,7 @@ import bge
 
 from Scripts.ui.layouts import *
 from Scripts.ui.cgen_layouts import *
+from Scripts.ui.tutorials import TutorialLayout
 from Scripts.ui.shop_layout import *
 
 layouts = {
@@ -50,7 +51,7 @@ class BlenderUISystem(bgui.System):
 		
 	def load_layout(self, layout):
 		# Use a delayed loading of layouts, see run() for more info
-		self.current_layout = layout if layout else "none_layout"
+		self.current_layout = layout# if layout else "none_layout"
 		self._change_layout = True
 		
 	def toggle_overlay(self, layout):
@@ -92,12 +93,19 @@ class BlenderUISystem(bgui.System):
 		# immediately and in the same frame as creation. This gets rid of possible ui flickering
 		# as layouts adjust themselves.
 		if self._change_layout:
-			self._remove_widget(self.layout)
-			if self.current_layout in globals():
-				self.layout = globals()[self.current_layout](self)
+			if self.layout:
+				self._remove_widget(self.layout)
+			if self.current_layout:
+				if self.current_layout in globals():
+					self.layout = globals()[self.current_layout](self)
+				else:
+					self.layout = layouts[self.current_layout](self)
 			else:
-				self.layout = layouts[self.current_layout](self)
+				self.layout = None
 			self._change_layout = False
+				
+		if not self.current_layout:
+			return
 		
 		# Update the layout and overlays
 		self.layout.update(main)

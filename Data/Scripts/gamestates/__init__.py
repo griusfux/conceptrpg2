@@ -10,3 +10,4 @@ from .player_state import PlayerState
 from .inventory_state import InventoryState
 from .network_setup_state import NetworkSetupState
 from .dead_state import DeadState
+from .tutorial_state import TutorialState
