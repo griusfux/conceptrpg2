@@ -7,7 +7,7 @@ from Scripts.packages import Power, Race, Class
 class Layout(bgui.Widget):
 	def __init__(self, sys, name, use_mouse=False):
 		bgui.Widget.__init__(self, sys, name, size=[1,1])
-		
+		self.use_mouse = use_mouse
 		sys.mouse.visible = use_mouse
 		
 	def update(self, main):
@@ -840,7 +840,7 @@ class DefaultStateLayout(Layout):
 		self.combat = False
 		
 		# Player data frame
-		self.pframe = bgui.Frame(self, "ds_pframe", aspect=2.5, size=[0, 0.15], pos=[0, 0], sub_theme="HUD")
+		self.pframe = bgui.Frame(self, "ds_pframe", aspect=2.5, size=[0, 0.14], pos=[0, 0], sub_theme="HUD")
 		self.player_name = bgui.Label(self.pframe, "ds_name", pt_size=34, pos=[0.05, 0.70])
 		self.classlvl = bgui.Label(self.pframe, "ds_classlvl", pt_size=24, pos=[0.05, 0.50])
 		
@@ -867,7 +867,7 @@ class DefaultStateLayout(Layout):
 		# Power Bar
 		self.power_imgs = []
 		self.power_bar_selection=-1
-		self.power_frame = bgui.Image(self, "ds_frame_pow", "Textures/ui/power_bar.png", aspect=5.1, size=[0,.13],
+		self.power_frame = bgui.Image(self, "ds_frame_pow", "Textures/ui/power_bar.png", aspect=5, size=[0,.12],
 										pos=[0,0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		
 		# Target info
@@ -890,15 +890,16 @@ class DefaultStateLayout(Layout):
 		psys = main['player'].powers
 		powers = psys.all
 		
-		if self.power_imgs:
-			for i, power in enumerate(powers):
-				if power.timer>0:
-					self.power_imgs[i].update_image("Textures/ui/hex_tile_gray.png")
-				else:
-					self.power_imgs[i].update_image("Textures/ui/hex_tile_blue.png")
+#		if self.power_imgs:
+#			for i, power in enumerate(powers):
+#				if power.timer>0:
+#					self.power_imgs[i].update_image("Textures/ui/hex_tile_gray.png")
+#				else:
+#					self.power_imgs[i].update_image("Textures/ui/hex_tile_blue.png")
 			
 		if not update_all:
 			return
+		
 		# Clear the old images
 		for i in self.power_imgs:
 			self.power_frame._remove_widget(i)
@@ -907,11 +908,11 @@ class DefaultStateLayout(Layout):
 		# Create new images
 		for i in range(min(8, len(powers))):
 			# Background
-			bg = "Textures/ui/hex_tile_blue.png"
+			bg = "Textures/ui/power_used.png"
 			if (not self.combat and "NON_COMBAT" not in powers[i].flags):
-				bg = "Textures/ui/hex_tile_gray.png"
+				bg = "Textures/ui/power_used.png"
 			img = bgui.Image(self.power_frame, "sbg"+str(i), bg, aspect=1,
-							 size=[0, .54], pos=[.087+.13*i, .145])
+							 size=[0, .75], pos=[.03+.16*i, .115])
 			
 			# Power icon
 			img_name = powers[i].open_image()

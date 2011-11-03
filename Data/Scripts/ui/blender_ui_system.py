@@ -68,7 +68,12 @@ class BlenderUISystem(bgui.System):
 			print("Overlay: %s, is already added" % layout)
 			return
 	
-		self.overlays[layout] = layouts[layout](self)
+		if layout in globals():
+			self.overlays[layout] = globals()[layout](self)
+		else:
+			self.overlays[layout] = layouts[layout](self)
+			
+#		self.overlays[layout] = layouts[layout](self)
 		
 	def remove_overlay(self, layout):
 		"""Remove an overlay layout by name"""
@@ -76,6 +81,13 @@ class BlenderUISystem(bgui.System):
 		if layout in self.overlays:
 			self._remove_widget(self.overlays[layout])
 			del self.overlays[layout]
+			
+			# Take care of mouse visibility
+			use_mouse = self.layout.use_mouse
+			if self.overlays:
+				for overlay in self.overlays.items():
+					use_mouse = overlay.use_mouse
+			self.mouse.visible = use_mouse
 		else:
 			print("WARNING: Overlay: %s was not found, nothing was removed" % layout)
 		
