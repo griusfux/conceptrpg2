@@ -448,7 +448,6 @@ class PowersLayout(Layout):
 			self.ele_bar.element = player.element
 			
 			self.powers = []
-			self.new = player.powers.all[:]
 			self.pp = player.power_pool
 			
 			self.init= True
@@ -468,7 +467,7 @@ class PowersLayout(Layout):
 		details = ""
 
 		# Kinda hacky, but should be fine
-		self.lbox.renderer.known_powers = self.new
+		self.lbox.renderer.known_powers = player.powers.all
 		
 		self.buy_btn.visible = False
 		self.sell_btn.visible = False
@@ -479,7 +478,7 @@ class PowersLayout(Layout):
 			info = power.description
 			details = "Cost: %d" % power.cost(player.affinities)
 			
-			for i in self.new:
+			for i in player.powers.all:
 				if power.name == i.name:
 					self.sell_btn.visible = True
 					break
@@ -492,31 +491,43 @@ class PowersLayout(Layout):
 		self.pow_details.text = details
 		
 	def buy_click(self, widget):
+		player = self.main['player']
+		cont = self.main['player_controller']
+		
 		power = self.lbox.selected
-		cost = power.cost(self.main['player'].affinities)
+		cost = power.cost(player.affinities)
 		
 		if cost <= self.pp:
-			self.new.append(power)
+			player.powers.add(power, cont)
 			self.pp -= cost
 			
 	def sell_click(self, widget):
+		player = self.main['player']
+		cont = self.main['player_controller']
+		
 		power = self.lbox.selected
-		cost = power.cost(self.main['player'].affinities)
+		cost = power.cost(player.affinities)
 		
 		self.pp += cost
 		
-		for i in self.new:
+		for i in player.powers.all:
 			if i.name == power.name:
-				self.new.remove(i)
+				player.powers.remove(i, cont)
 				break
 			
 	def accept_click(self, widget):
 		self.main['player_exit'] = True
-		self.main['player_new_powers'] = self.new
 			
 	def cancel_click(self, widget):
+		self.cancel()
 		self.main['player_exit'] = True
-		self.main['player_new_powers'] = []
+		
+	def cancel(self):
+		player = self.main['player']
+		cont = self.main['player_controller']
+		player.powers.remove_all(cont)
+		for power in self.main['player_old_powers']:
+			player.powers.add(power, cont)
 		
 class TitleLayout(Layout):
 	def __init__(self, sys):
@@ -933,7 +944,8 @@ class DefaultStateLayout(Layout):
 		self.exp_text.text = "EXP (%d/%d)" % (player.xp, player.next_level)#player.xp+100-(player.xp%100))
 		self.exp_bar.percent = (player.xp-player.last_level)/(player.next_level-player.last_level+1)
 		
-		self.update_powerbar(main, self.power_bar_selection != main['player'].powers.active_index)
+		self.update_powerbar(main, self.power_bar_selection != player.powers.active_index\
+								or len(self.power_imgs) != len(player.powers.all))
 			
 		# Net Players
 		missing_players = self.net_ids[:]

@@ -10,13 +10,13 @@ class PlayerState(DefaultState):
 		main['camera'].target = main['player'].object
 		main['camera'].change_mode("shop", 30)
 		
-		self.last_layout = main['ui_system'].current_layout
-		self.layout_loaded = False
+#		self.last_layout = main['ui_system'].current_layout
+		self.layout = ""
 		
 		main['player_exit'] = False
-		main['player_new_powers'] = []
+		main['player_old_powers'] = main['player'].powers.all[:]
+		main['player_controller'] = self
 		main['drop_item'] = None
-	
 	def client_run(self, main):
 		"""Client-side run method"""
 		player = main['player']
@@ -28,15 +28,15 @@ class PlayerState(DefaultState):
 		if main['camera']._transition_point != 0:
 			return
 		
-		# If the inventory window isn't up yet, put it up
-		if not self.layout_loaded:
+		# If the player window isn't up yet, put it up
+		if not self.layout:
 			if main['overlay'] == "PlayerStats":
-				main['ui_system'].load_layout("PlayerStatsLayout")
+				self.layout = "PlayerStatsLayout"
 			elif main['overlay'] == "Inventory":
-				main['ui_system'].load_layout("InventoryLayout")
+				self.layout = "InventoryLayout"
 			elif main['overlay'] == "Powers":
-				main['ui_system'].load_layout("PowersLayout")
-			self.layout_loaded = True
+				self.layout = "PowersLayout"
+			main['ui_system'].add_overlay(self.layout)
 			
 		# Get inputs
 		inputs = main['input_system'].run()
@@ -60,9 +60,6 @@ class PlayerState(DefaultState):
 			return("Player", "SWITCH")
 		
 		if ("InGameMenu", "INPUT_CLICK") in inputs:
-#			for power in main['player_new_powers']:
-#				main['player'].powers.add(power, self)
-#			main['player'].power_points = main['player_new_pp']
 			return('', 'POP')
 		
 		if main['drop_item']:
@@ -80,21 +77,21 @@ class PlayerState(DefaultState):
 			main['drop_item'] = None
 		
 		if main['player_exit']:
-			if main['player_new_powers']:
-				player.powers.remove_all(self)
-				for power in main['player_new_powers']:
-					player.powers.add(power, self)
-				player.recalc_stats()
-				player.save()
+			player.recalc_stats()
+			player.save()
 			return('', 'POP')
 		
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
-		main['ui_system'].load_layout(self.last_layout)
+		# If the user did not exit, make sure the powers get canceled
+		if not main['player_exit'] and self.layout=="PowersLayout":
+			main['ui_system'].overlays[self.layout].cancel()
+		main['ui_system'].remove_overlay(self.layout)
 		
 		# Reset the mouse position
 		main['input_system'].mouse.position = (0.5, 0.5)
 		
 		# Clean up main
 		del main['player_exit']
-		del main['player_new_powers']
+		del main['player_old_powers']
+		del main['player_controller']
