@@ -5,6 +5,8 @@ import Scripts.packages as packages
 import Scripts.character_logic as character_logic
 import Scripts.effect_manager as effects
 
+from Scripts.networking import COMMAND_SEP, ARG_SEP
+
 # This is used to implement RPC like functionality
 def rpc(d, name, *args):
 	def decorator(f):
@@ -43,19 +45,19 @@ class RPC:
 				
 			p.append(v)
 		# Send out the command
-		self.client.send(f.encode()+b":::"+b"$$".join(p))
+		self.client.send(f.encode()+COMMAND_SEP+ARG_SEP.join(p))
 		
 	def parse_command(self, main, data, client=None):
 		if not data:
 			return
 
 		# Grab the functions and arguments
-		s = data.split(b':::')
+		s = data.split(COMMAND_SEP)
 		if len(s) != 2:
 			print("Invalid command string", data)
 			return
 
-		f, args = s[0].decode(), s[1].split(b'$$')
+		f, args = s[0].decode(), s[1].split(ARG_SEP)
 		
 		# Make sure we have a function we know
 		if f not in self.funcs:
@@ -290,7 +292,7 @@ class BaseState:
 	# Server functions
 	@rpc(server_functions, "dis")
 	def dis(self, main, client):
-		client.server.broadcast(b"dis:::"+client.id.encode())
+		client.server.broadcast(b"dis"+COMMAND_SEP+client.id.encode())
 		client.server.drop_client(client.peer, "Disconnected")
 		
 	@rpc(server_functions, "add_player", "pickle", "pickle", "pickle")

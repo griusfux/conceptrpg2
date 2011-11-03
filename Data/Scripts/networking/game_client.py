@@ -3,7 +3,7 @@
 # Description: The game client
 # Contributers: Mitchell Stokes
 
-from Scripts.networking import NET_ENCODING
+from Scripts.networking import NET_ENCODING, COMMAND_SEP
 
 import time
 import enet
@@ -24,7 +24,7 @@ class GameClient:
 		self.server_addr = None
 		
 	def disconnect(self):
-		self.send(b'dis:::')
+		self.send(b'dis'+COMMAND_SEP)
 		self.host.flush()
 		
 	def restart(self, id, addr):
@@ -55,8 +55,8 @@ class GameClient:
 			self.server_addr = "0.0.0.0"
 		elif event.type == enet.EVENT_TYPE_RECEIVE:
 			data = event.packet.data
-			if data.startswith(b'cid:::'):
-				self.id = str(data.split(b':::')[1], NET_ENCODING)
+			if data.startswith(b'cid'+COMMAND_SEP):
+				self.id = str(data.split(COMMAND_SEP)[1], NET_ENCODING)
 				print("ID set to", self.id)
 				self.registered = True
 			else:

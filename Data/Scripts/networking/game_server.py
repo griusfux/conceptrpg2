@@ -4,7 +4,7 @@
 # Contributers: Mitchell Stokes
 
 
-from Scripts.networking import NET_ENCODING
+from Scripts.networking import NET_ENCODING, COMMAND_SEP
 from Scripts.gamestate_manager import GameStateManager
 from Scripts.character_logic import CharacterLogic, MonsterLogic
 from Scripts.packages import ActionSet
@@ -171,7 +171,7 @@ class GameServer():
 				return
 			client_id += '_'
 			
-		peer.send(0, enet.Packet(b'cid:::'+bytes(client_id, NET_ENCODING)))
+		peer.send(0, enet.Packet(b'cid'+COMMAND_SEP+bytes(client_id, NET_ENCODING)))
 		self.main['clients'][client_id] = ClientHandle(self, client_id, peer)
 		print("%s Registered as %s" % (peer.address, client_id))
 					
