@@ -10,8 +10,7 @@ class TutorialState(DefaultState):
 		print("Displaying %s tutorial" % tutorial)
 		
 		# Get the state ready to display the tutorial
-		self.last_layout = main['ui_system'].current_layout
-		main['ui_system'].load_layout("TutorialLayout")
+		main['ui_system'].add_overlay("TutorialLayout")
 		
 		main['tutorial_exit'] = False
 		
@@ -29,7 +28,7 @@ class TutorialState(DefaultState):
 		
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
-		main['ui_system'].load_layout(self.last_layout)
+		main['ui_system'].remove_overlay("TutorialLayout")
 		
 		# Reset the mouse position
 		main['input_system'].mouse.position = (0.5, 0.5)
