@@ -8,7 +8,6 @@ class TutorialLayout(Layout):
 	def __init__(self, parent):
 		Layout.__init__(self, parent, "tutorial", use_mouse=True)
 		self.tut = None
-#		self.parent_ = parent
 		
 	def update(self, main):
 		self.main = main

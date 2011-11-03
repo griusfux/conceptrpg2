@@ -419,6 +419,6 @@ class BaseController:
 		else:
 			self.server.invoke("drop_item", item, *position)
 			
-	def display_tutorial(self, player, tip):
-		if player.tutorials != None and tip not in player.tutorials:
-			self.main['tutorial_queue'].append(tip)
+	def display_tutorial(self, player, tut, force=False):
+		if force or (player.tutorials != None and tut not in player.tutorials):
+			self.main['tutorial_queue'].append(tut)

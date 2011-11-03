@@ -7,7 +7,6 @@ class TutorialState(DefaultState):
 		"""Initialize the client state"""
 		
 		tutorial = main['tutorial_string']
-		print("Displaying %s tutorial" % tutorial)
 		
 		# Get the state ready to display the tutorial
 		main['ui_system'].add_overlay("TutorialLayout")

@@ -130,17 +130,17 @@ class DefaultState(BaseState, BaseController):
 			tutorial = main['tutorial_queue'][0]
 			
 			# Make sure duplicates didn't sneak in
-			if tutorial not in main['player'].tutorials:
+#			if tutorial not in main['player'].tutorials:
 		
-				# Note that the player has seen the tutorial,
-				# and remove it from the queue
-				main['player'].tutorials.append(tutorial)
-				main['tutorial_queue'].remove(tutorial)
-				
-				main['tutorial_string'] = tutorial
-				
-				# Display the tutorial
-				return("Tutorial", "PUSH")
+			# Note that the player has seen the tutorial,
+			# and remove it from the queue
+			main['player'].tutorials.append(tutorial)
+			main['tutorial_queue'].remove(tutorial)
+			
+			main['tutorial_string'] = tutorial
+			
+			# Display the tutorial
+			return("Tutorial", "PUSH")
 			
 		# Update the player's lock
 		main['player'].update_lock()
