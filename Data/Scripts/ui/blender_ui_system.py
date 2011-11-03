@@ -1,5 +1,6 @@
 import bgui
 import bge
+import collections
 
 from Scripts.ui.layouts import *
 from Scripts.ui.cgen_layouts import *
@@ -41,7 +42,7 @@ class BlenderUISystem(bgui.System):
 		self.layout = Layout(self, self.current_layout)
 		
 		# We can also add 'overlay' layouts
-		self.overlays = {}
+		self.overlays = collections.OrderedDict()
 		
 		# Now we generate a dict to map BGE keys to bgui keys
 		self.keymap = {getattr(bge.events, val): getattr(bgui, val) for val in dir(bge.events) if val.endswith('KEY') or val.startswith('PAD')}
