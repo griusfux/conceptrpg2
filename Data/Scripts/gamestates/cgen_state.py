@@ -17,14 +17,13 @@ class CharacterCreationState(BaseState, BaseController):
 	# Client
 	##########
 	
+	ui_layout = "CharGenLayout"
+	
 	def client_init(self, main):
 		"""Intialize the client state"""
 		main['cgen_data'] = {}
 		main['cgen_exit'] = False
 		main['cgen_help'] = False
-		
-		# Load the ui
-		main['ui_system'].load_layout("CharGenLayout")
 		
 		# Setup the camera
 		self.scene = main['engine'].add_object("char_gen", (0,0,0), (0,0,0))

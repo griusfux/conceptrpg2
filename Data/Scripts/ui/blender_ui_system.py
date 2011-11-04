@@ -37,9 +37,10 @@ class BlenderUISystem(bgui.System):
 		self.mouse = bge.logic.mouse
 		
 		# All layouts will be a widget subclass, so we can just keep track of one widget
-		self.current_layout = "none_layout"
-		self._change_layout = False
-		self.layout = Layout(self, self.current_layout)
+#		self.current_layout = "none_layout"
+#		self._change_layout = False
+#		self.layout = Layout(self, self.current_layout)
+		self.layout = None
 		
 		# We can also add 'overlay' layouts
 		self.overlays = collections.OrderedDict()
@@ -50,10 +51,22 @@ class BlenderUISystem(bgui.System):
 		# Now setup the scene callback so we can draw
 		bge.logic.getCurrentScene().post_draw.append(self.render)
 		
-	def load_layout(self, layout):
-		# Use a delayed loading of layouts, see run() for more info
-		self.current_layout = layout# if layout else "none_layout"
-		self._change_layout = True
+	def load_layout(self, layout, state):
+#		# Use a delayed loading of layouts, see run() for more info
+#		self.current_layout = layout# if layout else "none_layout"
+#		self._change_layout = True
+#		self.current_layout = layout
+
+		if self.layout:
+			self._remove_widget(self.layout)
+
+		if layout:
+			if layout in globals():
+				self.layout = globals()[layout](self, state)
+			else:
+				self.layout = layouts[layout](self, state)
+		else:
+			self.layout = None
 		
 	def toggle_overlay(self, layout):
 		if layout in self.overlays:
@@ -61,7 +74,7 @@ class BlenderUISystem(bgui.System):
 		else:
 			self.add_overlay(layout)
 		
-	def add_overlay(self, layout):
+	def add_overlay(self, layout, state):
 		"""Add an overlay layout"""
 		
 		if layout in self.overlays:
@@ -69,11 +82,9 @@ class BlenderUISystem(bgui.System):
 			return
 	
 		if layout in globals():
-			self.overlays[layout] = globals()[layout](self)
+			self.overlays[layout] = globals()[layout](self, state)
 		else:
-			self.overlays[layout] = layouts[layout](self)
-			
-#		self.overlays[layout] = layouts[layout](self)
+			self.overlays[layout] = layouts[layout](self, state)
 		
 	def remove_overlay(self, layout):
 		"""Remove an overlay layout by name"""
@@ -105,19 +116,22 @@ class BlenderUISystem(bgui.System):
 		# We use a delay loading of layouts so that the new layout's first update is called
 		# immediately and in the same frame as creation. This gets rid of possible ui flickering
 		# as layouts adjust themselves.
-		if self._change_layout:
-			if self.layout:
-				self._remove_widget(self.layout)
-			if self.current_layout:
-				if self.current_layout in globals():
-					self.layout = globals()[self.current_layout](self)
-				else:
-					self.layout = layouts[self.current_layout](self)
-			else:
-				self.layout = None
-			self._change_layout = False
-				
-		if not self.current_layout:
+#		if self._change_layout:
+#			if self.layout:
+#				self._remove_widget(self.layout)
+#			if self.current_layout:
+#				if self.current_layout in globals():
+#					self.layout = globals()[self.current_layout](self)
+#				else:
+#					self.layout = layouts[self.current_layout](self)
+#			else:
+#				self.layout = None
+#			self._change_layout = False
+#				
+#		if not self.current_layout:
+#			return
+
+		if not self.layout:
 			return
 		
 		# Update the layout and overlays

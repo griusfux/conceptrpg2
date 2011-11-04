@@ -4,6 +4,8 @@ from .default_state import DefaultState
 class PlayerState(DefaultState):
 	"""A state for player screens"""
 	
+	ui_layout = None
+	
 	def client_init(self, main):
 		"""Initialize the client state"""
 		
@@ -36,7 +38,7 @@ class PlayerState(DefaultState):
 				self.layout = "InventoryLayout"
 			elif main['overlay'] == "Powers":
 				self.layout = "PowersLayout"
-			main['ui_system'].add_overlay(self.layout)
+			main['ui_system'].add_overlay(self.layout, self)
 			
 		# Get inputs
 		inputs = main['input_system'].run()
@@ -44,20 +46,17 @@ class PlayerState(DefaultState):
 		if ("Character", "INPUT_CLICK") in inputs:
 			if main['overlay'] == "PlayerStats":
 				return('', "POP")
-			main['overlay'] = "PlayerStats"
-			return("Player", "SWITCH")
+			self.switch_overlay("PlayerStats", main)
 
 		if ("Powers", "INPUT_CLICK") in inputs:
 			if main['overlay'] == "Powers":
 				return('', "POP")
-			main['overlay'] = "Powers"
-			return("Player", "SWITCH")
+			self.switch_overlay("Powers", main)
 
 		if ("Inventory", "INPUT_CLICK") in inputs:
 			if main['overlay'] == "Inventory":
 				return('', "POP")
-			main['overlay'] = "Inventory"
-			return("Player", "SWITCH")
+			self.switch_overlay("Inventory", main)
 		
 		if ("InGameMenu", "INPUT_CLICK") in inputs:
 			return('', 'POP')
@@ -95,3 +94,9 @@ class PlayerState(DefaultState):
 		del main['player_exit']
 		del main['player_old_powers']
 		del main['player_controller']
+		
+	def switch_overlay(self, next, main):
+		main['ui_system'].remove_overlay(self.layout)
+		main['overlay'] = next
+		self.layout = next+"Layout"
+		main['ui_system'].add_overlay(self.layout, self)

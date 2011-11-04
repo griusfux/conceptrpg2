@@ -10,6 +10,8 @@ class DungeonGenerationState(BaseState):
 	
 	client_functions = BaseState.client_functions.copy()
 	server_functions = BaseState.server_functions.copy()
+	
+	ui_layout = "dun_gen"
 			
 	##########
 	# Client
@@ -42,9 +44,6 @@ class DungeonGenerationState(BaseState):
 		"""Intialize the client state"""
 		# Import the generator here so the server won't complain
 		from Scripts.dungeon_generator import DungeonGenerator
-		
-		# Show the loading screen
-		main['ui_system'].load_layout('dun_gen')
 		
 		# Load up the map file and load the scene
 		self.map = Map('Mines')

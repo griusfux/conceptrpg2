@@ -98,6 +98,8 @@ class BaseState:
 	client_functions = {}
 	server_functions = {}
 	
+	ui_layout = None
+	
 	def __init__(self, main, is_server=False):
 		"""BaseState Constructor"""
 		

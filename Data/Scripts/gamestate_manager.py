@@ -79,12 +79,20 @@ class GameStateManager:
 					state.cleanup(main)
 					self.states.remove(state)
 					self.states.insert(idx, STATES[val[0]](main, self.is_server))
+					if not self.is_server:
+						main['ui_system'].load_layout(self.states[idx].ui_layout, self.states[idx])
 				elif val[1] == 'PUSH':
 					# Suspend the current state and enqueue the new state
-					self.states.append(STATES[val[0]](main, self.is_server))
+					state = STATES[val[0]](main, self.is_server)
+					self.states.append(state)
+					
+					if not self.is_server and state.ui_layout:
+						main['ui_system'].add_overlay(state.ui_layout, state)
 				elif val[1] == 'POP':
 					# Remove the state from the "queue"
 					state.cleanup(main)
+					if not self.is_server and state.ui_layout:
+						main['ui_system'].remove_overlay(state.ui_layout)
 					self.states.remove(state)
 				else:
 					raise RuntimeError(val[1]+" is an invalid state flag!")

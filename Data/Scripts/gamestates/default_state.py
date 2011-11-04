@@ -14,12 +14,14 @@ TURN = 240
 class DefaultState(BaseState, BaseController):
 	"""The default state for the game"""
 			
+	client_functions = BaseState.client_functions.copy()
+	server_functions = BaseState.server_functions.copy()
+	
+	ui_layout = "default_state"
+	
 	##########
 	# Client
 	##########
-	
-	client_functions = BaseState.client_functions.copy()
-	server_functions = BaseState.server_functions.copy()
 				
 	# Client functions
 	@rpc(client_functions, "position", str, float, float, float)
@@ -88,7 +90,6 @@ class DefaultState(BaseState, BaseController):
 	def client_init(self, main):
 		"""Intialize the client state"""
 		
-		main['ui_system'].load_layout("default_state")
 		main['engine'].set_active_camera(main['camera'])
 		main['engine'].play_bgm('The Cannery.mp3')
 		self.camera_mode = "frankie"

@@ -4,13 +4,14 @@ from .default_state import DefaultState
 class InventoryState(DefaultState):
 	"""A state for the in-game menu"""
 	
+	ui_layout = None
+	
 	def client_init(self, main):
 		"""Initialize the client state"""
 		
 		main['camera'].target = main['player'].object
 		main['camera'].change_mode("shop", 30)
 		
-		self.last_layout = main['ui_system'].current_layout
 		self.layout_loaded = False
 	
 	def client_run(self, main):
@@ -24,7 +25,7 @@ class InventoryState(DefaultState):
 		
 		# If the inventory window isn't up yet, put it up
 		if not self.layout_loaded:
-			main['ui_system'].load_layout("PlayerStatsLayout")
+			main['ui_system'].load_layout("PlayerStatsLayout", self)
 			self.layout_loaded = True
 			
 		# Get inputs
@@ -36,7 +37,6 @@ class InventoryState(DefaultState):
 		
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
-		main['ui_system'].load_layout(self.last_layout)
 		
 		# Reset the mouse position
 		main['input_system'].mouse.position = (0.5, 0.5)

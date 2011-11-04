@@ -3,10 +3,12 @@ from .base_state import BaseState
 class TitleState(BaseState):
 	"""A state for the title screen"""
 	
+	ui_layout = "title"
+	
 	def client_init(self, main):
 		"""Intialize the client state"""
 		main['action'] = ''
-		main['ui_system'].load_layout("title")
+		main['ui_system'].load_layout("title", self)
 		
 		self.current_overlay = ""
 		main['start_game'] = False
@@ -41,7 +43,7 @@ class TitleState(BaseState):
 				print("Unsupported action:", action)
 				
 			if self.current_overlay:
-				main['ui_system'].add_overlay(self.current_overlay)
+				main['ui_system'].add_overlay(self.current_overlay, self)
 
 			main['action'] = ''
 			

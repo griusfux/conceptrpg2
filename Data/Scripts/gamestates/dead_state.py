@@ -6,15 +6,15 @@ class DeadState(CombatState):
 	client_functions = CombatState.client_functions.copy()
 	server_functions = CombatState.server_functions.copy()
 	
+	ui_layout = "dead"
+	
 	##########
 	# Client
 	##########
 	
 	def client_init(self, main):
 		"""Initialize the client state"""
-		
-		main['ui_system'].load_layout("dead")
-		
+
 		self.play_animation(main['player'], "Die")
 		
 	def client_run(self, main):

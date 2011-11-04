@@ -4,6 +4,8 @@ from .default_state import DefaultState
 class ShopState(DefaultState):
 	"""A state to handle shopping from a shopkeeper"""
 	
+	ui_layout = None
+	
 	##########
 	# Client
 	##########
@@ -26,7 +28,7 @@ class ShopState(DefaultState):
 		
 		# If the shop window isn't up yet, put it up
 		if not self.layout_loaded:
-			main['ui_system'].load_layout("shop")
+			main['ui_system'].load_layout("shop", self)
 			self.layout_loaded = True
 		
 		# Get inputs
@@ -39,7 +41,6 @@ class ShopState(DefaultState):
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
 		main['camera'].target = main['player'].object
-		main['ui_system'].load_layout("default_state")
 		del main['shop_exit']
 		
 	##########

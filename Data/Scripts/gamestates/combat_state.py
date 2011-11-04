@@ -34,6 +34,8 @@ class CombatState(DefaultState, BaseController):
 	client_functions = DefaultState.client_functions.copy()
 	server_functions = DefaultState.server_functions.copy()
 	
+	ui_layout = "combat"
+	
 	##########
 	# Client
 	##########
@@ -108,7 +110,6 @@ class CombatState(DefaultState, BaseController):
 	def client_init(self, main):
 		"""Initialize the client state"""
 		
-		main['ui_system'].load_layout("combat")
 		main['engine'].play_bgm('Take the Lead.mp3')
 		
 		self.monster_list = {}

@@ -3,13 +3,15 @@ from .default_state import DefaultState
 class TutorialState(DefaultState):
 	"""A state to display tutorials"""
 	
+	ui_layout = None
+	
 	def client_init(self, main):
 		"""Initialize the client state"""
 		
 		tutorial = main['tutorial_string']
 		
 		# Get the state ready to display the tutorial
-		main['ui_system'].add_overlay("TutorialLayout")
+		main['ui_system'].add_overlay("TutorialLayout", self)
 		
 		main['tutorial_exit'] = False
 		

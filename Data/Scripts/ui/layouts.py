@@ -5,18 +5,19 @@ from Scripts.character_logic import PlayerLogic
 from Scripts.packages import Power, Race, Class
 
 class Layout(bgui.Widget):
-	def __init__(self, sys, name, use_mouse=False):
+	def __init__(self, sys, name, state, use_mouse=False):
 		bgui.Widget.__init__(self, sys, name, size=[1,1])
 		self.use_mouse = use_mouse
 		sys.mouse.visible = use_mouse
+		self.state = state
 		
 	def update(self, main):
 		# To be overridden
 		pass
 		
 class StatsOverlay(Layout):
-	def __init__(self, parent):
-		Layout.__init__(self, parent, "stats_overlay")
+	def __init__(self, parent, state):
+		Layout.__init__(self, parent, "stats_overlay", state)
 		
 		self.fps = bgui.Label(self, "fps", pt_size=42, pos=[0.05, .9])
 		
@@ -24,8 +25,8 @@ class StatsOverlay(Layout):
 		self.fps.text = "%.2f fps" % main['engine'].fps
 		
 class PlayerStatsLayout(Layout):
-	def __init__(self, parent):
-		Layout.__init__(self, parent, "player_stats_overlay", use_mouse=True)
+	def __init__(self, parent, state):
+		Layout.__init__(self, parent, "player_stats_overlay", state, use_mouse=True)
 		
 		self.mframe = bgui.Image(self, "1x1_frame", "Textures/ui/menu_background.png",
 								 aspect=1, size=[0,.9],	sub_theme="HUD",
@@ -153,8 +154,8 @@ class InventoryLayout(Layout):
 			self.label.text = item.name
 			return self.frame
 			
-	def __init__(self, parent):
-		Layout.__init__(self, parent, "inventory_overlay", use_mouse=True)
+	def __init__(self, parent, state):
+		Layout.__init__(self, parent, "inventory_overlay", state, use_mouse=True)
 		
 		self.mframe = bgui.Image(self, "1x1_frame", "Textures/ui/menu_background.png",
 								 aspect=1, size=[0,.9],	sub_theme="HUD",
@@ -351,8 +352,8 @@ class PowersLayout(Layout):
 				self.nlbl.color = self.dlbl.color = self.tlbl.color = power_color
 			
 			return self.frame
-	def __init__(self, parent):
-		Layout.__init__(self, parent, "powers_overlay", use_mouse=True)
+	def __init__(self, parent, state):
+		Layout.__init__(self, parent, "powers_overlay", state, use_mouse=True)
 		
 		self.mframe = bgui.Image(self, "1x1_frame",
 								"Textures/ui/menu_background.png",
@@ -532,8 +533,8 @@ class PowersLayout(Layout):
 			player.powers.add(power, cont)
 		
 class TitleLayout(Layout):
-	def __init__(self, sys):
-		Layout.__init__(self, sys, "title_layout", use_mouse=True)
+	def __init__(self, sys, state):
+		Layout.__init__(self, sys, "title_layout", state, use_mouse=True)
 		
 		# Background image
 		self.splash = bgui.Image(self, "title_splash", "Textures/TitleSplash.png", size=[1, 1], pos=[0, 0])
@@ -564,8 +565,8 @@ class TitleLayout(Layout):
 		self.main['action'] = widget.name.split('_')[-1]
 		
 class StartGameOverlay(Layout):
-	def __init__(self, sys):
-		Layout.__init__(self, sys, "start_game_overlay", use_mouse=True)
+	def __init__(self, sys, state):
+		Layout.__init__(self, sys, "start_game_overlay", state, use_mouse=True)
 		
 		# Background frame
 		self.frame = bgui.Frame(self, "sgo_frame", size=[.33, .66], pos=[0.30, 0.05],
@@ -629,8 +630,8 @@ class StartGameOverlay(Layout):
 		Widget._handle_key(self, key, is_shifted)
 
 class CreditsOverlay(Layout):
-	def __init__(self, sys):
-		Layout.__init__(self, sys, "credits_overlay", use_mouse=True)
+	def __init__(self, sys, state):
+		Layout.__init__(self, sys, "credits_overlay", state, use_mouse=True)
 		
 		# Background frame
 		self.frame = bgui.Frame(self, "co_frame", size=[0.33, 0.66], pos=[0.30, 0.05],
@@ -653,8 +654,8 @@ class CreditsOverlay(Layout):
 		self.main['overlay_done'] = True
 
 class InGameMenuLayout(Layout):
-	def __init__(self, sys):
-		Layout.__init__(self, sys, "ingame_menu", use_mouse=True)
+	def __init__(self, sys, state):
+		Layout.__init__(self, sys, "ingame_menu", state, use_mouse=True)
 		
 		# Background frame
 		self.frame = bgui.Frame(self, "igm_frame", size=[.25, .50], sub_theme='HUD',
@@ -678,8 +679,8 @@ class InGameMenuLayout(Layout):
 		self.main['action'] = widget.name.split('_')[-1]
 		
 class CharSelectLayout(Layout):
-	def __init__(self, sys):
-		Layout.__init__(self, sys, "char_select_layout", use_mouse=True)
+	def __init__(self, sys, state):
+		Layout.__init__(self, sys, "char_select_layout", state, use_mouse=True)
 		
 		self.frame = bgui.Image(self, "csl_frame",
 								"Textures/ui/char_select_bg.png",
@@ -732,8 +733,8 @@ class CharSelectLayout(Layout):
 		self.main['csl_index'] += 1
 		
 class CharGenLayout(Layout):
-	def __init__(self, parent):
-		Layout.__init__(self, parent, "char_gen_layout", use_mouse=True)
+	def __init__(self, parent, state):
+		Layout.__init__(self, parent, "char_gen_layout", state, use_mouse=True)
 		
 		# Setup the main frame
 		self.mframe = bgui.Image(self, "1x1_frame",
@@ -818,9 +819,9 @@ class CharGenLayout(Layout):
 		
 class DunGenLayout(Layout):
 	
-	def __init__(self, sys):
+	def __init__(self, sys, state):
 		
-		Layout.__init__(self, sys, "dun_gen_layout")
+		Layout.__init__(self, sys, "dun_gen_layout", state)
 		
 		# A timer for animation
 		self.timer = 1
@@ -854,8 +855,8 @@ class DunGenLayout(Layout):
 			
 		
 class DefaultStateLayout(Layout):
-	def __init__(self, sys):
-		Layout.__init__(self, sys, "default_state_layout")
+	def __init__(self, sys, state):
+		Layout.__init__(self, sys, "default_state_layout", state)
 		
 		self.combat = False
 		
@@ -1008,16 +1009,16 @@ class DefaultStateLayout(Layout):
 			self.mmap_frame.visible = not main['full_map']
 		
 class CombatLayout(DefaultStateLayout):
-	def __init__(self, sys):
-		DefaultStateLayout.__init__(self, sys)
+	def __init__(self, sys, state):
+		DefaultStateLayout.__init__(self, sys, state)
 		self.combat = True
 		
 	def update (self, main):
 		DefaultStateLayout.update(self, main)
 	
 class DeadLayout(Layout):
-	def __init__(self, sys):
-		Layout.__init__(self, sys, "dead_state_layout")
+	def __init__(self, sys, state):
+		Layout.__init__(self, sys, "dead_state_layout", state)
 		
 		self.deadlbl = bgui.Label(self, "deadlbl", pt_size=42, text="You have died. :(\nPress Attack to respawn",
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
@@ -1035,8 +1036,8 @@ class ShopLayout(Layout):
 			self.label.text = item.name
 			return self.frame
 			
-	def __init__(self, parent):
-		Layout.__init__(self, parent, "inventory_overlay", use_mouse=True)
+	def __init__(self, parent, state):
+		Layout.__init__(self, parent, "inventory_overlay", state, use_mouse=True)
 		
 		self.mframe = bgui.Image(self, "1x1_frame", "Textures/ui/menu_background.png",
 								 aspect=1, size=[0,.9],	sub_theme="HUD",

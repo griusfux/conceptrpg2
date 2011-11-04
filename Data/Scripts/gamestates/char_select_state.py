@@ -16,11 +16,10 @@ _POSITIONS = 	[
 class CharacterSelectState(BaseState, BaseController):
 	"""A state for the title screen"""
 	
+	ui_layout = "CharSelectLayout"
+	
 	def client_init(self, main):
-		"""Intialize the client state"""
-		
-		# Load the ui
-		main['ui_system'].load_layout("CharSelectLayout")
+		"""Initialize the client state"""
 		
 		# Setup the camera
 		self.scene = main['engine'].add_object("char_select", (0,0,0), (0,0,0))

@@ -14,6 +14,8 @@ servers = [
 class NetworkSetupState(BaseState):
 	"""This states handles setting up the networking (start or join)"""
 	
+	ui_layout = None
+	
 	def client_init(self, main):
 		"""Initialize the client state"""
 		
