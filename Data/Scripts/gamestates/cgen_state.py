@@ -21,6 +21,7 @@ class CharacterCreationState(BaseState, BaseController):
 		"""Intialize the client state"""
 		main['cgen_data'] = {}
 		main['cgen_exit'] = False
+		main['cgen_help'] = False
 		
 		# Load the ui
 		main['ui_system'].load_layout("CharGenLayout")
@@ -37,11 +38,25 @@ class CharacterCreationState(BaseState, BaseController):
 		self.element = ""
 	def client_run(self, main):
 		"""Client-side run method"""
+		if self.suspended:
+			return
 		
 		inputs = main['input_system'].run()
 		
 		if ("InGameMenu", "INPUT_CLICK") in inputs:
 			return("InGameMenu", "PUSH")
+		
+		if main['cgen_help']:
+			print("Cgen Help")
+			self.display_tutorial(None, "Race", force=True)
+			self.display_tutorial(None, "Class", force=True)
+			self.display_tutorial(None, "Element", force=True)
+			main['cgen_help'] = False
+		
+		# Display any queued tutorials
+		if not self.suspended and main['tutorial_queue']:
+			main['tutorial_string'] = main['tutorial_queue'].pop(0)
+			return("Tutorial", "PUSH")
 		
 		if main['cgen_data']:
 			if not self.race or self.race.name != main['cgen_data']['race'].name:
@@ -143,6 +158,7 @@ class CharacterCreationState(BaseState, BaseController):
 		# We added these so we need to get rid of them too
 		del main['cgen_data']
 		del main['cgen_exit']
+		del main['cgen_help']
 			
 	##########
 	# Server

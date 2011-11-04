@@ -33,6 +33,5 @@ class TutorialState(DefaultState):
 		main['input_system'].mouse.position = (0.5, 0.5)
 		
 		# Clean up main
-		print("Tutorial Cleanup")
 		del main['tutorial_exit']
 		

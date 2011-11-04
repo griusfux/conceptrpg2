@@ -67,12 +67,7 @@ class CharacterSelectState(BaseState, BaseController):
 		"""Client-side run method"""
 		
 		if len(self.saves) == 0:
-			return("CharacterCreation", "SWITCH")
-		
-		inputs = main['input_system'].run()
-		
-		if ("InGameMenu", "INPUT_CLICK") in inputs:
-			return("InGameMenu", "PUSH")		
+			return("CharacterCreation", "SWITCH")		
 		
 		index = main['csl_index'] % len(self.characters)
 		
@@ -83,6 +78,15 @@ class CharacterSelectState(BaseState, BaseController):
 													idle['end'], mode=1)
 			
 		main['csl_char'] = self.characters[index]
+		
+		
+		if self.suspended:
+			return
+		
+		inputs = main['input_system'].run()
+		
+		if ("InGameMenu", "INPUT_CLICK") in inputs:
+			return("InGameMenu", "PUSH")
 		
 		if main['csl_new']:
 			return("CharacterCreation", "SWITCH")

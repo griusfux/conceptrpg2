@@ -336,7 +336,8 @@ class PowersLayout(Layout):
 			self.frame.colors = color
 			self.nlbl.text = power.name
 			self.dlbl.text = power.delivery.title()
-			self.tlbl.text = str(power.tier)
+			if hasattr(self, 'affinities'):
+				self.tlbl.text = str(power.cost(self.affinities))
 			
 			# Mark known powers as white
 			if hasattr(self, "known_powers"):
@@ -387,7 +388,7 @@ class PowersLayout(Layout):
 									pos=[.8,0], sub_theme="Submenu")
 		
 		self.tier_lbl = bgui.Label(self.tier_frame, "tier_l",
-								pos=[0.05,0], text="TIER", sub_theme="Subtitle",
+								pos=[0.05,0], text="COST", sub_theme="Subtitle",
 								options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
 		
 		self.lbox = bgui.ListBox(self.lframe, "lb", size=[1, .9375])
@@ -468,6 +469,7 @@ class PowersLayout(Layout):
 
 		# Kinda hacky, but should be fine
 		self.lbox.renderer.known_powers = player.powers.all
+		self.lbox.renderer.affinities = player.affinities
 		
 		self.buy_btn.visible = False
 		self.sell_btn.visible = False
@@ -779,11 +781,15 @@ class CharGenLayout(Layout):
 		
 		self.cancel_btn = Button(self.mframe, "can_btn", text="CANCEL", pos=[0.4, 0.07],
 								on_click=self.cancel_click)
+		
+		self.help_btn = Button(self.mframe, "help_btn", text="HELP", pos=[0.65, 0.8],
+								on_click=self.help_click)
 	
 	def update(self, main):			
 		self.main = main
 		self.race.text = self.selector.race
-		self.class_.text = self.selector.player_class
+		class_ob = Class(self.selector.player_class)
+		self.class_.text = "%s/%s" % (class_ob.name, class_ob.subclass[self.selector.element.upper()])
 		self.element.text = self.selector.element.title()
 		
 		self.focus_info.text = "Click on a Race, Class, or Element to select it.\nFor more information about a choice, hover over it."
@@ -796,7 +802,7 @@ class CharGenLayout(Layout):
 		if 'race' not in data or data['race'].name != self.race.text:
 			data['race'] = Race(self.race.text)
 		if 'class' not in data or data['class'].name != self.class_.text:
-			data['class'] = Class(self.class_.text)
+			data['class'] = class_ob
 		if 'element' not in data or data['element'] != self.element.text.upper():
 			data['element'] = self.element.text.upper()
 	
@@ -806,6 +812,9 @@ class CharGenLayout(Layout):
 	def cancel_click(self, main):
 		self.main['cgen_data'] = {}
 		self.main['cgen_exit'] = True
+		
+	def help_click(self, main):
+		self.main['cgen_help'] = True
 		
 class DunGenLayout(Layout):
 	

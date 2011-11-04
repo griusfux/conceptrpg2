@@ -7,8 +7,7 @@ class InGameMenuState(DefaultState):
 	def client_init(self, main):
 		"""Intialize the client state"""
 		main['action'] = ''
-		self.last_layout = main['ui_system'].current_layout
-		main['ui_system'].load_layout("ingame_menu")
+		main['ui_system'].add_overlay("ingame_menu")
 	
 	def client_run(self, main):
 		"""Client-side run method"""
@@ -38,7 +37,7 @@ class InGameMenuState(DefaultState):
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
 		del main['action']
-		main['ui_system'].load_layout(self.last_layout)
+		main['ui_system'].remove_overlay("ingame_menu")
 		
 		# Reset the mouse position
 		# main['input_system'].mouse.position = (0.5, 0.5)
