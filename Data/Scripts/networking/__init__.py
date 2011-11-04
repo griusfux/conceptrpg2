@@ -4,8 +4,8 @@ NET_ENCODING = "utf8"
 
 import re
 
-COMMAND_SEP = b"::::"
-ARG_SEP = b"$$"
+COMMAND_SEP = b"**:"
+ARG_SEP = b"$$:"
 
 def parse_request(request):
 	"""Takes a network request and returns user, cmd, data"""
