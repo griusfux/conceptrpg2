@@ -1,4 +1,5 @@
 from .Engine.packages import *
+import imp
 
 class Map(Package):
 	"""Map package"""
@@ -73,24 +74,10 @@ class Power(Package):
 		# Create a script file if this is a new package
 		if new_package:
 			open(os.path.join(self._dir, package_name, 'power.py'), 'wb').close()
-		
-		# Write the script to a temp file
-		pyfile = tempfile.NamedTemporaryFile(suffix=".py", delete=False)
-		pyfile.write(self._package.read("power.py"))
-		pyfile.read() # Not sure why this is needed, but the module isn't properly loaded otherwise
-		
-		# Load the module
-		p = imp.load_source("power", pyfile.name)
-	
-		
-		# We don't need the temp file anymore, so clean up
-		pyfile.close()
-		os.remove(pyfile.name)
-		try:
-			os.remove(pyfile.name.replace('.py', '.pyc'))
-		except WindowsError:
-			# Probably not the best thing as there could be still useful files in this folder...
-			shutil.rmtree(os.path.join(tempfile.gettempdir(), '__pycache__'))
+
+		# Load power.py as a module
+		p = imp.new_module(package_name)
+		exec(self._package.read("power.py"), p.__dict__)
 
 		# Grab the method from the module
 		self._use = p.power
