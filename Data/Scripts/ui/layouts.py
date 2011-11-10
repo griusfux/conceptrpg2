@@ -1,7 +1,7 @@
 import bgui
 from time import time
 from Scripts.ui.custom_widgets import *
-from Scripts.character_logic import PlayerLogic
+from Scripts.character_logic import PlayerLogic, ELEMENT_COLOR
 from Scripts.packages import Power, Race, Class
 
 class Layout(bgui.Widget):
@@ -888,8 +888,10 @@ class DefaultStateLayout(Layout):
 		# Power Bar
 		self.power_imgs = []
 		self.power_bar_selection=-1
-		self.power_frame = bgui.Image(self, "ds_frame_pow", "Textures/ui/power_bar.png", aspect=5, size=[0,.12],
-										pos=[0,0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+		self.power_frame = bgui.Frame(self, "ds_frame_pow", aspect=5, size=[0,.12], sub_theme="HUD",
+								pos=[0,0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
+#		self.power_frame = bgui.Image(self, "ds_frame_pow", "Textures/ui/power_bar.png", aspect=5, size=[0,.12],
+#										pos=[0,0], options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERX)
 		
 		# Target info
 		self.target_frame = bgui.Frame(self, "ds_target", aspect=2.5, size=[0, 0.1],
@@ -907,7 +909,7 @@ class DefaultStateLayout(Layout):
 								sub_theme="HUD", options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
 		self.fmap_frame.visible = False
 		
-	def update_powerbar(self, main, update_all):	
+	def update_powerbar(self, main, update_all):
 		psys = main['player'].powers
 		powers = psys.all
 		
@@ -929,12 +931,15 @@ class DefaultStateLayout(Layout):
 		# Create new images
 		for i in range(min(8, len(powers))):
 			# Background
-			bg = "Textures/ui/power_used.png"
-			if (not self.combat and "NON_COMBAT" not in powers[i].flags):
-				bg = "Textures/ui/power_used.png"
+#			bg = "Textures/ui/power_used.png"
+#			if (not self.combat and "NON_COMBAT" not in powers[i].flags):
+#				bg = "Textures/ui/power_used.png"
+			bg = "Textures/ui/power_bar_bg.png"
 			img = bgui.Image(self.power_frame, "sbg"+str(i), bg, aspect=1,
 							 size=[0, .75], pos=[.03+.16*i, .115])
-			
+
+			img.color = ELEMENT_COLOR[powers[i].element]+[1.0]
+
 			# Power icon
 			img_name = powers[i].open_image()
 			simg = bgui.Image(img, powers[i].name, img_name, size=[1, 1], pos=[0, 0])
