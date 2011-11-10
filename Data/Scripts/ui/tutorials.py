@@ -5,8 +5,8 @@ import Scripts.ui.custom_widgets as Custom
 from .layouts import Layout
 
 class TutorialLayout(Layout):
-	def __init__(self, parent):
-		Layout.__init__(self, parent, "tutorial", use_mouse=True)
+	def __init__(self, parent, state):
+		Layout.__init__(self, parent, "tutorial", state, use_mouse=True)
 		self.tut = None
 		
 	def update(self, main):
