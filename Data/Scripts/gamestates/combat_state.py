@@ -104,7 +104,7 @@ class CombatState(DefaultState, BaseController):
 	def end_combat(self, main, cid):
 		if cid != main['combat_id']: return
 		# XXX We shouldn't be calling gameobj here
-		del main['combat_room'].gameobj['encounter']
+		del main['room'].gameobj['encounter']
 		self._next_state = "Default"
 	
 	def client_init(self, main):
@@ -498,6 +498,8 @@ class CombatState(DefaultState, BaseController):
 			AiManager.set_controller(self)
 			AiManager.set_extern_actions("Scripts.ai.actions")
 			AiManager.set_extern_transitions("Scripts.ai.transitions")
+		elif combat is None:
+			return
 		elif client.id not in combat.hero_list:
 			combat.hero_list[client.id] = main['players'][client.id]	
 			
