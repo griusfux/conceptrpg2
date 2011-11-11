@@ -52,6 +52,9 @@ class PowerManager:
 		else:
 			self._powers.remove(power)
 			
+	def __len__(self):
+		return len(self._powers)
+			
 	def remove_all(self, controller):
 		"""Remove all of the powers from the manager"""
 		

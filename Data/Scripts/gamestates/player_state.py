@@ -1,4 +1,5 @@
 from .default_state import DefaultState
+from Scripts.packages import Power
 
 # We subclass DefaultState so we still have RPCs for networking
 class PlayerState(DefaultState):
@@ -77,6 +78,8 @@ class PlayerState(DefaultState):
 		
 		if main['player_exit']:
 			player.recalc_stats()
+			if len(player.powers) == 0:
+				player.powers.add([p for p in Power.get_package_list() if p.name == 'Attack'][0], self)
 			player.save()
 			return('', 'POP')
 		
