@@ -371,9 +371,20 @@ class DungeonGenerator:
 	def clear_encounter(self, room):
 		"""Clears the encounter volume from the given room"""
 		
-		for ob in room.gameobj.childrenRecursive:
+		room = room.gameobj
+		
+		for ob in room.childrenRecursive:
 			if 'volume' in ob and ob['volume'] == "encounter":
 				ob.endObject()
+			if ob.name == self.tiles['Barriers'][0]:
+				ob.endObject()
+				
+	def clear_barriers(self, room):
+		"""Clear just the barriers instead of the whole encounter (used for player death)"""
+		
+		room = room.gameobj
+		
+		for ob in room.childrenRecursive:
 			if ob.name == self.tiles['Barriers'][0]:
 				ob.endObject()
 		

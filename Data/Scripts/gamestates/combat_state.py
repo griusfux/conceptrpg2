@@ -104,6 +104,7 @@ class CombatState(DefaultState, BaseController):
 	def end_combat(self, main, cid):
 		if cid != main['combat_id']: return
 		main['dgen'].clear_encounter(main['room'])
+		main['room'] = None
 		self._next_state = "Default"
 	
 	def client_init(self, main):
@@ -341,8 +342,6 @@ class CombatState(DefaultState, BaseController):
 
 	def client_cleanup(self, main):
 		"""Cleanup the client state"""
-		
-		main['room'] = None
 		
 		player = main['player']
 		

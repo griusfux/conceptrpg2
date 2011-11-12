@@ -30,6 +30,8 @@ class DeadState(CombatState):
 				self.server.invoke("position", player.id, *player.position)
 				player.hp = player.max_hp
 				self.server.invoke("set_health", player.id, player.hp)
+				main['dgen'].clear_barriers(main['room'])
+				main['room'] = None
 				return ("Default", "SWITCH")
 			
 	def client_cleanup(self, main):
