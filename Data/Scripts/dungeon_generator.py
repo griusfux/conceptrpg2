@@ -389,9 +389,7 @@ class DungeonGenerator:
 		newob.setParent(room, True, False)
 		
 		# Exits
-		print(room.parent.childrenRecursive)
 		for ob in [i for i in room.parent.childrenRecursive if i.name.startswith('exit')]:
-			print(ob)
 			newob = scene.addObject(barrier, ob)
 			
 			# We need to rotate PI radians about the z axis since the exits are facing the other way
