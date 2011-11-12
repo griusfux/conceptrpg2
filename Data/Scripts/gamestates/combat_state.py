@@ -103,8 +103,7 @@ class CombatState(DefaultState, BaseController):
 	@rpc(client_functions, "end_combat", str)
 	def end_combat(self, main, cid):
 		if cid != main['combat_id']: return
-		# XXX We shouldn't be calling gameobj here
-		del main['room'].gameobj['encounter']
+		main['dgen'].clear_encounter(main['room'])
 		self._next_state = "Default"
 	
 	def client_init(self, main):
@@ -145,6 +144,9 @@ class CombatState(DefaultState, BaseController):
 			weapon = main['player'].weapon
 			obj = weapon.createObjectInstance(main['engine'])
 			main['player'].set_right_hand(obj)
+			
+		# Put up the combat barriers
+		main['dgen'].place_combat_barriers(main['room'])
 			
 		self.camera = 'combat'
 		self.last_camera = 'frankie'

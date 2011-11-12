@@ -6,5 +6,6 @@
 	"room_tiles": [{ "obj": "str" }],
 	"corridor_tiles": [{ "obj": "str" }],
 	"end_tiles": [{ "obj": "str" }],
-	"stair_tiles": [{ "obj": "str" }]
+	"stair_tiles": [{ "obj": "str" }],
+	"combat_barriers": [{ "obj": "str" }]
 }

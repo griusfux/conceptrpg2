@@ -23,5 +23,8 @@
 		],
 	"stair_tiles": [
 			{ "obj": "end" }
+		],
+	"combat_barriers": [
+			{ "obj": "combat_barrier" }
 		]
 }

@@ -6,6 +6,8 @@ import Scripts.blender_wrapper as BlenderWrapper
 from mathutils import Vector, Matrix
 from Scripts.packages import EncounterDeck
 
+import math
+
 GEN_LINEAR = 0
 GEN_RANDOM = 1
 
@@ -49,7 +51,8 @@ class DungeonGenerator:
 				'Rooms': [i['obj'] for i in map.room_tiles],
 				'Corridors': [i['obj'] for i in map.corridor_tiles],
 				'Ends': [i['obj'] for i in map.end_tiles],
-				'Stairs': [i['obj'] for i in map.stair_tiles]
+				'Stairs': [i['obj'] for i in map.stair_tiles],
+				'Barriers': [i['obj'] for i in map.combat_barriers],
 				}
 				
 		self.deck = EncounterDeck(map.encounter_deck)
@@ -281,13 +284,15 @@ class DungeonGenerator:
 					self.result.append(("Shop", 0, 0, pos, ori))
 					
 					self.shop_node = ShopNode(pos, ori)
+				elif 'volume' in ob and ob['volume'] == "encounter":
+					ob['encounter'] = True
+					ob['room_id'] = self.room_count+1
 					
 			# See if anything needs to be done based on the type of tile placed
 			if type == 'Rooms':
 				self.room_count += 1
 				self.rooms[str(self.room_count)] = BlenderWrapper.Object(tile_obj)
 				tile_obj['room_id'] = self.room_count
-				tile_obj['encounter'] = True
 			elif type == 'Stairs':
 				self.has_stairs = True
 			elif type == 'Ends':
@@ -362,7 +367,39 @@ class DungeonGenerator:
 			room_id = mess.bodies[0]
 			
 		return room_id
+	
+	def clear_encounter(self, room):
+		"""Clears the encounter volume from the given room"""
 		
+		for ob in room.gameobj.childrenRecursive:
+			if 'volume' in ob and ob['volume'] == "encounter":
+				ob.endObject()
+			if ob.name == self.tiles['Barriers'][0]:
+				ob.endObject()
+		
+	def place_combat_barriers(self, room):
+		"""Places combat barriers at the entrance and exits"""
+		
+		scene = GameLogic.getCurrentScene()
+		barrier = self.tiles['Barriers'][0]
+		room = room.gameobj
+		
+		# Entrance
+		newob = scene.addObject(barrier, room.parent)
+		newob.setParent(room, True, False)
+		
+		# Exits
+		print(room.parent.childrenRecursive)
+		for ob in [i for i in room.parent.childrenRecursive if i.name.startswith('exit')]:
+			print(ob)
+			newob = scene.addObject(barrier, ob)
+			
+			# We need to rotate PI radians about the z axis since the exits are facing the other way
+			rot_mat = Matrix.Rotation(math.pi, 3, 'Z')
+			newob.localOrientation = newob.localOrientation * rot_mat
+			
+			newob.setParent(room, True, False)
+
 # class EncounterDeck():
 	# def __init__(self, deckfile):
 		# self.Deckfile = deckfile
