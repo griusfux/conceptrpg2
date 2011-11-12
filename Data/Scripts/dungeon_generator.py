@@ -352,6 +352,16 @@ class DungeonGenerator:
 						
 		# Made it through, with no collision
 		return False
+	
+	def get_id_from_message(self, mess):
+		"""Gets a room_id from a Message sensor"""
+		
+		room_id = None
+		
+		if mess.positive:
+			room_id = mess.bodies[0]
+			
+		return room_id
 		
 # class EncounterDeck():
 	# def __init__(self, deckfile):

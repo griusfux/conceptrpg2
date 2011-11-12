@@ -104,6 +104,9 @@ def init(own):
 	# Create a wrapper for the engine
 	if 'engine' not in own:
 		own['engine'] = BlenderWrapper.Engine(own)
+		
+	# Store the message sensor used to detect combat
+	own['encounter_message'] = own.sensors['encounter_mess']
 
 	# Create a ui system
 	if 'ui_system' not in own:
