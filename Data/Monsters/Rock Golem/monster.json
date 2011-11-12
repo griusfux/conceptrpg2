@@ -14,7 +14,7 @@
     "level_adjustment": 1, 
     "name": "Rock Golem", 
     "root_object": "Rock Golem", 
-    "size": 1.5, 
+    "size": 1.7, 
     "speed": 3.0, 
     "xp_reward": 75
 }

@@ -14,7 +14,7 @@
     "level_adjustment": 2, 
     "name": "Water Elemental", 
     "root_object": "Water Elemental", 
-    "size": 0.8, 
+    "size": 1.0, 
     "speed": 3.0, 
     "xp_reward": 100
 }
