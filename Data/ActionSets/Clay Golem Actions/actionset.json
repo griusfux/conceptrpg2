@@ -9,6 +9,13 @@
 			"name" : "cg.Idle",
 			"start" : 0,
 			"end" : 79}]
+		},
+		{
+			"name" : "Spawn",
+			"actions" : [{
+			"name" : "cg.Spawn",
+			"start" : 1,
+			"end" : 140}]
 		}
 	]
 }
