@@ -50,6 +50,23 @@ class TextEffect(StaticEffect):
 			# Make sure we're using smooth shading instead of flat
 			bgl.glShadeModel(bgl.GL_SMOOTH)
 
+
+		# Calculate x and y
+		screen_coord = cam.getScreenPosition(self.position)
+		x = screen_coord[0] * ras.getWindowWidth()
+		y = ras.getWindowHeight() - (screen_coord[1] * ras.getWindowHeight())
+		
+		# Check to make sure the position isn't behind the camera
+		if not cam.pointInsideFrustum(self.position):
+			return
+	
+		# Calculate scale
+		distance = cam.getDistanceTo(self.position)
+		if 1000 - distance > 0:
+			scale = (1000 - distance) / 1000
+		else:
+			scale = 0
+
 		# Setup the matrices
 		bgl.glMatrixMode(bgl.GL_PROJECTION)
 		bgl.glPushMatrix()
@@ -58,22 +75,11 @@ class TextEffect(StaticEffect):
 		bgl.glMatrixMode(bgl.GL_MODELVIEW)
 		bgl.glPushMatrix()
 		bgl.glLoadIdentity()
-
-		# Calculate x and y
-		screen_coord = cam.getScreenPosition(self.position)
-		x = screen_coord[0] * ras.getWindowWidth()
-		y = ras.getWindowHeight() - (screen_coord[1] * ras.getWindowHeight())
-
+		
 		# Center the x
 		text_width, text_height = blf.dimensions(self.fontid, self.text)
 		x -= text_width / 2
 
-		distance = cam.getDistanceTo(self.position)
-		# Calculate scale
-		if 1000 - distance > 0:
-			scale = (1000 - distance) / 1000
-		else:
-			scale = 0
 			
 		# Draw the font if large enough
 		if scale:

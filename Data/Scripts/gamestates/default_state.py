@@ -240,7 +240,7 @@ class DefaultState(BaseState, BaseController):
 			
 		if ("Action", "INPUT_CLICK") in inputs:
 			for k, v in main['ground_items'].items():
-				if (Vector(v[1].position) - player.object.position).length < 3:
+				if (Vector(v[1].position) - player.position).length < 1:
 					self.server.invoke("request_item_pickup", k)
 		if ("ShowItemNames", "INPUT_ACTIVE") in inputs:
 			for k, v in main['ground_items'].items():

@@ -13,11 +13,10 @@ class StaticEffect:
 		self.continuous = continuous
 		self.obj = None
 		self.fired = False
-		
 		if isinstance(self.target, character.CharacterLogic):
-			self.position = self.target.object.position
+			self.position = self.target.position
 		else:
-			self.postion = self.target
+			self.position = self.target
 		
 	def _load(self, id, engine):
 		self.id = id
