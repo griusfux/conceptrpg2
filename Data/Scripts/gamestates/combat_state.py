@@ -239,8 +239,8 @@ class CombatState(DefaultState, BaseController):
 				self.server.invoke("kill_monster", id)
 		
 			# This should get moved, but it will sit here for now
-			if monster.action_set:
-				self.play_animation(monster, "Idle", mode=1)
+#			if monster.action_set:
+#				self.play_animation(monster, "Idle", mode=1)
 			
 		# Our id so we can talk with the server
 		id = main['client'].id
@@ -742,7 +742,7 @@ class CombatState(DefaultState, BaseController):
 			combat = self.main['combats'].get(self.client_handle.combat_id, None)
 			if combat and character.id in combat.monster_list:
 				combat.monster_list[character.id].position = position
-				self.play_animation(character, "Spawn")
+				self.play_animation(character, "Spawn", lock=140)
 				self.clients.invoke("position", character.id, *position)
 	
 	def move(self, character, linear = (0,0,0) , angular = (0,0,0) , local = False):

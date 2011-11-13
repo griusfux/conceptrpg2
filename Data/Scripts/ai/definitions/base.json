@@ -12,7 +12,7 @@
 			"actions" : [],
 			"exit_actions" : ["spawn_random"],
 			
-			"transitions" : [["always", "target"]]
+			"transitions" : [["always", "lock"]]
 		},
 		
 		{
