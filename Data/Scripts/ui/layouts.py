@@ -569,7 +569,7 @@ class StartGameOverlay(Layout):
 		Layout.__init__(self, sys, "start_game_overlay", state, use_mouse=True)
 		
 		# Background frame
-		self.frame = bgui.Frame(self, "sgo_frame", size=[.33, .66], pos=[0.30, 0.05],
+		self.frame = bgui.Frame(self, "sgo_frame", aspect=1, size=[.33, .66], pos=[0.30, 0.05],
 			sub_theme='HUD')
 		
 		ysize = 0.05 # Tweak this to get the inputs and labels to line up
@@ -634,7 +634,7 @@ class CreditsOverlay(Layout):
 		Layout.__init__(self, sys, "credits_overlay", state, use_mouse=True)
 		
 		# Background frame
-		self.frame = bgui.Frame(self, "co_frame", size=[0.33, 0.66], pos=[0.30, 0.05],
+		self.frame = bgui.Frame(self, "co_frame", aspect=1,  size=[0.33, 0.66], pos=[0.30, 0.05],
 			sub_theme='HUD')
 			
 		# Credits text pulled from a file
@@ -771,10 +771,10 @@ class CharGenLayout(Layout):
 									pos=[0.3, 0.75], sub_theme="Subtitle")
 		
 		# Setup description of current focus
-		self.focus_info = bgui.TextBlock(self.mframe, "finfo", pos=[0.07, 0.45],
-										size=[0.86, 0.27])
-		self.focus_details = bgui.TextBlock(self.mframe, "fdetail", pos=[0.07, 0.15],
-										size=[0.86, 0.27])
+		self.focus_info = bgui.TextBlock(self.mframe, "finfo", pos=[0.07, 0.35],
+										size=[0.86, 0.37])
+		self.focus_details = bgui.TextBlock(self.mframe, "fdetail", pos=[0.07, 0.05],
+										size=[0.86, 0.37])
 		
 		# Add on a couple of buttons
 		self.fin_btn = Button(self.mframe, "fin_btn", text="FINISH", pos=[0.65, 0.07],
@@ -793,7 +793,7 @@ class CharGenLayout(Layout):
 		self.class_.text = "%s/%s" % (class_ob.name, class_ob.subclass[self.selector.element.upper()])
 		self.element.text = self.selector.element.title()
 		
-		self.focus_info.text = "Click on a Race, Class, or Element to select it.\nFor more information about a choice, hover over it."
+		self.focus_info.text = "Click on a Race, Class, or Element to select it.\n\nRace currently only controls appearance.\nClass controls your starting delivery affinities. (weapon and spell)\nElement determines your base elemental affinities."
 		self.focus_details.text = ""
 		
 		data = self.main['cgen_data']

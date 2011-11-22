@@ -96,7 +96,7 @@ class BlenderUISystem(bgui.System):
 			# Take care of mouse visibility
 			use_mouse = self.layout.use_mouse
 			if self.overlays:
-				for overlay in self.overlays.items():
+				for overlay in self.overlays.values():
 					use_mouse = overlay.use_mouse
 			self.mouse.visible = use_mouse
 		else:

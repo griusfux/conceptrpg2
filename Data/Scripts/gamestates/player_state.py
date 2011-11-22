@@ -20,6 +20,7 @@ class PlayerState(DefaultState):
 		main['player_old_powers'] = main['player'].powers.all[:]
 		main['player_controller'] = self
 		main['drop_item'] = None
+		
 	def client_run(self, main):
 		"""Client-side run method"""
 		player = main['player']
@@ -33,13 +34,19 @@ class PlayerState(DefaultState):
 		
 		# If the player window isn't up yet, put it up
 		if not self.layout:
+			tut=""
 			if main['overlay'] == "PlayerStats":
 				self.layout = "PlayerStatsLayout"
+				tut="Affinities"
 			elif main['overlay'] == "Inventory":
 				self.layout = "InventoryLayout"
 			elif main['overlay'] == "Powers":
 				self.layout = "PowersLayout"
+				tut="PowerPool"
 			main['ui_system'].add_overlay(self.layout, self)
+			
+			if tut:
+				self.display_tutorial(player, tut)
 			
 		# Get inputs
 		inputs = main['input_system'].run()

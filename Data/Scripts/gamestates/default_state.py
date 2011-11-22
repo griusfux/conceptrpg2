@@ -126,21 +126,15 @@ class DefaultState(BaseState, BaseController):
 				return
 
 		# Display any queued tutorials
-		if not self.suspended and main['tutorial_queue']:
+		if main['tutorial_queue']:
 			# Peek at the first item
-			tutorial = main['tutorial_queue'][0]
-			
-			# Make sure duplicates didn't sneak in
-#			if tutorial not in main['player'].tutorials:
+			tutorial = main['tutorial_queue'].pop()
 		
-			# Note that the player has seen the tutorial,
-			# and remove it from the queue
+			# Note that the player has seen the tutorial\
 			main['player'].tutorials.append(tutorial)
-			main['tutorial_queue'].remove(tutorial)
-			
+
+			# Display the tutorial			
 			main['tutorial_string'] = tutorial
-			
-			# Display the tutorial
 			return("Tutorial", "PUSH")
 			
 		# Update the player's lock

@@ -46,13 +46,12 @@ class CharacterCreationState(BaseState, BaseController):
 			return("InGameMenu", "PUSH")
 		
 		if main['cgen_help']:
-			print("Cgen Help")
 			self.display_tutorial(None, "Race", force=True)
 			self.display_tutorial(None, "Class", force=True)
 			self.display_tutorial(None, "Element", force=True)
 			main['cgen_help'] = False
 		
-		# Display any queued tutorials
+		# Display any queued tutorials (no default state running yet)
 		if not self.suspended and main['tutorial_queue']:
 			main['tutorial_string'] = main['tutorial_queue'].pop(0)
 			return("Tutorial", "PUSH")
