@@ -76,33 +76,30 @@ class Power(Package):
 			open(os.path.join(self._dir, package_name, 'power.py'), 'wb').close()
 
 		# Load power.py as a module
-		p = imp.new_module(package_name)
-		exec(self._package.read("power.py"), p.__dict__)
-
-		# Grab the method from the module
-		self._use = p.power
-		self._push = None
-		self._pop = None
+		self._module = imp.new_module(package_name)
+		exec(self._package.read("power.py"), self._module.__dict__)
 		
 		# Set up a timer to use for cooldowns
 		self.timer = 0
 		
-		if "PASSIVE" in self.flags:
-			self._push = p.push
-			self._pop = p.pop
-		
 	def use(self, controller, user):
-		self._use(self, controller, user)
+		mod = self._module
+		if hasattr(mod, "power"):
+			mod.power(self, controller, user)
+		else:
+			pass
 		
 	def push(self, controller, user):
-		if self._push:
-			self._push(self, controller, user)
+		mod = self._module
+		if hasattr(mod, "push"):
+			mod.push(self, controller, user)
 		else:
 			pass
 			
 	def pop(self, controller, user):
-		if self._pop:
-			self._pop(self, controller, user)
+		mod = self._module
+		if hasattr(mod, "pop"):
+			mod.pop(self, controller, user)
 		else:
 			pass
 	
