@@ -595,6 +595,12 @@ class Engine:
 		# XXX This should be replaced by some user setting
 		self.volume = 0.5
 		
+		# Setup some default options
+		self.options = {
+					'x_sensitivity': 2.0,
+					'y_sensitivity': 2.0,
+				}
+		
 	def __del__(self):
 		self.free_libraries()
 	
@@ -656,7 +662,7 @@ class Engine:
 		
 		ob, pos, norm = object.gameobj.rayCast(to_pos, from_pos, 0, xray_prop, 0, 1 if xray_prop else 0)
 		
-		return Object(ob) if ob else None, pos, norm
+		return Object(ob), pos, norm if ob else None, pos, norm
 		
 	@property
 	def fps(self):
