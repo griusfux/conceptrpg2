@@ -254,7 +254,7 @@ class DefaultState(BaseState, BaseController):
 			# Update rotations (mouse look)
 			dx = 0.5 - main['input_system'].mouse.position[0]
 			if not player.auto_target and abs(dx) > 0:
-				self.server.invoke("rotate", id, 0, 0, dx)
+				self.server.invoke("rotate", id, 0, 0, dx*main['engine'].options['x_sensitivity'])
 			main['input_system'].mouse.position = (0.5, 0.5)
 
 			if ("MoveForward", "INPUT_ACTIVE") in inputs:

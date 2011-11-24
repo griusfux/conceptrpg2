@@ -597,8 +597,8 @@ class Engine:
 		
 		# Setup some default options
 		self.options = {
-					'x_sensitivity': 2.0,
-					'y_sensitivity': 2.0,
+					'x_sensitivity': 1.5,
+					'y_sensitivity': 1.5,
 				}
 		
 	def __del__(self):
