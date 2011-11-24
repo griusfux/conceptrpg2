@@ -68,11 +68,11 @@ class PowerPool(Tutorial):
 		Tutorial.__init__(self, parent, state)
 		self.title.text = "Power Pool"
 		
-		bgui.Image(self, "text1_i", "Textures/ui/tutorials/controls/wasd.png",
-									1.4, [0, 0.15], [0.1, .65])
+		bgui.Image(self, "text1_i", "Textures/ui/tutorials/power_pool/points.png",
+									1, [0, 0.15], [0.135, .5])
 
-		bgui.Image(self, "text2_i", "Textures/ui/tutorials/controls/cip.png",
-									175/60, [0, 0.075], [0.1, .5])
+		bgui.Image(self, "text2_i", "Textures/ui/tutorials/power_pool/add_remove.png",
+									1, [0, 0.15], [0.135, .3])
 		
 		bgui.TextBlock(self, "text1", size=[0.5, 0.2], pos=[0.4, 0.6]).text=self.text1
 		bgui.TextBlock(self, "text2", size=[0.5, 0.2], pos=[0.4, 0.4]).text=self.text2
