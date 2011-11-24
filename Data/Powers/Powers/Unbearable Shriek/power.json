@@ -8,5 +8,8 @@
     "flags": [], 
     "name": "Unbearable Shriek", 
     "shape_modifier": 3, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
     "tier": 2
 }

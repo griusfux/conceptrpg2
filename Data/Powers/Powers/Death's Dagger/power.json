@@ -1,12 +1,17 @@
 {
-    "cool_down": 0, 
+    "cool_down": 1, 
     "delivery": "WEAPON", 
     "description": "Caster's weapon does arcane damage.", 
     "distance": 0, 
     "effect_shape": "SELF", 
     "element": "DEATH", 
-    "flags": ["NON_COMBAT"], 
+    "flags": [
+        "NON_COMBAT"
+    ], 
     "name": "Death's Dagger", 
     "shape_modifier": 0, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
     "tier": 1
 }

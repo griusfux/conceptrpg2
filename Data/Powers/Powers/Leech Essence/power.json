@@ -8,5 +8,8 @@
     "flags": [], 
     "name": "Leech Essence", 
     "shape_modifier": 0, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
     "tier": 3
 }

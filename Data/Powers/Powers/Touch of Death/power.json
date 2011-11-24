@@ -8,5 +8,8 @@
     "flags": [], 
     "name": "Touch Of Death", 
     "shape_modifier": 0, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
     "tier": 2
 }

@@ -8,5 +8,8 @@
     "flags": [], 
     "name": "Horrify", 
     "shape_modifier": 0, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
     "tier": 1
 }

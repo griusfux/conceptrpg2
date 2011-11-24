@@ -8,5 +8,8 @@
     "flags": [], 
     "name": "Drain Life", 
     "shape_modifier": 0, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
     "tier": 3
 }

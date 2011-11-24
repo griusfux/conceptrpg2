@@ -8,5 +8,8 @@
     "flags": [], 
     "name": "Dark Cloud", 
     "shape_modifier": 3, 
+    "target_mask": [
+        "ENEMIES"
+    ], 
     "tier": 2
 }

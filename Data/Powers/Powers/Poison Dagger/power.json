@@ -5,7 +5,9 @@
     "distance": 0, 
     "effect_shape": "SELF", 
     "element": "DEATH", 
-    "flags": ["NON_COMBAT"], 
+    "flags": [
+        "NON_COMBAT"
+    ], 
     "name": "Poison Dagger", 
     "shape_modifier": 0, 
     "target_mask": [
