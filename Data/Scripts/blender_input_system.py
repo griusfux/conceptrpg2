@@ -160,3 +160,14 @@ class BlenderInputSystem():
 			return ""
 			
 		return bge.events.EventToString(e)
+	
+	# Get the keyboard character for a supplied input
+	def event_to_char(self, event):
+		e = self.keyboard.dict.get(event)
+		
+		if not e:
+			e = self.mouse.dict.get(event)
+		if not e:
+			return ""
+		
+		return bge.events.EventToCharacter(e)
