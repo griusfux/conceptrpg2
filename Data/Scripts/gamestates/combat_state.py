@@ -568,6 +568,7 @@ class CombatState(DefaultState, BaseController):
 		damage += caster.affinities[power.element]
 		damage -= target.affinities[power.element]
 		
+		type = type.upper()
 		if type == "PHYSICAL":
 			damage += caster.physical_damage
 			damage -= target.physical_defense

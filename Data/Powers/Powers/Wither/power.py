@@ -12,7 +12,7 @@ def power(self, controller, user):
 
 	def f_collision(effect):
 		strength = 4 + random.randrange(0, 3)
-		controller.deal_damage(target, strength*0.1, self.tier, self.element, self.delivery)
+		controller.deal_damage(user, target, self, strength, "arcane")
 
 	pos = user.object.position
 	effect = Effect.ProjectileEffect("wither_effect", pos, target)
