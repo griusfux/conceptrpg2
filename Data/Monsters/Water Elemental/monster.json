@@ -13,7 +13,7 @@
     "hp_per_level": 5, 
     "level_adjustment": 2, 
     "name": "Water Elemental", 
-    "root_object": "Water Elemental", 
+    "root_object": "WaterElementalArm", 
     "size": 1.0, 
     "speed": 3.0, 
     "xp_reward": 100
