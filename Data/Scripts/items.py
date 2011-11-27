@@ -176,7 +176,7 @@ class Weapon(Item):
 	
 	Translate['BOW'] = {
 						"weight" : lambda x: x,
-						"range" : lambda x: x,
+						"range" : lambda x: max(5, 10 + 5*x),
 						"accuracy" : lambda x: x,
 						}
 	
