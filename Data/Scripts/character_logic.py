@@ -7,8 +7,6 @@ import pickle
 import random
 import time
 
-import cego
-
 from Scripts.packages import *
 from Scripts.power_manager import PowerManager
 from Scripts.levels import UnspentLevel
@@ -471,7 +469,7 @@ class PlayerLogic(CharacterLogic):
 		
 		self.race		= Race(info["race"])
 	
-class MonsterLogic(CharacterLogic, cego.Agent):
+class MonsterLogic(CharacterLogic):
 	def __init__(self, object, monsterdata, level=1):
 		CharacterLogic.__init__(self, object)
 		

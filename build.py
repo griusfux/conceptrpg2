@@ -144,16 +144,18 @@ if __name__ == '__main__':
 	for dir in INSTALL_DIRS:
 		shutil.copytree("Data/"+dir, "build/Data/"+dir, ignore=ct_ignore)
 		
+	os.chdir("build/Data")
 	# Compile py files
-	subprocess.call("python -m compileall -b build/Data")
-	clear_py("build/Data")
+	subprocess.call("python -m compileall -bq .")
+	clear_py(".")
+	os.chdir("../..")
 	
 	# Now copy extern (this avoid compiling the modules in extern, which is known to cause problems)
 	shutil.copytree("Data/extern", "build/Data/extern", ignore=ct_ignore)
 	
 	# Create the runtime
 	print("Creating runtime...", end=' ')
-	subprocess.call("xcopy release\\win64\\*.* build\\Data /Y /E")
+	subprocess.call("xcopy release\\win64\\*.* build\\Data /Y /E /Q")
 	WriteRuntime("build/Data/blenderplayer.exe", "Data/data.blend", "build/Data/data.exe")
 	os.remove("build/Data/blenderplayer.exe")
 	print("Done")
