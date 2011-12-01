@@ -9,7 +9,7 @@ from Scripts import effects
 from .base_state import *
 
 # A constant for how many frames are in a "turn"
-TURN = 240
+TURN = 120
 
 class DefaultState(BaseState, BaseController):
 	"""The default state for the game"""
@@ -63,7 +63,19 @@ class DefaultState(BaseState, BaseController):
 			print("WARNING: The status \"%s\" was not found" % status)
 			return
 		
+		status.push(self, main['net_players'][cid])
 		main['net_players'][cid].statuses.append(status)
+		
+	@rpc(client_functions, "remove_status", str, str)
+	def c_remove_status(self, main, cid, status):
+		if cid not in main['net_players']: return
+		
+		player = main['net_players'][cid]
+		for i in player.statuses[:]:
+			if i.name == status:
+				player.statuses.remove(i)
+				i.pop(self, player)
+		
 
 	@rpc(client_functions, "modify_health", str, float)
 	def c_modify_health(self, main, cid, amount):
@@ -257,14 +269,15 @@ class DefaultState(BaseState, BaseController):
 				self.server.invoke("rotate", id, 0, 0, dx*main['engine'].options['x_sensitivity'])
 			main['input_system'].mouse.position = (0.5, 0.5)
 
-			if ("MoveForward", "INPUT_ACTIVE") in inputs:
-				movement[1] = speed
-			if ("MoveBackward", "INPUT_ACTIVE") in inputs:
-				movement[1] = -speed
-			if ("MoveRight", "INPUT_ACTIVE") in inputs:
-				movement[0] = speed
-			if ("MoveLeft", "INPUT_ACTIVE") in inputs:
-				movement[0] = -speed
+			if 'HELD' not in player.flags:
+				if ("MoveForward", "INPUT_ACTIVE") in inputs:
+					movement[1] = speed
+				if ("MoveBackward", "INPUT_ACTIVE") in inputs:
+					movement[1] = -speed
+				if ("MoveRight", "INPUT_ACTIVE") in inputs:
+					movement[0] = speed
+				if ("MoveLeft", "INPUT_ACTIVE") in inputs:
+					movement[0] = -speed
 				
 		
 		# Normalize the vector to the character's speed
@@ -356,7 +369,7 @@ class DefaultState(BaseState, BaseController):
 			print("WARNING: The status \"%s\" was not found" % status)
 			return
 		_status.amount = amount
-		_status.time = duration * TURN
+		_status.time = duration
 		
 		character = main['players'][cid]
 		_status.push(self, character)
@@ -393,16 +406,22 @@ class DefaultState(BaseState, BaseController):
 		
 	def server_run(self, main, client):
 		"""Server-side run method"""
-		
 		# This function is locked to 60/TURN executions per second
 		new_time = time.time()
 		self.accum += new_time - self.time
 		self.time = new_time
 		
-		dt = 1/60 * TURN
+		dt = 1/60 * TURN # Convert turns to seconds
 		while self.accum >= dt:
-			for key in main['players']:
-				main['players'][key].manage_statuses(self)
+			for player in main['players'].values():
+				for status in player.statuses:
+					status.use(self, player)
+					status.time -= 1
+					
+					if status.time <= 0:
+						status.pop(self, player)
+						player.statuses.remove(status)
+						self.clients.invoke("remove_status", player.id, status.name)
 			self.accum -= dt
 
 	##########

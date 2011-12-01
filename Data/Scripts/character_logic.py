@@ -122,6 +122,9 @@ class CharacterLogic:
 		
 		# the character's game object
 		self._object = obj
+				
+		# Various flags
+		self.flags = set()
 		
 		# The character's current "lock", which is represented as the time at which the lock ends
 		self.lock = 0

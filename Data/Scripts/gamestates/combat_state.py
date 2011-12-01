@@ -480,6 +480,9 @@ class CombatState(DefaultState, BaseController):
 		
 		self.monster_id = 0
 		
+		self.ai_accum = 0
+		self.ai_time = time.time()
+		
 		DefaultState.server_init(self, main)
 		
 	def server_run(self, main, client):
@@ -524,14 +527,14 @@ class CombatState(DefaultState, BaseController):
 		# Run the ai if it is set up, else try to set it up
 		if client.id == combat.owner:
 			new_time = time.time()
-			self.accum += new_time - self.time
-			self.time = new_time
+			self.ai_accum += new_time - self.ai_time
+			self.ai_time = new_time
 			
 			dt = 1/30
-			while self.accum >= dt:
+			while self.ai_accum >= dt:
 				if AiManager.get_environment():
 					AiManager.run()
-				self.accum -= dt
+				self.ai_accum -= dt
 				
 				# update monster lock
 				for monster in combat.monster_list.values():
