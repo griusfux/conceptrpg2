@@ -754,6 +754,7 @@ class CombatState(DefaultState, BaseController):
 		if self.is_server:
 			# The only people that should be moving server side are monsters
 			self.clients.invoke("move_monster", character.id, *linear)
+			self.play_animation(character, "Move", mode=1)
 		else:
 			# Move the character
 			character.object.move(linear, min=[-50, -50, 0], max=[50, 50, 0], local=local)
