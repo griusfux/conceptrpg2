@@ -5,6 +5,7 @@ from .MapEditor import MapEditor
 from .MonsterEditor import MonsterEditor
 from .PowerEditor import PowerEditor
 from .RaceEditor import RaceEditor
+from .StatusEditor import StatusEditor
 from .WeaponEditor import WeaponEditor
 
 # import EditorFiles.Editors.ArmorEditor as ArmorEditor

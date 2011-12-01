@@ -24,6 +24,7 @@ class EditorWindow(QMainWindow):
 		'Monsters': MonsterEditor,
 		'Powers': PowerEditor,
 		'Races': RaceEditor,
+		'Statuses': StatusEditor,
 		'Weapons': WeaponEditor,
 		}
 
@@ -93,6 +94,7 @@ class EditorWindow(QMainWindow):
 		self.create_subtree('Powers', Power)
 		self.create_subtree('Races', Race)
 		# self.create_subtree('Shields', Shield)
+		self.create_subtree('Statuses', Status)
 		self.create_subtree('Weapons', Weapon)
 		
 		left = QTreeView()
@@ -148,7 +150,7 @@ class EditorWindow(QMainWindow):
 		f.close()
 		
 		for key in SETTINGS:
-			SETTINGS[key] = settings[key]
+			SETTINGS[key] = settings.get(key)
 			
 	def save_settings(self):
 		with open('editor_settings.conf', 'w') as f:
@@ -178,7 +180,8 @@ class EditorWindow(QMainWindow):
 			try:
 				arc_file = package(file)
 			except Exception as e:
-				print(e)
+				import traceback
+				traceback.print_exc()
 				print('Unable to open', file)
 				continue
 

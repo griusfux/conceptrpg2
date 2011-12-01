@@ -2,7 +2,8 @@ import subprocess
 import os
 
 SETTINGS = {
-	'blender_path': ""
+	'blender_path': "",
+	'text_editor_path': "",
 	}
 
 def get_blender_objects(datafile):
@@ -32,3 +33,13 @@ def get_blender_objects(datafile):
 	os.unlink('grabber.txt')
 	
 	return retval
+
+def edit_text_file(file):
+	editor = SETTINGS['text_editor_path']
+	
+	if not editor:
+		print("WARNING: No text editor set")
+		return
+	
+	p = subprocess.Popen([editor, file])
+	

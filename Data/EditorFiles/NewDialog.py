@@ -9,6 +9,7 @@ TYPES = [
 	'Map',
 	'Monster',
 	'Power',
+	'Status',
 	'Weapon'
 ]
 
@@ -35,7 +36,10 @@ class NewDialog(QDialog):
 		if package:
 			# Unlike the package system, the editor uses the plural forms of the 
 			# package types, so change to plural for this part
-			package_type += 's'
+			if package_type[-1] == 's':
+				package_type += 'es'
+			else:
+				package_type += 's'
 		
 			# Add the new package to the data_files
 			self.editor.data_files[package_type][package_name] = package

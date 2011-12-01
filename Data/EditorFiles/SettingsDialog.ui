@@ -14,6 +14,16 @@
    <string>Settings</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
+   <item row="1" column="0">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
@@ -23,7 +33,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
+     <item row="0" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QLineEdit" name="blender_path"/>
@@ -37,17 +47,41 @@
        </item>
       </layout>
      </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Text Editor:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="1" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLineEdit" name="text_editor_path"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="tebrowsebutton">
+         <property name="text">
+          <string>Browse</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
     </layout>
-   </item>
-   <item row="1" column="0">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>
@@ -89,11 +123,11 @@
    <sender>browse_button</sender>
    <signal>clicked()</signal>
    <receiver>SettingsDialog</receiver>
-   <slot>find_file()</slot>
+   <slot>find_blender()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>368</x>
-     <y>134</y>
+     <x>388</x>
+     <y>33</y>
     </hint>
     <hint type="destinationlabel">
      <x>397</x>
@@ -101,8 +135,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tebrowsebutton</sender>
+   <signal>clicked()</signal>
+   <receiver>SettingsDialog</receiver>
+   <slot>find_text_editor()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>326</x>
+     <y>56</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>407</x>
+     <y>162</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
-  <slot>find_file()</slot>
+  <slot>find_blender()</slot>
+  <slot>find_text_editor()</slot>
  </slots>
 </ui>

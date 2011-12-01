@@ -16,15 +16,24 @@ class SettingsDialog(QDialog):
         self.ui.setupUi(self)
         
         self.ui.blender_path.setText(SETTINGS['blender_path'])
+        self.ui.text_editor_path.setText(SETTINGS['text_editor_path'])
         
         
     def accept(self):
         SETTINGS['blender_path'] = self.ui.blender_path.text()
+        SETTINGS['text_editor_path'] = self.ui.text_editor_path.text()
         self.close()
     
-    def find_file(self):
+    def find_blender(self):
         path = QFileDialog.getOpenFileName(parent=self,
                                            caption='Select a Blender binary',
                                            directory=os.path.dirname(self.ui.blender_path.text()))
         
         self.ui.blender_path.setText(os.path.abspath(path))
+        
+    def find_text_editor(self):
+    	path = QFileDialog.getOpenFileName(parent=self,
+										caption='Select a text editor',
+										directory=os.path.dirname(self.ui.text_editor_path.text()))
+    	
+    	self.ui.text_editor_path.setText(os.path.abspath(path))

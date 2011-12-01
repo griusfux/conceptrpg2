@@ -1,5 +1,7 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
+import os
+from ..common import edit_text_file
 
 class BaseEditor(QFrame):
     def __init__(self, parent, data, ui):
@@ -24,3 +26,7 @@ class BaseEditor(QFrame):
         if hasattr(self, "qtitem"):
             self.save()
             self.qtitem.setForeground(Qt.red)
+            
+    def edit_text(self):
+    	if hasattr(self, "pyfile"):
+    		edit_text_file(os.path.join(self.data._dir, self.data.package_name, self.pyfile))
