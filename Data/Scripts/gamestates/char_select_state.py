@@ -122,7 +122,7 @@ class CharacterSelectState(BaseState, BaseController):
 				elif child.name == "burst":
 					main['target_shapes']['BURST'] = child
 					
-			player = self.characters[index]
+			player = self.characters[0]
 			player.object.position = gameobj.position
 			player.object.set_parent(gameobj)
 			gameobj.armature = player.object
