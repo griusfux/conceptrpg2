@@ -59,25 +59,38 @@ class CharacterSelectState(BaseState, BaseController):
 		main['csl_new'] = False
 		main['cls_del'] = False
 		main['csl_char'] = None
-		main['csl_index'] = 0
-													
+		self.old_index = main['csl_index'] = 0
 			
 	def client_run(self, main):
 		"""Client-side run method"""
 		
 		if len(self.saves) == 0:
-			return("CharacterCreation", "SWITCH")		
+			return("CharacterCreation", "SWITCH")
 		
-		index = main['csl_index'] % len(self.characters)
+		# Make sure the models are in the right spot
+		if self.old_index != main['csl_index']:
+			diff = main['csl_index'] - self.old_index
+			j = 0 if diff > 0 else -1
+			k = len(self.characters) if diff > 0 else 0
+			diff = diff if diff > 0 else -diff
+			for i in range(diff):
+				tmp = self.characters.pop(j)
+				self.characters.insert(k, tmp)
+			self.old_index = main['csl_index']
+			
+		for i in range(len(self.characters)):
+			if i < 4:
+				self.characters[i].object.position = _POSITIONS[i]
+			else:
+				self.characters[i].object.position = (0, 0, -20)
 		
 		# Lets add a little bit of movement
 		for i in range(min(len(self.characters), 4)):
 			idle = main['actions'][self.characters[i].action_set]['Idle'][0]
 			self.characters[i].object.play_animation(idle['name'], idle['start'],
 													idle['end'], mode=1)
-			
-		main['csl_char'] = self.characters[index]
-		
+
+		main['csl_char'] = self.characters[0]
 		
 		if self.suspended:
 			return
