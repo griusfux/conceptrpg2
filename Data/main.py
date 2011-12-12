@@ -130,10 +130,13 @@ def init(own):
 	print("\nLoading Actions . . .")
 	own['actions'] = {}
 	for actionset in ActionSet.get_package_list():
-		own['actions'][actionset.name] = actionset.actions
-		
-		# Now load the library so it can be found by the engine
-		own['engine'].load_library(actionset, type='Action')
+		if actionset.name not in own['actions']:
+			own['actions'][actionset.name] = actionset.actions
+			
+			# Now load the library so it can be found by the engine
+			own['engine'].load_library(actionset, type='Action')
+		else:
+			print("WARNING: Duplicate actionset found:", actionset.name)
 
 	# Current room to use for the combat state
 	own['room'] = None
