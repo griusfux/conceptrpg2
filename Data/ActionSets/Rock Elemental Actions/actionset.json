@@ -1,7 +1,22 @@
 {
-	"name" : "Rock Golem Actions",
+	"name" : "Rock Elemental Actions",
 	
 	"action_set":
 	[
+		{
+			"name" : "Move",
+			"actions" : [{
+			"name" : "re.Run",
+			"start" : 0,
+			"end" : 59}]
+		},
+		
+		{
+			"name" : "Spawn",
+			"actions" : [{
+			"name" : "re.Spawn",
+			"start" : 0,
+			"end" : 113}]
+		}
 	]
 }
