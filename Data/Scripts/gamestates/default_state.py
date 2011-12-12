@@ -108,7 +108,9 @@ class DefaultState(BaseState, BaseController):
 		
 		main['full_map'] = False
 		
-		main['player'].save()
+		player = main['player']
+		
+		player.save()
 
 		# Center the mouse so the character isn't staring up or down when the game starts
 		main['input_system'].mouse.position = (0.5, 0.5)
@@ -117,8 +119,10 @@ class DefaultState(BaseState, BaseController):
 		
 		self.item_effects = []
 		
+		# Make sure the player is holding their weapon if they have one
+		player.reset_weapon_mesh(main['engine'])
+		
 		# Some helpful tutorials for the player
-		player = main['player']
 		self.display_tutorial(player, "Controls")
 		
 	def client_run(self, main):
@@ -223,10 +227,10 @@ class DefaultState(BaseState, BaseController):
 			main['effect_systm'].remove(i)
 			
 	def _get_idle_animation(self, main):
-		return "Idle"
+		return "1h Idle"
 		
 	def _get_forward_animation(self, main):
-		return "Walk"
+		return "1h Walk"
 			
 	def _handle_generic_input(self, main, inputs):
 		# Our id so we can talk with the server

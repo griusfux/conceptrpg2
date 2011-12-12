@@ -139,12 +139,6 @@ class CombatState(DefaultState, BaseController):
 		else:
 			# Request monsters from the server
 			self.server.invoke("request_monsters")
-		
-		# If the player has a weapon, socket it
-		if main['player'].weapon:
-			weapon = main['player'].weapon
-			obj = weapon.createObjectInstance(main['engine'])
-			main['player'].set_right_hand(obj)
 			
 		# Put up the combat barriers
 		main['dgen'].place_combat_barriers(main['room'])
@@ -344,9 +338,6 @@ class CombatState(DefaultState, BaseController):
 		"""Cleanup the client state"""
 		
 		player = main['player']
-		
-		# Put away the player's weapon
-		player.clear_right_hand()
 		
 		# Clear any targeting
 		player.targets = []
@@ -817,9 +808,3 @@ class CombatState(DefaultState, BaseController):
 			
 		
 		return def_value >= off_value
-
-	def _get_idle_animation(self, main):
-		return '1h Idle'
-		
-	def _get_forward_animation(self, main):
-		return '1h Walk'

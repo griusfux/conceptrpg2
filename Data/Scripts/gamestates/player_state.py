@@ -82,6 +82,8 @@ class PlayerState(DefaultState):
 			
 			self.drop_item(item, player.position)
 			main['drop_item'] = None
+			
+			main['player'].reset_weapon_mesh(main['engine'])
 		
 		if main['player_exit']:
 			player.recalc_stats()

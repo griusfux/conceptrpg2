@@ -468,6 +468,13 @@ class PlayerLogic(CharacterLogic):
 		CharacterLogic.load_from_info(self, info)
 		
 		self.race		= Race(info["race"])
+		
+	def reset_weapon_mesh(self, engine):
+		self.clear_right_hand()
+
+		if self.weapon:
+			obj = self.weapon.createObjectInstance(engine)
+			self.set_right_hand(obj)
 	
 class MonsterLogic(CharacterLogic):
 	def __init__(self, object, monsterdata, level=1):

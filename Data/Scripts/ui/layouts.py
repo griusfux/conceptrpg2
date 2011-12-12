@@ -245,6 +245,7 @@ class InventoryLayout(Layout):
 		if item:
 			if self.selection == "weapons":
 				player.weapon = item
+				player.reset_weapon_mesh(self.main['engine'])
 			elif self.selection == "armor":
 				player.armor = item
 				
