@@ -606,12 +606,13 @@ class Engine:
 	
 	def load_library(self, package, type='Scene'):
 		"""Load scene data from a package file"""
+		pname = package.__class__.__name__+":"+package.name
 		# Don't load libraries multiple times
-		if package.name in self.library_list:
+		if pname in self.library_list:
 			return
 			
-		gl.LibLoad(package.name, type, package.blend, load_actions=True)
-		self.library_list.append(package.name)
+		gl.LibLoad(pname, type, package.blend, load_actions=True)
+		self.library_list.append(pname)
 		
 	def free_libraries(self):
 		"""Free all the cached libraries"""
