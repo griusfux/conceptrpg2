@@ -52,7 +52,16 @@ class Item:
 			retval += "\n\t"+i
 			
 		return retval
+	
+	def __getstate__(self):
+		d = self.__dict__.copy()
+		del d['_datafile']
+		return d
 		
+	def __setstate__(self, state):
+		state['_datafile'] = getattr(Packages, self.__class__.__name__)(state['_base'])
+		self.__dict__ = state
+
 	def modify(self, name, value):
 		# We want to randomize modifier levels a bit
 		r = random.random()
