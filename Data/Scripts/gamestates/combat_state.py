@@ -91,7 +91,9 @@ class CombatState(DefaultState, BaseController):
 	@rpc(client_functions, "rotate_monster", str, float, float, float)
 	def rotate_monster(self, main, cid, x, y, z):
 		if cid not in self.monster_list: return
-		self.monster_list[cid].object.rotate((x, y, z))
+		monster = self.monster_list[cid]
+		monster.object.rotate((x, y, z))
+		self.server.invoke("rotation", cid, monster.object.get_orientation().to_euler()[2])
 
 	@rpc(client_functions, "add_hero", str, str)
 	def add_hero(self, main, cid, hid):
@@ -363,6 +365,7 @@ class CombatState(DefaultState, BaseController):
 																#[MonsterLogic(None, Monster(monster), level), [x, y, z]]
 			combat.monster_list[cid].id = cid
 			AiManager.add_agent(combat.monster_list[cid], "Scripts/ai/definitions/base.json", "spawn")
+			combat.monster_list[cid].rotation = 0
 			self.clients.invoke("add_player", cid, combat.monster_list[cid].get_info(), 1, [x, y, z], None)
 			self.clients.invoke("add_monster", client.combat_id, monster, cid, x, y, z)
 			
@@ -447,6 +450,14 @@ class CombatState(DefaultState, BaseController):
 	@rpc(server_functions, "rotate_monster", str, float, float, float)
 	def s_rotate_monster(self, main, client, cid, x, y, z):
 		self.clients.invoke("rotate_monster", cid, x, y, z)
+		
+	@rpc(server_functions, "rotation", str, float)
+	def s_rotation(self, main, client, cid, rotation):
+		combat = main['combats'].get(client.combat_id, None)
+		if combat:
+			character = combat.monster_list.get(cid, None)
+			if character:
+				character.rotation = rotation
 		
 	@rpc(server_functions, "position_monster", str, float, float, float)
 	def s_position_monster(self, main, client, cid, x, y, z):
@@ -736,8 +747,8 @@ class CombatState(DefaultState, BaseController):
 		if hasattr(self, 'clients'):
 			combat = self.main['combats'].get(self.client_handle.combat_id, None)
 			if combat and character.id in combat.monster_list:
+				self.animate_lock(character, "Spawn")
 				combat.monster_list[character.id].position = position
-				self.play_animation(character, "Spawn", lock=140)
 				self.clients.invoke("position", character.id, *position)
 	
 	def move(self, character, linear = (0,0,0) , angular = (0,0,0) , local = False):
@@ -745,6 +756,7 @@ class CombatState(DefaultState, BaseController):
 		if self.is_server:
 			# The only people that should be moving server side are monsters
 			self.clients.invoke("move_monster", character.id, *linear)
+			self.clients.invoke("rotate_monster", character.id, *angular)
 			self.play_animation(character, "Move", mode=1)
 		else:
 			# Move the character

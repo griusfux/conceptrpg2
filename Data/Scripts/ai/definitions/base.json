@@ -27,7 +27,7 @@
 		{
 			"name" : "chase",
 			"entry_actions" : [],
-			"actions" : ["seek"],
+			"actions" : ["seek", "look_forward"],
 			"exit_actions" : [],
 			
 			"transitions" : [["target_range_power < attack", "attack"]]
@@ -53,8 +53,8 @@
 		
 		{
 			"name" : "death",
-			"entry_actions" : [],
-			"actions" : ["die"],
+			"entry_actions" : ["die"],
+			"actions" : [],
 			"exit_actions" : [],
 			
 			"transitions" : []
