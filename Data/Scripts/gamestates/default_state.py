@@ -440,8 +440,8 @@ class DefaultState(BaseState, BaseController):
 		
 	def add_status(self, character, status, amount, duration):		
 		self.server.invoke("add_status", character.id, status, amount, duration)
-		
-	def animate_weapon(self, character, animation):
+	
+	def animate_lock(self, character, animation):
 		"""Convenience function that automatically sets the lock and mode for an animation
 		
 		character -- the character attacking
@@ -467,6 +467,10 @@ class DefaultState(BaseState, BaseController):
 				
 		self.play_animation(character, animation, lock=lock, mode=0)
 		
+	def animate_weapon(self, character, animation):
+		"""This function is used for when an attack animation is played"""
+		self.animate_lock(character, animation)
+		
 	def animate_spell(self, character, animation):
 		"""This function exists in case we want to handle spells and attacks differently, e.g. speed"""
-		self.animate_weapon(character, animation)
+		self.animate_lock(character, animation)

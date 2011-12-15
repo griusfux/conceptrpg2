@@ -356,11 +356,12 @@ class BaseController:
 		
 		"""
 		
+		if lock:
+			character.add_lock(lock)
+			
 		if self.is_server:
 			self.clients.invoke('animate', character.id, animation, mode)
 		else:
-			if lock:
-				character.add_lock(lock)
 				
 			self.server.invoke("animate", character.id, animation, mode)
 		
