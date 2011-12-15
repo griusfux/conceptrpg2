@@ -903,12 +903,12 @@ class DefaultStateLayout(Layout):
 		self.target_frame.visible = False
 		
 		# Map
-		self.mmap_frame = Map(self, "ds_map", aspect=1, size=[0, .25], pos=[0,0])
-		self.mmap_frame.position = [1-self.mmap_frame.size[0]/sys.size[0], 1-self.mmap_frame.size[1]/sys.size[1]]
-		
-		self.fmap_frame = bgui.Frame(self, "ds_fmap", size=[.8, .8], pos=[0,0],
-								sub_theme="HUD", options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
-		self.fmap_frame.visible = False
+#		self.mmap_frame = Map(self, "ds_map", aspect=1, size=[0, .25], pos=[0,0])
+#		self.mmap_frame.position = [1-self.mmap_frame.size[0]/sys.size[0], 1-self.mmap_frame.size[1]/sys.size[1]]
+#		
+#		self.fmap_frame = bgui.Frame(self, "ds_fmap", size=[.8, .8], pos=[0,0],
+#								sub_theme="HUD", options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+#		self.fmap_frame.visible = False
 		
 	def update_powerbar(self, main, update_all):
 		psys = main['player'].powers
@@ -1010,9 +1010,9 @@ class DefaultStateLayout(Layout):
 
 #		# Map
 #		self.mmap_frame.im_buf = main['map_data']
-		if not self.combat:
-			self.fmap_frame.visible = main['full_map']
-			self.mmap_frame.visible = not main['full_map']
+#		if not self.combat:
+#			self.fmap_frame.visible = main['full_map']
+#			self.mmap_frame.visible = not main['full_map']
 		
 class CombatLayout(DefaultStateLayout):
 	def __init__(self, sys, state):
