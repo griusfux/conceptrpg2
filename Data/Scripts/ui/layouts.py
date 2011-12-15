@@ -570,7 +570,8 @@ class StartGameOverlay(Layout):
 		Layout.__init__(self, sys, "start_game_overlay", state, use_mouse=True)
 		
 		# Background frame
-		self.frame = bgui.Frame(self, "sgo_frame", aspect=1, size=[.33, .66], pos=[0.30, 0.05],
+		self.frame = bgui.Image(self, "sgo_frame", "Textures/ui/menu_background.png",
+								aspect=1, size=[.33, .66], pos=[0.30, 0.05],
 			sub_theme='HUD')
 		
 		ysize = 0.05 # Tweak this to get the inputs and labels to line up
@@ -591,8 +592,7 @@ class StartGameOverlay(Layout):
 		self.tab_idx = 0
 
 		# "Go" button
-		self.go_button = bgui.FrameButton(self.frame, "sgo_go", text="",
-			size=[0.2, 0.075], pos=[0.75, 0.05])
+		self.go_button = Button(self.frame, "sgo_go", text="", pos=[0.75, 0.05])
 		self.go_button.on_click = self.button_click
 			
 	def update(self, main):
@@ -635,7 +635,8 @@ class CreditsOverlay(Layout):
 		Layout.__init__(self, sys, "credits_overlay", state, use_mouse=True)
 		
 		# Background frame
-		self.frame = bgui.Frame(self, "co_frame", aspect=1,  size=[0.33, 0.66], pos=[0.30, 0.05],
+		self.frame = bgui.Image(self, "co_frame", "Textures/ui/menu_background.png",
+								aspect=1,  size=[0.33, 0.66], pos=[0.30, 0.05],
 			sub_theme='HUD')
 			
 		# Credits text pulled from a file
@@ -644,8 +645,7 @@ class CreditsOverlay(Layout):
 				size=[0.95, 0.65], pos=[0.05, 0.3])
 		
 		# "Go" button
-		self.go_button = bgui.FrameButton(self.frame, "sgo_go", text="Done",
-			size=[0.2, 0.075], pos=[0.75, 0.05])
+		self.go_button = Button(self.frame, "sgo_go", text="Done", pos=[0.75, 0.05])
 		self.go_button.on_click = self.button_click
 		
 	def update(self, main):	

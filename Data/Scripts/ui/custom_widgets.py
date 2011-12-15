@@ -29,6 +29,7 @@ class Button(Image):
 	def __init__(self, parent, name, pos=[0,0], type="DEFUALT", text="Button",
 				on_click=None, resize=True, options=BGUI_DEFAULT):
 		
+		self.resize = resize
 		img_str = "Textures/ui/buttons/default.png"
 		text = text
 		aspect = 3
@@ -53,17 +54,29 @@ class Button(Image):
 		if on_click:
 			self.on_click = on_click
 		
-		self.text = Label(self, name+'lbl', text=text, pt_size=text_size,
+		self.lbl = Label(self, name+'lbl', text=text, pt_size=text_size,
 							color=text_color, options=BGUI_DEFAULT|BGUI_CENTERED)
-		
-		if resize and self.text.size[0] > self.size[0]:
-			self.aspect=None
-			self.size = [(self.text.size[0] *1.5)/self.parent.size[0],
-						self.size[1]/self.parent.size[1]]
-			self._remove_widget(self.text)
-			self.text = Label(self, name+'lbl', text=text, pt_size=text_size,
-								color=text_color, options=BGUI_DEFAULT|BGUI_CENTERED)
+
 			
+	def _resize(self):
+		if not self.resize or self.lbl.size[0] < self.size[0]:
+			return
+		self.aspect=None
+		self.size = [(self.lbl.size[0] *1.5)/self.parent.size[0],
+					self.size[1]/self.parent.size[1]]
+		self._remove_widget(self.lbl)
+		self.lbl = Label(self, name+'lbl', text=text, pt_size=text_size,
+							color=text_color, options=BGUI_DEFAULT|BGUI_CENTERED)
+
+	@property
+	def text(self):
+		return self.lbl.text
+	
+	@text.setter
+	def text(self, value):
+		self.lbl.text = value
+		self._resize()
+						
 class ElementBar(Frame):
 	def __init__(self, parent):
 		Frame.__init__(self, parent, "ele_bar", 0, None, [.9,.1], [0,.85],
