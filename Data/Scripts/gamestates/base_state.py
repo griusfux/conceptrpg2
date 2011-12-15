@@ -179,7 +179,7 @@ class BaseState:
 		if id not in main['net_players']: return
 		
 		self._delete_player(self, main, cid)
-		print(cid, "diconnected.")
+		print(cid, "disconnected.")
 		
 	@rpc(client_functions, "remove_player", str)
 	def remove_player(self, main, cid):
