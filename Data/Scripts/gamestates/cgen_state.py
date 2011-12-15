@@ -84,7 +84,7 @@ class CharacterCreationState(BaseState, BaseController):
 				self.element = main['cgen_data']['element']
 				self.character.accent = ELEMENT_COLOR[self.element]
 				
-			idle = main['actions'][self.race.action_set]['Idle'][0]
+			idle = main['actions'][self.race.action_set][self.character.get_action('Idle')][0]
 			self.character.play_animation(idle['name'], idle['start'], idle['end'], mode=1)
 				
 		

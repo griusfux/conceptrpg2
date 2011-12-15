@@ -86,7 +86,7 @@ class CharacterSelectState(BaseState, BaseController):
 		
 		# Lets add a little bit of movement
 		for i in range(min(len(self.characters), 4)):
-			idle = main['actions'][self.characters[i].action_set]['Idle'][0]
+			idle = main['actions'][self.characters[i].action_set][self.characters[i].get_action('Idle')][0]
 			self.characters[i].object.play_animation(idle['name'], idle['start'],
 													idle['end'], mode=1)
 

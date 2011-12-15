@@ -4,28 +4,32 @@
 	"action_set":
 	[
 		{
-			"name" : "Idle",
+			"name" : "Idle Empty",
 			"actions" : [{
-			"name" : "base.idle",
+			"name" : "kat.idle_bottom_empty",
+			"start" : 0,
+			"end" : 79},
+			{
+			"name" : "kat.idle_top_empty",
 			"start" : 0,
 			"end" : 79}]
 		},
 		{
-			"name" : "Walk",
+			"name" : "Walk Empty",
 			"actions" : [{
 			"name" : "base.walk",
 			"start" : 1,
 			"end" : 79}]
 		},
 		{
-			"name" : "1h Idle",
+			"name" : "Idle 1h",
 			"actions" : [{
 			"name" : "base.1h_idle",
 			"start" : 1,
 			"end" : 79}]
 		},
 		{
-			"name" : "1h Walk",
+			"name" : "Walk 1h",
 			"actions" : [{
 			"name" : "walk_1h",
 			"start" : 0,

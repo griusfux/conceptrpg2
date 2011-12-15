@@ -225,13 +225,7 @@ class DefaultState(BaseState, BaseController):
 		del main['full_map']
 		for i in self.item_effects:
 			main['effect_systm'].remove(i)
-			
-	def _get_idle_animation(self, main):
-		return "1h Idle"
-		
-	def _get_forward_animation(self, main):
-		return "1h Walk"
-			
+
 	def _handle_generic_input(self, main, inputs):
 		# Our id so we can talk with the server
 		id = main['client'].id
@@ -289,7 +283,7 @@ class DefaultState(BaseState, BaseController):
 			player.auto_target = player.auto_power = None
 			movement = [float(i) for i in (Vector(movement).normalized()*speed)]
 			self.server.invoke("position", id, *player.position)
-			act = self._get_forward_animation(main)
+			act = player.get_action("Walk")
 			self.play_animation(player, act, mode=1)
 		elif player.auto_target:
 			if "WEAPON_RANGE" in player.auto_power.flags:
@@ -325,12 +319,12 @@ class DefaultState(BaseState, BaseController):
 
 				self.server.invoke("rotate", id, 0, 0, rot)
 				
-				act = self._get_forward_animation(main)
+				act = player.get_action("Walk")
 				self.play_animation(player, act, mode=1)
 
 		# Otherwise, idle
 		elif not player.lock:
-			act = self._get_idle_animation(main)
+			act = player.get_action("Idle")
 			self.play_animation(player, act, mode=1)
 
 		# Send the message

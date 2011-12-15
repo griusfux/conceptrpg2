@@ -476,6 +476,51 @@ class PlayerLogic(CharacterLogic):
 			obj = self.weapon.createObjectInstance(engine)
 			self.set_right_hand(obj)
 	
+	def get_action(self, action):
+		v = "Empty"
+		
+		if self.weapon:
+			wtype = self.weapon.type
+			whands = self.weapon.hands
+	
+			# 'SWORD', 'AXE', 'POLEARM', 'BLUNT', 'BOW', 'GUN', 'THROWN'
+			if whands == 2:
+				if wtype == "SWORD":
+					v = "1h"
+				elif wtype == "AXE":
+					v = "1h"
+				elif wtype == "POLEARM":
+					v = "1h"
+				elif wtype == "BLUNT":
+					v = "1h"
+				elif wtype == "BOW":
+					v = "1h"
+				elif wtype == "GUN":
+					v = "1h"
+				elif wtype == "THROWN":
+					v = "1h"
+			else: # One handed weapons
+				if wtype == "SWORD":
+					v = "1h"
+				elif wtype == "AXE":
+					v = "1h"
+				elif wtype == "POLEARM":
+					v = "1h"
+				elif wtype == "BLUNT":
+					v = "1h"
+				elif wtype == "BOW":
+					v = "1h"
+				elif wtype == "GUN":
+					v = "1h"
+				elif wtype == "THROWN":
+					v = "1h"
+			
+			# If we made it this far without changing v, we've missed a case.
+			if v == "Empty":
+				print("WARNING Missing weapon animation case: Hands=%d, Type=%s" % (whands, wtype))
+				v = "1h"
+		return " ".join([action, v])
+
 class MonsterLogic(CharacterLogic):
 	def __init__(self, object, monsterdata, level=1):
 		CharacterLogic.__init__(self, object)

@@ -37,7 +37,7 @@ class Object:
 		self.pid = [30.0, 0.5, 0.0]
 		
 		# Stores the current animation
-		self.animation = ""
+		self.animations = [""]*8
 		
 	def __eq__(self, other):
 		self.gameobj == other.gameobj
@@ -154,9 +154,9 @@ class Object:
 		return self.gameobj.getVectTo(position)[arg]	
 		
 	def play_animation(self, anim, start=0, end=0, mode=0, layer=0, blending=0):
-		if self._armature and anim != self.animation:
+		if self._armature and anim != self.animations[layer]:
 			self._armature.playAction(anim, start, end, play_mode=mode, layer=layer)
-			self.animation = anim
+			self.animations[layer] = anim
 			# self.gameobj.sendMessage("animation", anim, self._armature.name)
 			
 	def end(self):
@@ -593,7 +593,7 @@ class Engine:
 		self.bgm_file = None
 		
 		# XXX This should be replaced by some user setting
-		self.volume = 0.5
+		self.volume = 0.0
 		
 		# Setup some default options
 		self.options = {
