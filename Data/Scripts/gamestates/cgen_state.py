@@ -84,8 +84,9 @@ class CharacterCreationState(BaseState, BaseController):
 				self.element = main['cgen_data']['element']
 				self.character.accent = ELEMENT_COLOR[self.element]
 				
-			idle = main['actions'][self.race.action_set]["Idle Empty"][0]
-			self.character.play_animation(idle['name'], idle['start'], idle['end'], mode=1)
+			idle = main['actions'][self.race.action_set]["Idle Empty"]
+			for i, v in enumerate(idle):
+				self.character.play_animation(v['name'], v['start'], v['end'], mode=1, layer=i)
 				
 		
 		# Check for cgen end
