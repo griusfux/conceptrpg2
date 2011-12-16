@@ -31,14 +31,39 @@
 		{
 			"name" : "Move 1h",
 			"actions" : [{
-			"name" : "walk_1h",
+			"name" : "kat.move_1h",
 			"start" : 0,
 			"end" : 79}]
 		},
 		{
 			"name" : "Attack 1h",
 			"actions" : [{
-			"name" : "1h_swing_2",
+			"name" : "kat.attack_1h",
+			"start": 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "Idle Bow",
+			"actions" : [{
+			"name" : "kat.idle_bottom_empty",
+			"start" : 0,
+			"end" : 79},
+			{
+			"name" : "kat.idle_top_bow",
+			"start" : 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "Move Bow",
+			"actions" : [{
+			"name" : "kat.move_1h",
+			"start" : 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "Attack Bow",
+			"actions" : [{
+			"name" : "kat.attack_1h",
 			"start": 0,
 			"end" : 79}]
 		}

@@ -497,7 +497,7 @@ class PlayerLogic(CharacterLogic):
 				elif wtype == "BLUNT":
 					v = "1h"
 				elif wtype == "BOW":
-					v = "1h"
+					v = "Bow"
 				elif wtype == "GUN":
 					v = "1h"
 				elif wtype == "THROWN":
