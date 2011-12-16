@@ -15,7 +15,7 @@
 			"end" : 79}]
 		},
 		{
-			"name" : "Walk Empty",
+			"name" : "Move Empty",
 			"actions" : [{
 			"name" : "base.walk",
 			"start" : 1,
@@ -29,21 +29,14 @@
 			"end" : 79}]
 		},
 		{
-			"name" : "Walk 1h",
+			"name" : "Move 1h",
 			"actions" : [{
 			"name" : "walk_1h",
 			"start" : 0,
 			"end" : 79}]
 		},
 		{
-			"name" : "1h Swing",
-			"actions" : [{
-			"name" : "1h_swing_2",
-			"start" : 0,
-			"end" : 119}]
-		},
-		{
-			"name" : "1h Swing 2",
+			"name" : "Attack 1h",
 			"actions" : [{
 			"name" : "1h_swing_2",
 			"start": 0,

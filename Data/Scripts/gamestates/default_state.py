@@ -283,7 +283,7 @@ class DefaultState(BaseState, BaseController):
 			player.auto_target = player.auto_power = None
 			movement = [float(i) for i in (Vector(movement).normalized()*speed)]
 			self.server.invoke("position", id, *player.position)
-			act = player.get_action("Walk")
+			act = player.get_action("Move")
 			self.play_animation(player, act, mode=1)
 		elif player.auto_target:
 			if "WEAPON_RANGE" in player.auto_power.flags:
@@ -319,7 +319,7 @@ class DefaultState(BaseState, BaseController):
 
 				self.server.invoke("rotate", id, 0, 0, rot)
 				
-				act = player.get_action("Walk")
+				act = player.get_action("Move")
 				self.play_animation(player, act, mode=1)
 
 		# Otherwise, idle

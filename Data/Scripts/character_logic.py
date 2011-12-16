@@ -411,6 +411,9 @@ class CharacterLogic:
 		self.last_level = XP_TABLE[self.level-1] if self.level-1 < len(XP_TABLE) else XP_TABLE[-1]
 
 		self.recalc_stats()
+
+	def get_action(self, action):
+		return action
 		
 	@property
 	def position(self):

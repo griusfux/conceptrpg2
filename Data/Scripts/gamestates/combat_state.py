@@ -777,8 +777,8 @@ class CombatState(DefaultState, BaseController):
 	def despawn(self, character):
 		pass
 	
-	def attack(self, power, character, animation="1h Swing", multiplier=1):
-		self.animate_weapon(character, animation)
+	def attack(self, power, character, multiplier=1):
+		self.animate_weapon(character, character.get_action("Attack"))
 		for target in self.get_targets(power, character):
 			damage = character.weapon.damage*multiplier
 			hit = True #character.accuracy - target.reflex + random.randint(3, 18) >= 11
