@@ -325,6 +325,11 @@ class BaseState:
 		main['players'][cid].hp = amount
 		
 		self.clients.invoke('set_health', cid, amount)
+	
+	@rpc(server_functions, "noop")
+	def s_no_op(self, main, client):
+		"""This function simply exists to kick the server when needed"""
+		pass
 		
 	def server_init(self, main):
 		"""Initialize the server state"""

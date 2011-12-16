@@ -238,6 +238,10 @@ class CombatState(DefaultState, BaseController):
 #			if monster.action_set:
 #				self.play_animation(monster, "Idle", mode=1)
 			
+		# Make sure the server moves along
+		if main['owns_combat']:
+			self.server.invoke("noop")
+
 		# Our id so we can talk with the server
 		id = main['client'].id
 		
