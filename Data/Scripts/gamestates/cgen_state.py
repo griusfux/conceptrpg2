@@ -32,6 +32,7 @@ class CharacterCreationState(BaseState, BaseController):
 		# Some variables for viewing the character
 		self.character = None
 		self.weapon = None
+		self.weaponobj = None
 		self.race = None
 		self.pclass = None
 		self.element = ""
@@ -74,17 +75,18 @@ class CharacterCreationState(BaseState, BaseController):
 				
 			if not self.pclass or self.pclass.name != main['cgen_data']['class'].name:
 				self.pclass = main['cgen_data']['class']
-				if self.weapon:
-					self.weapon.end()
-				main['engine'].load_library((Weapon(self.pclass.starting_weapon)))
-				self.weapon = main['engine'].add_object(self.pclass.starting_weapon)			
-				self.character.socket_fill('right_hand', self.weapon)
+				if self.weaponobj:
+					self.weaponobj.end()
+				self.weapon = Weapon(self.pclass.starting_weapon)
+				main['engine'].load_library(self.weapon)
+				self.weaponobj = main['engine'].add_object(self.pclass.starting_weapon)			
+				self.character.socket_fill('right_hand', self.weaponobj)
 				
 			if self.element != main['cgen_data']['element']:
 				self.element = main['cgen_data']['element']
 				self.character.accent = ELEMENT_COLOR[self.element]
 				
-			idle = main['actions'][self.race.action_set]["Idle Empty"]
+			idle = main['actions'][self.race.action_set][PlayerLogic.get_action(self, "Idle")]
 			for i, v in enumerate(idle):
 				self.character.play_animation(v['name'], v['start'], v['end'], mode=1, layer=i)
 				
