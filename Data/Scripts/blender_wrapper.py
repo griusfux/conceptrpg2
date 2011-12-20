@@ -151,7 +151,17 @@ class Object:
 		return vector
 		
 	def get_local_vector_to(self, position, arg = 2):
-		return self.gameobj.getVectTo(position)[arg]	
+		return self.gameobj.getVectTo(position)[arg]
+	
+	def play_action(self, actions, mode=0):		
+		# Now play all of the actions in the set
+		for i, v in enumerate(actions):
+			self.play_animation(v['name'], v['start'], v['end'], mode=mode, layer=i)
+			
+		# Now clear the other layers
+		for i in range(len(actions), len(self.animations)):
+			self._armature.stopAction(i)
+			self.animations[i] = ""
 		
 	def play_animation(self, anim, start=0, end=0, mode=0, layer=0, blending=0):
 		if self._armature and anim != self.animations[layer]:

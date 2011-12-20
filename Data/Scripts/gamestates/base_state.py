@@ -214,8 +214,7 @@ class BaseState:
 		
 		if action in main['actions'][character.action_set]:
 			actions = main['actions'][character.action_set][action]
-			for i, v in enumerate(actions):
-				character.object.play_animation(v['name'], v['start'], v['end'], mode=mode, layer=i)
+			character.object.play_action(actions, mode=mode)
 		else:
 			print("WARNING: action %s not found in action set %s." % (action, character.action_set))
 
