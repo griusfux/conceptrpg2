@@ -4,19 +4,32 @@
 	"action_set":
 	[
 		{
+			"name" : "Spawn",
+			"actions" : [{
+			"name" : "re.Spawn",
+			"start" : 0,
+			"end" : 90}]
+		},
+		{
 			"name" : "Move",
 			"actions" : [{
 			"name" : "re.Run",
 			"start" : 0,
 			"end" : 59}]
 		},
-		
 		{
-			"name" : "Spawn",
+			"name" : "Die",
 			"actions" : [{
-			"name" : "re.Spawn",
+			"name" : "re.Death",
 			"start" : 0,
-			"end" : 113}]
+			"end" : 56}]
+		},
+		{
+			"name" : "Attack",
+			"actions" : [{
+			"name" : "re.Attack",
+			"start": 0,
+			"end" : 50}]
 		}
 	]
 }
