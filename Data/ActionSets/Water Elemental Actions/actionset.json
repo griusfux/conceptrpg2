@@ -3,5 +3,33 @@
 	
 	"action_set":
 	[
+		{
+			"name" : "Spawn",
+			"actions" : [{
+			"name" : "we.Spawn",
+			"start" : 0,
+			"end" : 40}]
+		},
+		{
+			"name" : "Move",
+			"actions" : [{
+			"name" : "we.Run",
+			"start" : 0,
+			"end" : 29}]
+		},
+		{
+			"name" : "Die",
+			"actions" : [{
+			"name" : "we.Death",
+			"start" : 0,
+			"end" : 50}]
+		},
+		{
+			"name" : "Attack",
+			"actions" : [{
+			"name" : "we.Attack",
+			"start": 0,
+			"end" : 40}]
+		}
 	]
 }
