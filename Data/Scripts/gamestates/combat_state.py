@@ -587,7 +587,7 @@ class CombatState(DefaultState, BaseController):
 		else:
 			print("WARNING: invalid type supplied to deal_damage() from power:", power.name)
 		
-		self.modify_health(target, -damage)
+		self.modify_health(target, -max(1, damage))
 		
 	def modify_health(self, character, amount):
 		BaseController.modify_health(self, character, amount)
