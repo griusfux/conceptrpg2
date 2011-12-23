@@ -225,6 +225,18 @@ class DefaultState(BaseState, BaseController):
 		del main['full_map']
 		for i in self.item_effects:
 			main['effect_systm'].remove(i)
+			
+	def _display_item_name(self, main, itemv):
+		if itemv[2] is None:
+			pos = itemv[1].position[:2] + (itemv[1].position[2]+0.5,)
+			effect = effects.TextEffect(itemv[0].name, pos, duration=1000,
+										continuous=0, static=True)
+			itemv[2] = main['effect_system'].add(effect)
+			
+	def _remove_item_name(self, main, itemv):
+		if itemv[2] is not None:
+			main['effect_system'].remove(itemv[2])
+			itemv[2] = None
 
 	def _handle_generic_input(self, main, inputs):
 		# Our id so we can talk with the server
@@ -236,6 +248,10 @@ class DefaultState(BaseState, BaseController):
 		movement = [0.0, 0.0, 0.0]
 		speed = player.speed
 		
+		# Find the items in range here so we don't have to calculate twice
+		# (once to display names and again for picking up items)
+		items_to_display = items_in_range = {k: v for k, v in main['ground_items'].items() if (Vector(v[1].position).xy-player.position.xy).length_squared < 2}
+		
 		if ("InGameMenu", "INPUT_CLICK") in inputs:
 			return("InGameMenu", "PUSH")
 			
@@ -243,21 +259,17 @@ class DefaultState(BaseState, BaseController):
 			main['ui_system'].toogle_overlay("stats")
 			
 		if ("Action", "INPUT_CLICK") in inputs:
-			for k, v in main['ground_items'].items():
-				if (Vector(v[1].position).xy - player.position.xy).length_squared < 2:
-					self.server.invoke("request_item_pickup", k)
+			for key in items_in_range:
+				self.server.invoke("request_item_pickup", key)
 		if ("ShowItemNames", "INPUT_ACTIVE") in inputs:
-			for k, v in main['ground_items'].items():
-				if v[2] is None:
-					pos = v[1].position[:2] + (v[1].position[2]+0.5,)
-					effect = effects.TextEffect(v[0].name, pos, duration=1000,
-												continuous=0, static=True)
-					v[2] = main['effect_system'].add(effect)
-		elif ("ShowItemNames", "INPUT_RELEASE") in inputs:
-			for k, v in main['ground_items'].items():
-				if v[2] is not None:
-					main['effect_system'].remove(v[2])
-					v[2] = None
+			items_to_display = main['ground_items']
+			
+		# Now display all the names for items in range
+		for k, v in main['ground_items'].items():
+			if k in items_to_display:
+				self._display_item_name(main, v)
+			else:
+				self._remove_item_name(main, v)
 
 		# Only let the player do stuff while they are not "locked"
 		if not player.lock:
