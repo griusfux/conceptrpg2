@@ -429,8 +429,7 @@ class CombatState(DefaultState, BaseController):
 	def request_monsters(self, main, client):
 		combat = main['combats'].get(client.combat_id, None)
 		if combat is None: return
-		if client.combat_id not in combat.monster_list: return
-		
+
 		for i, v in combat.monster_list.items():
 			self.client.invoke("add_player", i, v.get_info(), 1, v.position, None)
 			self.client.invoke("add_monster", client.combat_id, v.name, i, *v.position)
