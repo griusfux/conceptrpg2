@@ -476,7 +476,9 @@ class DefaultState(BaseState, BaseController):
 	def animate_weapon(self, character, animation):
 		"""This function is used for when an attack animation is played"""
 		self.animate_lock(character, animation)
-		
-	def animate_spell(self, character, animation):
+	
+	# XXX Powers should no longer specify there casting animation!
+	# We specify None here to keep powers from breaking until they are fixed.
+	def animate_spell(self, character, animation=None):
 		"""This function exists in case we want to handle spells and attacks differently, e.g. speed"""
-		self.animate_lock(character, animation)
+		self.animate_lock(character, "Cast")

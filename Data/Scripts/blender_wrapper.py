@@ -155,7 +155,8 @@ class Object:
 	def play_action(self, actions, mode=0):		
 		# Now play all of the actions in the set
 		for i, v in enumerate(actions):
-			self.play_animation(v['name'], v['start'], v['end'], mode=mode, layer=i)
+			if v['name'] != "*":
+				self.play_animation(v['name'], v['start'], v['end'], mode=mode, layer=i)
 			
 		# Now clear the other layers
 		for i in range(len(actions), len(self.animations)):
