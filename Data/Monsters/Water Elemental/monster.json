@@ -15,6 +15,6 @@
     "name": "Water Elemental", 
     "root_object": "WaterElementalArm", 
     "size": 1.0, 
-    "speed": 3.0, 
+    "speed": 2.0, 
     "xp_reward": 100
 }

@@ -15,6 +15,6 @@
     "name": "Rock Elemental", 
     "root_object": "RockGolemArm", 
     "size": 1.7, 
-    "speed": 3.0, 
+    "speed": 2.0, 
     "xp_reward": 75
 }

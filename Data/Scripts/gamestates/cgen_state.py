@@ -115,7 +115,7 @@ class CharacterCreationState(BaseState, BaseController):
 				
 				
 				player.max_hp = 16
-				player.speed = 5
+				player.speed = 3.0
 				
 				# Now it is time to fill in the rest of the stats
 				player.recalc_stats()
