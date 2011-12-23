@@ -85,7 +85,7 @@ class CombatState(DefaultState, BaseController):
 		
 		if main['is_host']:
 			monster = self.monster_list[cid]
-			monster.object.move((x, y, z), min=[-50, -50, 0], max=[50, 50, 0], local=True)
+			monster.object.move((x, y, z), min=[-50, -50, 0], max=[50, 50, 0], local=False)
 			self.server.invoke("position", cid, *monster.position)
 		
 	@rpc(client_functions, "rotate_monster", str, float, float, float)
