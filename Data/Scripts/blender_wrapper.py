@@ -136,8 +136,7 @@ class Object:
 			sign = -1
 		else:
 			axis = " " + axis
-		
-		ori = self.gameobj.localOrientation[:]
+
 		vector = (0, 0, 0)
 		if axis[1] == 'x':
 			vector = (1, 0, 0)
@@ -610,9 +609,6 @@ class Engine:
 					'x_sensitivity': 1.5,
 					'y_sensitivity': 1.5,
 				}
-		
-	def __del__(self):
-		self.free_libraries()
 	
 	def load_library(self, package, type='Scene'):
 		"""Load scene data from a package file"""

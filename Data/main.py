@@ -40,7 +40,7 @@ def exit_game(main):
 	# We use try/except so that we always reach gl.endGame()
 	try:
 		# Attempt to save the player
-		if 'player' in main:
+		if 'player' in main and main['player']:
 			main['player'].save()
 			
 		# Disconnect from the server
@@ -51,16 +51,25 @@ def exit_game(main):
 		if "server" in main:
 			main['server'].terminate()
 			del main['server']
+			
+		# Free any libraries
+		# XXX This seems to cause some crashes right now. We really should get this fixed to clean up some memory.
+#		if 'engine' in main:
+#			main['engine'].free_libraries()
 	except Exception as e:
 		import traceback
 		traceback.print_exc()
 	
 	gl.error = True
 	
+	# Close our log and return sys.stdout to the way it was
+	sys.stdout.close()
+	sys.stdout = sys.stdout.stream
+	
+	
 	if main['exit'] == "RESTART":
 		gl.restartGame()
 	else:
-		sys.stdout.close()
 		gl.endGame()
 					
 def in_game(cont):
