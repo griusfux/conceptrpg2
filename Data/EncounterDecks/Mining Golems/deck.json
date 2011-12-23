@@ -5,6 +5,6 @@
 		{ "monster": "Bomb Golem", "points": 2, "weight": 1 },
 		{ "monster": "Furnace Golem", "points": 2, "weight": 1},
 		{ "monster": "Water Elemental", "points": 2, "weight": 1},
-		{ "monster": "Rock Golem", "points": 4, "weight": 1}
+		{ "monster": "Rock Elemental", "points": 4, "weight": 1}
 	]
 }

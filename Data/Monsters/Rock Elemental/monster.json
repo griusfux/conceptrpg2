@@ -12,7 +12,7 @@
     "element": "EARTH", 
     "hp_per_level": 5, 
     "level_adjustment": 1, 
-    "name": "Rock Golem", 
+    "name": "Rock Elemental", 
     "root_object": "RockGolemArm", 
     "size": 1.7, 
     "speed": 3.0, 
