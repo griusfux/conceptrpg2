@@ -2,7 +2,7 @@
     "cool_down": 3, 
     "delivery": "SPELL", 
     "description": "Target takes moderate physical damage.", 
-    "distance": 4, 
+    "distance": 10, 
     "effect_shape": "SINGLE", 
     "element": "FIRE", 
     "flags": [], 
