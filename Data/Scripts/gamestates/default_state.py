@@ -515,7 +515,7 @@ class DefaultState(BaseState, BaseController):
 		"""This function exists in case we want to handle spells and attacks differently, e.g. speed"""
 		self.animate_lock(character, "Cast")
 
-	def deal_damage(self, caster, target, power, damage, type):
+	def deal_damage(self, caster, target, power, damage, type, delay=0):
 			damage += caster.affinities[power.element]
 			damage -= target.affinities[power.element]
 			
@@ -529,9 +529,9 @@ class DefaultState(BaseState, BaseController):
 			else:
 				print("WARNING: invalid type supplied to deal_damage() from power:", power.name)
 			
-			self.modify_health(target, -max(1, damage))
+			self.modify_health(target, -max(1, damage), delay=delay)
 		
-	def modify_health(self, character, amount):
+	def modify_health(self, character, amount, delay=0):
 		BaseController.modify_health(self, character, amount)
 		
 		if not self.is_server:
@@ -540,7 +540,7 @@ class DefaultState(BaseState, BaseController):
 					self.server.invoke("modify_health", i, amount)
 					
 					pos = character.object.position[:2]+(character.object.position[2]+2,)
-					effect = effects.TextEffect(amount, pos, 90)
+					effect = effects.TextEffect(amount, pos, 90, delay=delay)
 					self.add_effect(effect)
 		
 	def end_effect(self, id):
@@ -720,7 +720,12 @@ class DefaultState(BaseState, BaseController):
 		pass
 	
 	def attack(self, power, character, multiplier=1):
-		self.animate_weapon(character, character.get_action("Attack"))
+		# Fetching animation data to determine a delay
+		action = character.get_action("Attack")
+		animation = self.main['actions'][character.action_set][action]
+		delay = (animation[0]['end'] - animation[0]['start'])
+		
+		self.animate_weapon(character, action)
 		for target in self.get_targets(power, character):
 			damage = character.weapon.damage*multiplier
 			hit = True #character.accuracy - target.reflex + random.randint(3, 18) >= 11
@@ -744,10 +749,10 @@ class DefaultState(BaseState, BaseController):
 			for name in remove: character.remove_callback(name, "ATTACK")
 			
 			if state['HIT']:
-				self.deal_damage(character, state['TARGET'], power, state['DAMAGE']
-								, state['TYPE'])
+				self.deal_damage(character, state['TARGET'], power,
+								state['DAMAGE'] , state['TYPE'], delay=delay/2)
 			else:
-				self.modify_health(target, 0)
+				self.modify_health(target, 0, delay=delay)
 	
 	def use_power(self, character, power, auto_range=True):
 		if isinstance(power, str):
