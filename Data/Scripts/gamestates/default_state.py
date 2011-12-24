@@ -162,7 +162,7 @@ class DefaultState(BaseState, BaseController):
 		# Our id so we can talk with the server
 		id = main['client'].id
 		
-		if inputs and not self.suspended:
+		if not self.suspended:
 			if ("SwitchCamera", "INPUT_ACTIVE") in inputs:
 				main['full_map'] = True
 

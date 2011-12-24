@@ -82,6 +82,13 @@
 			{"name" : "kat.cast",
 			"start": 0,
 			"end" : 80}]
+		},
+		{
+			"name" : "Die",
+			"actions" : [{
+			"name" : "kat.death",
+			"start": 0,
+			"end" : 60}]
 		}
 	]
 }

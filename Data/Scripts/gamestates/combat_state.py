@@ -245,7 +245,7 @@ class CombatState(DefaultState, BaseController):
 		# Our id so we can talk with the server
 		id = main['client'].id
 		
-		if inputs and not self.suspended:
+		if not self.suspended:
 			# Only let the player do stuff while they are not "locked"
 			if not main['player'].lock:
 				
