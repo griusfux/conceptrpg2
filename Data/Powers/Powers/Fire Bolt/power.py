@@ -8,7 +8,7 @@ def power(self, controller, user):
         return
     target = targets[0]
     
-    controller.animate_spell(user, "cast")
+    controller.animate_spell(user)
 
     def f_collision(effect):
         strength = 4 + random.randrange(0, 3)
