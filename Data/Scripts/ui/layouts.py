@@ -458,7 +458,8 @@ class PowersLayout(Layout):
 		if self.element != self.ele_bar.element:
 			self.element = self.ele_bar.element
 			self.powers = [power for power in Power.get_package_list()
-							if power.element == self.element.upper()]
+							if power.element == self.element.upper()
+							and power.tier <= 1]
 			self.lbox.items = self.powers
 			self.lbox.active = None
 				

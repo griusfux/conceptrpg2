@@ -3,9 +3,37 @@ import random
 import Scripts.packages as Packages
 from Scripts.modifiers import *
 
+# Restricting weapons to those that are completed
+_RestrictedWeapons = [
+						"Battlestaff",
+						"Claymore",
+						"Club",
+						"Crossbow",
+						"Dagger",
+						"Flail",
+						"Grenade",
+						"Halberd",
+						"Handaxe",
+						"Hatchet",
+						"Katana",
+						"Mace",
+						"Pike",
+						"Pistol",
+						"Rifle",
+						"Saber",
+						"Shortbow",
+						"Spear",
+						"Throwing Axe",
+						"Throwing Knife",
+						"Throwing Star",
+						"Waraxe",
+						"Warhammer",
+						]
+
 AvailableItems = [i.name for i in Packages.Item.get_package_list()]
 AvailableArmors = [i.name for i in Packages.Armor.get_package_list()]
-AvailableWeapons = [i.name for i in Packages.Weapon.get_package_list()]
+AvailableWeapons = [i.name for i in Packages.Weapon.get_package_list()
+					if i.name not in _RestrictedWeapons]
 
 MOD_LEVEL_MINUS_ONE = 0.2
 MOD_LEVEL_PLUS_ONE = 0.4
