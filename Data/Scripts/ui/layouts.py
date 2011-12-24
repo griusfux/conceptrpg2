@@ -577,15 +577,18 @@ class StartGameOverlay(Layout):
 		
 		ysize = 0.05 # Tweak this to get the inputs and labels to line up
 		
-		self.userlbl = bgui.Label(self.frame, "sgo_usr_lbl", text="Username: ", pos=[0.05, 0.8])
+		self.userlbl = bgui.Label(self.frame, "sgo_usr_lbl", text="Username: ",
+								pos=[0.05, 0.8], sub_theme='Title')
 		self.user = bgui.TextInput(self.frame, "sgo_user",
 				size=[0.5, ysize], pos=[0.3, 0.8], text="User")
 				
-		self.iplbl = bgui.Label(self.frame, "sgo_ip_lbl", text="Server IP: ", pos=[0.05, 0.7])
+		self.iplbl = bgui.Label(self.frame, "sgo_ip_lbl", text="Server IP: ",
+								pos=[0.05, 0.7], sub_theme='Title')
 		self.ip = bgui.TextInput(self.frame, "sgo_ip",
 				size=[0.5, ysize], pos=[0.3, 0.7], text="localhost")
 				
-		self.portlbl = bgui.Label(self.frame, "sgo_port_lbl", text="Server Port: ", pos=[0.05, 0.6])
+		self.portlbl = bgui.Label(self.frame, "sgo_port_lbl", text="Server Port: ",
+									pos=[0.05, 0.6], sub_theme='Title')
 		self.port = bgui.TextInput(self.frame, "sgo_port",
 				size=[0.5, ysize], pos=[0.3, 0.6], text="9999")
 		
@@ -755,7 +758,7 @@ class CharGenLayout(Layout):
 									pos=[0.07, 0.9], sub_theme="Title")
 		
 		self.name_in = bgui.TextInput(self.mframe, "name_in", pos=[0.28, 0.89],
-										size=[0.2, 0.07], text="Hero", color=(0,0,0,.8))
+										size=[0.2, 0.07], text="Hero")
 		
 		# Setup the display of current choices
 		self.race_lbl = bgui.Label(self.mframe, "race_l", text="2. Race",
@@ -774,7 +777,7 @@ class CharGenLayout(Layout):
 		
 		# Setup description of current focus
 		self.focus_info = bgui.TextBlock(self.mframe, "finfo", pos=[0.07, 0.35],
-										size=[0.86, 0.37])
+										size=[0.86, 0.30])
 		self.focus_details = bgui.TextBlock(self.mframe, "fdetail", pos=[0.07, 0.05],
 										size=[0.86, 0.37])
 		
@@ -785,8 +788,8 @@ class CharGenLayout(Layout):
 		self.cancel_btn = Button(self.mframe, "can_btn", text="CANCEL", pos=[0.4, 0.07],
 								on_click=self.cancel_click)
 		
-		self.help_btn = Button(self.mframe, "help_btn", text="HELP", pos=[0.65, 0.8],
-								on_click=self.help_click)
+#		self.help_btn = Button(self.mframe, "help_btn", text="HELP", pos=[0.65, 0.8],
+#								on_click=self.help_click)
 	
 	def update(self, main):			
 		self.main = main
