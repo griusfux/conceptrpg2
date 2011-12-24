@@ -16,6 +16,7 @@ class NetPlayer(CharacterLogic):
 		
 	def __init__(self, char_info, pos, ori):
 		CharacterLogic.__init__(self, None)
+		self.load_from_info(char_info)
 		self.char_info = char_info
 		self._position = pos
 		self._orientation = ori

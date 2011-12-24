@@ -124,6 +124,9 @@ class CharacterLogic:
 		# Various flags
 		self.flags = set()
 		
+		# Flag to notify that we need to resend player data over the server
+		self.network_update = False
+		
 		# The character's current "lock", which is represented as the time at which the lock ends
 		self.lock = 0
 		
@@ -184,6 +187,8 @@ class CharacterLogic:
 		self.power_pool = self.power_pool_max
 		for power in self.powers:
 			self.power_pool -= power.cost(self.affinities)
+			
+		self.network_update = True
 		
 	def apply_affinities(self):
 		for k, v in self.player_class.affinities.items():

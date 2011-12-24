@@ -305,6 +305,13 @@ class BaseState:
 			if v.__class__.__name__ == 'NetPlayer':
 				self.client.invoke('add_player', k, v.char_info, 0, v.position, v.orientation)
 		
+	@rpc(server_functions, "update_player_info", "pickle")
+	def update_player_info(self, main, client, char_info):
+		player = main['players'].get(client.id, None)
+		
+		if player:
+			player.load_from_info(char_info)
+		
 	@rpc(server_functions, "animate", str, str, int)
 	def s_animate(self, main, client, cid, action, mode):
 		self.clients.invoke('animate', cid, action, mode) 
