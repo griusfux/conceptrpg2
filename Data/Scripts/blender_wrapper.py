@@ -164,10 +164,13 @@ class Object:
 			self.animations[i] = ""
 		
 	def play_animation(self, anim, start=0, end=0, mode=0, layer=0, blending=0):
-		if self._armature and anim != self.animations[layer]:
-			self._armature.playAction(anim, start, end, play_mode=mode, layer=layer)
-			self.animations[layer] = anim
-			# self.gameobj.sendMessage("animation", anim, self._armature.name)
+		if not self._armature: return
+		
+		if self._armature.isPlayingAction(layer) and anim == self.animations[layer]: return
+		
+		# We've passed all of the checks, so play the animation
+		self._armature.playAction(anim, start, end, play_mode=mode, layer=layer)
+		self.animations[layer] = anim
 			
 	def end(self):
 		if not self.gameobj.invalid:
