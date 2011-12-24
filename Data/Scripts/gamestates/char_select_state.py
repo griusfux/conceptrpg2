@@ -106,9 +106,9 @@ class CharacterSelectState(BaseState, BaseController):
 		
 		if main['cls_del']:
 			try:
-				shutil.rmtree(Package.Save._dir+"/"+self.saves[index].package_name)
+				shutil.rmtree(Package.Save._dir+"/"+self.saves[main['csl_index']].package_name)
 			except:
-				print("Error when trying to delete save:", self.saves[index].package_name)
+				print("Error when trying to delete save:", self.saves[main['csl_index']].package_name)
 			return ("CharacterSelect", "SWITCH")
 		
 		if main['csl_continue']:	
