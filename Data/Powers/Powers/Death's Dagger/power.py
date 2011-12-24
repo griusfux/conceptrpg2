@@ -1,15 +1,14 @@
-import random
-
 import Scripts.effects as Effect
 
 def power(self, controller, user):
-	if user.stance == self.name:
+	if user.stance == "Death's Dagger":
+		cb = user.callbacks['ATTACK']["death's dagger"]
+		controller.end_effect(cb.effect_id)
+		user.remove_callback("death's dagger", "ATTACK")
 		user.stance = ""
-		user.remove_callback("ATTACK", self.callback)
-		del self.callback
 		return
-	else:
-		user.stance = self.name
+	
+	user.stance = "Death's Dagger"
 	
 	controller.animate_spell(user, "cast")
 
@@ -19,8 +18,8 @@ def power(self, controller, user):
 	effect = Effect.StaticEffect("small_cloud_purple", user, 100, delay=50, continuous=0)
 	id = controller.add_effect(effect)
 
-	self.callback = death_dagger_callback(user, self.name, controller, id)
-	user.add_callback("ATTACK", self.callback)
+	callback = death_dagger_callback(user, self.name, controller, id)
+	user.add_callback("death's dagger", "ATTACK", callback)
 		
 class death_dagger_callback:
 	def __init__(self, user, name, controller, id):
@@ -29,9 +28,9 @@ class death_dagger_callback:
 		self.user = user
 		self.name = name
 		
-	def __call__(self, target, hit, damage):
-		damage += 4 + random.randrange(0, 3)
-		return target, hit, damage, True
+	def __call__(self, state):
+		state['TYPE'] = 'ARCANE'
+		return state, False
 	
 	def __del__(self):
 		self.controller.remove_effect(self.effect_id)

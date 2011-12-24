@@ -263,6 +263,10 @@ class DefaultState(BaseState, BaseController):
 				self.server.invoke("request_item_pickup", key)
 		if ("ShowItemNames", "INPUT_ACTIVE") in inputs:
 			items_to_display = main['ground_items']
+		if ("NextPower", "INPUT_CLICK") in inputs:
+			player.powers.make_next_active()
+		if ("PrevPower", "INPUT_CLICK") in inputs:
+			player.powers.make_prev_active()
 			
 		# Now display all the names for items in range
 		for k, v in main['ground_items'].items():
@@ -444,7 +448,7 @@ class DefaultState(BaseState, BaseController):
 	# Controller
 	##########
 		
-	def add_status(self, character, status, amount, duration):		
+	def add_status(self, character, status, amount, duration):
 		self.server.invoke("add_status", character.id, status, amount, duration)
 	
 	def animate_lock(self, character, animation):

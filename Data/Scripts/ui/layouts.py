@@ -914,40 +914,51 @@ class DefaultStateLayout(Layout):
 		psys = main['player'].powers
 		powers = psys.all
 		
-#		if self.power_imgs:
-#			for i, power in enumerate(powers):
-#				if power.timer>0:
-#					self.power_imgs[i].update_image("Textures/ui/hex_tile_gray.png")
-#				else:
-#					self.power_imgs[i].update_image("Textures/ui/hex_tile_blue.png")
-			
+		self.power_bar_selection = psys.active_index
+		
+		# If the images don't need to be updated, then update the bar for cool downs	
 		if not update_all:
+			for i in range(len(powers)):
+				power = powers[i]
+				img = self.power_imgs[i]
+				lbl = self.power_timers[i]
+				y = 15 if i == self.power_bar_selection else 3
+				
+				x = (img.position[0]-self.power_frame.position[0])/self.power_frame.size[0]
+				y = (y-self.power_frame.position[1])/self.power_frame.size[1]
+				img.position = [x, y]
+				
+				if power.timer > 0:
+					lbl.text = "%.0f"%(power.timer/60)
+					img.color = ELEMENT_COLOR['NEUTRAL']+[0.0]
+				else:
+					lbl.text = ""
+					img.color = ELEMENT_COLOR[powers[i].element]+[1.0]
 			return
 		
 		# Clear the old images
 		for i in self.power_imgs:
 			self.power_frame._remove_widget(i)
 		self.power_imgs = []
+		self.power_timers = []
 	
 		# Create new images
 		for i in range(min(8, len(powers))):
 			# Background
-#			bg = "Textures/ui/power_used.png"
-#			if (not self.combat and "NON_COMBAT" not in powers[i].flags):
-#				bg = "Textures/ui/power_used.png"
 			bg = "Textures/ui/power_bar_bg.png"
 			img = bgui.Image(self.power_frame, "sbg"+str(i), bg, aspect=1,
 							 size=[0, .75], pos=[.03+.16*i, .115])
-
 			img.color = ELEMENT_COLOR[powers[i].element]+[1.0]
 
 			# Power icon
 			img_name = powers[i].open_image()
 			simg = bgui.Image(img, powers[i].name, img_name, size=[1, 1], pos=[0, 0])
 			powers[i].close_image()
+			
+			lbl = bgui.Label(img, "cdl"+str(i), pt_size=20, options=bgui.BGUI_CENTERED)
+			
 			self.power_imgs.append(img)
-								
-		self.power_bar_selection = psys.active_index
+			self.power_timers.append(lbl)
 		
 	def update(self, main):
 		player = main['player']
@@ -960,8 +971,7 @@ class DefaultStateLayout(Layout):
 		self.exp_text.text = "EXP (%d/%d)" % (player.xp, player.next_level)#player.xp+100-(player.xp%100))
 		self.exp_bar.percent = (player.xp-player.last_level)/(player.next_level-player.last_level+1)
 		
-		self.update_powerbar(main, self.power_bar_selection != player.powers.active_index\
-								or len(self.power_imgs) != len(player.powers.all))
+		self.update_powerbar(main, len(self.power_imgs) != len(player.powers.all))
 			
 		# Net Players
 		missing_players = self.net_ids[:]

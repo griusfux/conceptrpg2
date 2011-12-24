@@ -44,7 +44,7 @@ BASE_AFFINITIES = {
 			}
 
 CALLBACKS = {
-			"ATTACK" : [],
+			"ATTACK" : {},
 			}
 
 class CharacterLogic:
@@ -220,21 +220,23 @@ class CharacterLogic:
 				status.pop(controller, self)
 				self.statuses.remove(status)
 				
-	def add_callback(self, type, callback):
+	def add_callback(self, name, type, callback):
 		if type not in CALLBACKS:
 			print("WARNING: %s is not a supported character callback. Supported callbacks are:"%type)
 			for key in CALLBACKS:
 				print(key)
 			return
-		self.callbacks[type].append(callback)
+		# New callbacks over write old ones
+		self.callbacks[type][name] = callback
 		
-	def remove_callback(self, type, callback):
+	def remove_callback(self, name, type):
 		if type not in CALLBACKS:
 			print("WARNING: %s is not a supported character callback. Supported callbacks are:"%type)
 			for key in CALLBACKS:
 				print(key)
 			return
-		self.callbacks[type].remove(callback)
+		if name in self.callbacks[type]:
+			del self.callbacks[type][name]
 		
 	def level_up(self):
 		self.level += 1

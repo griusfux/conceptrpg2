@@ -252,11 +252,7 @@ class CombatState(DefaultState, BaseController):
 				player = main['player']
 				
 				if ("UsePower", "INPUT_CLICK") in inputs:
-					self.use_power(player, player.powers.active.name)
-				if ("NextPower", "INPUT_CLICK") in inputs:
-					player.powers.make_next_active()
-				if ("PrevPower", "INPUT_CLICK") in inputs:
-					player.powers.make_prev_active()
+					self.use_power(player, player.powers.active)
 				if ("UsePowerOne", "INPUT_CLICK") in inputs:
 					if player.powers.has_power(0):
 						self.use_power(player, player.powers.all[0])
@@ -781,12 +777,28 @@ class CombatState(DefaultState, BaseController):
 		for target in self.get_targets(power, character):
 			damage = character.weapon.damage*multiplier
 			hit = True #character.accuracy - target.reflex + random.randint(3, 18) >= 11
-			for callback in character.callbacks['ATTACK']:
-				target, hit, damage, complete = callback(target, hit, damage)
+			
+			# Store state information for callbacks to modify
+			state = {
+						'HIT' : hit,
+						'DAMAGE' : damage,
+						'TARGET' : target,
+						'TYPE' : 'PHYSICAL', 
+					}
+			
+			# Address all the callbacks
+			remove = []
+			for name, callback in character.callbacks['ATTACK'].items():
+				state, complete = callback(state)
 				if complete:
-					character.remove_callback("ATTACK", callback)
-			if hit:
-				self.deal_damage(character, target, power, damage, 'PHYSICAL')
+					remove.append(name)
+					
+			# Clear out the complete callbacks		
+			for name in remove: character.remove_callback(name, "ATTACK")
+			
+			if state['HIT']:
+				self.deal_damage(character, state['TARGET'], power, state['DAMAGE']
+								, state['TYPE'])
 			else:
 				self.modify_health(target, 0)
 	
