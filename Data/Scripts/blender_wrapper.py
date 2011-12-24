@@ -603,7 +603,7 @@ class Engine:
 		self.bgm_file = None
 		
 		# XXX This should be replaced by some user setting
-		self.volume = 0.0
+		self.volume = 0.5
 		
 		# Setup some default options
 		self.options = {
