@@ -162,7 +162,7 @@ class BlenderInputSystem():
 		return bge.events.EventToString(e)
 	
 	# Get the keyboard character for a supplied input
-	def event_to_char(self, event):
+	def event_to_char(self, event, shifted=False):
 		e = self.keyboard.dict.get(event)
 		
 		if not e:
@@ -170,4 +170,4 @@ class BlenderInputSystem():
 		if not e:
 			return ""
 		
-		return bge.events.EventToCharacter(e)
+		return bge.events.EventToCharacter(e, shifted)

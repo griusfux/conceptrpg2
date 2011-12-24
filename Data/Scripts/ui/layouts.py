@@ -956,8 +956,14 @@ class DefaultStateLayout(Layout):
 			simg = bgui.Image(img, powers[i].name, img_name, size=[1, 1], pos=[0, 0])
 			powers[i].close_image()
 			
+			# cool down
 			lbl = bgui.Label(img, "cdl"+str(i), pt_size=20, options=bgui.BGUI_CENTERED)
 			
+			# Key Binding
+			kb = bgui.Label(img, "kb"+str(i), pt_size=30, pos=[0.05, 0.05])
+			convert = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight']
+			kb.text = main['input_system'].event_to_char('UsePower'+convert[i])
+
 			self.power_imgs.append(img)
 			self.power_timers.append(lbl)
 		
