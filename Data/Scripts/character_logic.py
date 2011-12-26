@@ -500,7 +500,7 @@ class PlayerLogic(CharacterLogic):
 				elif wtype == "AXE":
 					v = "1h"
 				elif wtype == "POLEARM":
-					v = "1h"
+					v = "Spear"
 				elif wtype == "BLUNT":
 					v = "1h"
 				elif wtype == "BOW":
