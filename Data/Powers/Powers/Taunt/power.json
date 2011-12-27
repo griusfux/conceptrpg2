@@ -3,7 +3,7 @@
     "delivery": "WEAPON", 
     "description": "Causes the caster's target to target the caster.", 
     "distance": 8, 
-    "effect_shape": "SINGLE", 
+    "effect_shape": "SELF", 
     "element": "EARTH", 
     "flags": [], 
     "name": "Taunt", 

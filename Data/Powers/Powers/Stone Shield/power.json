@@ -3,7 +3,7 @@
     "delivery": "SPELL", 
     "description": "Gives the caster a high increase to physical resistance.", 
     "distance": 0, 
-    "effect_shape": "SINGLE", 
+    "effect_shape": "SELF", 
     "element": "EARTH", 
     "flags": [], 
     "name": "Stone Shield", 
