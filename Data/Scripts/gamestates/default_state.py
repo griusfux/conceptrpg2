@@ -2,6 +2,7 @@
 
 import time
 import random
+import math
 
 from Scripts.packages import *
 from Scripts.mathutils import Vector
@@ -678,7 +679,7 @@ class DefaultState(BaseState, BaseController):
 				if (target.position - source).length < distance:
 					targets.append(target)
 		elif shape == 'CONE':
-			pi_fourths = pi / 4
+			pi_fourths = math.pi / 4
 			for target in tlist:
 			
 				# Start with a simple distance check

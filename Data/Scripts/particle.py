@@ -84,8 +84,7 @@ class ParticleSystem():
 		
 		# Determine the particle velocity vector
 		velocity = self.object.getAxisVect(Z_AXIS)
-		velocity.rotate(mathutils.Euler((x_tilt, 0, 0)))
-		velocity.rotate(mathutils.Euler((0, y_tilt, 0)))
+		velocity.rotate(mathutils.Euler((x_tilt, 0, y_tilt)))
 		
 		# Assign the particle properties
 		particle['life'] = self.part_life
@@ -103,7 +102,7 @@ class ParticleSystem():
 		
 	def update_particle(self, particle):
 		# Update particle life
-		if particle['life'] == 0:
+		if particle['life'] <= 0:
 			self.particle_list.remove(particle)
 			particle.endObject()
 			return
