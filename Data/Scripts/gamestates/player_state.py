@@ -48,6 +48,10 @@ class PlayerState(DefaultState):
 			if tut:
 				self.display_tutorial(player, tut)
 			
+		# Play the idle animation
+		act = player.get_action("Idle")
+		self.play_animation(player, act, mode=1)
+
 		# Get inputs
 		inputs = main['input_system'].run()
 
