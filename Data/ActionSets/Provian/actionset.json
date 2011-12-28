@@ -3,5 +3,117 @@
 	
 	"action_set":
 	[
+		{
+			"name" : "Idle Empty",
+			"actions" : [{
+			"name" : "prv.idle_bottom_empty",
+			"start" : 0,
+			"end" : 79},
+			{
+			"name" : "prv.idle_top_empty",
+			"start" : 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "Move Empty",
+			"actions" : [{
+			"name" : "prv.move_empty",
+			"start" : 1,
+			"end" : 79}]
+		},
+		{
+			"name" : "Attack Empty",
+			"actions" : [{
+			"name" : "prv.attack_empty",
+			"start": 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "Idle 1h",
+			"actions" : [{
+			"name" : "prv.idle_1h",
+			"start" : 1,
+			"end" : 79}]
+		},
+		{
+			"name" : "Move 1h",
+			"actions" : [{
+			"name" : "prv.move_1h",
+			"start" : 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "Attack 1h",
+			"actions" : [{
+			"name" : "prv.attack_1h",
+			"start": 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "Idle Bow",
+			"actions" : [{
+			"name" : "prv.idle_bottom_empty",
+			"start" : 0,
+			"end" : 79},
+			{
+			"name" : "prv.idle_top_bow",
+			"start" : 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "Move Bow",
+			"actions" : [{
+			"name" : "prv.move_1h",
+			"start" : 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "Attack Bow",
+			"actions" : [{
+			"name" : "prv.attack_bow",
+			"start": 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "Idle Spear",
+			"actions" : [{
+			"name" : "prv.idle_bottom_empty",
+			"start" : 0,
+			"end" : 79},
+			{
+			"name" : "prv.idle_top_spear",
+			"start" : 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "Move Spear",
+			"actions" : [{
+			"name" : "prv.move_1h",
+			"start" : 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "Attack Spear",
+			"actions" : [{
+			"name" : "prv.attack_spear",
+			"start": 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "Cast",
+			"actions" : [
+			{"name" : "*", "start": 0, "end" : 0},
+			{"name" : "*", "start" : 0, "end" : 0},
+			{"name" : "prv.cast",
+			"start": 0,
+			"end" : 80}]
+		},
+		{
+			"name" : "Die",
+			"actions" : [{
+			"name" : "prv.death",
+			"start": 0,
+			"end" : 60}]
+		}
 	]
 }
