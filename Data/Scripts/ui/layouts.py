@@ -144,14 +144,35 @@ class PlayerStatsLayout(Layout):
 		
 class InventoryLayout(Layout):
 	class ItemCellRenderer():
-		def __init__(self, listbox):
-			self.frame = bgui.Image(listbox, "frame", "Textures/ui/bottom_border.png",
-									size=[1, 0.0625])
+		def __init__(self, listbox, inventory):
+			self.frame = bgui.Frame(listbox, "frame", size=[1, 0.0625],
+									sub_theme="Submenu")
 			self.label = bgui.Label(self.frame, "label", pos=[.05,.2],
 								sub_theme="Menu", options=bgui.BGUI_DEFAULT)
 			
+			self.listbox = listbox
+			self.inventory = inventory
+			
 		def render_item(self, item):
+			color = [[0,0,0,0]] * 4
+			if item == self.listbox.selected:
+				color = [[0,0,0,.1]] * 4
+				
+			self.frame.colors = color
+			
+			player = self.inventory.main['player']
+			if self.inventory.selection == "weapons":
+				pitem = player.weapon
+			elif self.inventory.selection == "armor":
+				pitem = player.armor
+			else:
+				pitem = None
 			self.label.text = item.name
+
+			if item == pitem:
+				self.label.color = [1, 1, 1, 1]
+			else:
+				self.label.color = self.label.theme['Color']
 			return self.frame
 			
 	def __init__(self, parent, state):
@@ -168,7 +189,7 @@ class InventoryLayout(Layout):
 								pos=[0.05, 0.1], sub_theme="Menu")
 		
 		self.lbox = bgui.ListBox(self.lframe, "list_box", size=[1, 0.9])
-		self.lbox.renderer = self.ItemCellRenderer(self.lbox)
+		self.lbox.renderer = self.ItemCellRenderer(self.lbox, self)
 		
 		self.type_buttons = {}
 		self.type_labels = {}
@@ -458,8 +479,7 @@ class PowersLayout(Layout):
 		if self.element != self.ele_bar.element:
 			self.element = self.ele_bar.element
 			self.powers = [power for power in Power.get_package_list()
-							if power.element == self.element.upper()
-							and power.tier <= 1]
+							if power.element == self.element.upper()]
 			self.lbox.items = self.powers
 			self.lbox.active = None
 				
@@ -577,18 +597,15 @@ class StartGameOverlay(Layout):
 		
 		ysize = 0.05 # Tweak this to get the inputs and labels to line up
 		
-		self.userlbl = bgui.Label(self.frame, "sgo_usr_lbl", text="Username: ",
-								pos=[0.05, 0.8], sub_theme='Title')
+		self.userlbl = bgui.Label(self.frame, "sgo_usr_lbl", text="Username: ", pos=[0.05, 0.8])
 		self.user = bgui.TextInput(self.frame, "sgo_user",
 				size=[0.5, ysize], pos=[0.3, 0.8], text="User")
 				
-		self.iplbl = bgui.Label(self.frame, "sgo_ip_lbl", text="Server IP: ",
-								pos=[0.05, 0.7], sub_theme='Title')
+		self.iplbl = bgui.Label(self.frame, "sgo_ip_lbl", text="Server IP: ", pos=[0.05, 0.7])
 		self.ip = bgui.TextInput(self.frame, "sgo_ip",
 				size=[0.5, ysize], pos=[0.3, 0.7], text="localhost")
 				
-		self.portlbl = bgui.Label(self.frame, "sgo_port_lbl", text="Server Port: ",
-									pos=[0.05, 0.6], sub_theme='Title')
+		self.portlbl = bgui.Label(self.frame, "sgo_port_lbl", text="Server Port: ", pos=[0.05, 0.6])
 		self.port = bgui.TextInput(self.frame, "sgo_port",
 				size=[0.5, ysize], pos=[0.3, 0.6], text="9999")
 		
@@ -758,7 +775,7 @@ class CharGenLayout(Layout):
 									pos=[0.07, 0.9], sub_theme="Title")
 		
 		self.name_in = bgui.TextInput(self.mframe, "name_in", pos=[0.28, 0.89],
-										size=[0.2, 0.07], text="Hero")
+										size=[0.2, 0.07], text="Hero", color=(0,0,0,.8))
 		
 		# Setup the display of current choices
 		self.race_lbl = bgui.Label(self.mframe, "race_l", text="2. Race",
@@ -777,7 +794,7 @@ class CharGenLayout(Layout):
 		
 		# Setup description of current focus
 		self.focus_info = bgui.TextBlock(self.mframe, "finfo", pos=[0.07, 0.35],
-										size=[0.86, 0.30])
+										size=[0.86, 0.37])
 		self.focus_details = bgui.TextBlock(self.mframe, "fdetail", pos=[0.07, 0.05],
 										size=[0.86, 0.37])
 		
@@ -788,8 +805,8 @@ class CharGenLayout(Layout):
 		self.cancel_btn = Button(self.mframe, "can_btn", text="CANCEL", pos=[0.4, 0.07],
 								on_click=self.cancel_click)
 		
-#		self.help_btn = Button(self.mframe, "help_btn", text="HELP", pos=[0.65, 0.8],
-#								on_click=self.help_click)
+		self.help_btn = Button(self.mframe, "help_btn", text="HELP", pos=[0.65, 0.8],
+								on_click=self.help_click)
 	
 	def update(self, main):			
 		self.main = main
@@ -959,14 +976,8 @@ class DefaultStateLayout(Layout):
 			simg = bgui.Image(img, powers[i].name, img_name, size=[1, 1], pos=[0, 0])
 			powers[i].close_image()
 			
-			# cool down
 			lbl = bgui.Label(img, "cdl"+str(i), pt_size=20, options=bgui.BGUI_CENTERED)
 			
-			# Key Binding
-			kb = bgui.Label(img, "kb"+str(i), pt_size=30, pos=[0.05, 0.05])
-			convert = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight']
-			kb.text = main['input_system'].event_to_char('UsePower'+convert[i])
-
 			self.power_imgs.append(img)
 			self.power_timers.append(lbl)
 		
