@@ -47,6 +47,15 @@ CALLBACKS = {
 			"ATTACK" : {},
 			}
 
+MODS = {
+		"Arcane Damage" : 0,
+		"Physical Damage" : 0,
+		"Accuracy" : 0,
+		"Arcane Defense" : 0,
+		"Physical Defense" : 0,
+		"Reflex" : 0,
+		}
+
 class CharacterLogic:
 	"""A logic object that stores all the information and methods of the player"""
 	
@@ -99,6 +108,8 @@ class CharacterLogic:
 		self.physical_defense=5
 		self.accuracy		= 5
 		self.reflex			= 5
+		
+		self.mods = MODS.copy()
 							
 		#hit points
 		self.max_hp		= 1
@@ -170,13 +181,23 @@ class CharacterLogic:
 		self.hp = int(self.max_hp * hp_percent)
 		
 		#other stats
-		#XXX handle "mods" from statuses
 		self.physical_damage = max(1, 10+self.affinities['STORM'])
+		self.physical_damage += self.mods['Physical Damage']
+		
 		self.physical_defense = max(1, 10+self.affinities['EARTH'])
+		self.physical_defense += self.mods['Physical Defense']
+		
 		self.arcane_damage = max(1, 10+self.affinities['DEATH'])
+		self.arcane_damage += self.mods['Arcane Damage']
+		
 		self.arcane_defense = max(1, 10+self.affinities['HOLY'])
+		self.arcane_defense += self.mods['Arcane Defense']
+		
 		self.reflex = max(1, 10+self.affinities['WATER'])
+		self.reflex += self.mods['Reflex']
+		
 		self.accuracy = max(1, 10+self.affinities['FIRE'])
+		self.accuracy += self.mods['Accuracy']
 		
 		# Stats from items
 		self.physical_defense += self.armor.physical_defense
@@ -242,7 +263,24 @@ class CharacterLogic:
 			return
 		if name in self.callbacks[type]:
 			del self.callbacks[type][name]
-		
+			
+	def add_status(self, controller, status):
+		for _status in self.statuses:
+			if _status.name == status.name:
+				self.remove_status(controller, _status)
+				break
+				
+		status.push(controller, self)
+		self.statuses.append(status)
+		self.recalc_stats()
+	
+	def remove_status(self, controller, status_name):
+		for status in self.statuses:
+			if status.name == status_name:
+				status.pop(controller, self)
+				self.statuses.remove(status)
+		self.recalc_stats()
+	
 	def level_up(self):
 		self.level += 1
 		

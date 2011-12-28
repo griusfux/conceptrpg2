@@ -53,8 +53,8 @@ class DefaultState(BaseState, BaseController):
 		print("Playing", action)
 		main['net_players'][cid].object.play_animation(action, start, end, layer, blending)
 	
-	@rpc(client_functions, "add_status", str, str)	
-	def c_add_status(self, main, cid, status):
+	@rpc(client_functions, "add_status", str, str, float)	
+	def c_add_status(self, main, cid, status, amount):
 		if cid not in main['net_players']: return
 		
 		try:
@@ -63,19 +63,15 @@ class DefaultState(BaseState, BaseController):
 			print("WARNING: The status \"%s\" was not found" % status)
 			return
 		
-		status.push(self, main['net_players'][cid])
-		main['net_players'][cid].statuses.append(status)
+		status.amount = amount
+		main['net_players'][cid].add_status(self, status)
 		
 	@rpc(client_functions, "remove_status", str, str)
 	def c_remove_status(self, main, cid, status):
 		if cid not in main['net_players']: return
 		
 		player = main['net_players'][cid]
-		for i in player.statuses[:]:
-			if i.name == status:
-				player.statuses.remove(i)
-				i.pop(self, player)
-		
+		player.remove_status(self, status)
 
 	@rpc(client_functions, "modify_health", str, float)
 	def c_modify_health(self, main, cid, amount):
@@ -414,10 +410,15 @@ class DefaultState(BaseState, BaseController):
 		_status.time = duration
 		
 		character = main['players'][cid]
-		_status.push(self, character)
-		character.statuses.append(_status)
+		character.add_status(self, _status)
 		
-		self.clients.invoke("add_status", cid, status)
+		self.clients.invoke("add_status", cid, status, amount)
+		
+	@rpc(server_functions, "remove_status", str, str)
+	def s_remove_status(self, main, client, cid, status):
+		character = main['players'][cid]
+		character.remove_status(self, status)
+		self.clients.invoke("remove_status", cid, status)
 
 	@rpc(server_functions, "request_item_pickup", int)
 	def request_item_pickup(self, main, client, id):
@@ -479,6 +480,9 @@ class DefaultState(BaseState, BaseController):
 	def add_status(self, character, status, amount, duration):
 		self.server.invoke("add_status", character.id, status, amount, duration)
 	
+	def remove_status(self, character, status):
+		self.server.invoke("remove_status", character.id, status)
+		
 	def animate_lock(self, character, animation):
 		"""Convenience function that automatically sets the lock and mode for an animation
 		
