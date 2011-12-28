@@ -95,7 +95,7 @@
 		{
 			"name" : "Attack Spear",
 			"actions" : [{
-			"name" : "kat.attack_1h",
+			"name" : "kat.attack_spear",
 			"start": 0,
 			"end" : 79}]
 		},

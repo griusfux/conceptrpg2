@@ -4,6 +4,7 @@ import configparser
 from collections import OrderedDict
 
 CONFIG_NAME = "config.ini"
+#CONFIG_NAME = "record_config.ini"
 PLATFORMS = ('win64')
 
 def main():
@@ -35,7 +36,9 @@ def main():
 		print("%s is not a supported platform at this time" % platform)
 		return
 	
-	args.append("release/%s/blenderplayer.exe" % platform)
+#	args.append("release/win64/blenderplayer.exe")
+#	args.append("D:/blender-dev/install/trunk-2.5/blenderplayer.exe")
+	args.append("D:/blender-dev/trunk/projectfiles/bin/RelWithDebInfo/blenderplayer.exe")
 	args.append('-f' if config.getboolean('window', 'fullscreen') else '-w')
 	args.append(config['window']['x_resolution'])
 	args.append(config['window']['y_resolution'])
@@ -48,6 +51,8 @@ def main():
 		
 	args.append("Data/data.blend")
 		
+#	with open("log1.txt", "w") as f:
+#		subprocess.call(" ".join(args), creationflags=subprocess.CREATE_NEW_CONSOLE, stdout=f, stderr=f)
 	subprocess.call(" ".join(args), creationflags=subprocess.CREATE_NEW_CONSOLE)
-	
+
 main()
