@@ -256,9 +256,9 @@ class InventoryLayout(Layout):
 #		self.iaccylbl = bgui.Label(self.iframe, 'iaccylbl', text='Accuracy:', sub_theme="Menu", pos=[0.03, 0.26])
 #		self.iaccy = bgui.Label(self.iframe, 'iaccy', sub_theme='Menu', pos=[0.4, 0.26])
 		self.iphysdeflbl = bgui.Label(self.iframe, 'iphysdeflbl', text='Physical Defense:', sub_theme="Menu", pos=[0.03, 0.76])
-		self.iphysdef = bgui.Label(self.iframe, 'iphysdef', sub_theme='Menu', pos=[0.4, 0.76])
+		self.iphysical_defense = bgui.Label(self.iframe, 'iphysdef', sub_theme='Menu', pos=[0.4, 0.76])
 		self.iarcdeflbl = bgui.Label(self.iframe, 'iarcdeflbl', text='Arcane Defense:', sub_theme="Menu", pos=[0.03, 0.69])
-		self.iarcdef = bgui.Label(self.iframe, 'iarcdef', sub_theme='Menu', pos=[0.4, 0.69])
+		self.iarcane_defense = bgui.Label(self.iframe, 'iarcdef', sub_theme='Menu', pos=[0.4, 0.69])
 		self.ireflexlbl = bgui.Label(self.iframe, 'ireflexlbl', text='Reflex:', sub_theme="Menu", pos=[0.03, 0.62])
 		self.ireflex = bgui.Label(self.iframe, 'ireflex', sub_theme='Menu', pos=[0.4, 0.62])
 		
@@ -325,22 +325,6 @@ class InventoryLayout(Layout):
 		self.arcdef.text = str(player.arcane_defense)
 		self.reflex.text = str(player.reflex)
 		
-		# Hide all of the item attributes
-#		self.ihplbl.visible = False
-#		self.ihp.visible = False
-#		self.iphysdlbl.visible = False
-#		self.iphysd.visible = False
-#		self.iarcdlbl.visible = False
-#		self.iarcd.visible = False
-#		self.iaccylbl.visible = False
-#		self.iaccy.visible = False
-		self.iphysdeflbl.visible = False
-		self.iphysdef.visible = False
-		self.iarcdeflbl.visible = False
-		self.iarcdef.visible = False
-		self.ireflexlbl.visible = False
-		self.ireflex.visible = False
-		
 		# Update item info
 		if self.lbox.selected:
 			for i in self.iframe.children.values(): i.visible = True
@@ -351,23 +335,22 @@ class InventoryLayout(Layout):
 			self.idesc.text = item.description
 			
 			if self.selection == "armor":
-#				self.ihplbl.visible = False
-#				self.ihp.visible = False
-#				self.iphysdlbl.visible = False
-#				self.iphysd.visible = False
-#				self.iarcdlbl.visible = False
-#				self.iarcd.visible = False
-#				self.iaccylbl.visible = False
-#				self.iaccy.visible = False
-
-				self.iphysdef.text = "%d (%+d)" % (item.physical_defense, item.physical_defense - player.armor.physical_defense)
-				self.iarcdef.text = "%d (%+d)" % (item.arcane_defense, item.arcane_defense - player.armor.arcane_defense)
-				self.ireflex.text = "%d (%+d)" % (item.reflex, item.reflex - player.armor.reflex)
+				for i in ("physical_defense", "arcane_defense", "reflex"):
+					lbl = getattr(self, "i"+i)
+					diff = getattr(item, i) - getattr(player.armor, i)
+					lbl.text = "%d (%+d)" % (getattr(item, i), diff)
+					
+					if diff > 0:
+						lbl.color = (0.15, 0.50, 0.16, 0.9)
+					elif diff < 0:
+						lbl.color = (0.70, 0.19, 0.16, 0.9)
+					else:
+						lbl.color = lbl.theme['Color']
 			else:
 				self.iphysdeflbl.visible = False
-				self.iphysdef.visible = False
+				self.iphysical_defense.visible = False
 				self.iarcdeflbl.visible = False
-				self.iarcdef.visible = False
+				self.iarcane_defense.visible = False
 				self.ireflexlbl.visible = False
 				self.ireflex.visible = False
 		else:
