@@ -1,6 +1,7 @@
 # $Id$
 
 import time
+import random
 
 from Scripts.packages import *
 from Scripts.mathutils import Vector
@@ -543,8 +544,9 @@ class DefaultState(BaseState, BaseController):
 				if character == v:
 					self.server.invoke("modify_health", i, amount)
 					
+					text = amount if amount > 0 else "Missed"
 					pos = character.object.position[:2]+(character.object.position[2]+2,)
-					effect = effects.TextEffect(amount, pos, 90, delay=delay)
+					effect = effects.TextEffect(text, pos, 90, delay=delay)
 					self.add_effect(effect)
 		
 	def end_effect(self, id):
@@ -732,7 +734,7 @@ class DefaultState(BaseState, BaseController):
 		self.animate_weapon(character, action)
 		for target in self.get_targets(power, character):
 			damage = character.weapon.damage*multiplier
-			hit = True #character.accuracy - target.reflex + random.randint(3, 18) >= 11
+			hit = character.accuracy + random.randint(1, 20) >= target.reflex + random.randint(1, 20)
 			
 			# Store state information for callbacks to modify
 			state = {
