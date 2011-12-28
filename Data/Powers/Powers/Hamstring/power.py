@@ -10,7 +10,8 @@ def power(self, controller, user):
 	controller.attack(self, target)
 	
 	pos = target.object.position
-	effect = Effect.StaticEffect("blood_spread", pos, 50)
+	ori = user.object.get_orientation()
+	effect = Effect.StaticEffect("blood_spread", pos, ori, 50)
 	controller.add_effect(effect)
 	
 	if random.random() < 0.45:

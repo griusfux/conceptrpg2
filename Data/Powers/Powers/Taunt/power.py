@@ -4,5 +4,6 @@ def power(self, controller, user):
 	controller.animate_spell(user)
 	
 	pos = user.object.position
-	effect = Effect.StaticEffect("taunt", pos, 30)
+	ori = user.object.get_orientation()
+	effect = Effect.StaticEffect("taunt", pos, ori, 30)
 	controller.add_effect(effect)

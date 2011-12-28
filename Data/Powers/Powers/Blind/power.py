@@ -10,7 +10,8 @@ def power(self, controller, user):
 	
 	pos = target.object.position
 	pos[2] += 1
-	effect = Effect.StaticEffect("large_cloud_black", pos, 100)
+	ori = user.object.get_orientation()
+	effect = Effect.StaticEffect("large_cloud_black", pos, ori, 100)
 	controller.add_effect(effect)
 	
 	controller.add_status(target, "Accuracy", -0.2, 2)

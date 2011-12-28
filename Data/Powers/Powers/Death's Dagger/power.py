@@ -12,10 +12,11 @@ def power(self, controller, user):
 	
 	controller.animate_spell(user, "cast")
 
-	effect = Effect.StaticEffect("small_smoke", user, 50)
+	ori = user.object.get_orientation()
+	effect = Effect.StaticEffect("small_smoke", user, ori, 50)
 	controller.add_effect(effect)
 	
-	effect = Effect.StaticEffect("small_cloud_purple", user, 100, delay=50, continuous=0)
+	effect = Effect.StaticEffect("small_cloud_purple", user, ori, 100, delay=50, continuous=0)
 	id = controller.add_effect(effect)
 
 	callback = death_dagger_callback(user, self.name, controller, id)

@@ -14,8 +14,9 @@ def power(self, controller, user):
 		controller.add_status(target, "Arcane Defense", amount, 2)
 		
 		pos = target.object.position
-		effect = Effect.StaticEffect("small_smoke", pos, 50)
+		ori = target.object.get_orientation()
+		effect = Effect.StaticEffect("small_smoke", pos, ori, 50)
 		controller.add_effect(effect)
-		pos = target.object.position
-		effect = Effect.StaticEffect("skull_smoke", pos, 120)
+
+		effect = Effect.StaticEffect("skull_smoke", pos, ori, 120)
 		controller.add_effect(effect)

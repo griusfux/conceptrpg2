@@ -4,7 +4,13 @@ import Scripts.mathutils as mathutils
 
 class ProjectileEffect(StaticEffect):
 	def __init__(self, visual, position, target, speed=0.2, duration=10000, delay=0, continuous=-1):
-		StaticEffect.__init__(self, visual, position, duration, delay, continuous)
+		
+		if isinstance(target, mathutils.Vector):
+			ori = target-pos
+		else:
+			ori = target.object.position - position
+			
+		StaticEffect.__init__(self, visual, position, ori, duration, delay, continuous)
 		
 		self.target = target
 		self.target_position = mathutils.Vector((0, 0, 0))

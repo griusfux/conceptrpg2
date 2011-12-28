@@ -3,10 +3,11 @@ import Scripts.mathutils as mathutils
 import Scripts.character_logic as character
 
 class StaticEffect:
-	def __init__(self, visual, position, duration=0, delay=0, continuous=-1):
+	def __init__(self, visual, position, orientation, duration=0, delay=0, continuous=-1):
 		self.visual = visual
 		
 		self.position = mathutils.Vector((0, 0, 0))
+		self.orientation = orientation
 		self.target = position
 		self.duration = duration
 		self.delay = delay
@@ -40,7 +41,7 @@ class StaticEffect:
 				return True
 			return False
 		engine.load_library(packages.Effect(self.visual))
-		self.obj = engine.add_object(self.visual, self.position, time=0)
+		self.obj = engine.add_object(self.visual, self.position, self.orientation, time=0)
 		
 		if isinstance(self.target, character.CharacterLogic):
 			self.obj.set_parent(self.target.object)

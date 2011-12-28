@@ -1,4 +1,5 @@
 from Scripts.effects import StaticEffect
+import Scripts.mathutils as mathutils
 
 # Importing bge code, this prevents the server from chocking in it
 try:
@@ -11,7 +12,8 @@ except:
 	
 class TextEffect(StaticEffect):
 	def __init__(self, text, position, duration=30, delay=0, continuous=-1, static=False):
-		StaticEffect.__init__(self, None, position, duration, delay, continuous)
+		StaticEffect.__init__(self, None, position, mathutils.Matrix(),
+								duration, delay, continuous)
 		self.fontid = 0
 		self.pt_size = 20
 		self.color = (1, 1, 1, 1)

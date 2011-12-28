@@ -3,10 +3,11 @@ import Scripts.effects as Effect
 def power(self, controller, user):	
 	controller.animate_spell(user, "cast")
 
-	effect = Effect.StaticEffect("small_smoke_green", user, 50)
+	ori = user.object.get_orientation()
+	effect = Effect.StaticEffect("small_smoke_green", user, ori, 50)
 	controller.add_effect(effect)
 	
-	effect = Effect.StaticEffect("small_cloud_green", user, 100, delay=50, continuous=0)
+	effect = Effect.StaticEffect("small_cloud_green", user, ori, 100, delay=50, continuous=0)
 	id = controller.add_effect(effect)
 
 	user.add_callback("poison dagger", "ATTACK", poison_dagger_callback(controller, id))

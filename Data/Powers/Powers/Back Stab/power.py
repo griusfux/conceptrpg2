@@ -7,7 +7,8 @@ def power(self, controller, user):
 	target = targets[0]
 	
 	pos = user.object.position
-	effect = Effect.StaticEffect("small_smoke", pos, 50)
+	ori = user.object.get_orientation()
+	effect = Effect.StaticEffect("small_smoke", pos, ori, 50)
 	controller.add_effect(effect)
 	
 	new_pos = target.object.position
@@ -17,10 +18,10 @@ def power(self, controller, user):
 	rotation = user.object.forward_vector.rotation_difference(target.object.forward_vector)
 	rotation = rotation.to_euler()
 	controller.move(user, angular=rotation)
-	
-	
+		
 	pos = user.object.position
-	effect = Effect.StaticEffect("small_smoke", pos, 50)
+	ori = user.object.get_orientation()
+	effect = Effect.StaticEffect("small_smoke", pos, ori, 50)
 	controller.add_effect(effect)
 	
 	controller.attack(self, user, multiplier=2)
