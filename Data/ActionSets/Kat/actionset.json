@@ -17,7 +17,7 @@
 		{
 			"name" : "Move Empty",
 			"actions" : [{
-			"name" : "base.walk",
+			"name" : "kat.move_empty",
 			"start" : 1,
 			"end" : 79}]
 		},
@@ -31,7 +31,7 @@
 		{
 			"name" : "Idle 1h",
 			"actions" : [{
-			"name" : "base.1h_idle",
+			"name" : "kat.idle_1h",
 			"start" : 1,
 			"end" : 79}]
 		},
