@@ -244,7 +244,23 @@ class InventoryLayout(Layout):
 		self.itemname = bgui.Label(self.iframe, 'inlbl', sub_theme='Menu', pos=[0.03, 0.95])
 		self.type = bgui.Label(self.iframe, 'type', text='Type:', sub_theme='Menu', pos=[0.03, 0.85])
 		self.idesc =  bgui.TextBlock(self.iframe, "info", size=[0.9, .3],
-										pos=[0.05, 0.3], sub_theme="")
+										pos=[0.03, 0.2], sub_theme="")
+		
+		# Not all of these are currently used, but they could be.
+#		self.ihplbl = bgui.Label(self.iframe, 'ihplbl', text='HP:', sub_theme='Menu', pos=[0.03, 0.55])
+#		self.ihp = bgui.Label(self.iframe, 'ihp', sub_theme='Menu', pos=[0.15, 0.55])
+#		self.iphysdlbl = bgui.Label(self.iframe, 'iphysdlbl', text='Physical Damage:', sub_theme="Menu", pos=[0.03, 0.40])
+#		self.iphysd = bgui.Label(self.iframe, 'iphysd', sub_theme='Menu', pos=[0.4, 0.40])
+#		self.iarcdlbl = bgui.Label(self.iframe, 'iarcdlbl', text='Arcane Damage:', sub_theme="Menu", pos=[0.03, 0.33])
+#		self.iarcd = bgui.Label(self.iframe, 'iarcd', sub_theme='Menu', pos=[0.4, 0.33])
+#		self.iaccylbl = bgui.Label(self.iframe, 'iaccylbl', text='Accuracy:', sub_theme="Menu", pos=[0.03, 0.26])
+#		self.iaccy = bgui.Label(self.iframe, 'iaccy', sub_theme='Menu', pos=[0.4, 0.26])
+		self.iphysdeflbl = bgui.Label(self.iframe, 'iphysdeflbl', text='Physical Defense:', sub_theme="Menu", pos=[0.03, 0.76])
+		self.iphysdef = bgui.Label(self.iframe, 'iphysdef', sub_theme='Menu', pos=[0.4, 0.76])
+		self.iarcdeflbl = bgui.Label(self.iframe, 'iarcdeflbl', text='Arcane Defense:', sub_theme="Menu", pos=[0.03, 0.69])
+		self.iarcdef = bgui.Label(self.iframe, 'iarcdef', sub_theme='Menu', pos=[0.4, 0.69])
+		self.ireflexlbl = bgui.Label(self.iframe, 'ireflexlbl', text='Reflex:', sub_theme="Menu", pos=[0.03, 0.62])
+		self.ireflex = bgui.Label(self.iframe, 'ireflex', sub_theme='Menu', pos=[0.4, 0.62])
 		
 		# Item buttons
 		self.drop = Button(self.iframe, "drop_btn", text="DROP", 
@@ -309,6 +325,22 @@ class InventoryLayout(Layout):
 		self.arcdef.text = str(player.arcane_defense)
 		self.reflex.text = str(player.reflex)
 		
+		# Hide all of the item attributes
+#		self.ihplbl.visible = False
+#		self.ihp.visible = False
+#		self.iphysdlbl.visible = False
+#		self.iphysd.visible = False
+#		self.iarcdlbl.visible = False
+#		self.iarcd.visible = False
+#		self.iaccylbl.visible = False
+#		self.iaccy.visible = False
+		self.iphysdeflbl.visible = False
+		self.iphysdef.visible = False
+		self.iarcdeflbl.visible = False
+		self.iarcdef.visible = False
+		self.ireflexlbl.visible = False
+		self.ireflex.visible = False
+		
 		# Update item info
 		if self.lbox.selected:
 			for i in self.iframe.children.values(): i.visible = True
@@ -317,10 +349,32 @@ class InventoryLayout(Layout):
 			self.itemname.text = item.name
 			self.type.text = "Type: %s" % item.type.title()
 			self.idesc.text = item.description
+			
+			if self.selection == "armor":
+#				self.ihplbl.visible = False
+#				self.ihp.visible = False
+#				self.iphysdlbl.visible = False
+#				self.iphysd.visible = False
+#				self.iarcdlbl.visible = False
+#				self.iarcd.visible = False
+#				self.iaccylbl.visible = False
+#				self.iaccy.visible = False
+
+				self.iphysdef.text = "%d (%+d)" % (item.physical_defense, item.physical_defense - player.armor.physical_defense)
+				self.iarcdef.text = "%d (%+d)" % (item.arcane_defense, item.arcane_defense - player.armor.arcane_defense)
+				self.ireflex.text = "%d (%+d)" % (item.reflex, item.reflex - player.armor.reflex)
+			else:
+				self.iphysdeflbl.visible = False
+				self.iphysdef.visible = False
+				self.iarcdeflbl.visible = False
+				self.iarcdef.visible = False
+				self.ireflexlbl.visible = False
+				self.ireflex.visible = False
 		else:
 			for i in self.iframe.children.values(): i.visible = False
 		
 	def selection_click(self, widget):
+		self.lbox.selected = None
 		self.selection = widget.name
 		
 class PowersLayout(Layout):
