@@ -12,5 +12,10 @@ def power(self, controller, user):
 	effect = Effect.StaticEffect("jab", pos, ori, 20)
 	controller.add_effect(effect)
 	
-	controller.add_status(user, "Accuracy", 0.2, 0)
-	controller.attack(self, target)
+	user.mods['Accuracy'] += user.accuracy*0.2
+	user.recalc_stats()
+	
+	controller.attack(self, user)
+	
+	user.mods['Accuracy'] -= user.accuracy*0.2
+	user.recalc_stats()

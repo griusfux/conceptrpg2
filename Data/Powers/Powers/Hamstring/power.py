@@ -7,7 +7,7 @@ def power(self, controller, user):
 	if targets == []:
 		return
 	target = targets[0]
-	controller.attack(self, target)
+	controller.attack(self, user)
 	
 	pos = target.object.position
 	ori = user.object.get_orientation()
