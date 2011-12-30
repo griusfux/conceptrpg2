@@ -17,9 +17,9 @@
 		{
 			"name" : "Move Empty",
 			"actions" : [{
-			"name" : "kat.move_empty",
+			"name" : "kat.move_unarmed",
 			"start" : 1,
-			"end" : 79}]
+			"end" : 59}]
 		},
 		{
 			"name" : "Attack Empty",
