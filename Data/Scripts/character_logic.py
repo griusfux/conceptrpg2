@@ -454,7 +454,7 @@ class CharacterLogic:
 			self.xp += 0
 		self.next_level = XP_TABLE[self.level] if self.level < len(XP_TABLE) else XP_TABLE[-1]
 		self.last_level = XP_TABLE[self.level-1] if self.level-1 < len(XP_TABLE) else XP_TABLE[-1]
-
+		
 		self.recalc_stats()
 
 	def get_action(self, action):
@@ -514,8 +514,10 @@ class PlayerLogic(CharacterLogic):
 		
 	def load_from_info(self, info):
 		CharacterLogic.load_from_info(self, info)
-		
+
 		self.race		= Race(info["race"])
+		if self.race:
+			self.action_set = self.race.action_set
 		
 	def reset_weapon_mesh(self, engine):
 		self.clear_right_hand()
