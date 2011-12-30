@@ -32,6 +32,3 @@ class death_dagger_callback:
 	def __call__(self, state):
 		state['TYPE'] = 'ARCANE'
 		return state, False
-	
-	def __del__(self):
-		self.controller.remove_effect(self.effect_id)
