@@ -48,8 +48,8 @@ class ParticleSystem():
 		# Store a time step
 		self.dt = 1/bge.logic.getLogicTicRate()
 		
-		# Precalculate gravity*dt
-		self.gravity_dt = args['Gravity']*self.dt
+		# Precalculate gravity*dt^2
+		self.gravity_dt = args['Gravity']*self.dt*self.dt
 		
 		# Precalculate velocity*dt
 		self.start_velocity_dt = args['Starting Velocity'] * self.dt
@@ -64,7 +64,6 @@ class ParticleSystem():
 			frame_position += self.ppf_inv
 			
 		[self.update_particle(particle) for particle in self.particle_list]
-			
 	def create_particle(self, frame_position=0):
 		# Add the particle
 		scene = bge.logic.getCurrentScene()
@@ -92,10 +91,12 @@ class ParticleSystem():
 			particle['life'] *= 1+random.uniform(-self.life_variance, self.life_variance)
 		particle['velocity'] = velocity * self.start_velocity_dt
 		if self.velocity_var > .0001:
-			particle['velocity'] *= 1+random.uniform(-self.velocity_var, self.velocity_var)
+			particle['velocity'] *= (1+random.uniform(-self.velocity_var, self.velocity_var))
 		# Deal with subframe positioning
 		if frame_position < 1:
-			particle.worldPosition = particle.worldPosition.copy() + particle['velocity']*self.dt*frame_position
+			particle.worldPosition = particle.worldPosition + particle['velocity']*self.dt*frame_position
+			
+		particle['velocity'] *= self.dt
 		
 		# Return the particle
 		return particle
@@ -113,5 +114,5 @@ class ParticleSystem():
 		particle['velocity'][2] += self.gravity_dt
 		
 		# Update particle position
-		particle.worldPosition = particle.worldPosition.copy() + particle['velocity']*self.dt
+		particle.worldPosition = particle.worldPosition + particle['velocity']
 		
