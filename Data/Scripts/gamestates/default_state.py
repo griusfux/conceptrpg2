@@ -751,6 +751,8 @@ class DefaultState(BaseState, BaseController):
 	
 	def move(self, character, linear = (0,0,0) , angular = (0,0,0) , local = False):
 		"""Handles linear and angular movement of a character"""
+		if "HELD" in character.flags:
+			return
 		if self.is_server:
 			# The only people that should be moving server side are monsters
 			self.clients.invoke("move_monster", character.id, *linear)
