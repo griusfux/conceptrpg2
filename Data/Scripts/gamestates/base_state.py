@@ -150,12 +150,13 @@ class BaseState:
 	##########
 	
 	def _delete_player(self, main, cid):
-		obj = main['net_players'][cid].object
-		effect = effects.FadeEffect(obj, 25)
-		def f_end(object, engine):
-			object.end()
-		effect.f_end = f_end
-		self.add_effect(effect)
+		player = main['net_players'][cid]
+		player.object.end()
+#		effect = effects.FadeEffect(player, 25)
+#		def f_end(object, engine):
+#			object.end()
+#		effect.f_end = f_end
+#		self.add_effect(effect)
 		
 		del main['net_players'][cid]
 	

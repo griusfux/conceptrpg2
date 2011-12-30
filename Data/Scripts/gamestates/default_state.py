@@ -571,17 +571,23 @@ class DefaultState(BaseState, BaseController):
 			for i, v in self.monster_list.items():
 				if character == v:
 					self.server.invoke("modify_health", i, amount)
-					
-					text = amount if amount > 0 else "Missed"
-					pos = character.object.position[:2]+(character.object.position[2]+2,)
-					effect = effects.TextEffect(text, pos, 90, delay=delay)
-					self.add_effect(effect)
+				
+		text = amount if amount != 0 else "Missed"
+		pos = list(character.position[:])
+		pos[2] += 2
+		effect = effects.TextEffect(text, pos, 90, delay=delay)
+		self.add_effect(effect)
 		
 	def add_effect(self, effect):
-		self.main["effect_system"].add(effect)
 		info = effect.get_info()
-		self.server.invoke("add_effect", info, effect.id)
-		return effect.id
+		
+		if self.is_server:
+			self.main['effect_id'] += 1
+			self.clients.invoke("add_effect", info, "", self.main['effect_id'])
+		else:
+			self.main["effect_system"].add(effect)
+			self.server.invoke("add_effect", info, effect.id)
+			return effect.id
 		
 	def end_effect(self, id):
 		effect_system = self.main["effect_system"]

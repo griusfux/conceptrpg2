@@ -59,7 +59,7 @@ class CombatState(DefaultState, BaseController):
 		color[3] = 0
 		obj.color = color
 	
-		effect = effects.FadeEffect(obj, duration=90, amount=1)
+		effect = effects.FadeEffect(logic, duration=90, amount=1)
 		self.add_effect(effect)
 		
 	@rpc(client_functions, "kill_monster", str, str)
