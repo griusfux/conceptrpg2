@@ -6,5 +6,11 @@ def power(self, controller, user):
 		return
 	target = targets[0]
 	
-	controller.animate_weapon(user, "grab")
-	controller.add_status(target, "Hold", 0, 2)
+	controller.attack(self, user, multiplier=0)
+	
+	pos = target.object.position
+	ori = target.object.get_orientation()
+	effect = Effect.StaticEffect("grab", pos, ori, 100)
+	controller.add_effect(effect)
+	
+	controller.add_status(target, "Held", 0, 2)
