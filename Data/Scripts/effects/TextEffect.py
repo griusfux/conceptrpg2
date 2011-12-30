@@ -12,7 +12,8 @@ except:
 	
 class TextEffect(StaticEffect):
 	def __init__(self, text, position, duration=30, delay=0, continuous=-1, static=False):
-		StaticEffect.__init__(self, None, position, mathutils.Matrix(),
+		ori  =[[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+		StaticEffect.__init__(self, None, position, ori,
 								duration, delay, continuous)
 		self.fontid = 0
 		self.pt_size = 20
@@ -20,7 +21,43 @@ class TextEffect(StaticEffect):
 		self.text = str(text)
 		self.speed = 0 if static else .01
 		
+		self.static = static
+		
 		self.position = list(self.position)
+	@staticmethod
+	def create_from_info(info, translate):
+		text = info['text']
+		
+		pos = info['target']
+#		if isinstance(pos, str):
+#			pos = translate[pos]
+#		else:
+#			pos = mathutils.Vector(pos)
+		
+		del info['type']
+		del info['text']
+		del info['target']	
+		effect = TextEffect(text, pos, **info)
+		
+		return effect
+			
+	def get_info(self):
+		info = {
+				'type' : "TextEffect",
+				'text' : self.text,
+				'target' : self.position,
+				'duration' : self.duration,
+				'delay' : self.delay,
+				'continuous' : self.continuous,
+				'static' : self.static,
+				}
+		
+#		if isinstance(self.target, character.CharacterLogic):
+#			info['target'] = self.target.id
+#		else:
+#			info['target'] = self.target.to_tuple()
+		
+		return info
 		
 	def _unload(self, engine):
 		bge.logic.getCurrentScene().post_draw.remove(self.draw)

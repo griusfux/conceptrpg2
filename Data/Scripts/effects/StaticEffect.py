@@ -6,7 +6,7 @@ class StaticEffect:
 	def __init__(self, visual, position, orientation, duration=0, delay=0, continuous=-1):
 		self.visual = visual
 		
-		self.position = mathutils.Vector((0, 0, 0))
+		self.position = None
 		self.orientation = orientation
 		self.target = position
 		self.duration = duration
@@ -24,8 +24,12 @@ class StaticEffect:
 	@staticmethod
 	def create_from_info(info, translate):
 		visual = info['visual']
-		ori = mathutils.Quaternion(info['orientation'])
-		ori = ori.to_matrix()
+		ori = info['orientation']
+		if len(ori) == 4:
+			ori = mathutils.Quaternion(info['orientation'])
+			ori = ori.to_matrix()
+		else:
+			ori = mathutils.Vector(info['orientation'])
 		
 		pos = info['target']
 		if isinstance(pos, str):
@@ -51,8 +55,11 @@ class StaticEffect:
 				'delay' : self.delay,
 				'continuous' : self.continuous,
 				}
-		q = self.orientation.to_quaternion()
-		info['orientation'] = (q.w, q.x, q.y, q.z)
+		if isinstance(self.orientation, mathutils.Matrix):
+			q = self.orientation.to_quaternion()
+			info['orientation'] = (q.w, q.x, q.y, q.z)
+		else:
+			info['orientation'] = self.orientation.to_tuple()
 		
 		if isinstance(self.target, character.CharacterLogic):
 			info['target'] = self.target.id
