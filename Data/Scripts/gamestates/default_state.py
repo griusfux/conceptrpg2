@@ -83,11 +83,22 @@ class DefaultState(BaseState, BaseController):
 		player.hp += amount
 		if player.hp < 0: player.hp = 0
 		
-	@rpc(client_functions, "add_effect", "pickle", int)
-	def c_add_effect(self, main, info, id):
+	@rpc(client_functions, "add_effect", "pickle", str, int)
+	def c_add_effect(self, main, info, cid, id):
+		if cid == main['player'].id: return
+		
 		effect = getattr(effects, info['type'])
 		effect = effect.create_from_info(info, main['net_players'])
-		main['effect_system'].add(effect, id=id)
+		main['effect_system'].add_remote(effect, id)
+		
+	@rpc(client_functions, "update_effect_remote_id", int, int)
+	def c_update_effect_rid(self, main, lid, rid):
+		main['effect_system'].update_remote_id(lid, rid)
+		
+	@rpc(client_functions, "end_effect", str, int)
+	def c_end_effect(self, main, cid, remote_id):
+		if cid == main['player'].id: return
+		main['effect_system'].remove_remote(remote_id)
 		
 	@rpc(client_functions, "kill_player", str)
 	def kill_player(self, main, cid):
@@ -427,9 +438,16 @@ class DefaultState(BaseState, BaseController):
 		character.remove_status(self, status)
 		self.clients.invoke("remove_status", cid, status)
 		
-	@rpc(server_functions, "add_effect", "pickle")
-	def s_add_effect(self, main, client, info):
-		self.clients.invoke("add_effect", info, -1)
+	@rpc(server_functions, "add_effect", "pickle", int)
+	def s_add_effect(self, main, client, info, local_id):
+		main['effect_id'] += 1
+		self.clients.invoke("add_effect", info, client.id, main['effect_id'])
+		
+		self.client.invoke("update_effect_remote_id", local_id, main['effect_id'])
+		
+	@rpc(server_functions, "end_effect", int)
+	def s_end_effect(self, main, client, remote_id):
+		self.clients.invoke("end_effect", client.id, remote_id)
 
 	@rpc(server_functions, "request_item_pickup", int)
 	def request_item_pickup(self, main, client, id):
@@ -560,12 +578,19 @@ class DefaultState(BaseState, BaseController):
 					self.add_effect(effect)
 		
 	def add_effect(self, effect):
+		self.main["effect_system"].add(effect)
 		info = effect.get_info()
-		self.server.invoke("add_effect", info)
-		return -1
+		self.server.invoke("add_effect", info, effect.id)
+		return effect.id
 		
 	def end_effect(self, id):
-		self.main["effect_system"].remove(id)
+		effect_system = self.main["effect_system"]
+		
+		remote_id = effect_system.get_remote_id(id)
+		effect_system.remove(id)
+
+		if remote_id is not None:
+			self.server.invoke("end_effect", remote_id)
 		
 	def get_potential_targets(self):
 		l = []

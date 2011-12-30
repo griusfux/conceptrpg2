@@ -4,6 +4,7 @@ class FadeEffect:
 		self.time = duration
 		self.amount = amount / duration
 		
+		self.remote_id = None
 		self.f_end = None
 		
 	def _load(self, id, engine):

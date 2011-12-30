@@ -5,35 +5,73 @@ from Scripts.effects import *
 class EffectManager:
 	def __init__(self, engine):
 		self._engine = engine
-		self._effects = []
+		self._local_effects = {}
+		self._remote_effects = {}
 		self._next_id = 0
 		
-	def add(self, effect, id=None):
-		self._effects.append(effect)
-		
+	def add(self, effect, id=None, d=None):		
 		if id == None:
 			id = self._next_id
 			
-		if effect._load(id, self._engine):
-			self._next_id += 1
-			return effect.id
-		return -1
+		if d is None:
+			d = self._local_effects
+			
+		if id in d:
+			if d == self._local_effects:
+				print("WARNING: Local effect id already in use: %d. Skipping" % id)
+			else:
+				print("WARNING: Remote effect id already in use: %d. Skipping" % id)
+			return -1
+			
+		d[id] = effect
+		effect._load(id, self._engine)
+		self._next_id += 1
+		return effect.id
 	
-	def remove(self, id):
+	def remove(self, id, d=None):
 		# -1 indicates that the effect was never added
 		if id == -1: return
 		
-		for effect in self._effects:
-			if effect.id == id:
-				effect._unload(self._engine)
-				self._effects.remove(effect)
+		if d is None:
+			d = self._local_effects
 		
-	def update(self):
-		for effect in self._effects:
-			if effect.time <= 0:
-				if not effect._fire(self._engine):
-					self.remove(effect.id)
-			else:
-				effect._update(self._engine)
-				effect.time -= 1
-			
+		effect = d.get(id)
+		
+		if not effect:
+			if d == self._local_effects:
+				print("WARNING: Could not find local effect id:", id)
+			# XXX Do we want to print warnings for remotes too?
+			return
+		
+		effect._unload(self._engine)
+		del d[id]
+		
+	def add_remote(self, effect, id):
+		if id is None: return
+		
+		self.add(effect, id, self._remote_effects)
+
+	def remove_remote(self, id):
+		self.remove(id, self._remote_effects)
+		
+	def update_remote_id(self, local_id, remote_id):
+		if local_id not in self._local_effects:
+			print("WARNING: Could not find local effect id for updating remote id:", local_id)
+			return
+		self._local_effects[local_id].remote_id = remote_id
+		
+	def get_remote_id(self, id):
+		return self._local_effects[id].remote_id
+		
+	def update(self):		
+		for d in (self._local_effects, self._remote_effects):
+			to_remove = []
+			for effect in d.values():
+				if effect.time <= 0:
+					if not effect._fire(self._engine):
+						to_remove.append(effect)
+				else:
+					effect._update(self._engine)
+					effect.time -= 1
+			for effect in to_remove:
+				self.remove(effect.id, d)

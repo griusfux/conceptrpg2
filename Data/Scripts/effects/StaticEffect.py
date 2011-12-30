@@ -19,6 +19,8 @@ class StaticEffect:
 		else:
 			self.position = self.target
 			
+		self.remote_id = None
+			
 	@staticmethod
 	def create_from_info(info, translate):
 		visual = info['visual']

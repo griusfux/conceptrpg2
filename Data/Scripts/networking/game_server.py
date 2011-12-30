@@ -120,6 +120,9 @@ class GameServer():
 		for actionset in ActionSet.get_package_list():
 			self.main['actions'][actionset.name] = actionset.actions	
 		
+		# Next available remote id
+		self.main['effect_id'] = 0
+		
 		# Create the host
 		self.host = enet.Host(enet.Address(b'', port), 10, 0, 0, 0)
 		
