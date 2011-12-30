@@ -756,6 +756,8 @@ class DefaultState(BaseState, BaseController):
 			for name in remove: character.remove_callback(name, "ATTACK")
 			
 			if state['HIT']:
+				if multiplier == 0: return
+				
 				self.deal_damage(character, state['TARGET'], power,
 								state['DAMAGE'] , state['TYPE'], delay=delay/2)
 			else:
