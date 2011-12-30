@@ -52,7 +52,6 @@ class DefaultState(BaseState, BaseController):
 	@rpc(client_functions, "anim", str, str, int, int, int, int)	
 	def anim(self, main, cid, action, start, end, layer, blending):
 		if cid not in main['net_players']: return
-		print("Playing", action)
 		main['net_players'][cid].object.play_animation(action, start, end, layer, blending)
 	
 	@rpc(client_functions, "add_status", str, str, float)	
@@ -88,7 +87,6 @@ class DefaultState(BaseState, BaseController):
 	def c_add_effect(self, main, info, id):
 		effect = getattr(effects, info['type'])
 		effect = effect.create_from_info(info, main['net_players'])
-		print(effect)
 		main['effect_system'].add(effect, id=id)
 		
 	@rpc(client_functions, "kill_player", str)
