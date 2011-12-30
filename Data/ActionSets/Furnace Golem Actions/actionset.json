@@ -3,5 +3,40 @@
 	
 	"action_set":
 	[
+		{
+			"name" : "Idle",
+			"actions" : [{
+			"name" : "fg.Idle",
+			"start" : 0,
+			"end" : 79}]
+		},
+		{
+			"name" : "Spawn",
+			"actions" : [{
+			"name" : "fg.Spawn",
+			"start" : 1,
+			"end" : 140}]
+		},
+		{
+			"name" : "Move",
+			"actions" : [{
+			"name" : "fg.Run",
+			"start" : 0,
+			"end" : 49}]
+		},
+		{
+			"name" : "Die",
+			"actions" : [{
+			"name" : "fg.Death",
+			"start" : 0,
+			"end" : 80}]
+		},
+		{
+			"name" : "Attack",
+			"actions" : [{
+			"name" : "fg.MeleeAttack",
+			"start" : 1,
+			"end" : 40}]
+		}
 	]
 }
