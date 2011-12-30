@@ -84,6 +84,13 @@ class DefaultState(BaseState, BaseController):
 		player.hp += amount
 		if player.hp < 0: player.hp = 0
 		
+	@rpc(client_functions, "add_effect", "pickle", int)
+	def c_add_effect(self, main, info, id):
+		effect = getattr(effects, info['type'])
+		effect = effect.create_from_info(info, main['net_players'])
+		print(effect)
+		main['effect_system'].add(effect, id=id)
+		
 	@rpc(client_functions, "kill_player", str)
 	def kill_player(self, main, cid):
 		if cid != main['player'].id: return
@@ -421,6 +428,10 @@ class DefaultState(BaseState, BaseController):
 		character = main['players'][cid]
 		character.remove_status(self, status)
 		self.clients.invoke("remove_status", cid, status)
+		
+	@rpc(server_functions, "add_effect", "pickle")
+	def s_add_effect(self, main, client, info):
+		self.clients.invoke("add_effect", info, -1)
 
 	@rpc(server_functions, "request_item_pickup", int)
 	def request_item_pickup(self, main, client, id):
@@ -549,6 +560,11 @@ class DefaultState(BaseState, BaseController):
 					pos = character.object.position[:2]+(character.object.position[2]+2,)
 					effect = effects.TextEffect(text, pos, 90, delay=delay)
 					self.add_effect(effect)
+		
+	def add_effect(self, effect):
+		info = effect.get_info()
+		self.server.invoke("add_effect", info)
+		return -1
 		
 	def end_effect(self, id):
 		self.main["effect_system"].remove(id)

@@ -413,10 +413,6 @@ class BaseController:
 			character.stat_mods[stat] = 0
 		character.stat_mods[stat] += amount
 		character.recalc_stats()
-		
-	def add_effect(self, effect):
-		id = self.main["effect_system"].add(effect)
-		return id
 	
 	def remove_effect(self, id):
 		self.main["effect_system"].remove(id)

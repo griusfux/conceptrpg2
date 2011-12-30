@@ -8,13 +8,21 @@ class EffectManager:
 		self._effects = []
 		self._next_id = 0
 		
-	def add(self, effect):
+	def add(self, effect, id=None):
 		self._effects.append(effect)
-		effect._load(self._next_id, self._engine)
-		self._next_id += 1
-		return effect.id
 		
+		if id == None:
+			id = self._next_id
+			
+		if effect._load(id, self._engine):
+			self._next_id += 1
+			return effect.id
+		return -1
+	
 	def remove(self, id):
+		# -1 indicates that the effect was never added
+		if id == -1: return
+		
 		for effect in self._effects:
 			if effect.id == id:
 				effect._unload(self._engine)
