@@ -595,8 +595,15 @@ class TitleLayout(Layout):
 	def __init__(self, sys, state):
 		Layout.__init__(self, sys, "title_layout", state, use_mouse=True)
 		
+		self.bg = bgui.Frame(self, "title_bg", size=[1, 1], pos=[0, 0])
+		self.bg.colors = [[0, 0, 0, 1]]*4
 		# Background image
-		self.splash = bgui.Image(self, "title_splash", "Textures/TitleSplash.png", size=[1, 1], pos=[0, 0])
+		self.img = bgui.Image(self, "title_splash", "Textures/TitleSplash.png",
+									size=[0, 1], aspect=1,
+									 options=bgui.BGUI_DEFAULT|bgui.BGUI_CENTERED)
+		
+		self.splash = bgui.Frame(self, "main_frame", size=[1, 1], pos=[0, 0])
+		self.splash.colors = [[0, 0, 0, 0]]*4
 		
 		# Menu entries
 		self.menu = [
