@@ -42,9 +42,13 @@
 		{
 			"name" : "Move 1h",
 			"actions" : [{
-			"name" : "kat.move_1h",
+			"name" : "kat.move_bottom_empty",
+			"start" : 1,
+			"end" : 59},
+			{
+			"name" : "kat.move_top_1h",
 			"start" : 0,
-			"end" : 79}]
+			"end" : 59}]
 		},
 		{
 			"name" : "Attack 1h",
