@@ -17,8 +17,12 @@
 		{
 			"name" : "Move Empty",
 			"actions" : [{
-			"name" : "kat.move_unarmed",
+			"name" : "kat.move_bottom_empty",
 			"start" : 1,
+			"end" : 59},
+			{
+			"name" : "kat.move_top_empty",
+			"start" : 0,
 			"end" : 59}]
 		},
 		{
@@ -63,9 +67,13 @@
 		{
 			"name" : "Move Bow",
 			"actions" : [{
-			"name" : "kat.move_1h",
+			"name" : "kat.move_bottom_empty",
+			"start" : 1,
+			"end" : 59},
+			{
+			"name" : "kat.move_top_bow",
 			"start" : 0,
-			"end" : 79}]
+			"end" : 59}]
 		},
 		{
 			"name" : "Attack Bow",
