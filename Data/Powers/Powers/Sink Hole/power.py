@@ -7,4 +7,11 @@ def power(self, controller, user):
 	target = targets[0]
 	
 	controller.animate_spell(user, "cast")
-	controller.add_status(target, "Hold", 0, 2)
+	
+	
+	pos = target.object.position
+	ori = target.object.get_orientation()
+	effect = Effect.StaticEffect("sinkhole", pos, ori, 50)
+	controller.add_effect(effect)
+	
+	controller.add_status(target, "Held", 0, 6)

@@ -13,4 +13,4 @@ def power(self, controller, user):
 	effect = Effect.StaticEffect("grab", pos, ori, 100)
 	controller.add_effect(effect)
 	
-	controller.add_status(target, "Held", 0, 2)
+	controller.add_status(target, "Held", 0, 6)
