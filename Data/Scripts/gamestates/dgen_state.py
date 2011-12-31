@@ -1,6 +1,6 @@
 # $Id$
 
-from Scripts.packages import Map, Shop
+from Scripts.packages import Map, Shop, Monster
 from .base_state import *
 
 import time
@@ -105,6 +105,15 @@ class DungeonGenerationState(BaseState):
 		else:
 			# Dungeon is done
 			print("\nDungeon generation complete with %d rooms\n in %.4f seconds" % (main['dgen'].room_count, time.time() - self.start_time))
+			
+			self.start_time = time.time()
+			# Now libload the monsters so we don't have to later
+			for x in main['dgen'].deck.cards:
+				monster = Monster(x['monster'])
+				main['engine'].load_library(monster)
+				
+			print("\nMonsters loaded in %.4f seconds" % (time.time() - self.start_time))
+				
 			
 			player = main['player']
 			
