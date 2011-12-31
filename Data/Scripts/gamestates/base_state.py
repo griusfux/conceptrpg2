@@ -242,6 +242,11 @@ class BaseState:
 		main['net_players'][cid].load_from_info(char_info)
 		main['net_players'][cid].id = cid
 		main['net_players'][cid].auto_target = pos
+		
+		if char_info['weapon']:
+			weapon = char_info['weapon']
+			wobj = weapon.createObjectInstance(main['engine'])
+			main['net_players'][cid].set_right_hand(wobj) 
 	
 	@rpc(client_functions, "drop_item", int, "pickle", float, float, float)
 	def c_drop_item(self, main, id, item, x, y, z):
