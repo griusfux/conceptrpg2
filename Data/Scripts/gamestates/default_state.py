@@ -285,26 +285,28 @@ class DefaultState(BaseState, BaseController):
 		if ("ShowItemNames", "INPUT_ACTIVE") in inputs:
 			items_to_display = main['ground_items']
 
-		if ("UsePower", "INPUT_CLICK") in inputs:
-			self.use_power(player, player.powers.active)
-		if ("UsePowerOne", "INPUT_CLICK") in inputs:
-			if player.powers.has_power(0):
-				self.use_power(player, player.powers.all[0])
-		if ("UsePowerTwo", "INPUT_CLICK") in inputs:
-			if player.powers.has_power(1):
-				self.use_power(player, player.powers.all[1])
-		if ("UsePowerThree", "INPUT_CLICK") in inputs:
-			if player.powers.has_power(2):
-				self.use_power(player, player.powers.all[2])
-		if ("UsePowerFour", "INPUT_CLICK") in inputs:
-			if player.powers.has_power(3):
-				self.use_power(player, player.powers.all[3])
-		if ("UsePowerFive", "INPUT_CLICK") in inputs:
-			if player.powers.has_power(4):
-				self.use_power(player, player.powers.all[4])
-		if ("UsePowerSix", "INPUT_CLICK") in inputs:
-			if player.powers.has_power(5):
-				self.use_power(player, player.powers.all[5])
+		if not player.lock:
+			if ("UsePower", "INPUT_CLICK") in inputs:
+				self.use_power(player, player.powers.active)
+			if ("UsePowerOne", "INPUT_CLICK") in inputs:
+				if player.powers.has_power(0):
+					self.use_power(player, player.powers.all[0])
+			if ("UsePowerTwo", "INPUT_CLICK") in inputs:
+				if player.powers.has_power(1):
+					self.use_power(player, player.powers.all[1])
+			if ("UsePowerThree", "INPUT_CLICK") in inputs:
+				if player.powers.has_power(2):
+					self.use_power(player, player.powers.all[2])
+			if ("UsePowerFour", "INPUT_CLICK") in inputs:
+				if player.powers.has_power(3):
+					self.use_power(player, player.powers.all[3])
+			if ("UsePowerFive", "INPUT_CLICK") in inputs:
+				if player.powers.has_power(4):
+					self.use_power(player, player.powers.all[4])
+			if ("UsePowerSix", "INPUT_CLICK") in inputs:
+				if player.powers.has_power(5):
+					self.use_power(player, player.powers.all[5])
+
 		if ("NextPower", "INPUT_CLICK") in inputs:
 			player.powers.make_next_active()
 		if ("PrevPower", "INPUT_CLICK") in inputs:
