@@ -29,15 +29,21 @@ class DefaultState(BaseState, BaseController):
 	@rpc(client_functions, "position", str, float, float, float)
 	def position(self, main, cid, x, y, z):
 		if cid not in main['net_players']: return
+		
+		nplayer = main['net_players'][cid]
 
 		# Check to make sure we are still where the server says we are
 		server_pos = [x, y, z]
-		client_pos = main['net_players'][cid].position
+		client_pos = nplayer.position
 		
-		for i in range(3):
-			if abs(server_pos[i]-client_pos[i]) > 0.5:
-				client_pos[i] = server_pos[i]
-		main['net_players'][cid].position = client_pos
+		if cid == main['player'].id or (isinstance(nplayer, MonsterLogic) and main['is_host']):
+			for i in range(3):
+				if abs(server_pos[i]-client_pos[i]) > 0.5:
+					client_pos[i] = server_pos[i]
+				
+			nplayer.position = client_pos
+		else:
+			nplayer.ipo_target = Vector(server_pos)
 		
 	@rpc(client_functions, "move", str, float, float, float)
 	def move(self, main, cid, x, y, z):
@@ -386,6 +392,21 @@ class DefaultState(BaseState, BaseController):
 		elif not player.lock:
 			act = player.get_action("Idle")
 			self.play_animation(player, act, mode=1)
+			
+		# Interpolate netplayer positions
+		for nplayer in [i for i in main['net_players'].values() if i !=player and i.ipo_target]:
+			vec = nplayer.ipo_target - nplayer.position
+			distance = vec.length_squared
+	
+			if distance > 100.0:
+				nplayer.position = nplayer.ipo_target
+			elif distance > 0.5:
+				v = vec.normalized() * speed
+				if v.length_squared > distance:
+					nplayer.position = nplayer.ipo_target
+				nplayer.position += v
+			else:
+				nplayer.position = nplayer.ipo_target
 
 		# Send the message
 		# self.server.invoke("move", id, *movement)

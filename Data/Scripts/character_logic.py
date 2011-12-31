@@ -148,6 +148,9 @@ class CharacterLogic:
 		self.auto_target = None
 		self.auto_power = None
 		
+		# Used to interpolate network movement
+		self.ipo_target = None
+		
 		self.statuses = []
 		
 		self.action_set = None
