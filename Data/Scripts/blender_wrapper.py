@@ -241,7 +241,9 @@ class Object:
 		self.gameobj.color = color
 		
 		for c in self.gameobj.childrenRecursive:
-			c.color = color
+			# Lamps use a 3tuple for color, other objects use a 4tuple
+			if len(c.color) == len(color):
+				c.color = color
 			
 	@property
 	def accent(self):

@@ -130,7 +130,7 @@ class CharacterLogic:
 		self.credits	= 100
 		
 		# the character's game object
-		self._object = obj
+		self.object = obj
 				
 		# Various flags
 		self.flags = set()
@@ -488,6 +488,7 @@ class CharacterLogic:
 		# Apply accent color
 		if obj:
 			obj.accent = ELEMENT_COLOR[self.element]
+			obj.color = [1, 1, 1, 1]
 		self._object = obj
 		
 		

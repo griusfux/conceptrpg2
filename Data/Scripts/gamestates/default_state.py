@@ -630,7 +630,7 @@ class DefaultState(BaseState, BaseController):
 				l.extend(combat.hero_list.values())
 				l.extend(combat.monster_list.values())
 				
-		return l
+		return [target for target in l if "INVISIBLE" not in target.flags]
 		
 	def get_closest_target(self, character, targets):
 		"""Get the closest target to the given character from the targets list"""

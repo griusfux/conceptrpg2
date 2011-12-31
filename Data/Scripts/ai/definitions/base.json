@@ -30,7 +30,8 @@
 			"actions" : ["seek", "look_forward"],
 			"exit_actions" : [],
 			
-			"transitions" : [["target_range_power < attack", "attack"]]
+			"transitions" : [["target_range_power < attack", "attack"],
+							 ["target_invisible", "target"]]
 		},
 		
 		{
