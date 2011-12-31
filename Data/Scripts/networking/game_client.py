@@ -14,7 +14,8 @@ class GameClient:
 	"""The client for game networking"""
 	
 	def __init__(self, id, addr):
-		self.id = id
+		self._id = id
+		self.bytes_id = bytes(id, NET_ENCODING)
 		self.host = enet.Host(None, 1, 0, 0, 0)
 		self.peer = self.host.connect(enet.Address(*addr), 1)
 		self.connect_time = time.time()
@@ -22,6 +23,15 @@ class GameClient:
 		self.connected = False
 		self.registered = False
 		self.server_addr = None
+		
+	@property
+	def id(self):
+		return self._id
+	
+	@id.setter
+	def id(self, value):
+		self._id = value
+		self.bytes_id = bytes(value, NET_ENCODING)
 		
 	def disconnect(self):
 		self.send(b'dis'+COMMAND_SEP)
@@ -70,5 +80,5 @@ class GameClient:
 		if not self.connected:
 			return
 		
-		self.peer.send(0, enet.Packet(bytes(self.id, NET_ENCODING)+b" "+msg,))
+		self.peer.send(0, enet.Packet(b" ".join((self.bytes_id, msg))))
 				
