@@ -43,7 +43,7 @@
 			"name" : "Move 1h",
 			"actions" : [{
 			"name" : "kat.move_bottom_empty",
-			"start" : 1,
+			"start" : 0,
 			"end" : 59},
 			{
 			"name" : "kat.move_top_1h",
