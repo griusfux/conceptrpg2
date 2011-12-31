@@ -28,8 +28,8 @@
 			"name" : "Die",
 			"actions" : [{
 			"name" : "fg.Death",
-			"start" : 0,
-			"end" : 80}]
+			"start" : 1,
+			"end" : 60}]
 		},
 		{
 			"name" : "Attack",
