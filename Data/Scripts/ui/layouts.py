@@ -690,7 +690,9 @@ class StartGameOverlay(Layout):
 				self.tab_idx = (self.tab_idx + 1) % len(self.tabs)
 			for v in self.tabs:
 					v.deactivate()
+					v.select_none()
 			self.tabs[self.tab_idx].activate()
+			self.tabs[self.tab_idx].select_all()
 		if key in (keys.ENTERKEY, keys.PADENTER):
 			self.button_click(self.go_button)
 			
