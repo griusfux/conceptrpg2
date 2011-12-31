@@ -65,13 +65,10 @@ class EffectManager:
 		
 	def update(self):		
 		for d in (self._local_effects, self._remote_effects):
-			to_remove = []
-			for effect in d.values():
+			for effect in [i for i in d.values()]:
 				if effect.time <= 0:
 					if not effect._fire(self._engine):
-						to_remove.append(effect)
+						self.remove(effect.id, d)
 				else:
 					effect._update(self._engine)
 					effect.time -= 1
-			for effect in to_remove:
-				self.remove(effect.id, d)
