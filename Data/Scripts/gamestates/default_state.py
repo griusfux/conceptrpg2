@@ -112,6 +112,22 @@ class DefaultState(BaseState, BaseController):
 		
 		self._next_state = "Dead"
 		
+	@rpc(client_functions, "move_monster", str, float, float, float)
+	def move_monster(self, main, cid, x, y, z):
+		if cid not in self.monster_list: return
+		
+		if main['is_host']:
+			monster = self.monster_list[cid]
+			monster.object.move((x, y, z), min=[-50, -50, 0], max=[50, 50, 0], local=False)
+			self.server.invoke("position", cid, *monster.position)
+		
+	@rpc(client_functions, "rotate_monster", str, float, float, float)
+	def rotate_monster(self, main, cid, x, y, z):
+		if cid not in self.monster_list: return
+		monster = self.monster_list[cid]
+		monster.object.rotate((x, y, z))
+		self.server.invoke("rotation", cid, monster.object.get_orientation().to_euler()[2])
+		
 	@rpc(client_functions, "init_combat", str, int)
 	def init_combat(self, main, room_id, owns):
 		main['room'] = main['dgen'].rooms[room_id]
