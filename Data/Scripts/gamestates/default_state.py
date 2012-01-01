@@ -605,17 +605,14 @@ class DefaultState(BaseState, BaseController):
 		
 	def modify_health(self, character, amount, delay=0):
 		BaseController.modify_health(self, character, amount)
-		
-		if not self.is_server:
-			for i, v in self.monster_list.items():
-				if character == v:
-					self.server.invoke("modify_health", i, amount)
-				
-		text = amount if amount != 0 else "Missed"
-		pos = list(character.position[:])
-		pos[2] += 2
-		effect = effects.TextEffect(text, pos, 90, delay=delay)
-		self.add_effect(effect)
+
+		if self.is_server:		
+			text = amount if amount != 0 else "Missed"
+			print("Adding effect for", text)
+			pos = list(character.position[:])
+			pos[2] += 2
+			effect = effects.TextEffect(text, pos, 90, delay=delay)
+			self.add_effect(effect)
 		
 	def add_effect(self, effect):
 		info = effect.get_info()
