@@ -26,10 +26,13 @@ class StaticEffect:
 		visual = info['visual']
 		ori = info['orientation']
 		if len(ori) == 4:
-			ori = mathutils.Quaternion(info['orientation'])
+			ori = mathutils.Quaternion(ori)
 			ori = ori.to_matrix()
 		else:
-			ori = mathutils.Vector(info['orientation'])
+			try:
+				ori = mathutils.Vector(ori)
+			except (TypeError):
+				ori = mathutils.Matrix(ori)
 		
 		pos = info['target']
 		if isinstance(pos, str):
@@ -55,11 +58,14 @@ class StaticEffect:
 				'delay' : self.delay,
 				'continuous' : self.continuous,
 				}
-		if isinstance(self.orientation, mathutils.Matrix):
+		try:
 			q = self.orientation.to_quaternion()
 			info['orientation'] = (q.w, q.x, q.y, q.z)
-		else:
-			info['orientation'] = self.orientation.to_tuple()
+		except (AttributeError):
+			try:
+				info['orientation'] = self.orientation.to_tuple()
+			except:
+				info['orientation'] = self.orientation
 		
 		if isinstance(self.target, character.CharacterLogic):
 			info['target'] = self.target.id
@@ -73,7 +79,7 @@ class StaticEffect:
 		self.time = self.delay
 		
 	def _unload(self, engine):
-		engine.remove_object(self.obj)
+		self.obj.end()
 		
 	def _update(self, engine):
 		if isinstance(self.target, character.CharacterLogic):

@@ -620,19 +620,23 @@ class DefaultState(BaseState, BaseController):
 		if self.is_server:
 			self.main['effect_id'] += 1
 			self.clients.invoke("add_effect", info, "", self.main['effect_id'])
+			return self.main['effect_id']
 		else:
 			self.main["effect_system"].add(effect)
 			self.server.invoke("add_effect", info, effect.id)
 			return effect.id
 		
 	def end_effect(self, id):
-		effect_system = self.main["effect_system"]
-		
-		remote_id = effect_system.get_remote_id(id)
-		effect_system.remove(id)
-
-		if remote_id is not None:
-			self.server.invoke("end_effect", remote_id)
+		if self.is_server:
+			self.clients.invoke("end_effect", "", id)
+		else:
+			effect_system = self.main["effect_system"]
+			
+			remote_id = effect_system.get_remote_id(id)
+			effect_system.remove(id)
+	
+			if remote_id is not None:
+				self.server.invoke("end_effect", remote_id)
 		
 	def get_potential_targets(self):
 		l = []
