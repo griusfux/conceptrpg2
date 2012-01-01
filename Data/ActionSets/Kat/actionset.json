@@ -72,7 +72,7 @@
 			"name" : "Move Bow",
 			"actions" : [{
 			"name" : "kat.move_bottom_empty",
-			"start" : 1,
+			"start" : 0,
 			"end" : 59},
 			{
 			"name" : "kat.move_top_bow",
@@ -100,9 +100,13 @@
 		{
 			"name" : "Move Spear",
 			"actions" : [{
-			"name" : "kat.move_1h",
+			"name" : "kat.move_bottom_empty",
 			"start" : 0,
-			"end" : 79}]
+			"end" : 59},
+			{
+			"name" : "kat.move_top_spear",
+			"start" : 0,
+			"end" : 59}]
 		},
 		{
 			"name" : "Attack Spear",
