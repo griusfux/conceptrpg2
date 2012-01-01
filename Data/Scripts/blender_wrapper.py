@@ -169,7 +169,7 @@ class Object:
 		if self._armature.isPlayingAction(layer) and anim == self.animations[layer]: return
 		
 		# We've passed all of the checks, so play the animation
-		self._armature.playAction(anim, start, end, play_mode=mode, layer=layer)
+		self._armature.playAction(anim, start, end, play_mode=mode, layer=layer, blendin=5)
 		self.animations[layer] = anim
 			
 	def end(self):
