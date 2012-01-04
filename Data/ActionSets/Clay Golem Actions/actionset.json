@@ -30,6 +30,13 @@
 			"name" : "cg.Death",
 			"start" : 0,
 			"end" : 80}]
+		},
+		{
+			"name" : "Attack",
+			"actions" : [{
+			"name" : "cg.Attack",
+			"start" : 0,
+			"end" : 60}]
 		}
 	]
 }
