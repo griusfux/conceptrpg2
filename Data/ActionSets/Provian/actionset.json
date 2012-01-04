@@ -17,9 +17,13 @@
 		{
 			"name" : "Move Empty",
 			"actions" : [{
-			"name" : "prv.move_empty",
+			"name" : "prv.move_bottom_empty",
 			"start" : 1,
-			"end" : 79}]
+			"end" : 59},
+			{
+			"name" : "prv.move_top_empty",
+			"start" : 0,
+			"end" : 59}]
 		},
 		{
 			"name" : "Attack Empty",
@@ -38,9 +42,13 @@
 		{
 			"name" : "Move 1h",
 			"actions" : [{
-			"name" : "prv.move_1h",
+			"name" : "prv.move_bottom_empty",
 			"start" : 0,
-			"end" : 79}]
+			"end" : 59},
+			{
+			"name" : "prv.move_top_1h",
+			"start" : 0,
+			"end" : 59}]
 		},
 		{
 			"name" : "Attack 1h",
@@ -63,9 +71,13 @@
 		{
 			"name" : "Move Bow",
 			"actions" : [{
-			"name" : "prv.move_1h",
+			"name" : "prv.move_bottom_empty",
 			"start" : 0,
-			"end" : 79}]
+			"end" : 59},
+			{
+			"name" : "prv.move_top_bow",
+			"start" : 0,
+			"end" : 59}]
 		},
 		{
 			"name" : "Attack Bow",
@@ -88,9 +100,13 @@
 		{
 			"name" : "Move Spear",
 			"actions" : [{
-			"name" : "prv.move_1h",
+			"name" : "prv.move_bottom_empty",
 			"start" : 0,
-			"end" : 79}]
+			"end" : 59},
+			{
+			"name" : "prv.move_top_spear",
+			"start" : 0,
+			"end" : 59}]
 		},
 		{
 			"name" : "Attack Spear",
