@@ -1,4 +1,4 @@
-# $Id$
+# $Id: combat_state.py 1075 2012-01-01 02:04:29Z Moguri $
 
 from .base_state import *
 from .default_state import DefaultState, TURN

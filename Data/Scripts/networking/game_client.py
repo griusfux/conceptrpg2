@@ -1,4 +1,4 @@
-# $Id$
+# $Id: game_client.py 1062 2011-12-31 01:49:16Z Moguri $
 
 # Description: The game client
 # Contributers: Mitchell Stokes

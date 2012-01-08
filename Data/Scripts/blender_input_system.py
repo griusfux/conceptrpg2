@@ -1,4 +1,4 @@
-# $Id$
+# $Id: blender_input_system.py 1003 2011-12-24 07:28:28Z Kupoman $
 
 # Description: Handles player keyboard and joystick input from Blender
 # Contributers: Mitchell Stokes

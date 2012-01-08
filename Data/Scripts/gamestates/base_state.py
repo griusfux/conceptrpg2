@@ -1,4 +1,4 @@
-# $Id$
+# $Id: base_state.py 1069 2011-12-31 07:40:36Z Kupoman $
 
 import pickle
 import Scripts.packages as packages

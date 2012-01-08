@@ -1,4 +1,4 @@
-# $Id$
+# $Id: character_logic.py 1067 2011-12-31 07:39:10Z Kupoman $
 
 # Description: Handles character logic such as movement and stats
 # Contributers: Daniel Stokes, Mitchell Stokes

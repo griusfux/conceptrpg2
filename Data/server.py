@@ -1,4 +1,4 @@
-# $Id$
+# $Id: server.py 843 2011-10-02 05:30:09Z Moguri $
 
 # Description: A program that runs the game server
 # Contributers: Mitchell Stokes

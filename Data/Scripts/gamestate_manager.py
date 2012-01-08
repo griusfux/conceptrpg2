@@ -1,4 +1,4 @@
-# $Id$
+# $Id: gamestate_manager.py 885 2011-11-04 05:14:52Z Moguri $
 
 from .gamestates import *
 
