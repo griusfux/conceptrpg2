@@ -96,7 +96,14 @@ def in_game(cont):
 			if 'init' not in own:
 					init(own)
 			elif own['init']:
-				own['state_manager'].run(own)
+				if own['profile_run']:
+					import cProfile
+					profiler = cProfile.Profile()
+					profiler.runcall(own['state_manager'].run, own)
+					profiler.dump_stats('stats2.profile')
+					own['profile_run'] = False
+				else:	
+					own['state_manager'].run(own)
 	
 	except:
 		import traceback
@@ -109,6 +116,8 @@ def init(own):
 	sys.stderr = sys.stdout
 	sys.stdout = Log(sys.stdout, open('log.txt', 'w'))
 	print("Log start")
+	
+	own['profile_run'] = False
 	
 	# Create a wrapper for the engine
 	if 'engine' not in own:
