@@ -1,5 +1,3 @@
-# $Id: game_server.py 1053 2011-12-30 07:14:07Z Moguri $
-
 # Description: The game server
 # Contributers: Mitchell Stokes
 

@@ -1,5 +1,3 @@
-# $Id: blender_wrapper.py 1074 2012-01-01 01:29:46Z Moguri $
-
 # Description: Wraps a KX_GameObject to be used with the system
 # Contributers: Mitchell Stokes
 

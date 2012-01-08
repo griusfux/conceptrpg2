@@ -1,5 +1,3 @@
-# $Id: default_state.py 1087 2012-01-08 08:53:48Z Moguri $
-
 import time
 import random
 import math

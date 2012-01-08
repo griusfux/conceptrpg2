@@ -1,5 +1,3 @@
-# $Id: inventory.py 416 2011-02-14 06:51:47Z Moguri $
-
 class Inventory:
 	"""This class represents a player's inventory and stores items"""
 	

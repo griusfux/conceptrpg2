@@ -1,5 +1,3 @@
-# $Id: dungeon_generator.py 904 2011-11-12 20:10:35Z Moguri $
-
 import random
 import GameLogic
 import Scripts.blender_wrapper as BlenderWrapper

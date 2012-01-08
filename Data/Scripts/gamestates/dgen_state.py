@@ -1,5 +1,3 @@
-# $Id: dgen_state.py 1066 2011-12-31 05:23:55Z Moguri $
-
 from Scripts.packages import Map, Shop, Monster
 from .base_state import *
 

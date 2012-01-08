@@ -1,5 +1,3 @@
-# $Id: main.py 1087 2012-01-08 08:53:48Z Moguri $
-
 # Description: Main game loops to be used in various parts of the game
 # Contributers: Mitchell Stokes
 

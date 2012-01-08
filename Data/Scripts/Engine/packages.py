@@ -1,5 +1,3 @@
-# $Id: packages.py 659 2011-08-02 22:57:17Z Kupoman $
-
 import json
 import pickle
 import os
