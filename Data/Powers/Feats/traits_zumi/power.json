@@ -1,9 +1,0 @@
-{
-	"name": "Ancestry",
-	"level" : 1,
-	"usage" : "FEAT",
-	"range_type": "",
-	"range_size": 0,
-	"damage_types": [],
-	"flags": ["PASSIVE"]
-}
