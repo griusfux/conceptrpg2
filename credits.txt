@@ -6,4 +6,4 @@ Team Members:
 
 Special Thanks To:
  * Martins Upitis (Outline 2D filter)
- * Stephen Doonan (Harrowprint font)
+ * Stefan Gustavson (GLSL noise functions)
