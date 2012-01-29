@@ -77,14 +77,12 @@ class BlenderInput():
 
 class BlenderKeyboardInput(BlenderInput):
 	def check_input(self):
-		
 		val = []
-		for key, value in self.sensor.events.items():
-			if value != bge.logic.KX_INPUT_NONE:
-				temp = self.parse_input(key)
-				
-				if temp:
-					val.append((temp, INPUT_STATE[value]))
+
+		for key, value in self.sensor.active_events.items():
+			temp = self.parse_input(key)
+			if temp:
+				val.append((temp, INPUT_STATE[value]))
 					
 		return val
 		
@@ -92,12 +90,11 @@ class BlenderMouseInput(BlenderInput):
 	def check_input(self):
 		val = []
 		
-		for event, value in self.sensor.events.items():
-			if value != bge.logic.KX_INPUT_NONE:
-				temp = self.parse_input(event)
-				
-				if temp:
-					val.append((temp, INPUT_STATE[value]))
+		for event, value in self.sensor.active_events.items():
+			temp = self.parse_input(event)
+			
+			if temp:
+				val.append((temp, INPUT_STATE[value]))
 					
 		return val
 		
