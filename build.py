@@ -29,7 +29,6 @@ PACKAGES = [
 	Map,
 	Monster,
 	Power,
-	Feat,
 	Race,
 	Shop,
 	Status
