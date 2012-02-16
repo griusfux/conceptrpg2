@@ -155,6 +155,8 @@ class CharacterLogic:
 		
 		# Flag to notify that we need to resend player data over the server
 		self.network_update = False
+		self.last_position = [0, 0, 0] # The last position we sent to the server
+		self.network_rotation = None # A spot to accumulate network rotation updates until we send them
 		
 		# The character's current "lock", which is represented as the time at which the lock ends
 		self.lock = 0
@@ -172,6 +174,7 @@ class CharacterLogic:
 		self.statuses = []
 		
 		self.action_set = None
+		self.current_action = None
 		
 		self.callbacks = CALLBACKS.copy()
 		

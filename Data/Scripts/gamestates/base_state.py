@@ -234,6 +234,7 @@ class BaseState:
 		if action in main['actions'][character.action_set]:
 			actions = main['actions'][character.action_set][action]
 			character.object.play_action(actions, mode=mode)
+			character.current_action = action
 		else:
 			print("WARNING: action %s not found in action set %s." % (action, character.action_set))
 
@@ -382,6 +383,12 @@ class BaseState:
 # of the state. Subclass this controller and override methods as you need them.
 class BaseController:
 	"""Base controller interface"""
+
+	# Threshold limit needed to send position updates to the server
+	POSITION_THRESHOLD = 1.0
+	
+	# Threshold limit needed to send rotation updates to the server (radians)
+	ROTATION_THRESHOLD = 0.1
 	
 	def play_animation(self, character, animation, lock=0, mode=0):
 		"""Instruct the character to play the animation
@@ -398,8 +405,8 @@ class BaseController:
 		if self.is_server:
 			self.clients.invoke('animate', character.id, animation, mode)
 		else:
-				
-			self.server.invoke("animate", character.id, animation, mode)
+			if (character.current_action != animation):
+				self.server.invoke("animate", character.id, animation, mode)
 		
 	def get_targets(self, type, range):
 		"""Get targets in a range
@@ -457,3 +464,41 @@ class BaseController:
 	def display_tutorial(self, player, tut, force=False):
 		if force or (player.tutorials != None and tut not in player.tutorials):
 			self.main['tutorial_queue'].append(tut)
+			
+	def sync_position(self, character):
+		if not self.is_server:
+			return
+
+		update = False
+		last_pos = character.last_position
+		for i,v in enumerate(character.position):
+			if abs(v - last_pos[i]) > self.POSITION_THRESHOLD:
+				update = True
+				break
+				
+		if update:
+			character.last_position = character.position
+			self.server.invoke("position", character.id, *character.position)
+				
+	def sync_rotation(self, character, new_rot):
+		if self.is_server:
+			return
+		
+		if character.network_rotation:
+			character.network_rotation[0] += new_rot[0]
+			character.network_rotation[1] += new_rot[1]
+			character.network_rotation[2] += new_rot[2]
+		else:
+			character.network_rotation = list(new_rot)
+		
+		update = False
+		
+		for i in character.network_rotation:
+			if abs(i) > self.ROTATION_THRESHOLD:
+				update = True
+				break
+		
+		if update:
+			self.server.invoke("rotate", character.id, *character.network_rotation)
+			character.network_rotation = None
+			
