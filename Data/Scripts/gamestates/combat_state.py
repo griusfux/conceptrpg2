@@ -449,10 +449,12 @@ class CombatState(DefaultState, BaseController):
 	@rpc(server_functions, "add_node", "pickle")
 	def s_add_node(self, main, client, node):
 		combat = main['combats'].get(client.combat_id, None)
+		if combat == -1:
+			combat = self._init_combat(main, client)
 		combat.environment.append(node)
 	
 	@rpc(server_functions, "set_environment")
-	def s_set_environment(selfself, main, client):
+	def s_set_environment(self, main, client):
 		combat = main['combats'].get(client.combat_id, None)
 		AiManager.set_environment(combat.environment)
 	
@@ -475,15 +477,7 @@ class CombatState(DefaultState, BaseController):
 		combat = main['combats'].get(client.combat_id)
 				
 		if combat == -1:
-			# Init combat here so we have access to the client
-			main['combats'][client.combat_id] = combat =Combat()
-			combat.owner = client.id
-			combat.hero_list[client.id] = main['players'][client.id]
-			
-			# Setup Ai
-			AiManager.set_controller(self)
-			AiManager.set_extern_actions("Scripts.ai.actions")
-			AiManager.set_extern_transitions("Scripts.ai.transitions")
+			combat = self._init_combat(main, client)
 		elif combat is None:
 			return
 		elif client.id not in combat.hero_list:
@@ -529,6 +523,19 @@ class CombatState(DefaultState, BaseController):
 	##########
 	# Other
 	##########
+	
+	def _init_combat(self, main, client):
+		# Init combat here so we have access to the client
+		main['combats'][client.combat_id] = combat =Combat()
+		combat.owner = client.id
+		combat.hero_list[client.id] = main['players'][client.id]
+		
+		# Setup Ai
+		AiManager.set_controller(self)
+		AiManager.set_extern_actions("Scripts.ai.actions")
+		AiManager.set_extern_transitions("Scripts.ai.transitions")
+		
+		return combat
 	
 	def _generate_encounter(self, deck, num_players=1):
 		"""Generate an encounter by drawing cards from the encounter deck"""
