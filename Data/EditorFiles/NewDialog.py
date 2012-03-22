@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from PyQt4.QtGui import *
+from PySide.QtGui import *
 import Scripts.packages as p
 
 from .NewDialog_ui import Ui_NewDialog

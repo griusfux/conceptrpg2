@@ -21,8 +21,8 @@
 import sys
 import json
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PySide.QtGui import *
+from PySide.QtCore import *
 
 from Scripts.packages import *
 

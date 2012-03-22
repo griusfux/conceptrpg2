@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from PyQt4.QtGui import *
+from PySide.QtGui import *
 from .BaseEditor import BaseEditor
 from .ui.RaceEditor_ui import Ui_RaceEditor
 from ..common import get_blender_objects

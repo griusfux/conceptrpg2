@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from PyQt4.QtGui import *
+from PySide.QtGui import *
 
 from .SettingsDialog_ui import Ui_SettingsDialog
 from .common import SETTINGS
@@ -47,13 +47,13 @@ class SettingsDialog(QDialog):
     def find_blender(self):
         path = QFileDialog.getOpenFileName(parent=self,
                                            caption='Select a Blender binary',
-                                           directory=os.path.dirname(self.ui.blender_path.text()))
-        
+                                           directory=os.path.dirname(self.ui.blender_path.text()))[0]
+
         self.ui.blender_path.setText(os.path.abspath(path))
         
     def find_text_editor(self):
     	path = QFileDialog.getOpenFileName(parent=self,
 										caption='Select a text editor',
-										directory=os.path.dirname(self.ui.text_editor_path.text()))
+										directory=os.path.dirname(self.ui.text_editor_path.text()))[0]
     	
     	self.ui.text_editor_path.setText(os.path.abspath(path))
