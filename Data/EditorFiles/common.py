@@ -39,8 +39,6 @@ def get_blender_objects(datafile):
 		f.write(datafile.blend)	
 	
 		p = subprocess.Popen([blender, '-b', "tmp", '-P', './extern/blender_grabber.py'],
-								shell=True,
-								stdout=subprocess.PIPE,
 								stderr=subprocess.STDOUT,
 								creationflags=subprocess._subprocess.SW_HIDE,)
 		
