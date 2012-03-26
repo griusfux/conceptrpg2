@@ -466,7 +466,7 @@ class BaseController:
 			self.main['tutorial_queue'].append(tut)
 			
 	def sync_position(self, character):
-		if not self.is_server:
+		if self.is_server:
 			return
 
 		update = False
