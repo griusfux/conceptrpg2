@@ -365,7 +365,7 @@ class DefaultState(BaseState, BaseController):
 			# Update rotations (mouse look)
 			dx = 0.5 - main['input_system'].mouse.position[0]
 			if not player.auto_target and abs(dx) > 0:
-				self.server.invoke("rotate", id, 0, 0, dx*main['engine'].options['x_sensitivity'])
+				self.sync_rotation(player, (0, 0, dx*main['engine'].options['x_sensitivity']))
 			main['input_system'].mouse.position = (0.5, 0.5)
 
 			if 'HELD' not in player.flags:
@@ -383,7 +383,7 @@ class DefaultState(BaseState, BaseController):
 		if movement != [0.0, 0.0, 0.0]:
 			player.auto_target = player.auto_power = None
 			movement = [float(i) for i in (Vector(movement).normalized()*speed)]
-			self.server.invoke("position", id, *player.position)
+			self.sync_position(player)
 			act = player.get_action("Move")
 			self.play_animation(player, act, mode=1)
 		elif player.auto_target:
@@ -410,7 +410,7 @@ class DefaultState(BaseState, BaseController):
 
 				movement = [float(i) for i in vec*speed]
 				movement[2] = 0
-				self.server.invoke("position", id, *player.position)
+				self.sync_position(player)
 
 				rot = 0
 				if ang > 0.2:
@@ -418,7 +418,7 @@ class DefaultState(BaseState, BaseController):
 				if vec[0] > 0:
 					rot = -rot
 
-				self.server.invoke("rotate", id, 0, 0, rot)
+				self.sync_rotation(player, (0, 0, rot))
 				
 				act = player.get_action("Move")
 				self.play_animation(player, act, mode=1)
