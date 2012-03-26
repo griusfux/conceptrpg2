@@ -157,7 +157,7 @@ class DefaultState(BaseState, BaseController):
 		"""Intialize the client state"""
 		
 		main['engine'].set_active_camera(main['camera'])
-		main['engine'].play_bgm('The Cannery.mp3')
+		main['engine'].play_bgm('The Cannery')
 		self.camera_mode = "frankie"
 		
 		main['full_map'] = False

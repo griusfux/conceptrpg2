@@ -723,7 +723,7 @@ class Engine:
 			aud.device().play(f).position = p
 			
 		# Now fadein the new music
-		af = os.path.join(self.audio_folder, music)
+		af = os.path.join(self.audio_folder, music)+".mp3"
 		self.bgm_handle = aud.device().play(aud.Factory(af).fadein(0, 2))
 		self.bgm_handle.loop_count = -1
 		self.bgm_file = af

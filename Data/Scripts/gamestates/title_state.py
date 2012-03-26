@@ -34,7 +34,7 @@ class TitleState(BaseState):
 		main['start_game'] = False
 		main['overlay_done'] = False
 		
-		main['engine'].play_bgm('Heroic Age.mp3')
+		main['engine'].play_bgm('Heroic Age')
 	
 	def client_run(self, main):
 		"""Client-side run method"""

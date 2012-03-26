@@ -114,7 +114,7 @@ class CombatState(DefaultState, BaseController):
 	def client_init(self, main):
 		"""Initialize the client state"""
 		
-		main['engine'].play_bgm('Take the Lead.mp3')
+		main['engine'].play_bgm('Take the Lead')
 		
 		self.monster_list = {}
 		self.hero_list = {main['client'].id:main['player']}
