@@ -1,6 +1,7 @@
 import subprocess
 import os
 import configparser
+import sys
 from collections import OrderedDict
 
 CONFIG_NAME = "config.ini"
@@ -13,7 +14,7 @@ def main():
 		config.read(CONFIG_NAME)
 	else:
 		config['system'] =	OrderedDict([
-								('platform' , 'win64'),
+								('debug', 'false'),
 							])
 		config['window'] =	OrderedDict([
 								('fullscreen' , 'false'),
@@ -27,15 +28,20 @@ def main():
 							])
 		with open(CONFIG_NAME, 'w') as f:
 			config.write(f)
+	
+	if len(sys.argv) > 1:
+		platform = sys.argv[0]
+		if platform not in PLATFORMS:
+			print("%s is not a supported platform at this time" % platform)
+			return
+	else:
+		platform = None
 		
 	args = []
-	
-	platform = config['system']['platform']
-	if platform not in PLATFORMS:
-		print("%s is not a supported platform at this time" % platform)
-		return
-	
-	args.append("release/%s/blenderplayer.exe" % platform)
+	if platform:
+		args.append("release/%s/blenderplayer.exe" % platform)
+	else:
+		args.append("Data/data.exe")
 	args.append('-f' if config.getboolean('window', 'fullscreen') else '-w')
 	args.append(config['window']['x_resolution'])
 	args.append(config['window']['y_resolution'])
@@ -45,9 +51,13 @@ def main():
 		args.append("-g show_framerate = 1")
 	if config.getboolean('profile', 'show_profiler'):
 		args.append("-g show_profile = 1")
+	if config.getboolean('system', 'debug'):
+		args.append("-c")
 		
-	args.append("Data/data.blend")
-		
-	subprocess.call(" ".join(args), creationflags=subprocess.CREATE_NEW_CONSOLE)
+	if platform:
+		args.append("Data/data.blend")
+		subprocess.call(" ".join(args), creationflags=subprocess.CREATE_NEW_CONSOLE)
+	else:
+		subprocess.call(" ".join(args))
 	
 main()
