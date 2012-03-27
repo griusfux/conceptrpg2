@@ -5,8 +5,7 @@ import os
 # sys.path.append(os.path.join(os.getcwd(), '2.58', 'python', 'lib', 'site-packages'))
 sys.path.append("extern")
 
-
-from PyQt4.QtGui import *
+from PySide.QtGui import *
 from EditorFiles.EditorWindow import EditorWindow
 
 # Windows 7 hack
