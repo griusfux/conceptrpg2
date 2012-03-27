@@ -15,7 +15,6 @@ INSTALL_DIRS = [
 	"Scripts",
 	"Shops/.config",
 	"Textures",
-	"../Saves",
 ]
 
 PACKAGES = [
@@ -39,10 +38,11 @@ INSTALL_FILES = [
 	"keys.conf",
 	"main.py",
 	"mouse.conf",
+	"../credits.txt",
 ]
 
 def ct_ignore(dir, contents):
-	return [i for i in contents if i.startswith('.') or i.endswith('.pyc') or i == '__pycache__']
+	return [i for i in contents if i.startswith('.') or i.endswith('.pyc') or i == '__pycache__' or i.endswith('.ui') or i.endswith('.psd')]
 	
 def clear_py(dir):
 	for f in os.listdir(dir):
@@ -108,13 +108,14 @@ if __name__ == '__main__':
 		
 	os.mkdir("build")
 	os.mkdir("build/Data")
+	os.mkdir("build/Saves")	# Make a directory for saves instead of copying one
 	os.chdir("Data")
 	
 	# Freeze files
-	subprocess.call("C:/Python32/Scripts/cxfreeze.bat py_editor.pyw -s --base-name=Win32GUI --target-dir ../build/tmp")
-	subprocess.call("C:/Python32/Scripts/cxfreeze.bat server.py -s --target-dir ../build/tmp")
+	subprocess.call("C:/Python32_x86/Scripts/cxfreeze.bat py_editor.pyw -s --base-name=Win32GUI --target-dir ../build/tmp --include-modules Scripts.effects")
+	subprocess.call("C:/Python32_x86/Scripts/cxfreeze.bat server.py -s --target-dir ../build/tmp --exclude-modules Scripts")
+	subprocess.call("C:/Python32_x86/Scripts/cxfreeze.bat ../game.py -s --target-dir ../build/tmp")
 
-		
 	# Copy packed packages
 	for cls in PACKAGES:
 		print("Packing %s packages..." % cls.__name__)
@@ -133,6 +134,8 @@ if __name__ == '__main__':
 				 os.path.join("build", "Data", "py_editor.exe"))
 	shutil.copy2(os.path.join("build", "tmp", "server.exe"),
 				 os.path.join("build", "Data", "server.exe"))
+	shutil.copy2(os.path.join("build", "tmp", "game.exe"),
+				 os.path.join("build", "Concept RPG 2.exe"))
 	shutil.rmtree(os.path.join("build", "tmp"))
 	
 	# Copy files
@@ -154,7 +157,7 @@ if __name__ == '__main__':
 	
 	# Create the runtime
 	print("Creating runtime...", end=' ')
-	subprocess.call("xcopy release\\win64\\*.* build\\Data /Y /E /Q")
+	subprocess.call("xcopy release\\win32\\*.* build\\Data /Y /E /Q")
 	WriteRuntime("build/Data/blenderplayer.exe", "Data/data.blend", "build/Data/data.exe")
 	os.remove("build/Data/blenderplayer.exe")
 	print("Done")
