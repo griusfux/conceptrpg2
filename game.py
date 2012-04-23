@@ -5,7 +5,7 @@ import sys
 from collections import OrderedDict
 
 CONFIG_NAME = "config.ini"
-PLATFORMS = ('win64')
+PLATFORMS = ('win32', 'win64')
 
 def main():
 	config = configparser.ConfigParser()
@@ -30,7 +30,7 @@ def main():
 			config.write(f)
 	
 	if len(sys.argv) > 1:
-		platform = sys.argv[0]
+		platform = sys.argv[1]
 		if platform not in PLATFORMS:
 			print("%s is not a supported platform at this time" % platform)
 			return
